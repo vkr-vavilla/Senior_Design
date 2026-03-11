@@ -7,6 +7,7 @@ from config import GEMINI_API_KEY, JWT_SECRET, JWT_ALGORITHM
 from models.chat import ChatMessage, FeedbackResponse
 from bson import ObjectId
 import json
+import asyncio
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -34,25 +35,56 @@ async def chat_ws(websocket: WebSocket, token: str):
         return
 
     await websocket.accept()
+    print("DEBUG: WebSocket accepted")
 
     history = []
-    chat_session = gemini_client.chats.create(model="gemini-2.5-flash", history=[])
 
     try:
+        print("DEBUG: Creating Gemini chat session")
+        chat_session = gemini_client.chats.create(model="gemini-2.5-flash", history=[])
+        print("DEBUG: Chat session created")
+
         while True:
+            print("DEBUG: Waiting for message...")
             data = await websocket.receive_text()
+            print(f"DEBUG: Received data: {data[:100]}")
             message = json.loads(data).get("message", "")
             if not message:
                 continue
 
             history.append({"role": "user", "text": message})
 
-            # Stream response token by token
+            # Run the sync Gemini streaming in a thread so it doesn't block the event loop
+            loop = asyncio.get_running_loop()
+            queue: asyncio.Queue = asyncio.Queue()
+
+            def stream_sync():
+                try:
+                    print("DEBUG: Starting Gemini stream")
+                    for chunk in chat_session.send_message_stream(message):
+                        print(f"DEBUG chunk type: {type(chunk)}")
+                        print(f"DEBUG chunk.text: {repr(chunk.text)}")
+                        if chunk.text:
+                            loop.call_soon_threadsafe(queue.put_nowait, chunk.text)
+                    print("DEBUG: Gemini stream complete")
+                except Exception as e:
+                    print(f"DEBUG: Gemini stream error: {e}")
+                    loop.call_soon_threadsafe(queue.put_nowait, f"__ERROR__:{e}")
+                finally:
+                    loop.call_soon_threadsafe(queue.put_nowait, None)
+
+            loop.run_in_executor(None, stream_sync)
+
             full_reply = ""
-            for chunk in chat_session.send_message_stream(message):
-                if chunk.text:
-                    full_reply += chunk.text
-                    await websocket.send_text(json.dumps({"chunk": chunk.text, "done": False}))
+            while True:
+                item = await queue.get()
+                if item is None:
+                    break
+                if isinstance(item, str) and item.startswith("__ERROR__:"):
+                    print(f"Gemini error: {item}")
+                    break
+                full_reply += item
+                await websocket.send_text(json.dumps({"chunk": item, "done": False}))
 
             history.append({"role": "model", "text": full_reply})
             await websocket.send_text(json.dumps({"chunk": "", "done": True}))
@@ -86,7 +118,8 @@ communication clarity, and an overall score out of 10.
 TRANSCRIPT:
 {transcript}"""
 
-    response = gemini_client.models.generate_content(
+    response = await asyncio.to_thread(
+        gemini_client.models.generate_content,
         model="gemini-2.5-flash",
         contents=prompt
     )
