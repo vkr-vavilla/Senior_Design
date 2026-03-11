@@ -89,42 +89,42 @@ export function useInterviewChat(): UseInterviewChatReturn {
           if (!data.done) {
             setIsStreaming(true);
 
-            setMessages((prev) => {
+            if (!streamingIdRef.current) {
+              // First chunk — create new AI message
+              const newId = generateId();
+              streamingIdRef.current = newId;
+              setMessages((prev) => [
+                ...prev,
+                {
+                  id: newId,
+                  role: 'assistant' as const,
+                  content: data.chunk,
+                  isStreaming: true,
+                },
+              ]);
+            } else {
+              // Subsequent chunks — append to existing message
               const existingId = streamingIdRef.current;
-
-              if (existingId) {
-                // Append to existing streaming message
-                return prev.map((msg) =>
+              setMessages((prev) =>
+                prev.map((msg) =>
                   msg.id === existingId
                     ? { ...msg, content: msg.content + data.chunk, isStreaming: true }
                     : msg
-                );
-              } else {
-                // Create new AI message
-                const newId = generateId();
-                streamingIdRef.current = newId;
-                return [
-                  ...prev,
-                  {
-                    id: newId,
-                    role: 'assistant' as const,
-                    content: data.chunk,
-                    isStreaming: true,
-                  },
-                ];
-              }
-            });
-          } else {
-            // Stream complete
-            setIsStreaming(false);
-
-            if (streamingIdRef.current) {
-              setMessages((prev) =>
-                prev.map((msg) =>
-                  msg.id === streamingIdRef.current ? { ...msg, isStreaming: false } : msg
                 )
               );
-              streamingIdRef.current = null;
+            }
+          } else {
+            // Stream complete
+            const doneId = streamingIdRef.current;
+            streamingIdRef.current = null;
+            setIsStreaming(false);
+
+            if (doneId) {
+              setMessages((prev) =>
+                prev.map((msg) =>
+                  msg.id === doneId ? { ...msg, isStreaming: false } : msg
+                )
+              );
             }
           }
         } catch (err) {
