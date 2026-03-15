@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useRef, useCallback, useEffect } from 'react';
-import type { Message, InterviewConfig, ChatChunk } from '@/types/chat';
 import { generateId } from '@/lib/utils';
+import type { ChatChunk, InterviewConfig, Message } from '@/types/chat';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000';
 
@@ -63,7 +63,8 @@ export function useInterviewChat(): UseInterviewChatReturn {
         wsRef.current.close();
       }
 
-      const ws = new WebSocket(`${WS_URL}/chat/ws?token=${token}`);
+      const interviewIdParam = config.interviewId ? `&interview_id=${config.interviewId}` : '';
+      const ws = new WebSocket(`${WS_URL}/chat/ws?token=${token}${interviewIdParam}`);
       wsRef.current = ws;
 
       ws.onopen = () => {
