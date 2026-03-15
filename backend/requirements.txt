@@ -38,6 +38,8 @@ pycparser==3.0
 pydantic==2.12.5
 pydantic_core==2.41.5
 pymongo==4.16.0
+pdfplumber==0.11.9
+python-multipart==0.0.20
 pyparsing==3.3.2
 python-dotenv==1.2.2
 python-jose==3.5.0

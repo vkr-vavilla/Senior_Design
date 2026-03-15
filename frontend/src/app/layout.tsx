@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/contexts/AuthContext';
 
@@ -7,6 +7,13 @@ const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
   display: 'swap',
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-space-grotesk',
+  display: 'swap',
+  weight: ['500', '600', '700'],
 });
 
 export const metadata: Metadata = {
@@ -26,8 +33,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} dark`} suppressHydrationWarning>
-<body className="bg-slate-950 text-white antialiased min-h-screen">
+    <html
+      lang="en"
+      className={`${inter.variable} ${spaceGrotesk.variable} dark`}
+      suppressHydrationWarning
+    >
+      <body className="bg-slate-950 text-white antialiased min-h-screen">
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
