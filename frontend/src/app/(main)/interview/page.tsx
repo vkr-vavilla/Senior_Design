@@ -1,31 +1,29 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
-import {
-  Bot,
-  Clock,
-  Square,
-  CheckCircle,
-  ArrowLeft,
-  Briefcase,
-  Brain,
-  Shuffle,
-  Play,
-  ChevronRight,
-} from 'lucide-react';
-import { useAuthContext } from '@/contexts/AuthContext';
-import { useInterviewChat } from '@/hooks/useInterviewChat';
-import { Navbar } from '@/components/layout/Navbar';
 import { ChatInterface } from '@/components/chat/ChatInterface';
 import { MessageInput } from '@/components/chat/MessageInput';
+import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/Button';
 import { Input, Select } from '@/components/ui/Input';
 import { LoadingPage } from '@/components/ui/LoadingSpinner';
-import { formatTime } from '@/lib/utils';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { useInterviewChat } from '@/hooks/useInterviewChat';
+import { cn, formatTime } from '@/lib/utils';
 import type { InterviewConfig } from '@/types/chat';
-import { cn } from '@/lib/utils';
+import {
+    ArrowLeft,
+    Bot,
+    Brain,
+    Briefcase,
+    CheckCircle,
+    ChevronRight,
+    Clock,
+    Play,
+    Shuffle,
+    Square,
+} from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
 
 const INTERVIEW_TYPES = [
   { value: 'technical', label: 'Technical' },
@@ -77,6 +75,7 @@ function InterviewPageContent() {
     role: searchParams.get('role') || 'Software Engineer',
     type: (searchParams.get('type') as InterviewConfig['type']) || 'technical',
     difficulty: (searchParams.get('difficulty') as InterviewConfig['difficulty']) || 'medium',
+    interviewId: searchParams.get('interviewId') || undefined,
   });
 
   useEffect(() => {

@@ -81,3 +81,59 @@ export const chatApi = {
     return response.feedback;
   },
 };
+
+export const interviewApi = {
+  async createInterview(
+    data: {
+      resume: File;
+      jobDescription: string;
+      role: string;
+      interviewType: string;
+      difficulty: string;
+    },
+    token: string
+  ): Promise<{ interview_id: string; resume_filename: string; resume_text_preview: string }> {
+    const formData = new FormData();
+    formData.append('resume', data.resume);
+    formData.append('job_description', data.jobDescription);
+    formData.append('role', data.role);
+    formData.append('interview_type', data.interviewType);
+    formData.append('difficulty', data.difficulty);
+
+    const response = await fetch(`${API_URL}/interview/create`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      let detail: unknown;
+      try {
+        detail = await response.json();
+      } catch {
+        detail = await response.text();
+      }
+      const message =
+        typeof detail === 'object' && detail !== null && 'detail' in detail
+          ? String((detail as { detail: unknown }).detail)
+          : `Upload failed with status ${response.status}`;
+      throw new ApiError(response.status, message, detail);
+    }
+
+    return response.json();
+  },
+
+  async getSessions(token: string): Promise<unknown[]> {
+    return apiRequest('GET', '/interview/sessions', undefined, token);
+  },
+
+  async getSession(interviewId: string, token: string): Promise<unknown> {
+    return apiRequest('GET', `/interview/${interviewId}`, undefined, token);
+  },
+
+  getResumeUrl(interviewId: string): string {
+    return `${API_URL}/interview/${interviewId}/resume`;
+  },
+};

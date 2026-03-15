@@ -1,13 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Play, Briefcase, Brain, Shuffle, ChevronRight, Clock, Layers } from 'lucide-react';
-import { useAuthContext } from '@/contexts/AuthContext';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/Button';
 import { Input, Select } from '@/components/ui/Input';
 import { LoadingPage } from '@/components/ui/LoadingSpinner';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { interviewApi } from '@/lib/api';
+import { Brain, Briefcase, ChevronRight, Clock, FileText, Layers, Play, Shuffle, Upload, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 
 const INTERVIEW_TYPES = [
   { value: 'technical', label: 'Technical' },
@@ -58,11 +59,17 @@ const difficultyConfig = {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user, isLoading } = useAuthContext();
+  const { user, token, isLoading } = useAuthContext();
 
   const [role, setRole] = useState('Software Engineer');
   const [interviewType, setInterviewType] = useState('technical');
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [jobDescription, setJobDescription] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -73,14 +80,65 @@ export default function DashboardPage() {
   if (isLoading) return <LoadingPage />;
   if (!user) return null;
 
-  const handleBeginInterview = () => {
-    if (!role.trim()) return;
-    const params = new URLSearchParams({
-      role: role.trim(),
-      type: interviewType,
-      difficulty,
-    });
-    router.push(`/interview?${params.toString()}`);
+  const handleFileSelect = (file: File) => {
+    if (file.type !== 'application/pdf') {
+      setUploadError('Please upload a PDF file');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setUploadError('File must be under 10MB');
+      return;
+    }
+    setResumeFile(file);
+    setUploadError('');
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) handleFileSelect(file);
+  };
+
+  const handleBeginInterview = async () => {
+    if (!role.trim() || !token) return;
+    setUploadError('');
+
+    // If resume is provided, create an interview via API first
+    if (resumeFile && jobDescription.trim()) {
+      setIsUploading(true);
+      try {
+        const result = await interviewApi.createInterview(
+          {
+            resume: resumeFile,
+            jobDescription: jobDescription.trim(),
+            role: role.trim(),
+            interviewType,
+            difficulty,
+          },
+          token
+        );
+
+        const params = new URLSearchParams({
+          role: role.trim(),
+          type: interviewType,
+          difficulty,
+          interviewId: result.interview_id,
+        });
+        router.push(`/interview?${params.toString()}`);
+      } catch (err) {
+        setUploadError(err instanceof Error ? err.message : 'Upload failed');
+        setIsUploading(false);
+      }
+    } else {
+      // No resume — go directly (basic flow without context)
+      const params = new URLSearchParams({
+        role: role.trim(),
+        type: interviewType,
+        difficulty,
+      });
+      router.push(`/interview?${params.toString()}`);
+    }
   };
 
   const firstName = user.name.split(' ')[0];
@@ -233,16 +291,87 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
+                {/* Resume Upload */}
+                <div>
+                  <label className="text-sm font-medium text-slate-300 block mb-2">
+                    Resume (PDF) <span className="text-slate-500 font-normal">— optional</span>
+                  </label>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pdf"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleFileSelect(file);
+                    }}
+                  />
+                  {resumeFile ? (
+                    <div className="flex items-center gap-3 p-3 bg-indigo-500/10 border border-indigo-500/30 rounded-xl">
+                      <FileText className="w-5 h-5 text-indigo-400 shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-white font-medium truncate">{resumeFile.name}</p>
+                        <p className="text-xs text-slate-400">{(resumeFile.size / 1024).toFixed(0)} KB</p>
+                      </div>
+                      <button
+                        onClick={() => { setResumeFile(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}
+                        className="p-1 hover:bg-slate-700 rounded-lg transition-colors"
+                      >
+                        <X className="w-4 h-4 text-slate-400" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div
+                      onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                      onDragLeave={() => setIsDragging(false)}
+                      onDrop={handleDrop}
+                      onClick={() => fileInputRef.current?.click()}
+                      className={`flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed rounded-xl cursor-pointer transition-all ${
+                        isDragging
+                          ? 'border-indigo-500 bg-indigo-500/10'
+                          : 'border-slate-700 hover:border-slate-500 hover:bg-slate-800/50'
+                      }`}
+                    >
+                      <Upload className={`w-6 h-6 ${isDragging ? 'text-indigo-400' : 'text-slate-500'}`} />
+                      <p className="text-sm text-slate-400">
+                        <span className="text-indigo-400 font-medium">Click to upload</span> or drag and drop
+                      </p>
+                      <p className="text-xs text-slate-600">PDF only, up to 10MB</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Job Description */}
+                <div>
+                  <label className="text-sm font-medium text-slate-300 block mb-2">
+                    Job Description <span className="text-slate-500 font-normal">— optional</span>
+                  </label>
+                  <textarea
+                    value={jobDescription}
+                    onChange={(e) => setJobDescription(e.target.value)}
+                    placeholder="Paste the job description here. The AI will tailor questions to match the role requirements..."
+                    rows={4}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/50 resize-none transition-all"
+                  />
+                </div>
+
+                {/* Error message */}
+                {uploadError && (
+                  <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-2">
+                    {uploadError}
+                  </div>
+                )}
+
                 {/* Begin Button */}
                 <Button
                   onClick={handleBeginInterview}
                   variant="primary"
                   size="lg"
                   className="w-full"
-                  disabled={!role.trim()}
-                  rightIcon={<ChevronRight className="w-5 h-5" />}
+                  disabled={!role.trim() || isUploading}
+                  rightIcon={isUploading ? undefined : <ChevronRight className="w-5 h-5" />}
                 >
-                  Begin Interview
+                  {isUploading ? 'Uploading Resume...' : 'Begin Interview'}
                 </Button>
               </div>
             </div>
