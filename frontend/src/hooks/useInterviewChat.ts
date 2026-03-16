@@ -63,8 +63,18 @@ export function useInterviewChat(): UseInterviewChatReturn {
         wsRef.current.close();
       }
 
-      const interviewIdParam = config.interviewId ? `&interview_id=${config.interviewId}` : '';
-      const ws = new WebSocket(`${WS_URL}/chat/ws?token=${token}${interviewIdParam}`);
+      // Try to use existing interviewId or generate a fresh one for standalone session
+      const idToUse = config.interviewId || generateId();
+      setSessionId(idToUse);
+
+      const params = new URLSearchParams({ token });
+      if (config.interviewId) {
+        params.append('interview_id', config.interviewId);
+      } else {
+        params.append('client_session_id', idToUse);
+      }
+
+      const ws = new WebSocket(`${WS_URL}/chat/ws?${params.toString()}`);
       wsRef.current = ws;
 
       ws.onopen = () => {
@@ -140,9 +150,7 @@ export function useInterviewChat(): UseInterviewChatReturn {
 
         // Try to extract session ID from close event or generate one
         // The backend saves the session on close
-        if (!sessionId) {
-          setSessionId(generateId());
-        }
+        setSessionId((prev) => prev || generateId());
 
         if (!sessionEnded) {
           setSessionEnded(true);

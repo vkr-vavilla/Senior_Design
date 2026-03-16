@@ -7,7 +7,7 @@ db = None
 
 async def connect_db():
     global client, db
-    client = AsyncIOMotorClient(MONGODB_URI)
+    client = AsyncIOMotorClient(MONGODB_URI, tlsAllowInvalidCertificates=True)
     db = client[DB_NAME]
     print(f"Connected to MongoDB: {DB_NAME}")
 
