@@ -133,7 +133,23 @@ export const interviewApi = {
     return apiRequest('GET', `/interview/${interviewId}`, undefined, token);
   },
 
-  getResumeUrl(interviewId: string): string {
-    return `${API_URL}/interview/${interviewId}/resume`;
+  async downloadResume(interviewId: string, token: string, filename: string = 'resume.pdf'): Promise<void> {
+    const response = await fetch(`${API_URL}/interview/${interviewId}/resume`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error(`Download failed with status ${response.status}`);
+    }
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
   },
 };

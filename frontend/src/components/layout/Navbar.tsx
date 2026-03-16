@@ -1,10 +1,10 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Bot, LayoutDashboard, Plus, LogOut } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
+import { Bot, LayoutDashboard, LogOut, Plus } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export function Navbar() {
   const { user, logout } = useAuthContext();
@@ -63,12 +63,18 @@ export function Navbar() {
           <div className="flex items-center gap-3">
             {user && (
               <div className="hidden sm:flex items-center gap-3">
-                <div className="flex items-center gap-2.5">
+                <Link
+                  href="/history"
+                  className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
+                  title="View Past Interviews"
+                >
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
                     {initials}
                   </div>
-                  <span className="text-sm text-slate-300 font-medium">{user.name}</span>
-                </div>
+                  <span className="text-sm text-slate-300 font-medium hover:text-white transition-colors">
+                    {user.name}
+                  </span>
+                </Link>
               </div>
             )}
             <button
