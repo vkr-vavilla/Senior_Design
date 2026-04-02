@@ -1,16 +1,22 @@
 import Link from 'next/link';
 import { Bot } from 'lucide-react';
 import { RegisterForm } from '@/components/auth/RegisterForm';
+import { NeuralNetworkBackground } from '@/components/ui/NeuralNetworkBackground';
 
 export default function RegisterPage() {
   return (
-    <div className="min-h-screen bg-slate-950 bg-grid flex items-center justify-center px-4 py-12">
-      {/* Ambient glow */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-violet-600/8 rounded-full blur-3xl" />
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4 py-12 relative overflow-hidden">
+      {/* Neural network — full background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <NeuralNetworkBackground className="w-full h-full" />
       </div>
 
-      <div className="relative w-full max-w-md">
+      {/* Centre ambient glow */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[400px] bg-violet-600/10 rounded-full blur-3xl" />
+      </div>
+
+      <div className="relative z-10 w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2.5 group">
@@ -26,7 +32,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl shadow-black/40">
+        <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl p-8 shadow-2xl shadow-black/60">
           <RegisterForm />
 
           <div className="mt-6 pt-6 border-t border-slate-800 text-center">

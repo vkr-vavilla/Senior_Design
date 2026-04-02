@@ -2,21 +2,19 @@ import Link from 'next/link';
 import {
   ArrowRight,
   Bot,
-  CheckCircle,
   Users,
   TrendingUp,
   MessageSquare,
   Target,
   Zap,
   Star,
-  Sparkles,
 } from 'lucide-react';
 import { AnimateIn } from '@/components/ui/AnimateIn';
 import { InteractiveRobotSpline } from '@/components/ui/interactive-3d-robot';
 import { ContainerScroll } from '@/components/ui/container-scroll-animation';
 import CelestialSphere from '@/components/ui/celestial-sphere';
 import { FeatureCards } from '@/components/ui/FeatureCards';
-import { AISessionCard, LiveScoreHUD } from '@/components/ui/RobotHUD';
+import { AISessionCard } from '@/components/ui/RobotHUD';
 
 const ROBOT_SCENE = 'https://prod.spline.design/PyzDhpQ9E5f1E3MT/scene.splinecode';
 
@@ -104,27 +102,6 @@ export default function LandingPage() {
 
             {/* ── Left: text content ── */}
             <div className="flex flex-col order-2 lg:order-1">
-              {/* Badge */}
-              <div className="animate-fade-up self-start mb-8">
-                <div className="relative inline-flex items-center gap-3 px-4 py-2 rounded-xl bg-slate-900/80 backdrop-blur-sm border border-slate-700/60 shadow-lg shadow-black/20 overflow-hidden">
-                  {/* Shimmer sweep */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-500/8 to-transparent -translate-x-full animate-[badgeSweep_3s_ease-in-out_infinite]" />
-
-                  {/* Left accent block */}
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
-                  </div>
-
-                  {/* Right label */}
-                  <span className="text-[11px] font-medium tracking-wide text-slate-300">
-                    AI-Powered Interview Practice
-                  </span>
-
-                  {/* Right glow dot */}
-                  <Sparkles className="w-3 h-3 text-violet-400 flex-shrink-0" />
-                </div>
-              </div>
-
               {/* Headline */}
               <h1
                 className="animate-fade-up text-5xl sm:text-6xl lg:text-[3.75rem] xl:text-7xl font-bold tracking-tight text-white mb-6 leading-[1.07]"
@@ -139,46 +116,7 @@ export default function LandingPage() {
                 </span>
               </h1>
 
-              <p
-                className="animate-fade-up text-lg text-slate-400 mb-10 leading-relaxed max-w-lg"
-                style={{ animationDelay: '160ms' }}
-              >
-                Practice with an AI interviewer that adapts to your target role. Get real-time
-                feedback, pinpoint weak spots, and walk in confident every time.
-              </p>
 
-              {/* CTAs */}
-              <div
-                className="animate-fade-up flex flex-col sm:flex-row gap-4 mb-8"
-                style={{ animationDelay: '240ms' }}
-              >
-                <Link
-                  href="/register"
-                  className="group inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-0.5 cursor-pointer text-base"
-                >
-                  Start for Free
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-                </Link>
-                <Link
-                  href="/login"
-                  className="inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-slate-800/70 hover:bg-slate-700/80 text-white font-semibold rounded-xl transition-all duration-200 border border-slate-700 hover:border-slate-600 hover:-translate-y-0.5 cursor-pointer text-base backdrop-blur"
-                >
-                  Sign In
-                </Link>
-              </div>
-
-              {/* Social proof */}
-              <div
-                className="animate-fade-up flex flex-wrap gap-5 text-sm text-slate-500"
-                style={{ animationDelay: '320ms' }}
-              >
-                {['No credit card required', 'Free to start', 'Instant AI feedback'].map((text) => (
-                  <div key={text} className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                    {text}
-                  </div>
-                ))}
-              </div>
             </div>
 
             {/* ── Right: 3D Robot ── */}
@@ -202,7 +140,6 @@ export default function LandingPage() {
               </div>
 
               <AISessionCard />
-              <LiveScoreHUD />
             </div>
 
           </div>
