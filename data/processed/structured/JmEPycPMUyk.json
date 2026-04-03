@@ -1,0 +1,63 @@
+{
+  "video_id": "JmEPycPMUyk",
+  "summary": "The interview discusses methods to prevent duplicate payments on a checkout screen, starting with a simple front-end solution, then moving to server-side idempotency keys with Stripe, and finally detailing a custom database-backed idempotency workflow.",
+  "quality_flags": [
+    "technical terms corrected for accuracy (e.g., 'item potency' to 'idempotency', 'Postgress' to 'PostgreSQL')"
+  ],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "For today's software engineering interview, explain how you'd prevent duplicate payments on a checkout screen."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Simple. When somebody clicks the checkout button, we'll just disable that button on the front end so they can't click it again. This way, there can be no duplicate payments."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, but what if there's a retry from the client due to a network issue or them refreshing the page manually?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, we can do something on the server side. When a checkout session is initiated, we'll generate an idempotency key. Then we'll pass that along with every payment request all the way to Stripe. This way, it'll be able to use this key to detect if a payment has already been completed or not."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, what if we wanted to do this ourselves?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "We'll store the key and the status in our database. When a new request comes in with an idempotency key, we can check first if it's in our database. If it is in the database and the request is processing, failed, or completed, we'll just return that value. If it's not completed, we'll make a write to our database and then pass that forward to our payments processor, Stripe."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Great. Now, can you walk me through how this all works in the system?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Here's the full workflow. A user presses the checkout button. It makes a payment call with the idempotency key to our server. Then, we write to an ACID-compliant database like PostgreSQL that we've started the checkout process. After that, we can make a request to Stripe with the idempotency key to initiate the payment."
+    }
+  ],
+  "training_pairs": [
+    {
+      "question": "For today's software engineering interview, explain how you'd prevent duplicate payments on a checkout screen.",
+      "answer": "Simple. When somebody clicks the checkout button, we'll just disable that button on the front end so they can't click it again. This way, there can be no duplicate payments.",
+      "follow_up": "Okay, but what if there's a retry from the client due to a network issue or them refreshing the page manually?"
+    },
+    {
+      "question": "Okay, but what if there's a retry from the client due to a network issue or them refreshing the page manually?",
+      "answer": "Okay, we can do something on the server side. When a checkout session is initiated, we'll generate an idempotency key. Then we'll pass that along with every payment request all the way to Stripe. This way, it'll be able to use this key to detect if a payment has already been completed or not.",
+      "follow_up": "Okay, what if we wanted to do this ourselves?"
+    },
+    {
+      "question": "Okay, what if we wanted to do this ourselves?",
+      "answer": "We'll store the key and the status in our database. When a new request comes in with an idempotency key, we can check first if it's in our database. If it is in the database and the request is processing, failed, or completed, we'll just return that value. If it's not completed, we'll make a write to our database and then pass that forward to our payments processor, Stripe.",
+      "follow_up": "Great. Now, can you walk me through how this all works in the system?"
+    },
+    {
+      "question": "Great. Now, can you walk me through how this all works in the system?",
+      "answer": "Here's the full workflow. A user presses the checkout button. It makes a payment call with the idempotency key to our server. Then, we write to an ACID-compliant database like PostgreSQL that we've started the checkout process. After that, we can make a request to Stripe with the idempotency key to initiate the payment.",
+      "follow_up": "NONE"
+    }
+  ]
+}

@@ -1,0 +1,2275 @@
+{
+  "wireMagic": "pb3",
+  "pens": [ {
+  
+  } ],
+  "wsWinStyles": [ {
+  
+  } ],
+  "wpWinPositions": [ {
+  
+  } ],
+  "events": [ {
+    "tStartMs": 927,
+    "dDurationMs": 5973,
+    "segs": [ {
+      "utf8": "[Music] hello there and welcome to this system \ndesign mock interview today we want to show you a  "
+    } ]
+  }, {
+    "tStartMs": 6900,
+    "dDurationMs": 4740,
+    "segs": [ {
+      "utf8": "really high quality best-in-class system design \nanswer so that you can use it to prepare for  "
+    } ]
+  }, {
+    "tStartMs": 11640,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "your interviews and use it to know exactly what \nstandard you should be aiming for with us they  "
+    } ]
+  }, {
+    "tStartMs": 16800,
+    "dDurationMs": 5940,
+    "segs": [ {
+      "utf8": "give us the answers the candidate today I have \na former engineering manager at Google it's Mark  "
+    } ]
+  }, {
+    "tStartMs": 22740,
+    "dDurationMs": 6480,
+    "segs": [ {
+      "utf8": "Mark how are you doing. I'm doing great Tom thanks \nfor having me I'm looking forward to doing this  "
+    } ]
+  }, {
+    "tStartMs": 29220,
+    "dDurationMs": 4020,
+    "segs": [ {
+      "utf8": "oh thanks for thanks for coming on it's \ngreat to have you before we get started  "
+    } ]
+  }, {
+    "tStartMs": 33240,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "just want to quickly give people an idea of \nyour background as a as an engineering manager  "
+    } ]
+  }, {
+    "tStartMs": 38820,
+    "dDurationMs": 7140,
+    "segs": [ {
+      "utf8": "yeah I was an engineering manager at Google for \n13 years and worked on several large-scale systems  "
+    } ]
+  }, {
+    "tStartMs": 45960,
+    "dDurationMs": 6300,
+    "segs": [ {
+      "utf8": "with lots of great engineers and so I I hope \nI've learned a little bit from them and it'll  "
+    } ]
+  }, {
+    "tStartMs": 52260,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "be interesting to see me on the other side of the \nfence of uh of uh doing the being the interview  "
+    } ]
+  }, {
+    "tStartMs": 57360,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "candidate here so I'm looking forward to it I'm \nsure you do a great job yeah and Mark also is a  "
+    } ]
+  }, {
+    "tStartMs": 63240,
+    "dDurationMs": 6060,
+    "segs": [ {
+      "utf8": "coach on our platform so if you need some expert \nfeedback ahead of your interviewer Google Facebook  "
+    } ]
+  }, {
+    "tStartMs": 69300,
+    "dDurationMs": 5940,
+    "segs": [ {
+      "utf8": "anywhere any tech company then do check him out \non our platform okay uh if you're ready Mark  "
+    } ]
+  }, {
+    "tStartMs": 75240,
+    "dDurationMs": 8040,
+    "segs": [ {
+      "utf8": "let's crack straight into it the question I want \nto ask you today is how would you design Spotify"
+    } ]
+  }, {
+    "tStartMs": 85380,
+    "dDurationMs": 3780,
+    "segs": [ {
+      "utf8": "okay"
+    } ]
+  }, {
+    "tStartMs": 90240,
+    "dDurationMs": 6960,
+    "segs": [ {
+      "utf8": "uh so yeah so uh Spotify the probably one \nof the most popular music streaming services  "
+    } ]
+  }, {
+    "tStartMs": 97200,
+    "dDurationMs": 8020,
+    "segs": [ {
+      "utf8": "out there I guess uh so let's let me let me \nthink about that just for a moment [Music]"
+    } ]
+  }, {
+    "tStartMs": 111240,
+    "dDurationMs": 4740,
+    "segs": [ {
+      "utf8": "um because there's lots there's a lot of aspects \nof Spotify here let me see if I can actually maybe  "
+    } ]
+  }, {
+    "tStartMs": 115980,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "I'll just take some notes here so that I can kind \nof I think I think through this if that's okay and  "
+    } ]
+  }, {
+    "tStartMs": 121500,
+    "dDurationMs": 6840,
+    "segs": [ {
+      "utf8": "and can I get some uh make some assumptions so \nI have my notes I'll just put this right in here  "
+    } ]
+  }, {
+    "tStartMs": 128880,
+    "dDurationMs": 5340,
+    "segs": [ {
+      "utf8": "and then if it's okay I'll just use this for \nnotes as well as sort of the design diagrams  "
+    } ]
+  }, {
+    "tStartMs": 134220,
+    "dDurationMs": 4860,
+    "segs": [ {
+      "utf8": "and things like that later on yeah sounds good \nso yeah so let's yeah so let's talk about just  "
+    } ]
+  }, {
+    "tStartMs": 139080,
+    "dDurationMs": 5400,
+    "segs": [ {
+      "utf8": "some different sort of Spotify okay so I for \nSpotify I can I can think of things I mean  "
+    } ]
+  }, {
+    "tStartMs": 144480,
+    "dDurationMs": 5940,
+    "segs": [ {
+      "utf8": "obviously there's songs music that's the main \nthing uh there's you know you have playlists  "
+    } ]
+  }, {
+    "tStartMs": 150420,
+    "dDurationMs": 7380,
+    "segs": [ {
+      "utf8": "I mean there's users there's uh artists uh I \nguess Spotify even has things like podcasts  "
+    } ]
+  }, {
+    "tStartMs": 158340,
+    "dDurationMs": 5940,
+    "segs": [ {
+      "utf8": "that you know you can listen to and things like \nthat so there's a lot to it and so in terms of the  "
+    } ]
+  }, {
+    "tStartMs": 164820,
+    "dDurationMs": 6360,
+    "segs": [ {
+      "utf8": "system design for today uh is there is there like \ncan we can we constrain this a little bit just  "
+    } ]
+  }, {
+    "tStartMs": 171180,
+    "dDurationMs": 4380,
+    "segs": [ {
+      "utf8": "so that we can actually get through a design what \nwould you what would we would be good to focus on  "
+    } ]
+  }, {
+    "tStartMs": 175560,
+    "dDurationMs": 5580,
+    "segs": [ {
+      "utf8": "here yeah let's constrain it let's limit ourselves \nto let's look at finding and playing music  "
+    } ]
+  }, {
+    "tStartMs": 182520,
+    "dDurationMs": 9540,
+    "segs": [ {
+      "utf8": "okay okay so let me uh so use cases finding uh \nand playing music I'm just gonna write it down  "
+    } ]
+  }, {
+    "tStartMs": 192060,
+    "dDurationMs": 10260,
+    "segs": [ {
+      "utf8": "like verbatim here great yeah I think enough \nto talk about I think so yeah okay good so uh  "
+    } ]
+  }, {
+    "tStartMs": 202320,
+    "dDurationMs": 7500,
+    "segs": [ {
+      "utf8": "if I if I think about that let me let me try \nand ask a little bit or think a little bit about  "
+    } ]
+  }, {
+    "tStartMs": 212280,
+    "dDurationMs": 6600,
+    "segs": [ {
+      "utf8": "the use cases a little bit more so my typical use \ncase then as a user if I'm signed up to Spotify  "
+    } ]
+  }, {
+    "tStartMs": 218880,
+    "dDurationMs": 7200,
+    "segs": [ {
+      "utf8": "and I have an app on a phone uh I am going to \nbrowse some music maybe I'll find a particular  "
+    } ]
+  }, {
+    "tStartMs": 226080,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "search for a particular song but but then the \nmost core thing is that I play a song and it's  "
+    } ]
+  }, {
+    "tStartMs": 231120,
+    "dDurationMs": 6720,
+    "segs": [ {
+      "utf8": "you know coming back through my phone maybe my \ncar or whatever wherever I might be headphones uh  "
+    } ]
+  }, {
+    "tStartMs": 237840,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "to listen to it with big broad questions like this \nyou need to constrain the problem make it solvable  "
+    } ]
+  }, {
+    "tStartMs": 243540,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "in the space of an hour and Mark did this well \nestablishing the use cases we wanted to focus on  "
+    } ]
+  }, {
+    "tStartMs": 248760,
+    "dDurationMs": 5400,
+    "segs": [ {
+      "utf8": "if you're asked to design an already existing \nsystem in this case Spotify share what you  "
+    } ]
+  }, {
+    "tStartMs": 254160,
+    "dDurationMs": 3720,
+    "segs": [ {
+      "utf8": "know about it with the interviewer they can \ncorrect you or fill you in if you have any  "
+    } ]
+  }, {
+    "tStartMs": 257880,
+    "dDurationMs": 8940,
+    "segs": [ {
+      "utf8": "knowledge gaps so if I think about other \nif I think about metrics here let's think  "
+    } ]
+  }, {
+    "tStartMs": 266820,
+    "dDurationMs": 4620,
+    "segs": [ {
+      "utf8": "about size let's let's do some quick quick \ndrilling down into into some numbers here  "
+    } ]
+  }, {
+    "tStartMs": 272520,
+    "dDurationMs": 10320,
+    "segs": [ {
+      "utf8": "and pardon me while I get this going here so \nin numbers so tell me about how many users  "
+    } ]
+  }, {
+    "tStartMs": 282840,
+    "dDurationMs": 6600,
+    "segs": [ {
+      "utf8": "you're thinking about here for for this \ndesign yeah let's save a billion users"
+    } ]
+  }, {
+    "tStartMs": 291480,
+    "dDurationMs": 10800,
+    "segs": [ {
+      "utf8": "okay one billion users okay what about number \nof songs yeah I think I saw I think I saw it  "
+    } ]
+  }, {
+    "tStartMs": 302280,
+    "dDurationMs": 6180,
+    "segs": [ {
+      "utf8": "somewhere that Spotify has about 80 million \nsongs but let's say we need to have capacity  "
+    } ]
+  }, {
+    "tStartMs": 308460,
+    "dDurationMs": 9540,
+    "segs": [ {
+      "utf8": "for 100 million on there okay all right so 100 \nmillion songs a billion users and you know we're  "
+    } ]
+  }, {
+    "tStartMs": 318000,
+    "dDurationMs": 6480,
+    "segs": [ {
+      "utf8": "we're going to focus on the song piece of it so \nbut let me do a little bit of uh of math here  "
+    } ]
+  }, {
+    "tStartMs": 325500,
+    "dDurationMs": 3960,
+    "segs": [ {
+      "utf8": "or a little bit of thinking and you can I can \nI'll just you know double check with you to  "
+    } ]
+  }, {
+    "tStartMs": 329460,
+    "dDurationMs": 12480,
+    "segs": [ {
+      "utf8": "make sure that this makes sense but for from what \nI know think about a typical mp3 audio is going  "
+    } ]
+  }, {
+    "tStartMs": 341940,
+    "dDurationMs": 7800,
+    "segs": [ {
+      "utf8": "to be about for a typical song is is about five \nmegabytes and I mean I think that depends on oh  "
+    } ]
+  }, {
+    "tStartMs": 349740,
+    "dDurationMs": 6120,
+    "segs": [ {
+      "utf8": "the encoding of the song how long the song is and \nthings like that but uh if that if that if that's  "
+    } ]
+  }, {
+    "tStartMs": 355860,
+    "dDurationMs": 3660,
+    "segs": [ {
+      "utf8": "okay we can just kind of make that assumption \nis that fair yeah that sounds good to me"
+    } ]
+  }, {
+    "tStartMs": 360980,
+    "dDurationMs": 1000,
+    "segs": [ {
+      "utf8": "[Music]"
+    } ]
+  }, {
+    "tStartMs": 361980,
+    "dDurationMs": 9420,
+    "segs": [ {
+      "utf8": "yeah I mean I think you can encode \nthese things and you know really low  "
+    } ]
+  }, {
+    "tStartMs": 371400,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "quality like 96 kilobits per second all \nthe way up to 320 kilobits but right in  "
+    } ]
+  }, {
+    "tStartMs": 376320,
+    "dDurationMs": 6840,
+    "segs": [ {
+      "utf8": "the middle 12860 is about maybe about \nthat so all right so let's assume that  "
+    } ]
+  }, {
+    "tStartMs": 384180,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "and so then let's do let me just extrapolate from \nthis so if you've got five megabytes per song  "
+    } ]
+  }, {
+    "tStartMs": 389700,
+    "dDurationMs": 8460,
+    "segs": [ {
+      "utf8": "you've got 100 million songs so I think uh that \ntranslates to I'm trying to do my math here so  "
+    } ]
+  }, {
+    "tStartMs": 399180,
+    "dDurationMs": 9180,
+    "segs": [ {
+      "utf8": "100 million would be uh going to a thousand times \nthat would be a 100 billion and then 100 trillion  "
+    } ]
+  }, {
+    "tStartMs": 408360,
+    "dDurationMs": 7680,
+    "segs": [ {
+      "utf8": "would be a million times times five would be \n500 trillion so we're talking about uh total  "
+    } ]
+  }, {
+    "tStartMs": 417060,
+    "dDurationMs": 7380,
+    "segs": [ {
+      "utf8": "audio is something like 500 terabytes which is I \nguess it's the same thing is half a petabyte of  "
+    } ]
+  }, {
+    "tStartMs": 424440,
+    "dDurationMs": 8880,
+    "segs": [ {
+      "utf8": "data and so that's I'm making that assumption and \nso then depending on how you replicate this data  "
+    } ]
+  }, {
+    "tStartMs": 433320,
+    "dDurationMs": 4740,
+    "segs": [ {
+      "utf8": "because you typically want to have these songs in \nmultiple you know have multiple copies of these  "
+    } ]
+  }, {
+    "tStartMs": 438060,
+    "dDurationMs": 6420,
+    "segs": [ {
+      "utf8": "things so they don't get lost Etc and if some \nreplica is down so you know maybe you do let's  "
+    } ]
+  }, {
+    "tStartMs": 444480,
+    "dDurationMs": 6780,
+    "segs": [ {
+      "utf8": "say oops sorry my keyboard here 3x replication so \nthat would mean like one and a half petabytes of  "
+    } ]
+  }, {
+    "tStartMs": 451260,
+    "dDurationMs": 8280,
+    "segs": [ {
+      "utf8": "of raw audio data and then and then each song \nin terms of the metadata meaning the you know  "
+    } ]
+  }, {
+    "tStartMs": 459540,
+    "dDurationMs": 5640,
+    "segs": [ {
+      "utf8": "the the song title and things like that and \nand artists and all these things the metadata  "
+    } ]
+  }, {
+    "tStartMs": 465180,
+    "dDurationMs": 6300,
+    "segs": [ {
+      "utf8": "is probably not very big it might be I don't know \nyou know 100 bytes per song or something like that  "
+    } ]
+  }, {
+    "tStartMs": 472200,
+    "dDurationMs": 9720,
+    "segs": [ {
+      "utf8": "per song of metadata and so you might wind up with \nokay so let me do the you have it and that's uh uh  "
+    } ]
+  }, {
+    "tStartMs": 481920,
+    "dDurationMs": 6900,
+    "segs": [ {
+      "utf8": "billion 10 billion so that's only 10 gigabytes \nof of song metadata it's not really very much  "
+    } ]
+  }, {
+    "tStartMs": 490020,
+    "dDurationMs": 4500,
+    "segs": [ {
+      "utf8": "and even if you say it's it's a kilobyte then \nthat's 100 gigabytes so it's not very much and  "
+    } ]
+  }, {
+    "tStartMs": 494520,
+    "dDurationMs": 7620,
+    "segs": [ {
+      "utf8": "let me just double check my math here 100 \nmillion times 100 really 100 bytes yeah I  "
+    } ]
+  }, {
+    "tStartMs": 502140,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "think that would be 10 gigabytes so even if we \nsaid if we round it up dramatically and said  "
+    } ]
+  }, {
+    "tStartMs": 508200,
+    "dDurationMs": 8700,
+    "segs": [ {
+      "utf8": "100 gigabytes that's just not a ton of data \nnow in terms of users uh user data you might  "
+    } ]
+  }, {
+    "tStartMs": 516900,
+    "dDurationMs": 7500,
+    "segs": [ {
+      "utf8": "have you know again like a maybe you have a \nkilobyte oops kilobyte per user metadata I  "
+    } ]
+  }, {
+    "tStartMs": 524400,
+    "dDurationMs": 10920,
+    "segs": [ {
+      "utf8": "guess it's all metadata and so uh that might be \n[Music] times a billion users so that would be a  "
+    } ]
+  }, {
+    "tStartMs": 535320,
+    "dDurationMs": 4800,
+    "segs": [ {
+      "utf8": "terabyte of data approximately so just to kind \nof so this is just me doing some quick metrics  "
+    } ]
+  }, {
+    "tStartMs": 540120,
+    "dDurationMs": 4380,
+    "segs": [ {
+      "utf8": "quick calculations to get a rough back of \nthe envelope of how big these things are  "
+    } ]
+  }, {
+    "tStartMs": 546240,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "uh so does that make sense so far does \nthat seem yeah that will make sense so far  "
+    } ]
+  }, {
+    "tStartMs": 552120,
+    "dDurationMs": 5220,
+    "segs": [ {
+      "utf8": "before starting your high level design as marketed \nget some metrics to help you identify any higher  "
+    } ]
+  }, {
+    "tStartMs": 557340,
+    "dDurationMs": 4500,
+    "segs": [ {
+      "utf8": "level decisions that might be influenced by the \nscale of the system Mark asked the right questions  "
+    } ]
+  }, {
+    "tStartMs": 561840,
+    "dDurationMs": 4200,
+    "segs": [ {
+      "utf8": "about the number of users and number of songs \nI made some rough calculations without getting  "
+    } ]
+  }, {
+    "tStartMs": 566040,
+    "dDurationMs": 4980,
+    "segs": [ {
+      "utf8": "bogged down in the numbers what Mark didn't \ncalculate was the traffic how many songs are  "
+    } ]
+  }, {
+    "tStartMs": 571020,
+    "dDurationMs": 4020,
+    "segs": [ {
+      "utf8": "streamed per day or per second even that would \nhave helped him figure out the scaling of the  "
+    } ]
+  }, {
+    "tStartMs": 575040,
+    "dDurationMs": 4860,
+    "segs": [ {
+      "utf8": "web servers how many he'd need and how much \nbandwidth he'd need however since this didn't  "
+    } ]
+  }, {
+    "tStartMs": 579900,
+    "dDurationMs": 4200,
+    "segs": [ {
+      "utf8": "impact his high level design it was okay not \nto go into the details of scaling at this point  "
+    } ]
+  }, {
+    "tStartMs": 585240,
+    "dDurationMs": 6060,
+    "segs": [ {
+      "utf8": "okay so let me let me maybe think about \nsome basic components here and I'm going  "
+    } ]
+  }, {
+    "tStartMs": 591300,
+    "dDurationMs": 5640,
+    "segs": [ {
+      "utf8": "to draw them but I I'll get into them \nmaybe a little bit more in detail later"
+    } ]
+  }, {
+    "tStartMs": 600180,
+    "dDurationMs": 480,
+    "segs": [ {
+      "utf8": "okay"
+    } ]
+  }, {
+    "tStartMs": 603900,
+    "dDurationMs": 6720,
+    "segs": [ {
+      "utf8": "so some basic components that I would see so let \nme let me start with something that is my my best  "
+    } ]
+  }, {
+    "tStartMs": 610620,
+    "dDurationMs": 7140,
+    "segs": [ {
+      "utf8": "attempt at a mobile phone here so you cut your \nSpotify app and make this smaller so it fits into  "
+    } ]
+  }, {
+    "tStartMs": 617760,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "the thing so you've got your app which is on your \nphone typically and I'm gonna assume here that  "
+    } ]
+  }, {
+    "tStartMs": 622680,
+    "dDurationMs": 4740,
+    "segs": [ {
+      "utf8": "we're talking about the phone app because that's \nvery common uh and so you've got your your phone  "
+    } ]
+  }, {
+    "tStartMs": 628500,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "the phone is going to be talking to uh an \napplication server a Spotify application  "
+    } ]
+  }, {
+    "tStartMs": 634020,
+    "dDurationMs": 6120,
+    "segs": [ {
+      "utf8": "server somewhere or web server I \nguess and so let's draw some let  "
+    } ]
+  }, {
+    "tStartMs": 640140,
+    "dDurationMs": 8100,
+    "segs": [ {
+      "utf8": "me just put a like over here just say \nthere's a Spotify web server uh and uh  "
+    } ]
+  }, {
+    "tStartMs": 648900,
+    "dDurationMs": 7020,
+    "segs": [ {
+      "utf8": "and there's not going to just be one there's going \nto be lots of them and assume that that's a lot  "
+    } ]
+  }, {
+    "tStartMs": 657180,
+    "dDurationMs": 11280,
+    "segs": [ {
+      "utf8": "and then of course just because this is a standard \nthing that you do when you have applications uh  "
+    } ]
+  }, {
+    "tStartMs": 668460,
+    "dDurationMs": 5820,
+    "segs": [ {
+      "utf8": "you know in the cloud here this is I guess part of \nthe cloud you've got a load balancer and so let me  "
+    } ]
+  }, {
+    "tStartMs": 674280,
+    "dDurationMs": 5460,
+    "segs": [ {
+      "utf8": "draw let's assume that we've got an arrow here \nthat's talking so Spotify app's talking through  "
+    } ]
+  }, {
+    "tStartMs": 679740,
+    "dDurationMs": 6960,
+    "segs": [ {
+      "utf8": "the load balancer ultimately to these to these web \nservers and so those are the those are some some  "
+    } ]
+  }, {
+    "tStartMs": 686700,
+    "dDurationMs": 5820,
+    "segs": [ {
+      "utf8": "sort of key components here let me think about \nthis a little bit further yeah I think that's  "
+    } ]
+  }, {
+    "tStartMs": 692520,
+    "dDurationMs": 5280,
+    "segs": [ {
+      "utf8": "good so far okay and then of course the most \nimportant thing or one of the most important  "
+    } ]
+  }, {
+    "tStartMs": 697800,
+    "dDurationMs": 4140,
+    "segs": [ {
+      "utf8": "things here let me see if I can find a I know that \nthere's a shape here here we go that's a that's a  "
+    } ]
+  }, {
+    "tStartMs": 701940,
+    "dDurationMs": 7620,
+    "segs": [ {
+      "utf8": "good shape I'm just going to say call this uh the \ndatabase and let me make this a little bit more  "
+    } ]
+  }, {
+    "tStartMs": 710400,
+    "dDurationMs": 6720,
+    "segs": [ {
+      "utf8": "uh let's see that's what I wanted okay so there's \ndatabase and so the web servers are going to be  "
+    } ]
+  }, {
+    "tStartMs": 717120,
+    "dDurationMs": 7380,
+    "segs": [ {
+      "utf8": "talking to the database and getting stuff from \nbasically reading information writing information  "
+    } ]
+  }, {
+    "tStartMs": 725460,
+    "dDurationMs": 3600,
+    "segs": [ {
+      "utf8": "to and from the data reading and writing \ninformation to and from the database  "
+    } ]
+  }, {
+    "tStartMs": 730140,
+    "dDurationMs": 5820,
+    "segs": [ {
+      "utf8": "so those are kind of the very high level \ncomponents in system design interviews good dual  "
+    } ]
+  }, {
+    "tStartMs": 735960,
+    "dDurationMs": 5280,
+    "segs": [ {
+      "utf8": "bandwidth communication is important that's to say \nyou need to communicate well via both drawing and  "
+    } ]
+  }, {
+    "tStartMs": 741240,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "speaking you should practice this thoroughly \nbefore your interview Mark did this well he  "
+    } ]
+  }, {
+    "tStartMs": 746160,
+    "dDurationMs": 3720,
+    "segs": [ {
+      "utf8": "started drawing the components quite early on in \nhis answer and this allowed the interviewer to  "
+    } ]
+  }, {
+    "tStartMs": 749880,
+    "dDurationMs": 4260,
+    "segs": [ {
+      "utf8": "follow along easily it's okay to have simpler and \nfewer components at this point in the interview  "
+    } ]
+  }, {
+    "tStartMs": 754140,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "you can then break it out later in your answer as \nMark did when he splits his database in two and  "
+    } ]
+  }, {
+    "tStartMs": 761280,
+    "dDurationMs": 9360,
+    "segs": [ {
+      "utf8": "I probably am thinking about this I think this \nis obviously oversimplified and I'm not going to  "
+    } ]
+  }, {
+    "tStartMs": 770640,
+    "dDurationMs": 8340,
+    "segs": [ {
+      "utf8": "redesign Spotify uh you know the existing full \napplication as exists but I do think I can get  "
+    } ]
+  }, {
+    "tStartMs": 778980,
+    "dDurationMs": 5940,
+    "segs": [ {
+      "utf8": "a little bit more detailed here by I think I'm \nthinking about the data again because it's it's  "
+    } ]
+  }, {
+    "tStartMs": 784920,
+    "dDurationMs": 7740,
+    "segs": [ {
+      "utf8": "the data is important so I'm thinking about the \nmetadata and the user data and the audio data"
+    } ]
+  }, {
+    "tStartMs": 800400,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "and they're different very different types of data \nso I'm going to actually I'm going to split this  "
+    } ]
+  }, {
+    "tStartMs": 805440,
+    "dDurationMs": 5280,
+    "segs": [ {
+      "utf8": "database here into two things and I'll explain \nthat or I'll try to explain them just a little  "
+    } ]
+  }, {
+    "tStartMs": 810720,
+    "dDurationMs": 9300,
+    "segs": [ {
+      "utf8": "bit come on there we go make this just a little \nbit more uh so I'm going to split this up and say  "
+    } ]
+  }, {
+    "tStartMs": 821520,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "that I'm gonna there's a \nlike a song audio database"
+    } ]
+  }, {
+    "tStartMs": 828720,
+    "dDurationMs": 12000,
+    "segs": [ {
+      "utf8": "and then there's going to be like a \nmetadata database so this is users uh songs  "
+    } ]
+  }, {
+    "tStartMs": 841680,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "uh what else I mean are ultimately they're \nprobably be artists and Etc things like that  "
+    } ]
+  }, {
+    "tStartMs": 847920,
+    "dDurationMs": 6840,
+    "segs": [ {
+      "utf8": "but we're focusing on the songs I think in the \nin the music and so on this is also a database  "
+    } ]
+  }, {
+    "tStartMs": 854760,
+    "dDurationMs": 10860,
+    "segs": [ {
+      "utf8": "of course song audio database and metadata and \nso I think let me make this a little bit more  "
+    } ]
+  }, {
+    "tStartMs": 865620,
+    "dDurationMs": 6720,
+    "segs": [ {
+      "utf8": "uh this Spotify web server is actually going to \ntalk to this to The Meta oops the metadata and  "
+    } ]
+  }, {
+    "tStartMs": 873060,
+    "dDurationMs": 6060,
+    "segs": [ {
+      "utf8": "uh and the audio database it's actually going \nto be talking to two databases here yeah that's  "
+    } ]
+  }, {
+    "tStartMs": 879120,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "interesting can you can you can you go into a bit \nmore detail about why you'd split them into two"
+    } ]
+  }, {
+    "tStartMs": 887580,
+    "dDurationMs": 9480,
+    "segs": [ {
+      "utf8": "yeah yeah I'm kind of making that uh just assuming \nthat or making that yeah so okay let me let me  "
+    } ]
+  }, {
+    "tStartMs": 897060,
+    "dDurationMs": 3180,
+    "segs": [ {
+      "utf8": "to try and I wanted I want to \nanswer let me try and think of  "
+    } ]
+  }, {
+    "tStartMs": 900240,
+    "dDurationMs": 3720,
+    "segs": [ {
+      "utf8": "this in terms of the technologies that \nI might use I might use something like  "
+    } ]
+  }, {
+    "tStartMs": 904800,
+    "dDurationMs": 6480,
+    "segs": [ {
+      "utf8": "Amazon S3 here and I might use Amazon RDS and \nso now let me explain what I mean by that so  "
+    } ]
+  }, {
+    "tStartMs": 912780,
+    "dDurationMs": 8220,
+    "segs": [ {
+      "utf8": "the type of data that the actual MP3 files those \nI think of as immutable data they're just Blobs of  "
+    } ]
+  }, {
+    "tStartMs": 921000,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "data they're files they're five megabyte roughly \non you know on average files and they're not going  "
+    } ]
+  }, {
+    "tStartMs": 926040,
+    "dDurationMs": 4140,
+    "segs": [ {
+      "utf8": "to change they're just being streamed they're \nbeing you know stored and streamed essentially  "
+    } ]
+  }, {
+    "tStartMs": 930180,
+    "dDurationMs": 8400,
+    "segs": [ {
+      "utf8": "and so a blob database which is what S3 is lends \nitself really well towards that and it could be  "
+    } ]
+  }, {
+    "tStartMs": 938580,
+    "dDurationMs": 3480,
+    "segs": [ {
+      "utf8": "something like Google drive or there's other \nyou know technologies that are sort of just  "
+    } ]
+  }, {
+    "tStartMs": 942060,
+    "dDurationMs": 6960,
+    "segs": [ {
+      "utf8": "document like blob storage uh systems but Amazon \nS3 lends itself really well to that and it scales  "
+    } ]
+  }, {
+    "tStartMs": 949020,
+    "dDurationMs": 6300,
+    "segs": [ {
+      "utf8": "uh greatly you can just add more and more and more \nand more and it scales uh linearly which is great  "
+    } ]
+  }, {
+    "tStartMs": 956520,
+    "dDurationMs": 7200,
+    "segs": [ {
+      "utf8": "and and so and then you can connect it up to to \nbe able to stream the data and things like that so  "
+    } ]
+  }, {
+    "tStartMs": 963720,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "that type of data and the access patterns for that \nwhich is really mostly read you're just streaming  "
+    } ]
+  }, {
+    "tStartMs": 968400,
+    "dDurationMs": 6300,
+    "segs": [ {
+      "utf8": "this data you're never going back and forth and \nwriting to it that would be why I would want to  "
+    } ]
+  }, {
+    "tStartMs": 974700,
+    "dDurationMs": 8040,
+    "segs": [ {
+      "utf8": "put the songs in that kind of a database now S3 \nis great for that works really well but the data  "
+    } ]
+  }, {
+    "tStartMs": 982740,
+    "dDurationMs": 4620,
+    "segs": [ {
+      "utf8": "the metadata which is the the users and their \ninformation and the songs and their information  "
+    } ]
+  }, {
+    "tStartMs": 987360,
+    "dDurationMs": 5280,
+    "segs": [ {
+      "utf8": "and uh maybe they get updated maybe you're \nsearching across them and having to do queries  "
+    } ]
+  }, {
+    "tStartMs": 992640,
+    "dDurationMs": 7320,
+    "segs": [ {
+      "utf8": "to find songs for a particular genre or artists or \nthings like that or you're trying to update your  "
+    } ]
+  }, {
+    "tStartMs": 999960,
+    "dDurationMs": 6420,
+    "segs": [ {
+      "utf8": "users like if I'm playing us playing a song and \nI want to remember where I left off so that when  "
+    } ]
+  }, {
+    "tStartMs": 1006380,
+    "dDurationMs": 7440,
+    "segs": [ {
+      "utf8": "I continue playing it it remembers that I'm going \nto be modifying the data quite a bit or going back  "
+    } ]
+  }, {
+    "tStartMs": 1013820,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "and forth between that database and doing these \nqueries and you can't really do queries over S3  "
+    } ]
+  }, {
+    "tStartMs": 1018920,
+    "dDurationMs": 6720,
+    "segs": [ {
+      "utf8": "but you can over like a relational database so \nMySQL would be another option uh I just chose  "
+    } ]
+  }, {
+    "tStartMs": 1025640,
+    "dDurationMs": 5940,
+    "segs": [ {
+      "utf8": "RDS here really Amazon's relational database as \na as a because I'm going with the AWS family here  "
+    } ]
+  }, {
+    "tStartMs": 1033440,
+    "dDurationMs": 9060,
+    "segs": [ {
+      "utf8": "but yeah so uh let me let me try and try and just \nwrite something here a little bit more in terms of  "
+    } ]
+  }, {
+    "tStartMs": 1043520,
+    "dDurationMs": 7560,
+    "segs": [ {
+      "utf8": "in terms of songs you would have things \nlike a song ID you would have a song Maybe  "
+    } ]
+  }, {
+    "tStartMs": 1052760,
+    "dDurationMs": 7620,
+    "segs": [ {
+      "utf8": "maybe a URL like that you'd use for sharing \nuh you would have an artist a genre maybe  "
+    } ]
+  }, {
+    "tStartMs": 1060380,
+    "dDurationMs": 7860,
+    "segs": [ {
+      "utf8": "there's a link to album cover and maybe \nthere's the link to the to the audio I  "
+    } ]
+  }, {
+    "tStartMs": 1068240,
+    "dDurationMs": 7560,
+    "segs": [ {
+      "utf8": "guess so this is too too big to fit so this \nis the type of data that would be stored in  "
+    } ]
+  }, {
+    "tStartMs": 1075800,
+    "dDurationMs": 9780,
+    "segs": [ {
+      "utf8": "uh let me draw this in here again like in \nthat in that database and then just the Raw"
+    } ]
+  }, {
+    "tStartMs": 1089240,
+    "dDurationMs": 4380,
+    "segs": [ {
+      "utf8": "I mean I almost don't need to \nwrite this here so song MP3"
+    } ]
+  }, {
+    "tStartMs": 1096500,
+    "dDurationMs": 9000,
+    "segs": [ {
+      "utf8": "would be stored in this database down here so yeah \nso I think that the access patterns the types of  "
+    } ]
+  }, {
+    "tStartMs": 1105500,
+    "dDurationMs": 4200,
+    "segs": [ {
+      "utf8": "things that you want to do the size of the data \nbecause the size of the data here I think we said  "
+    } ]
+  }, {
+    "tStartMs": 1109700,
+    "dDurationMs": 8160,
+    "segs": [ {
+      "utf8": "was going to be well half a petabyte in one in \none for one replica so S3 lends itself well to  "
+    } ]
+  }, {
+    "tStartMs": 1117860,
+    "dDurationMs": 7380,
+    "segs": [ {
+      "utf8": "that the data here is going to be you know in \nthe you know maybe terabyte range uh something  "
+    } ]
+  }, {
+    "tStartMs": 1125240,
+    "dDurationMs": 4440,
+    "segs": [ {
+      "utf8": "like that and and it's going to have lots of \nqueries over it maybe some updates and things  "
+    } ]
+  }, {
+    "tStartMs": 1129680,
+    "dDurationMs": 4440,
+    "segs": [ {
+      "utf8": "like that so that's why I would separate these \nout is because I think the access patterns the  "
+    } ]
+  }, {
+    "tStartMs": 1134120,
+    "dDurationMs": 6360,
+    "segs": [ {
+      "utf8": "size of the data and the type of uh the type \nof queries that you need to be able to do over  "
+    } ]
+  }, {
+    "tStartMs": 1140480,
+    "dDurationMs": 5340,
+    "segs": [ {
+      "utf8": "would be very different does that make sense yes \ndoes that answer yeah yeah it does thank you yeah  "
+    } ]
+  }, {
+    "tStartMs": 1145820,
+    "dDurationMs": 4500,
+    "segs": [ {
+      "utf8": "I think that makes sense at this point of your \nanswer when you've laid out the main components  "
+    } ]
+  }, {
+    "tStartMs": 1150320,
+    "dDurationMs": 5280,
+    "segs": [ {
+      "utf8": "it's good to start identifying some technologies \nas Mark did here starting with the database his  "
+    } ]
+  }, {
+    "tStartMs": 1155600,
+    "dDurationMs": 4620,
+    "segs": [ {
+      "utf8": "design made sense breaking up the databases \ninto audio data and metadata but he could have  "
+    } ]
+  }, {
+    "tStartMs": 1160220,
+    "dDurationMs": 4500,
+    "segs": [ {
+      "utf8": "explained why he was doing this up front rather \nthan waiting for the interviewer to ask why in  "
+    } ]
+  }, {
+    "tStartMs": 1164720,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "general try to be upfront about your decision \nmaking yeah feel free to feel free to continue  "
+    } ]
+  }, {
+    "tStartMs": 1171320,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "so okay so let's say we have these two databases \nand I'm just trying to think about now the actual  "
+    } ]
+  }, {
+    "tStartMs": 1178160,
+    "dDurationMs": 5020,
+    "segs": [ {
+      "utf8": "the two the use case sorry the use cases we \ntalked about so finding and playing music [Music]"
+    } ]
+  }, {
+    "tStartMs": 1183740,
+    "dDurationMs": 10920,
+    "segs": [ {
+      "utf8": "so for finding music I think uh the \nthe Spotify app you know would need  "
+    } ]
+  }, {
+    "tStartMs": 1194660,
+    "dDurationMs": 6900,
+    "segs": [ {
+      "utf8": "to uh request a do it do a fine music and so \nthe user probably you know either is typing  "
+    } ]
+  }, {
+    "tStartMs": 1201560,
+    "dDurationMs": 5220,
+    "segs": [ {
+      "utf8": "in like an artist's name or maybe they're \nselecting a bunch of filters I actually I'm  "
+    } ]
+  }, {
+    "tStartMs": 1206780,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "not that familiar with that's how possible that \nis but but let's say I'm searching for music uh  "
+    } ]
+  }, {
+    "tStartMs": 1213740,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "for an artist with a particular genre and so \nultimately somehow I'm filling in this query  "
+    } ]
+  }, {
+    "tStartMs": 1218900,
+    "dDurationMs": 5820,
+    "segs": [ {
+      "utf8": "in my app either by clicking on some things or \ntyping some things or a combination and then that  "
+    } ]
+  }, {
+    "tStartMs": 1224720,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "request to find music is going to be sent to this \nweb server going through the load balancer to pick  "
+    } ]
+  }, {
+    "tStartMs": 1230240,
+    "dDurationMs": 6300,
+    "segs": [ {
+      "utf8": "up web server it's going to go there and then that \nweb server is going to do a query issue a query uh  "
+    } ]
+  }, {
+    "tStartMs": 1236540,
+    "dDurationMs": 9720,
+    "segs": [ {
+      "utf8": "translated query to to the relational database to \nfind a bunch of songs and return a list of songs  "
+    } ]
+  }, {
+    "tStartMs": 1247520,
+    "dDurationMs": 7740,
+    "segs": [ {
+      "utf8": "and return that back up to the app with whatever \nmetadata there there is and let's say that I found  "
+    } ]
+  }, {
+    "tStartMs": 1255980,
+    "dDurationMs": 6900,
+    "segs": [ {
+      "utf8": "it it finds I don't know 100 \nsongs that match my uh request for  "
+    } ]
+  }, {
+    "tStartMs": 1263720,
+    "dDurationMs": 7560,
+    "segs": [ {
+      "utf8": "uh uh Korean pop music or something like that \nand so I I now get back 100 songs and I can look  "
+    } ]
+  }, {
+    "tStartMs": 1271280,
+    "dDurationMs": 4860,
+    "segs": [ {
+      "utf8": "at those and now once I've gotten that list of \nsongs and by the way for for that query where I'm  "
+    } ]
+  }, {
+    "tStartMs": 1276140,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "searching for music I don't touch the mp3s at all \nI don't need to go to that database at all I just  "
+    } ]
+  }, {
+    "tStartMs": 1282380,
+    "dDurationMs": 6600,
+    "segs": [ {
+      "utf8": "need to go to uh to the metadata database and do \nthis query and because it's a relational database  "
+    } ]
+  }, {
+    "tStartMs": 1288980,
+    "dDurationMs": 6360,
+    "segs": [ {
+      "utf8": "that that query can happen pretty efficiently \nEtc so now I'm I return that information back  "
+    } ]
+  }, {
+    "tStartMs": 1296120,
+    "dDurationMs": 3780,
+    "segs": [ {
+      "utf8": "and that and then I display that to the \nuser does that does that seem does that  "
+    } ]
+  }, {
+    "tStartMs": 1299900,
+    "dDurationMs": 5340,
+    "segs": [ {
+      "utf8": "make sense in terms of a finding music \nyeah yeah that makes sense that's good"
+    } ]
+  }, {
+    "tStartMs": 1307460,
+    "dDurationMs": 4500,
+    "segs": [ {
+      "utf8": "um okay and so now I have a list of songs and \nmaybe I maybe there's like the one of the ones  "
+    } ]
+  }, {
+    "tStartMs": 1311960,
+    "dDurationMs": 4800,
+    "segs": [ {
+      "utf8": "in that list is like oh yeah that's what I was \nlooking for and so I click on that uh song to  "
+    } ]
+  }, {
+    "tStartMs": 1316760,
+    "dDurationMs": 3240,
+    "segs": [ {
+      "utf8": "play it I want to I want to hear that hear the \nsong so that's that second sort of part of the  "
+    } ]
+  }, {
+    "tStartMs": 1320000,
+    "dDurationMs": 6300,
+    "segs": [ {
+      "utf8": "use case that we talked about which is playing \nmusic so now to play music now this gets a little  "
+    } ]
+  }, {
+    "tStartMs": 1326300,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "interesting and this is I think I'm going to wind \nup maybe changing what I'm thinking about here a  "
+    } ]
+  }, {
+    "tStartMs": 1330980,
+    "dDurationMs": 7080,
+    "segs": [ {
+      "utf8": "little bit but but let me let me just talk through \nit so I I click on the play button or I click on  "
+    } ]
+  }, {
+    "tStartMs": 1338060,
+    "dDurationMs": 6900,
+    "segs": [ {
+      "utf8": "the song to play it and that translates into a \nrequest from the app to the web server to start  "
+    } ]
+  }, {
+    "tStartMs": 1344960,
+    "dDurationMs": 9480,
+    "segs": [ {
+      "utf8": "playing a song playing the song and it has an ID \nlike I mentioned as like an ID in it and so now  "
+    } ]
+  }, {
+    "tStartMs": 1355280,
+    "dDurationMs": 7440,
+    "segs": [ {
+      "utf8": "the the web server based on that song \ninformation ID maybe has to go to this  "
+    } ]
+  }, {
+    "tStartMs": 1362720,
+    "dDurationMs": 6420,
+    "segs": [ {
+      "utf8": "database here to look up the link uh what did \nI call it oh an audio link maybe that's an Mp3  "
+    } ]
+  }, {
+    "tStartMs": 1369140,
+    "dDurationMs": 7020,
+    "segs": [ {
+      "utf8": "link I don't know something like that that's a \nbetter term for it I don't know so the Mp3 link  "
+    } ]
+  }, {
+    "tStartMs": 1378260,
+    "dDurationMs": 9000,
+    "segs": [ {
+      "utf8": "and so that Mp3 link or audio link would be \nreturned and now the Spotify web server has to  "
+    } ]
+  }, {
+    "tStartMs": 1388400,
+    "dDurationMs": 6780,
+    "segs": [ {
+      "utf8": "go to the database where the actual audio is \nstored in Fetch that fetch that database now  "
+    } ]
+  }, {
+    "tStartMs": 1396740,
+    "dDurationMs": 8580,
+    "segs": [ {
+      "utf8": "you could imagine streaming that five \nmegabytes from this database so chunk by  "
+    } ]
+  }, {
+    "tStartMs": 1405320,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "chunk it comes back and chunk by chunk it goes \nup to the Spotify app in order to do this you  "
+    } ]
+  }, {
+    "tStartMs": 1411320,
+    "dDurationMs": 4740,
+    "segs": [ {
+      "utf8": "need like a websocket connection so you need a \nkind of a long-standing connection between the  "
+    } ]
+  }, {
+    "tStartMs": 1416060,
+    "dDurationMs": 5400,
+    "segs": [ {
+      "utf8": "application and this web server so that you can \nchunk that you can send the data back in chunks  "
+    } ]
+  }, {
+    "tStartMs": 1423380,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "but I'm not sure whether I would need to do that \nor whether because it's only five megabytes that's  "
+    } ]
+  }, {
+    "tStartMs": 1429260,
+    "dDurationMs": 7320,
+    "segs": [ {
+      "utf8": "possibly small enough to just fit in memory you \nknow read from the uh from S3 and fill fit into  "
+    } ]
+  }, {
+    "tStartMs": 1436580,
+    "dDurationMs": 8400,
+    "segs": [ {
+      "utf8": "memory and then have that particular web server \nchunk it back from there I think that might be  "
+    } ]
+  }, {
+    "tStartMs": 1444980,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "better because it would eliminate the possible lag \nbetween the database so you don't start streaming  "
+    } ]
+  }, {
+    "tStartMs": 1450080,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "the audio until you have it in memory that that \nmight be something that I I would consider doing  "
+    } ]
+  }, {
+    "tStartMs": 1457700,
+    "dDurationMs": 6600,
+    "segs": [ {
+      "utf8": "so now let me think about so that that would \nbe does that make sense in terms of like the  "
+    } ]
+  }, {
+    "tStartMs": 1464300,
+    "dDurationMs": 4980,
+    "segs": [ {
+      "utf8": "the playing like you're you start playing and \nobviously you can control it you can pause playing  "
+    } ]
+  }, {
+    "tStartMs": 1469280,
+    "dDurationMs": 5400,
+    "segs": [ {
+      "utf8": "and so on but does that make sense so you you you \nstart playing the web server gets the request to  "
+    } ]
+  }, {
+    "tStartMs": 1474680,
+    "dDurationMs": 6420,
+    "segs": [ {
+      "utf8": "play it maybe gets the information about where \nto go over here to get the the S oops the S3 uh  "
+    } ]
+  }, {
+    "tStartMs": 1481820,
+    "dDurationMs": 5280,
+    "segs": [ {
+      "utf8": "storage audio storage reads that back it's only \nfive megabytes that should be should not take  "
+    } ]
+  }, {
+    "tStartMs": 1487100,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "it should be almost instantaneous and then it \nstarts streaming that back to the application  "
+    } ]
+  }, {
+    "tStartMs": 1492200,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "does that make sense yeah that makes sense uh \nplease please carry on yeah so all good so far  "
+    } ]
+  }, {
+    "tStartMs": 1499400,
+    "dDurationMs": 7620,
+    "segs": [ {
+      "utf8": "Okay so this almost sounds too good to be \ntrue or sounds too easy I I think it's got  "
+    } ]
+  }, {
+    "tStartMs": 1507020,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "to be more complicated than that okay so \none thing I'm just realizing here is uh  "
+    } ]
+  }, {
+    "tStartMs": 1514100,
+    "dDurationMs": 3720,
+    "segs": [ {
+      "utf8": "probably out of these what did \nwe say we said 100 million songs  "
+    } ]
+  }, {
+    "tStartMs": 1519860,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "there's there's probably a lot of stuff that is \nuh I'm going to use the term Indie artists or  "
+    } ]
+  }, {
+    "tStartMs": 1525740,
+    "dDurationMs": 7920,
+    "segs": [ {
+      "utf8": "something like that stuff that few people uh not \nvery many people listen to or isn't very popular  "
+    } ]
+  }, {
+    "tStartMs": 1533660,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "and on the flip side of that I'm thinking \nabout like what could go wrong here well if  "
+    } ]
+  }, {
+    "tStartMs": 1539300,
+    "dDurationMs": 8880,
+    "segs": [ {
+      "utf8": "uh like BTS which is a again a Korean pop pop band \nuh if they let's say they release a new song and  "
+    } ]
+  }, {
+    "tStartMs": 1548180,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "it's like hey everybody wants to listen to this \nis super oh have you heard the latest song Etc if  "
+    } ]
+  }, {
+    "tStartMs": 1553940,
+    "dDurationMs": 6900,
+    "segs": [ {
+      "utf8": "you've got all of these web servers all fetching \nthat same thing uh that same song and let's say  "
+    } ]
+  }, {
+    "tStartMs": 1560840,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "you've got you know requests like it's released \nand in the next minute you've got I don't know  "
+    } ]
+  }, {
+    "tStartMs": 1566600,
+    "dDurationMs": 6660,
+    "segs": [ {
+      "utf8": "uh how do we you said a billion users okay let's \nsay that uh 10 million users all request the song  "
+    } ]
+  }, {
+    "tStartMs": 1573260,
+    "dDurationMs": 3600,
+    "segs": [ {
+      "utf8": "all at the same time or something like that \nbecause it's just been released and they're  "
+    } ]
+  }, {
+    "tStartMs": 1576860,
+    "dDurationMs": 6180,
+    "segs": [ {
+      "utf8": "following you know social media is something you \ncould easily overload in terms of bottlenecks you  "
+    } ]
+  }, {
+    "tStartMs": 1583040,
+    "dDurationMs": 6540,
+    "segs": [ {
+      "utf8": "could Pro you could overload possibly uh that \nbucket or that bucket excuse me that particular  "
+    } ]
+  }, {
+    "tStartMs": 1592100,
+    "dDurationMs": 7920,
+    "segs": [ {
+      "utf8": "uh song uh that file or whatever however it's \nstored in AWS and it could be stored different  "
+    } ]
+  }, {
+    "tStartMs": 1600020,
+    "dDurationMs": 7440,
+    "segs": [ {
+      "utf8": "ways I'm using it S3 here you could overload uh \nAWS or S3 there and you could also possibly be  "
+    } ]
+  }, {
+    "tStartMs": 1607460,
+    "dDurationMs": 6060,
+    "segs": [ {
+      "utf8": "you know like streaming like loading up all these \nthese web servers with the same song streaming the  "
+    } ]
+  }, {
+    "tStartMs": 1613520,
+    "dDurationMs": 7380,
+    "segs": [ {
+      "utf8": "same thing back so it's a lot of bandwidth Etc so \na better thing to do and a common thing to do for  "
+    } ]
+  }, {
+    "tStartMs": 1620900,
+    "dDurationMs": 6780,
+    "segs": [ {
+      "utf8": "stuff like this is to to use what's called a CDN \ncontent delivery Network which is like a it's a  "
+    } ]
+  }, {
+    "tStartMs": 1627680,
+    "dDurationMs": 7320,
+    "segs": [ {
+      "utf8": "cache so this this helps reduce the amount of load \non on back ends so let me draw something here let  "
+    } ]
+  }, {
+    "tStartMs": 1635000,
+    "dDurationMs": 5280,
+    "segs": [ {
+      "utf8": "me just I am going to pick uh what shape am I \ngoing to pick I'll just pick randomly something  "
+    } ]
+  }, {
+    "tStartMs": 1640280,
+    "dDurationMs": 11880,
+    "segs": [ {
+      "utf8": "like this so maybe over here so I'm going to say \nhere this is a CDN which is an song audio cache  "
+    } ]
+  }, {
+    "tStartMs": 1653840,
+    "dDurationMs": 10200,
+    "segs": [ {
+      "utf8": "this is typing in and so what would happen so and \nby the way the Technologies here just to this this  "
+    } ]
+  }, {
+    "tStartMs": 1664040,
+    "dDurationMs": 8520,
+    "segs": [ {
+      "utf8": "this CDN a Content delivery network is usually \nvery very close in terms of number of hops and  "
+    } ]
+  }, {
+    "tStartMs": 1672560,
+    "dDurationMs": 10560,
+    "segs": [ {
+      "utf8": "network connections to users so what would happen \nis let me draw another arrow here and let me draw  "
+    } ]
+  }, {
+    "tStartMs": 1683120,
+    "dDurationMs": 12720,
+    "segs": [ {
+      "utf8": "uh an arrow down to here so what what would happen \nhere is that the first time that this song is this  "
+    } ]
+  }, {
+    "tStartMs": 1695840,
+    "dDurationMs": 8340,
+    "segs": [ {
+      "utf8": "new BTS newly released single is is requested the \nweb server would read it and stream it like normal  "
+    } ]
+  }, {
+    "tStartMs": 1705080,
+    "dDurationMs": 5640,
+    "segs": [ {
+      "utf8": "but probably we need to make sure that \nthese Spotify web servers are somewhat uh  "
+    } ]
+  }, {
+    "tStartMs": 1711320,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "they're keeping track of things and they're \nkeeping track of you know which songs are being  "
+    } ]
+  }, {
+    "tStartMs": 1716480,
+    "dDurationMs": 6300,
+    "segs": [ {
+      "utf8": "requested which ones are hot they probably have a \nheat map the most recently requested songs and so  "
+    } ]
+  }, {
+    "tStartMs": 1723380,
+    "dDurationMs": 5580,
+    "segs": [ {
+      "utf8": "in that heat map as they see oh this song \nis now ever I've seen this requested the  "
+    } ]
+  }, {
+    "tStartMs": 1728960,
+    "dDurationMs": 2880,
+    "segs": [ {
+      "utf8": "fifth third time in you know in \na minute or something like that  "
+    } ]
+  }, {
+    "tStartMs": 1732920,
+    "dDurationMs": 5640,
+    "segs": [ {
+      "utf8": "at that point in time what it might do is it \nmight actually uh instead of just streaming  "
+    } ]
+  }, {
+    "tStartMs": 1738560,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "it back to itself or copying it back to itself \nexcuse me it might actually load that into the  "
+    } ]
+  }, {
+    "tStartMs": 1744800,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "CDN and so I am trying to I'm going to have to \ndraw another arrow I think in order to do that  "
+    } ]
+  }, {
+    "tStartMs": 1751040,
+    "dDurationMs": 3960,
+    "segs": [ {
+      "utf8": "because these things probably have to talk to the \nCDN and by the way I'm not a super expert on this  "
+    } ]
+  }, {
+    "tStartMs": 1755000,
+    "dDurationMs": 6180,
+    "segs": [ {
+      "utf8": "area in terms of how this works but there's some \nconnection between this Edge caching this content  "
+    } ]
+  }, {
+    "tStartMs": 1761180,
+    "dDurationMs": 6660,
+    "segs": [ {
+      "utf8": "delivery Network which is just there for caching \nand these Spotify web servers so these web servers  "
+    } ]
+  }, {
+    "tStartMs": 1767840,
+    "dDurationMs": 7200,
+    "segs": [ {
+      "utf8": "are going to somehow notify the CDN hey you \nshould be pulling this song this BTS latest song  "
+    } ]
+  }, {
+    "tStartMs": 1775040,
+    "dDurationMs": 9060,
+    "segs": [ {
+      "utf8": "pull that from uh the the MP3 the audio storage so \nthe CDN you know would load that up and this now  "
+    } ]
+  }, {
+    "tStartMs": 1784100,
+    "dDurationMs": 6540,
+    "segs": [ {
+      "utf8": "has to work in conjunction with the application \nso that means that the application when it when  "
+    } ]
+  }, {
+    "tStartMs": 1790640,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "the person decides when I request the song I want \nto play this latest BTS song and I haven't had it  "
+    } ]
+  }, {
+    "tStartMs": 1796160,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "on my phone yet it's just been released before \nI go and I talk to the web server I might even  "
+    } ]
+  }, {
+    "tStartMs": 1801320,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "go and check in this in the application might \nactually go and check in this content delivery  "
+    } ]
+  }, {
+    "tStartMs": 1807200,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "Network to see is it there it might also be so \nand if it is there then I just read it from there  "
+    } ]
+  }, {
+    "tStartMs": 1814580,
+    "dDurationMs": 4440,
+    "segs": [ {
+      "utf8": "the other option of the possibility and again this \nis technology that I'm sort of not super familiar  "
+    } ]
+  }, {
+    "tStartMs": 1819020,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "with is that it goes and asks the web server \njust like it normally would and the web server  "
+    } ]
+  }, {
+    "tStartMs": 1824900,
+    "dDurationMs": 5280,
+    "segs": [ {
+      "utf8": "sends back a redirect saying hey I don't have \nit but you should go over here to this content  "
+    } ]
+  }, {
+    "tStartMs": 1830180,
+    "dDurationMs": 7140,
+    "segs": [ {
+      "utf8": "delivery Network this this Edge cache to to to \nfetch the song it's much closer to you you'll  "
+    } ]
+  }, {
+    "tStartMs": 1837320,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "get better performance and you won't be loading \nme up so much so I've got a lot of arrows here  "
+    } ]
+  }, {
+    "tStartMs": 1842420,
+    "dDurationMs": 9120,
+    "segs": [ {
+      "utf8": "but uh the the the standard flow for a song \nfirst time around is you know coming around  "
+    } ]
+  }, {
+    "tStartMs": 1851540,
+    "dDurationMs": 5940,
+    "segs": [ {
+      "utf8": "getting the metadata going around to reading the \naudio data the web server is now keeping track  "
+    } ]
+  }, {
+    "tStartMs": 1857480,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "and realizing oh you know what this is getting \nI'm getting multiple requests for this same song  "
+    } ]
+  }, {
+    "tStartMs": 1863120,
+    "dDurationMs": 4620,
+    "segs": [ {
+      "utf8": "now I'm going to tell the CDN go and fetch \nthis song it's going to fetch it and so now  "
+    } ]
+  }, {
+    "tStartMs": 1867740,
+    "dDurationMs": 8520,
+    "segs": [ {
+      "utf8": "the application can I can it can be redirected for \nexample to read that audio from there so that's a  "
+    } ]
+  }, {
+    "tStartMs": 1876260,
+    "dDurationMs": 4260,
+    "segs": [ {
+      "utf8": "lot of talking but I was realizing that caching \nhere seems like it's a very important Point  "
+    } ]
+  }, {
+    "tStartMs": 1881660,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "in in this in this design and would help with \nthe bottleneck of of hot songs if you will  "
+    } ]
+  }, {
+    "tStartMs": 1888620,
+    "dDurationMs": 5580,
+    "segs": [ {
+      "utf8": "does that is that absolutely yeah by \nthe way that's a really good answer  "
+    } ]
+  }, {
+    "tStartMs": 1895880,
+    "dDurationMs": 8100,
+    "segs": [ {
+      "utf8": "okay and there's again in the AWS family here I'm \ngoing to use the family uh you know obviously if I  "
+    } ]
+  }, {
+    "tStartMs": 1903980,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "were a googlers you know I might be not be using \nthis but there's a technology called cloudfront  "
+    } ]
+  }, {
+    "tStartMs": 1909080,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "and cloudfront is uh basically a Content \ndelivery Network there's a bunch of other ones  "
+    } ]
+  }, {
+    "tStartMs": 1913760,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "uh gosh flask is that what it is I can't remember \nwhat the names of these of these Technologies are  "
+    } ]
+  }, {
+    "tStartMs": 1919280,
+    "dDurationMs": 4320,
+    "segs": [ {
+      "utf8": "but there's a bunch of other technologies that are \nvery similar in nature that allow you to do this  "
+    } ]
+  }, {
+    "tStartMs": 1925940,
+    "dDurationMs": 6720,
+    "segs": [ {
+      "utf8": "so that would help with the bottlenecks and uh in \nterms of the the the caching here you could also  "
+    } ]
+  }, {
+    "tStartMs": 1932660,
+    "dDurationMs": 8100,
+    "segs": [ {
+      "utf8": "and this is part of the reason by the way I just \nstepping backwards here a little bit part of the  "
+    } ]
+  }, {
+    "tStartMs": 1940760,
+    "dDurationMs": 4860,
+    "segs": [ {
+      "utf8": "reason why I think it would be better initially \nwhen the when the web server is getting the song  "
+    } ]
+  }, {
+    "tStartMs": 1945620,
+    "dDurationMs": 7560,
+    "segs": [ {
+      "utf8": "for the first time for it to read the the entire \nMP3 into its memory because then if it's if if it  "
+    } ]
+  }, {
+    "tStartMs": 1953180,
+    "dDurationMs": 5820,
+    "segs": [ {
+      "utf8": "is getting multiple requests for a particular song \nuh then it doesn't have to go to the database it  "
+    } ]
+  }, {
+    "tStartMs": 1959000,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "can actually just feed it from from its memory and \nthat's also a form of caching of course so it's  "
+    } ]
+  }, {
+    "tStartMs": 1964520,
+    "dDurationMs": 7380,
+    "segs": [ {
+      "utf8": "got a local cache essentially of of uh of these \nsongs and you could imagine having a shared cache  "
+    } ]
+  }, {
+    "tStartMs": 1971900,
+    "dDurationMs": 7260,
+    "segs": [ {
+      "utf8": "that's shared across these web servers so we that \ncould be another optimization but my point is that  "
+    } ]
+  }, {
+    "tStartMs": 1980060,
+    "dDurationMs": 7320,
+    "segs": [ {
+      "utf8": "if we have a cache in memory in these web servers \nthat stores the songs then we're offloading the  "
+    } ]
+  }, {
+    "tStartMs": 1987380,
+    "dDurationMs": 6600,
+    "segs": [ {
+      "utf8": "the database a little bit if we then have the \ncache here at this the edge of the network so  "
+    } ]
+  }, {
+    "tStartMs": 1993980,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "this is that's what it's called Edge Network Edge \ncaching then we're offloading the web servers  "
+    } ]
+  }, {
+    "tStartMs": 2001120,
+    "dDurationMs": 4980,
+    "segs": [ {
+      "utf8": "to to a large extent because the streaming this \nis optimized for streaming and so on and I think  "
+    } ]
+  }, {
+    "tStartMs": 2006100,
+    "dDurationMs": 7140,
+    "segs": [ {
+      "utf8": "if we go one step further actually I'm I'm sure \nand if I were designing it I would design the  "
+    } ]
+  }, {
+    "tStartMs": 2013240,
+    "dDurationMs": 6660,
+    "segs": [ {
+      "utf8": "application because these are on smartphones uh to \nto store this the songs that are played frequently  "
+    } ]
+  }, {
+    "tStartMs": 2019900,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "by the specific user locally in the local storage \nso it's another form of caching so then if it  "
+    } ]
+  }, {
+    "tStartMs": 2025600,
+    "dDurationMs": 7740,
+    "segs": [ {
+      "utf8": "finds the song in the local in its local cache \nessentially local store here on the phone uh then  "
+    } ]
+  }, {
+    "tStartMs": 2033340,
+    "dDurationMs": 4620,
+    "segs": [ {
+      "utf8": "you know you you wouldn't even need to go to the \nto the network at all right so you could actually  "
+    } ]
+  }, {
+    "tStartMs": 2037960,
+    "dDurationMs": 5640,
+    "segs": [ {
+      "utf8": "I'll even draw like this so it's like a little \nlittle cash a little local storage here of songs  "
+    } ]
+  }, {
+    "tStartMs": 2044320,
+    "dDurationMs": 4380,
+    "segs": [ {
+      "utf8": "so there's multi-layer caching I guess what I'm \nsaying multiple levels of caching ultimately with  "
+    } ]
+  }, {
+    "tStartMs": 2048700,
+    "dDurationMs": 4560,
+    "segs": [ {
+      "utf8": "the goal to provide the best user experience \nmake sure it's super fast and to then offload  "
+    } ]
+  }, {
+    "tStartMs": 2053260,
+    "dDurationMs": 6180,
+    "segs": [ {
+      "utf8": "obviously the system to to allow it to sort of \nscale and limit costs Etc so that's probably  "
+    } ]
+  }, {
+    "tStartMs": 2059440,
+    "dDurationMs": 6540,
+    "segs": [ {
+      "utf8": "enough on caching and I think I've gone \ngone you know gone deep a little bit there  "
+    } ]
+  }, {
+    "tStartMs": 2066760,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "be ready for the interviewer to ask you about \nparticular components or different aspects of your  "
+    } ]
+  }, {
+    "tStartMs": 2071440,
+    "dDurationMs": 4980,
+    "segs": [ {
+      "utf8": "system and to talk in detail about them it's also \ngood to talk through the flow of a particular use  "
+    } ]
+  }, {
+    "tStartMs": 2076420,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "case this helps make sure the interview is clear \non it but also helps you test your design as you  "
+    } ]
+  }, {
+    "tStartMs": 2081460,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "talk through it as well as helping you identify \nany potential bottlenecks as it did with Mark here  "
+    } ]
+  }, {
+    "tStartMs": 2086140,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "Mark explained the purpose of the caching and also \nwhere caches might exist in the system caching  "
+    } ]
+  }, {
+    "tStartMs": 2091660,
+    "dDurationMs": 4740,
+    "segs": [ {
+      "utf8": "wasn't limited to the CDN and the app but also \nthe web server he could have talked about caching  "
+    } ]
+  }, {
+    "tStartMs": 2096400,
+    "dDurationMs": 6840,
+    "segs": [ {
+      "utf8": "the metadata as well as the song data we've done \ncaching uh that's all good uh now I wanted to ask  "
+    } ]
+  }, {
+    "tStartMs": 2103240,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "you about load dancing uh yeah how would you think \nabout load balancing for for this particular app"
+    } ]
+  }, {
+    "tStartMs": 2111700,
+    "dDurationMs": 12720,
+    "segs": [ {
+      "utf8": "yeah magic load balancing it's uh yeah a little \na little bit of hand wavy here I think of load  "
+    } ]
+  }, {
+    "tStartMs": 2124420,
+    "dDurationMs": 9060,
+    "segs": [ {
+      "utf8": "balancing I mean so load balancing uh uh commonly \nis used to the load balancer's job here really  "
+    } ]
+  }, {
+    "tStartMs": 2134260,
+    "dDurationMs": 8580,
+    "segs": [ {
+      "utf8": "is to make sure that these web servers are don't \nare not overloaded so that they're providing  "
+    } ]
+  }, {
+    "tStartMs": 2142840,
+    "dDurationMs": 6420,
+    "segs": [ {
+      "utf8": "good service to the end users and they're \nnot overloaded and overloaded can can mean  "
+    } ]
+  }, {
+    "tStartMs": 2149260,
+    "dDurationMs": 6780,
+    "segs": [ {
+      "utf8": "many things often it's in terms of CPU so you know \nyou're getting requests in lots of requests coming  "
+    } ]
+  }, {
+    "tStartMs": 2156040,
+    "dDurationMs": 6360,
+    "segs": [ {
+      "utf8": "in uh and if if you're getting lots of requests \ncoming in then just load balancing these requests  "
+    } ]
+  }, {
+    "tStartMs": 2162400,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "across the server so that there's roughly the same \nnumber of requests on each one if assuming they're  "
+    } ]
+  }, {
+    "tStartMs": 2168400,
+    "dDurationMs": 8400,
+    "segs": [ {
+      "utf8": "all equal would probably also result in the CPU \nutilization being about equal I think for this  "
+    } ]
+  }, {
+    "tStartMs": 2176800,
+    "dDurationMs": 5220,
+    "segs": [ {
+      "utf8": "application I would think about load balancing \nI might think about it a little bit differently  "
+    } ]
+  }, {
+    "tStartMs": 2182020,
+    "dDurationMs": 7380,
+    "segs": [ {
+      "utf8": "because we're streaming data and so I might be \nnot instead of using CPU as my load balancing  "
+    } ]
+  }, {
+    "tStartMs": 2190240,
+    "dDurationMs": 6720,
+    "segs": [ {
+      "utf8": "uh metric to figure out how to distribute the load \nI might be looking at possibly Network bandwidth  "
+    } ]
+  }, {
+    "tStartMs": 2196960,
+    "dDurationMs": 6360,
+    "segs": [ {
+      "utf8": "like is is because if if a particular web server \nis not doing a lot from a CPU perspective but  "
+    } ]
+  }, {
+    "tStartMs": 2203320,
+    "dDurationMs": 7800,
+    "segs": [ {
+      "utf8": "if it is uh i o bound or network bound meaning \nit's it's hitting its limit of its if it of its  "
+    } ]
+  }, {
+    "tStartMs": 2211120,
+    "dDurationMs": 5940,
+    "segs": [ {
+      "utf8": "a network connection then uh I wouldn't want the \nload balancer to send it more traffic because  "
+    } ]
+  }, {
+    "tStartMs": 2217060,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "it's just going to bog down and you're going to \nget skips and things like that so I might make  "
+    } ]
+  }, {
+    "tStartMs": 2222580,
+    "dDurationMs": 6960,
+    "segs": [ {
+      "utf8": "this load balancer aware of multiple metrics one \nof them being Network maybe memory for caching  "
+    } ]
+  }, {
+    "tStartMs": 2229540,
+    "dDurationMs": 7620,
+    "segs": [ {
+      "utf8": "although you could probably you can kind of limit \nthat possibly but maybe not CPU for this purpose  "
+    } ]
+  }, {
+    "tStartMs": 2237160,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "it might be requests out outstanding or current \nstreams or something like that there might be  "
+    } ]
+  }, {
+    "tStartMs": 2242080,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "some other metrics but I'd want to I would want to \nmake this load balancer maybe a little bit smarter  "
+    } ]
+  }, {
+    "tStartMs": 2248080,
+    "dDurationMs": 7140,
+    "segs": [ {
+      "utf8": "than just a typical request uh round robin load \nbalancing scheme so I'm not sure if that's getting  "
+    } ]
+  }, {
+    "tStartMs": 2255220,
+    "dDurationMs": 6540,
+    "segs": [ {
+      "utf8": "it what you're asking yeah yeah I think that \nanswers my question load balancing is not a one  "
+    } ]
+  }, {
+    "tStartMs": 2261760,
+    "dDurationMs": 4560,
+    "segs": [ {
+      "utf8": "size fits all Mark mentioned looking at different \nmetrics as a way to load balance across different  "
+    } ]
+  }, {
+    "tStartMs": 2266320,
+    "dDurationMs": 4980,
+    "segs": [ {
+      "utf8": "servers which was a clever approach Mark was very \nopen about the fact that load balancing isn't an  "
+    } ]
+  }, {
+    "tStartMs": 2271300,
+    "dDurationMs": 4740,
+    "segs": [ {
+      "utf8": "error he's an expert on and this is okay it's fine \nto be honest when you ask about things that are  "
+    } ]
+  }, {
+    "tStartMs": 2276040,
+    "dDurationMs": 7080,
+    "segs": [ {
+      "utf8": "at the limits of your knowledge okay cool yeah \nall right are you are you done with your design  "
+    } ]
+  }, {
+    "tStartMs": 2284380,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "or is there anything else that you want to add \nyeah let me think about that and give me give me  "
+    } ]
+  }, {
+    "tStartMs": 2289540,
+    "dDurationMs": 11580,
+    "segs": [ {
+      "utf8": "just a moment I I mean it again it you know I've \nway oversimplified this but ah I guess I think if  "
+    } ]
+  }, {
+    "tStartMs": 2301120,
+    "dDurationMs": 6780,
+    "segs": [ {
+      "utf8": "I were to also think about this at a global \nscale I mean Spotify is a global app and so"
+    } ]
+  }, {
+    "tStartMs": 2309340,
+    "dDurationMs": 6780,
+    "segs": [ {
+      "utf8": "it's it's possible so uh replication I didn't \nreally talk about replication other than to do the  "
+    } ]
+  }, {
+    "tStartMs": 2316120,
+    "dDurationMs": 6780,
+    "segs": [ {
+      "utf8": "math to say hey maybe three three x replication \nand replication right why do we do this well we do  "
+    } ]
+  }, {
+    "tStartMs": 2322900,
+    "dDurationMs": 7380,
+    "segs": [ {
+      "utf8": "do it to make sure that we have uh data available \nwhen there's an outage so if so you know if I if  "
+    } ]
+  }, {
+    "tStartMs": 2330280,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "I were to you know I mean like do this right to \nindicate three replicas but that's that's a little  "
+    } ]
+  }, {
+    "tStartMs": 2335980,
+    "dDurationMs": 11040,
+    "segs": [ {
+      "utf8": "naive and the same thing for the metadata \nof course but the replicating the data is  "
+    } ]
+  }, {
+    "tStartMs": 2347020,
+    "dDurationMs": 6420,
+    "segs": [ {
+      "utf8": "not just for availability and downtime it's \nalso you would want to place those replicas  "
+    } ]
+  }, {
+    "tStartMs": 2354520,
+    "dDurationMs": 8040,
+    "segs": [ {
+      "utf8": "closer to where the users are and so from a \nGlobal Perspective you might have music that  "
+    } ]
+  }, {
+    "tStartMs": 2362560,
+    "dDurationMs": 8940,
+    "segs": [ {
+      "utf8": "is more local like maybe European punk rock is \nyou know more listened to more in Europe and  "
+    } ]
+  }, {
+    "tStartMs": 2371500,
+    "dDurationMs": 6600,
+    "segs": [ {
+      "utf8": "maybe maybe BTS is you know because it's Korean \npop is maybe it's more popular actually in Korea  "
+    } ]
+  }, {
+    "tStartMs": 2378940,
+    "dDurationMs": 6600,
+    "segs": [ {
+      "utf8": "or in Asia and so you might want to have the \nreplicas of those songs uh and and maybe even  "
+    } ]
+  }, {
+    "tStartMs": 2385540,
+    "dDurationMs": 8520,
+    "segs": [ {
+      "utf8": "the metadata be more locally uh represented more \nlocally so that you can get to it faster you don't  "
+    } ]
+  }, {
+    "tStartMs": 2394060,
+    "dDurationMs": 7800,
+    "segs": [ {
+      "utf8": "have to cross an ocean to get to the to the data \nand uh you know to reach it so kind of a Geo aware  "
+    } ]
+  }, {
+    "tStartMs": 2402520,
+    "dDurationMs": 6060,
+    "segs": [ {
+      "utf8": "strategy of data placement and possibly \nreplication strategy that might be a a  "
+    } ]
+  }, {
+    "tStartMs": 2408580,
+    "dDurationMs": 4140,
+    "segs": [ {
+      "utf8": "refinement I think that I would might make to \nthis design to make it just a little bit more  "
+    } ]
+  }, {
+    "tStartMs": 2413740,
+    "dDurationMs": 8760,
+    "segs": [ {
+      "utf8": "uh performant effective etc etc so yeah does that \ndoes that make sense yeah yeah I think nothing is  "
+    } ]
+  }, {
+    "tStartMs": 2422500,
+    "dDurationMs": 4860,
+    "segs": [ {
+      "utf8": "just interesting point to add it's a good idea \nto wrap up your answer by referring back to the  "
+    } ]
+  }, {
+    "tStartMs": 2427360,
+    "dDurationMs": 3720,
+    "segs": [ {
+      "utf8": "requirements laid out at the beginning of the \ninterview and confirming that your design meets  "
+    } ]
+  }, {
+    "tStartMs": 2431080,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "them if you have time it's always nice to think \nbig and take a quick look at the problem from a  "
+    } ]
+  }, {
+    "tStartMs": 2436240,
+    "dDurationMs": 4560,
+    "segs": [ {
+      "utf8": "different dimension that could make it more \ncomplex Mark did this with his geolocation  "
+    } ]
+  }, {
+    "tStartMs": 2440800,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "idea he didn't go into detail but another interior \nmight have explored this further and it could have  "
+    } ]
+  }, {
+    "tStartMs": 2445720,
+    "dDurationMs": 6360,
+    "segs": [ {
+      "utf8": "opened up a whole new aspect of the design overall \nan excellent answer from Mark yeah great job Mark  "
+    } ]
+  }, {
+    "tStartMs": 2453100,
+    "dDurationMs": 6900,
+    "segs": [ {
+      "utf8": "I think that was a a really good approach and \nyeah how did you feel now now looking back now  "
+    } ]
+  }, {
+    "tStartMs": 2460000,
+    "dDurationMs": 3300,
+    "segs": [ {
+      "utf8": "the interview is over let's say you've \nuh you've walked out the interview room  "
+    } ]
+  }, {
+    "tStartMs": 2463840,
+    "dDurationMs": 3180,
+    "segs": [ {
+      "utf8": "and read the big sigh of relief how \nhow are you feeling that it's gone"
+    } ]
+  }, {
+    "tStartMs": 2469180,
+    "dDurationMs": 4800,
+    "segs": [ {
+      "utf8": "I feel pretty good about it it's uh yeah it's \ndefinitely different being on the other side of  "
+    } ]
+  }, {
+    "tStartMs": 2473980,
+    "dDurationMs": 6720,
+    "segs": [ {
+      "utf8": "things and uh I I know that I'm sure I miss things \nand I'm I'm you know people are watching this and  "
+    } ]
+  }, {
+    "tStartMs": 2480700,
+    "dDurationMs": 5640,
+    "segs": [ {
+      "utf8": "and uh wind up scheduling some a session with me \nI'm you know happy to take the the feedback on  "
+    } ]
+  }, {
+    "tStartMs": 2486340,
+    "dDurationMs": 5280,
+    "segs": [ {
+      "utf8": "some things that I missed I'm sure I've missed \nthings but uh but yeah it's fun fun to do this  "
+    } ]
+  }, {
+    "tStartMs": 2491620,
+    "dDurationMs": 6720,
+    "segs": [ {
+      "utf8": "though cool good stuff well uh yeah thanks very \nmuch and uh yeah thanks everyone for watching  "
+    } ]
+  }, {
+    "tStartMs": 2499300,
+    "dDurationMs": 4740,
+    "segs": [ {
+      "utf8": "hello I really hope you found that useful if you \ndid you can like And subscribe and why not come  "
+    } ]
+  }, {
+    "tStartMs": 2504040,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "visit us at igotanoffer.com there you can find \nmore videos useful Frameworks and question guides  "
+    } ]
+  }, {
+    "tStartMs": 2509560,
+    "dDurationMs": 6120,
+    "segs": [ {
+      "utf8": "all completely free and you can also book expert \nfeedback one-to-one with our coaches from Google,  "
+    } ]
+  }, {
+    "tStartMs": 2515680,
+    "dDurationMs": 8040,
+    "segs": [ {
+      "utf8": "meta, Amazon Etc thank you and good luck \nwith your interview [Music] all right"
+    } ]
+  }, {
+    "tStartMs": 2523720,
+    "dDurationMs": 449,
+    "segs": [ {
+      "utf8": "[Music]"
+    } ]
+  } ]
+}

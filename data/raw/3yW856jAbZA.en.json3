@@ -1,0 +1,2370 @@
+{
+  "wireMagic": "pb3",
+  "pens": [ {
+  
+  } ],
+  "wsWinStyles": [ {
+  
+  } ],
+  "wpWinPositions": [ {
+  
+  } ],
+  "events": [ {
+    "tStartMs": 0,
+    "dDurationMs": 5960,
+    "segs": [ {
+      "utf8": "[Music] hello welcome to this system design \nmock interview very pleased to say we have a  "
+    } ]
+  }, {
+    "tStartMs": 5960,
+    "dDurationMs": 6040,
+    "segs": [ {
+      "utf8": "special guest with us today it's Eugene from one \nof our favorite channels Crushing Tech Education,  "
+    } ]
+  }, {
+    "tStartMs": 12000,
+    "dDurationMs": 6160,
+    "segs": [ {
+      "utf8": "Eugene thanks for coming on the platform thanks \nfor having me Tom it's great to have you on now  "
+    } ]
+  }, {
+    "tStartMs": 18160,
+    "dDurationMs": 5640,
+    "segs": [ {
+      "utf8": "you're going to be doing a classic system design \nmock interview question with us but before you  "
+    } ]
+  }, {
+    "tStartMs": 23800,
+    "dDurationMs": 7480,
+    "segs": [ {
+      "utf8": "do just quickly give people a quick overview of \nyour background of course I'm a senior engineer  "
+    } ]
+  }, {
+    "tStartMs": 31280,
+    "dDurationMs": 6160,
+    "segs": [ {
+      "utf8": "and manager so I started out my career back in \n2010 as a software engineer and over the years  "
+    } ]
+  }, {
+    "tStartMs": 37440,
+    "dDurationMs": 6640,
+    "segs": [ {
+      "utf8": "had an opportunity to work as a devops and network \nengineer engineering manager and VP of technology  "
+    } ]
+  }, {
+    "tStartMs": 44080,
+    "dDurationMs": 6080,
+    "segs": [ {
+      "utf8": "I also have my YouTube channel called Crushing \nTech Education where I post a lot of system design  "
+    } ]
+  }, {
+    "tStartMs": 50160,
+    "dDurationMs": 5720,
+    "segs": [ {
+      "utf8": "content the idea for the channel was to create \na Content that would cover all those deep dive  "
+    } ]
+  }, {
+    "tStartMs": 55880,
+    "dDurationMs": 5560,
+    "segs": [ {
+      "utf8": "concepts because that was my frustration back in \nthe day when I tried to learn more about it I just  "
+    } ]
+  }, {
+    "tStartMs": 61440,
+    "dDurationMs": 5640,
+    "segs": [ {
+      "utf8": "wouldn't find any deep dive content and majority \nof the videos would be very shallow and high  "
+    } ]
+  }, {
+    "tStartMs": 67080,
+    "dDurationMs": 7680,
+    "segs": [ {
+      "utf8": "level so I guess that's my attempt to fix that all \nright let's let's stop chattering and get stuck in  "
+    } ]
+  }, {
+    "tStartMs": 74760,
+    "dDurationMs": 9960,
+    "segs": [ {
+      "utf8": "shall we Eugene today I want to ask you to Design \nTwitter sounds good all right Twitter or now it's  "
+    } ]
+  }, {
+    "tStartMs": 84720,
+    "dDurationMs": 8520,
+    "segs": [ {
+      "utf8": "x.com right let's let's do it so first I think \nI'm just going to ask you a few more questions  "
+    } ]
+  }, {
+    "tStartMs": 93240,
+    "dDurationMs": 4720,
+    "segs": [ {
+      "utf8": "just to make sure we are on the same page on \nwhat components and workflow you want me to"
+    } ]
+  }, {
+    "tStartMs": 97960,
+    "dDurationMs": 13480,
+    "segs": [ {
+      "utf8": "cover so maybe you can provide me some components \nthat you want me to focus on so I can start it  "
+    } ]
+  }, {
+    "tStartMs": 111440,
+    "dDurationMs": 10720,
+    "segs": [ {
+      "utf8": "from there yeah sure let's let's look at posting \na tweet the timeline and user following okay so  "
+    } ]
+  }, {
+    "tStartMs": 122160,
+    "dDurationMs": 4120,
+    "segs": [ {
+      "utf8": "we want to cover three main features which is \npretty much the main workflow right so I post  "
+    } ]
+  }, {
+    "tStartMs": 126280,
+    "dDurationMs": 7040,
+    "segs": [ {
+      "utf8": "a tweet and then as a result of it that tweet \nwould probably go to all the followers that I  "
+    } ]
+  }, {
+    "tStartMs": 133320,
+    "dDurationMs": 9800,
+    "segs": [ {
+      "utf8": "have and their timeline would be updated can \ntweet contain any media like video or photo  "
+    } ]
+  }, {
+    "tStartMs": 143120,
+    "dDurationMs": 6160,
+    "segs": [ {
+      "utf8": "yeah yeah contain links photos and video all \nright so we can have any sort of content on  "
+    } ]
+  }, {
+    "tStartMs": 149280,
+    "dDurationMs": 5000,
+    "segs": [ {
+      "utf8": "that tweet and when you say a timeline there \nthere are two types of timelines right the  "
+    } ]
+  }, {
+    "tStartMs": 154280,
+    "dDurationMs": 5280,
+    "segs": [ {
+      "utf8": "first one is a user timeline that consists of \nthe tweets that I post myself and the second  "
+    } ]
+  }, {
+    "tStartMs": 159560,
+    "dDurationMs": 7440,
+    "segs": [ {
+      "utf8": "one is the home timeline that would be a mixture \nof the tweets from the users I follow but at the  "
+    } ]
+  }, {
+    "tStartMs": 167000,
+    "dDurationMs": 7640,
+    "segs": [ {
+      "utf8": "same time my tweets perhaps and some ads right \nyeah correct all right and do we want to also  "
+    } ]
+  }, {
+    "tStartMs": 174640,
+    "dDurationMs": 5680,
+    "segs": [ {
+      "utf8": "support that yeah we probably want to support \nthat user can users can follow each other to  "
+    } ]
+  }, {
+    "tStartMs": 180320,
+    "dDurationMs": 7080,
+    "segs": [ {
+      "utf8": "subscribe to their updates right yeah cool and \ndo you want me to cover any other Concepts like  "
+    } ]
+  }, {
+    "tStartMs": 187400,
+    "dDurationMs": 8360,
+    "segs": [ {
+      "utf8": "search retweet maybe favorite tweets likes \nyeah maybe Twitter search but let's see if  "
+    } ]
+  }, {
+    "tStartMs": 195760,
+    "dDurationMs": 6800,
+    "segs": [ {
+      "utf8": "we have enough time for that all right sounds \ngood let me just talk a little bit about the  "
+    } ]
+  }, {
+    "tStartMs": 202560,
+    "dDurationMs": 6160,
+    "segs": [ {
+      "utf8": "assumptions that I have and make sure you can \nstop me if I'm going some wrong direction or  "
+    } ]
+  }, {
+    "tStartMs": 209800,
+    "dDurationMs": 6200,
+    "segs": [ {
+      "utf8": "we have some discrepancy in the thought process \nso it's Twitter right so all the workloads are  "
+    } ]
+  }, {
+    "tStartMs": 216000,
+    "dDurationMs": 7240,
+    "segs": [ {
+      "utf8": "going to be read heavy because when people go to \nTwitter they mostly read and they read way more  "
+    } ]
+  }, {
+    "tStartMs": 223240,
+    "dDurationMs": 5680,
+    "segs": [ {
+      "utf8": "messages and tweets than they write and I would \nsay the ratio probably going to be like one to 10  "
+    } ]
+  }, {
+    "tStartMs": 228920,
+    "dDurationMs": 8600,
+    "segs": [ {
+      "utf8": "or one to 20 which means for every single tweet \nI post I probably read like 20 tweets right and  "
+    } ]
+  }, {
+    "tStartMs": 237520,
+    "dDurationMs": 10480,
+    "segs": [ {
+      "utf8": "when I post a message I would need to also likely \nindex it and making sure that it makes it to First  "
+    } ]
+  }, {
+    "tStartMs": 248000,
+    "dDurationMs": 10360,
+    "segs": [ {
+      "utf8": "the search across the Twitter at the same time \nto all the all my followers timelines so that  "
+    } ]
+  }, {
+    "tStartMs": 258360,
+    "dDurationMs": 6400,
+    "segs": [ {
+      "utf8": "likely not going to be instant and is that okay \nif we have eventual consistency here because I  "
+    } ]
+  }, {
+    "tStartMs": 264760,
+    "dDurationMs": 6680,
+    "segs": [ {
+      "utf8": "would assume that making sure that tweet makes \nit to all the timelines and search would take  "
+    } ]
+  }, {
+    "tStartMs": 271440,
+    "dDurationMs": 6760,
+    "segs": [ {
+      "utf8": "I don't know maybe 10 to 30 seconds would that be \nokay to have eventual consistency yeah I think 30  "
+    } ]
+  }, {
+    "tStartMs": 278200,
+    "dDurationMs": 11160,
+    "segs": [ {
+      "utf8": "to 60 seconds is fine yeah okay and so I would \nalso assume that majority of the searches and  "
+    } ]
+  }, {
+    "tStartMs": 289360,
+    "dDurationMs": 6600,
+    "segs": [ {
+      "utf8": "tweets read would be the most recent data right \nbecause that's what Twitter is used for reading  "
+    } ]
+  }, {
+    "tStartMs": 295960,
+    "dDurationMs": 6960,
+    "segs": [ {
+      "utf8": "the most recent news and everything and we would \nalso need to store historical data right if we  "
+    } ]
+  }, {
+    "tStartMs": 302920,
+    "dDurationMs": 4800,
+    "segs": [ {
+      "utf8": "do the search we would still want to search \nfor some data that probably was posted like  "
+    } ]
+  }, {
+    "tStartMs": 307720,
+    "dDurationMs": 12520,
+    "segs": [ {
+      "utf8": "a year ago sure yes all right all right so then \nif this is anything else you want me to cover or  "
+    } ]
+  }, {
+    "tStartMs": 320240,
+    "dDurationMs": 7800,
+    "segs": [ {
+      "utf8": "any other comments on the requirements or high \nlevel assumptions I think I think that's all  "
+    } ]
+  }, {
+    "tStartMs": 328040,
+    "dDurationMs": 4760,
+    "segs": [ {
+      "utf8": "good for now yeah Eugene did a great job taking \nthe question and reducing it into something more  "
+    } ]
+  }, {
+    "tStartMs": 332800,
+    "dDurationMs": 5000,
+    "segs": [ {
+      "utf8": "manageable you should clarify the main workflows \nand use cases that you need to cover talk through  "
+    } ]
+  }, {
+    "tStartMs": 337800,
+    "dDurationMs": 4880,
+    "segs": [ {
+      "utf8": "the functional and non-functional assumptions \nand confirm them with the interviewer then walk  "
+    } ]
+  }, {
+    "tStartMs": 342680,
+    "dDurationMs": 6680,
+    "segs": [ {
+      "utf8": "through the adjacent features and confirm whether \nthey need to be covered please continue all right  "
+    } ]
+  }, {
+    "tStartMs": 349360,
+    "dDurationMs": 8160,
+    "segs": [ {
+      "utf8": "sounds good then I'm G to go and just try to \nbriefly do some capacity estimation just so we  "
+    } ]
+  }, {
+    "tStartMs": 357520,
+    "dDurationMs": 5720,
+    "segs": [ {
+      "utf8": "know how much data we would be storing how big \nof a storage and network we would need for the"
+    } ]
+  }, {
+    "tStartMs": 363240,
+    "dDurationMs": 16440,
+    "segs": [ {
+      "utf8": "system all right you should be able to see \nmy screen over here can you see it yeah so  "
+    } ]
+  }, {
+    "tStartMs": 379680,
+    "dDurationMs": 7080,
+    "segs": [ {
+      "utf8": "I mean the Twitter site the Tweet itself would \nbe limited because we can't post a really big a  "
+    } ]
+  }, {
+    "tStartMs": 386760,
+    "dDurationMs": 7560,
+    "segs": [ {
+      "utf8": "lot of characters there it's 160 100 60 characters \nas far as I remember or 180 so I think that would  "
+    } ]
+  }, {
+    "tStartMs": 394320,
+    "dDurationMs": 12200,
+    "segs": [ {
+      "utf8": "probably be like what 10 kilobytes Max size so \nlet me just put some high level assumptions it's  "
+    } ]
+  }, {
+    "tStartMs": 406520,
+    "dDurationMs": 7040,
+    "segs": [ {
+      "utf8": "280 characters 280 characters they they moved \nit up but yeah it's not going to make a big  "
+    } ]
+  }, {
+    "tStartMs": 413560,
+    "dDurationMs": 7040,
+    "segs": [ {
+      "utf8": "difference there all right yeah so let's just \nlet's just seem like it can be 10 kilobytes per  "
+    } ]
+  }, {
+    "tStartMs": 420600,
+    "dDurationMs": 9760,
+    "segs": [ {
+      "utf8": "tweet maximum and from the user base how many \nhow many users how many active users we would  "
+    } ]
+  }, {
+    "tStartMs": 430360,
+    "dDurationMs": 8560,
+    "segs": [ {
+      "utf8": "want to have like 100 million or one billion say \na billion billion users so let's assume we have  "
+    } ]
+  }, {
+    "tStartMs": 438920,
+    "dDurationMs": 16560,
+    "segs": [ {
+      "utf8": "one billion active users and maybe what what maybe \n200 million of active users of of users that post  "
+    } ]
+  }, {
+    "tStartMs": 455480,
+    "dDurationMs": 13040,
+    "segs": [ {
+      "utf8": "messages Daily Post like daily users call it \nright and on average every user has maybe 200"
+    } ]
+  }, {
+    "tStartMs": 468520,
+    "dDurationMs": 12000,
+    "segs": [ {
+      "utf8": "[Music] followers all right so does it look \ndoes it look good to you is does that does  "
+    } ]
+  }, {
+    "tStartMs": 480520,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "make sense yeah that makes sense so far \nall right so let's try to estimate some  "
+    } ]
+  }, {
+    "tStartMs": 486760,
+    "dDurationMs": 8800,
+    "segs": [ {
+      "utf8": "storage and network capacity that we would \nneed so if we have 200 million daily users  "
+    } ]
+  }, {
+    "tStartMs": 495560,
+    "dDurationMs": 7840,
+    "segs": [ {
+      "utf8": "we can assume let's say 100 million users post \nmessage every day so we would have 100 million  "
+    } ]
+  }, {
+    "tStartMs": 503400,
+    "dDurationMs": 10760,
+    "segs": [ {
+      "utf8": "tweets per day right and every tweet would \nbe 10 kilobyte for text but then you also  "
+    } ]
+  }, {
+    "tStartMs": 514160,
+    "dDurationMs": 9160,
+    "segs": [ {
+      "utf8": "said that we might have some media right in \nthere so I would assume we would have let's"
+    } ]
+  }, {
+    "tStartMs": 523320,
+    "dDurationMs": 15920,
+    "segs": [ {
+      "utf8": "say what 200 kilobyte let's say per tweet \non average with media and pictures and if  "
+    } ]
+  }, {
+    "tStartMs": 539240,
+    "dDurationMs": 5480,
+    "segs": [ {
+      "utf8": "if that's the case then we would \nhave what 10 terabytes of data per"
+    } ]
+  }, {
+    "tStartMs": 544720,
+    "dDurationMs": 10280,
+    "segs": [ {
+      "utf8": "day so as we have u 10 terabytes of \ndata per day let's just think how  "
+    } ]
+  }, {
+    "tStartMs": 555000,
+    "dDurationMs": 8920,
+    "segs": [ {
+      "utf8": "many requests per second we would have so \nwith this if we have 100 million posts per  "
+    } ]
+  }, {
+    "tStartMs": 563920,
+    "dDurationMs": 6800,
+    "segs": [ {
+      "utf8": "day and we're just going to divide it \nby the number of seconds make us what"
+    } ]
+  }, {
+    "tStartMs": 570720,
+    "dDurationMs": 7080,
+    "segs": [ {
+      "utf8": "1,200 request per second and this \nwould be an on average so during  "
+    } ]
+  }, {
+    "tStartMs": 577800,
+    "dDurationMs": 6840,
+    "segs": [ {
+      "utf8": "the peak time likely we would have more \nbrights because let's say we would have  "
+    } ]
+  }, {
+    "tStartMs": 584640,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "five or 10x more rights which would \nmake it to six to 12,000 requests per"
+    } ]
+  }, {
+    "tStartMs": 590880,
+    "dDurationMs": 3300,
+    "segs": [ {
+      "utf8": "[Music]"
+    } ]
+  }, {
+    "tStartMs": 594180,
+    "dDurationMs": 12940,
+    "segs": [ {
+      "utf8": "second right and on average let's say \nwe would need to send we would need  "
+    } ]
+  }, {
+    "tStartMs": 607120,
+    "dDurationMs": 7000,
+    "segs": [ {
+      "utf8": "to propagate those tweets to 20 users \nthen for every single right and we have  "
+    } ]
+  }, {
+    "tStartMs": 614120,
+    "dDurationMs": 5720,
+    "segs": [ {
+      "utf8": "fix th000 request six 6,000 rights per \nsecond we would need to push that user  "
+    } ]
+  }, {
+    "tStartMs": 619840,
+    "dDurationMs": 9240,
+    "segs": [ {
+      "utf8": "to we would need to push that message to 20 \nfollowers that would make it what close to"
+    } ]
+  }, {
+    "tStartMs": 629080,
+    "dDurationMs": 6320,
+    "segs": [ {
+      "utf8": "[Music] about let's say"
+    } ]
+  }, {
+    "tStartMs": 635400,
+    "dDurationMs": 3920,
+    "segs": [ {
+      "utf8": "100,000 fan out"
+    } ]
+  }, {
+    "tStartMs": 639320,
+    "dDurationMs": 9680,
+    "segs": [ {
+      "utf8": "messages which means that pretty much during \nper second we would need not only to write 6  "
+    } ]
+  }, {
+    "tStartMs": 649000,
+    "dDurationMs": 7960,
+    "segs": [ {
+      "utf8": "to 12,000 tweets but also push them out to all \nthe followers and it would be about 100,000 F  "
+    } ]
+  }, {
+    "tStartMs": 656960,
+    "dDurationMs": 8440,
+    "segs": [ {
+      "utf8": "out messages per second [Music] okay do you \nwant me to go to the API now or we can skip  "
+    } ]
+  }, {
+    "tStartMs": 665400,
+    "dDurationMs": 13200,
+    "segs": [ {
+      "utf8": "that yeah let's have a have a look at the API for \nthe timeline all right so for the API I think our  "
+    } ]
+  }, {
+    "tStartMs": 678600,
+    "dDurationMs": 6480,
+    "segs": [ {
+      "utf8": "API would be relatively straightforward so yeah \nwe can cover the Tweets in Timeline here so when  "
+    } ]
+  }, {
+    "tStartMs": 685080,
+    "dDurationMs": 8040,
+    "segs": [ {
+      "utf8": "we post a tweet then we would just use the post \nmethod I would guess with the format we can have  "
+    } ]
+  }, {
+    "tStartMs": 693120,
+    "dDurationMs": 12640,
+    "segs": [ {
+      "utf8": "a version for the path and then let say tweets \nthis would be our post request and it would"
+    } ]
+  }, {
+    "tStartMs": 705760,
+    "dDurationMs": 6560,
+    "segs": [ {
+      "utf8": "contain it would contain"
+    } ]
+  }, {
+    "tStartMs": 712320,
+    "dDurationMs": 10600,
+    "segs": [ {
+      "utf8": "sorry we would have a a user ID content and the"
+    } ]
+  }, {
+    "tStartMs": 722920,
+    "dDurationMs": 10000,
+    "segs": [ {
+      "utf8": "media we would have a separate endpoint for \nthe media because we would want to store media  "
+    } ]
+  }, {
+    "tStartMs": 732920,
+    "dDurationMs": 8240,
+    "segs": [ {
+      "utf8": "separately and then just propagate the link to the \nmedia so there would likely be a different point  "
+    } ]
+  }, {
+    "tStartMs": 741160,
+    "dDurationMs": 11240,
+    "segs": [ {
+      "utf8": "for the media but we would just post it and we \nwould have so this is these are tweet end points  "
+    } ]
+  }, {
+    "tStartMs": 752400,
+    "dDurationMs": 5080,
+    "segs": [ {
+      "utf8": "then we'll probably have a few end points for \nthe user connections so it would be let's say  "
+    } ]
+  }, {
+    "tStartMs": 757480,
+    "dDurationMs": 7960,
+    "segs": [ {
+      "utf8": "post and delete for users to follow each other \nso when the user follows each other we would use  "
+    } ]
+  }, {
+    "tStartMs": 765440,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "post and then when we break the connection and \nuser unfollows someone we would use the delete  "
+    } ]
+  }, {
+    "tStartMs": 771680,
+    "dDurationMs": 13720,
+    "segs": [ {
+      "utf8": "verb and the API would probably look like this can \nhave like users and then perhaps user ID and then"
+    } ]
+  }, {
+    "tStartMs": 785400,
+    "dDurationMs": 9840,
+    "segs": [ {
+      "utf8": "follow and for the timeline as you mentioned \nwe would need get end points right so we would  "
+    } ]
+  }, {
+    "tStartMs": 795240,
+    "dDurationMs": 13120,
+    "segs": [ {
+      "utf8": "follow a similar pattern here and call it \ntimelines that would probably take as a  "
+    } ]
+  }, {
+    "tStartMs": 808360,
+    "dDurationMs": 10200,
+    "segs": [ {
+      "utf8": "parameter we would need a page page size \nwe would also need user ID obviously but  "
+    } ]
+  }, {
+    "tStartMs": 818560,
+    "dDurationMs": 9880,
+    "segs": [ {
+      "utf8": "user ID can be passed in the in the header \nand that will be the home timeline and then  "
+    } ]
+  }, {
+    "tStartMs": 828440,
+    "dDurationMs": 10320,
+    "segs": [ {
+      "utf8": "there would be a user timeline right \nso it probably look like this user IG"
+    } ]
+  }, {
+    "tStartMs": 841680,
+    "dDurationMs": 8120,
+    "segs": [ {
+      "utf8": "and and we would pass the page and Page size \nhere as well so I think this is like high level  "
+    } ]
+  }, {
+    "tStartMs": 849800,
+    "dDurationMs": 6680,
+    "segs": [ {
+      "utf8": "how the API would look like does it look okay \ngood enough do you want me to cover something  "
+    } ]
+  }, {
+    "tStartMs": 856480,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "else here yeah I think that I think that looks \ngood okay so now as we've covered like high  "
+    } ]
+  }, {
+    "tStartMs": 862720,
+    "dDurationMs": 6320,
+    "segs": [ {
+      "utf8": "level functionality and methods that we want \nto implement let's try to Define high level"
+    } ]
+  }, {
+    "tStartMs": 869040,
+    "dDurationMs": 17680,
+    "segs": [ {
+      "utf8": "components and as I think about it we would need a \nfew components right so our main components would  "
+    } ]
+  }, {
+    "tStartMs": 886720,
+    "dDurationMs": 8400,
+    "segs": [ {
+      "utf8": "be a tweet tweet service or tweet processor that \nwould be responsible for posting a tweet so when  "
+    } ]
+  }, {
+    "tStartMs": 895120,
+    "dDurationMs": 5800,
+    "segs": [ {
+      "utf8": "we post a tweet we would need to store it and then \npost it elsewhere Ware for some further processing  "
+    } ]
+  }, {
+    "tStartMs": 900920,
+    "dDurationMs": 6160,
+    "segs": [ {
+      "utf8": "right and indexing and search and timeline \ngeneration then the second one would be some  "
+    } ]
+  }, {
+    "tStartMs": 907080,
+    "dDurationMs": 7680,
+    "segs": [ {
+      "utf8": "sort of user graph that would be responsible for \nmaking sure we have all the user connections and  "
+    } ]
+  }, {
+    "tStartMs": 914760,
+    "dDurationMs": 7480,
+    "segs": [ {
+      "utf8": "that service would be tracking the users that \nfollow each other and and serve as a source  "
+    } ]
+  }, {
+    "tStartMs": 922240,
+    "dDurationMs": 5560,
+    "segs": [ {
+      "utf8": "of Truth for that and the third one would be \na timeline service that would be responsible  "
+    } ]
+  }, {
+    "tStartMs": 927800,
+    "dDurationMs": 9640,
+    "segs": [ {
+      "utf8": "for generating the timeline storing them and then \nserve back to users So based on the requirements  "
+    } ]
+  }, {
+    "tStartMs": 937440,
+    "dDurationMs": 7680,
+    "segs": [ {
+      "utf8": "does it make sense what I just said the components \nyeah I'm on board with that yeah all right sounds  "
+    } ]
+  }, {
+    "tStartMs": 945120,
+    "dDurationMs": 8160,
+    "segs": [ {
+      "utf8": "good and now I think we can briefly talk about \nthe database design if you want to just how the  "
+    } ]
+  }, {
+    "tStartMs": 953280,
+    "dDurationMs": 5320,
+    "segs": [ {
+      "utf8": "tables would look like yeah I think it would \nbe good to cover the main entities of that yes"
+    } ]
+  }, {
+    "tStartMs": 965000,
+    "dDurationMs": 9200,
+    "segs": [ {
+      "utf8": "all right so I mean high level our database design \nwould be relatively simple right we have the main  "
+    } ]
+  }, {
+    "tStartMs": 974200,
+    "dDurationMs": 12040,
+    "segs": [ {
+      "utf8": "enes would be a tweet that would need to contain \na user ID tweet ID we would need to have likely  "
+    } ]
+  }, {
+    "tStartMs": 986240,
+    "dDurationMs": 9480,
+    "segs": [ {
+      "utf8": "some sort of a Tim stamp on when the Tweet was \ncreated and and the content right we might also  "
+    } ]
+  }, {
+    "tStartMs": 995720,
+    "dDurationMs": 8720,
+    "segs": [ {
+      "utf8": "need to have links for the media but at the same \ntime I think those links can be inside the content  "
+    } ]
+  }, {
+    "tStartMs": 1004440,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "because when we would return the Tweet back to \nthe user we would use those IDs and links to  "
+    } ]
+  }, {
+    "tStartMs": 1010680,
+    "dDurationMs": 8440,
+    "segs": [ {
+      "utf8": "pull the media so I think high level that would \nbe like that would be it like for the the Tweet  "
+    } ]
+  }, {
+    "tStartMs": 1019120,
+    "dDurationMs": 8960,
+    "segs": [ {
+      "utf8": "the basic functionality for the user relation we \nhave some sort of user relation table that would  "
+    } ]
+  }, {
+    "tStartMs": 1028080,
+    "dDurationMs": 11160,
+    "segs": [ {
+      "utf8": "have many to many mapping for users that follow \neach other so I would assume we would have like  "
+    } ]
+  }, {
+    "tStartMs": 1039240,
+    "dDurationMs": 9160,
+    "segs": [ {
+      "utf8": "if we were to use single table for many to many \nconnection between users then we would just have  "
+    } ]
+  }, {
+    "tStartMs": 1050200,
+    "dDurationMs": 16440,
+    "segs": [ {
+      "utf8": "user ID and then and then or we can call it \nfollower ID follower user ID and then the  "
+    } ]
+  }, {
+    "tStartMs": 1066640,
+    "dDurationMs": 9280,
+    "segs": [ {
+      "utf8": "other one would be a followe user ID so every \nsingle time when someone follows an account we  "
+    } ]
+  }, {
+    "tStartMs": 1075920,
+    "dDurationMs": 6920,
+    "segs": [ {
+      "utf8": "would need to insert two records in this t table \none would be for one user to follow another one  "
+    } ]
+  }, {
+    "tStartMs": 1082840,
+    "dDurationMs": 6960,
+    "segs": [ {
+      "utf8": "and the other one would be for that user to get \na new follower so it's a bidirectional connection  "
+    } ]
+  }, {
+    "tStartMs": 1089800,
+    "dDurationMs": 8120,
+    "segs": [ {
+      "utf8": "that would require us to write two records for \na single follow functionality on the on on the  "
+    } ]
+  }, {
+    "tStartMs": 1097920,
+    "dDurationMs": 5440,
+    "segs": [ {
+      "utf8": "Twitter but again I think it can be optimized \na little bit by separation of the follower and  "
+    } ]
+  }, {
+    "tStartMs": 1103360,
+    "dDurationMs": 6800,
+    "segs": [ {
+      "utf8": "followe data but we're going to we're going to \nget to it later I guess once we go to the main  "
+    } ]
+  }, {
+    "tStartMs": 1110160,
+    "dDurationMs": 7600,
+    "segs": [ {
+      "utf8": "design sure do think that's kind of good enough \nfor now and'll be obviously the user Table Right  "
+    } ]
+  }, {
+    "tStartMs": 1117760,
+    "dDurationMs": 5320,
+    "segs": [ {
+      "utf8": "but it's pretty yeah just like high level user \ninformation so I think we can skip it for now  "
+    } ]
+  }, {
+    "tStartMs": 1123080,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "yeah I'm happy with that as Eugene did before \ngetting into the design you should draft some  "
+    } ]
+  }, {
+    "tStartMs": 1128000,
+    "dDurationMs": 4840,
+    "segs": [ {
+      "utf8": "capacity estimation for the system then you \ncan walk through the API design you also want  "
+    } ]
+  }, {
+    "tStartMs": 1132840,
+    "dDurationMs": 4880,
+    "segs": [ {
+      "utf8": "to define a database design for the main entities \nthat the system would operate Eugene did all this  "
+    } ]
+  }, {
+    "tStartMs": 1137720,
+    "dDurationMs": 5080,
+    "segs": [ {
+      "utf8": "very convinced and he was nicely set up to start \ndrawing his architecture diagram please please  "
+    } ]
+  }, {
+    "tStartMs": 1142800,
+    "dDurationMs": 11080,
+    "segs": [ {
+      "utf8": "carry on all right sounds good so let me just get \nthen to the high level design and the components  "
+    } ]
+  }, {
+    "tStartMs": 1153880,
+    "dDurationMs": 7640,
+    "segs": [ {
+      "utf8": "so as you mentioned we want to cover three main \nfeatures right posting a tweet user follow each  "
+    } ]
+  }, {
+    "tStartMs": 1161520,
+    "dDurationMs": 12120,
+    "segs": [ {
+      "utf8": "other and timeline generation so I'm just going to \ngo from there and going to create a few components  "
+    } ]
+  }, {
+    "tStartMs": 1173640,
+    "dDurationMs": 12760,
+    "segs": [ {
+      "utf8": "here for the user action so let's say this one \nis going to be post at [Music] tweet like that  "
+    } ]
+  }, {
+    "tStartMs": 1186400,
+    "dDurationMs": 11800,
+    "segs": [ {
+      "utf8": "then we would have the second feature user [Music] \nfollow and then we would have user timeline gener"
+    } ]
+  }, {
+    "tStartMs": 1198200,
+    "dDurationMs": 8560,
+    "segs": [ {
+      "utf8": "eration so user timeline and home"
+    } ]
+  }, {
+    "tStartMs": 1206760,
+    "dDurationMs": 15920,
+    "segs": [ {
+      "utf8": "timeline and I'm just going to split it like \nthis so This these are this these are would  "
+    } ]
+  }, {
+    "tStartMs": 1222680,
+    "dDurationMs": 11320,
+    "segs": [ {
+      "utf8": "be user requests from the internet so call \ninternet and U on the right side it would be  "
+    } ]
+  }, {
+    "tStartMs": 1234000,
+    "dDurationMs": 14280,
+    "segs": [ {
+      "utf8": "our [Music] system just to give high level high \nlevel framework all right so do you want me to  "
+    } ]
+  }, {
+    "tStartMs": 1248280,
+    "dDurationMs": 10840,
+    "segs": [ {
+      "utf8": "cover the like API Gateway load balancers like \nauthentification authorization does things no I  "
+    } ]
+  }, {
+    "tStartMs": 1259120,
+    "dDurationMs": 6120,
+    "segs": [ {
+      "utf8": "think we can Circle back to those at the end \nif we have time I think Skip for now okay so  "
+    } ]
+  }, {
+    "tStartMs": 1265240,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "then I'm going to assume that we'll have load \nbalancers we'll have some sort of API Gateway  "
+    } ]
+  }, {
+    "tStartMs": 1271480,
+    "dDurationMs": 7840,
+    "segs": [ {
+      "utf8": "that sits in front of the system load balancers as \nwell I'm just going to skip that and focus mostly  "
+    } ]
+  }, {
+    "tStartMs": 1279320,
+    "dDurationMs": 7120,
+    "segs": [ {
+      "utf8": "on the service architecture that's okay yeah \ngreat all right so starting from the posting  "
+    } ]
+  }, {
+    "tStartMs": 1286440,
+    "dDurationMs": 14920,
+    "segs": [ {
+      "utf8": "a tweet as I mentioned we would need some sort \nof tweet processor service just like that that"
+    } ]
+  }, {
+    "tStartMs": 1301360,
+    "dDurationMs": 12080,
+    "segs": [ {
+      "utf8": "would that would receive the tweet and then \nmake sure that the Tweet gets propagated down  "
+    } ]
+  }, {
+    "tStartMs": 1313440,
+    "dDurationMs": 7600,
+    "segs": [ {
+      "utf8": "the system and makes it to the search and \nother users timelines so with something  "
+    } ]
+  }, {
+    "tStartMs": 1321040,
+    "dDurationMs": 9200,
+    "segs": [ {
+      "utf8": "like that and this service would also need \nto be backed likely by a by a database so  "
+    } ]
+  }, {
+    "tStartMs": 1330240,
+    "dDurationMs": 12640,
+    "segs": [ {
+      "utf8": "let's have a a database here so it will \nhave to be no SQL database and since we  "
+    } ]
+  }, {
+    "tStartMs": 1342880,
+    "dDurationMs": 5200,
+    "segs": [ {
+      "utf8": "want to focus on storing the most recent data \nwe might as well choose Cassandra because it  "
+    } ]
+  }, {
+    "tStartMs": 1348080,
+    "dDurationMs": 10800,
+    "segs": [ {
+      "utf8": "allows wide rows and they can be sorted by by \ntime in our case so let's just assume we have  "
+    } ]
+  }, {
+    "tStartMs": 1358880,
+    "dDurationMs": 8960,
+    "segs": [ {
+      "utf8": "a persistent database here like Cassandra will \nlikely also need some sort of cach just so we  "
+    } ]
+  }, {
+    "tStartMs": 1367840,
+    "dDurationMs": 10120,
+    "segs": [ {
+      "utf8": "can retrieve records more efficiently \nif we need to we can have a reg here"
+    } ]
+  }, {
+    "tStartMs": 1380360,
+    "dDurationMs": 8880,
+    "segs": [ {
+      "utf8": "and you also mentioned that we can post media \nright so the Twitter proder would also need to  "
+    } ]
+  }, {
+    "tStartMs": 1389240,
+    "dDurationMs": 14880,
+    "segs": [ {
+      "utf8": "take care of the media that exists in the Tweet \nso we would need some sort of asset Service that  "
+    } ]
+  }, {
+    "tStartMs": 1404120,
+    "dDurationMs": 9360,
+    "segs": [ {
+      "utf8": "Twitter proder can call and make sure that the \nmedia is handled so we can call it asset service"
+    } ]
+  }, {
+    "tStartMs": 1413480,
+    "dDurationMs": 5960,
+    "segs": [ {
+      "utf8": "and you you also mentioned long links so perhaps  "
+    } ]
+  }, {
+    "tStartMs": 1419440,
+    "dDurationMs": 6520,
+    "segs": [ {
+      "utf8": "there could be a like URL \nshortener Service as well"
+    } ]
+  }, {
+    "tStartMs": 1425960,
+    "dDurationMs": 5240,
+    "segs": [ {
+      "utf8": "here URL"
+    } ]
+  }, {
+    "tStartMs": 1431200,
+    "dDurationMs": 6680,
+    "segs": [ {
+      "utf8": "shortener"
+    } ]
+  }, {
+    "tStartMs": 1439240,
+    "dDurationMs": 9120,
+    "segs": [ {
+      "utf8": "okay just going to put it here and so as \nwe receive a tweet we would and if it if  "
+    } ]
+  }, {
+    "tStartMs": 1448360,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "it has media we would call the asset \nservice and the service would store  "
+    } ]
+  }, {
+    "tStartMs": 1454600,
+    "dDurationMs": 4280,
+    "segs": [ {
+      "utf8": "that media in the the object storage \nso there's likely would be some sort  "
+    } ]
+  }, {
+    "tStartMs": 1458880,
+    "dDurationMs": 12200,
+    "segs": [ {
+      "utf8": "of object storage that would also be \nexposed as a CDN [Music] for quicker"
+    } ]
+  }, {
+    "tStartMs": 1471080,
+    "dDurationMs": 10320,
+    "segs": [ {
+      "utf8": "access yeah do you want me to go deeper into \nthe asset and CDN no I don't think I don't think  "
+    } ]
+  }, {
+    "tStartMs": 1481400,
+    "dDurationMs": 7520,
+    "segs": [ {
+      "utf8": "that's necessary now let's on okay so I'm just GNA \nskip it for now all right so as we post a tweet it  "
+    } ]
+  }, {
+    "tStartMs": 1488920,
+    "dDurationMs": 6040,
+    "segs": [ {
+      "utf8": "would go to the Twitter processor if it has a \nmedia like a picture or a video that we would  "
+    } ]
+  }, {
+    "tStartMs": 1494960,
+    "dDurationMs": 6880,
+    "segs": [ {
+      "utf8": "call the asset service stor it in the object \nstorage and receive back a uid for that media  "
+    } ]
+  }, {
+    "tStartMs": 1501840,
+    "dDurationMs": 7280,
+    "segs": [ {
+      "utf8": "that would later be used to retrieve that media \nand return it back to the user as we store this  "
+    } ]
+  }, {
+    "tStartMs": 1509120,
+    "dDurationMs": 6960,
+    "segs": [ {
+      "utf8": "data we also need to push it somewhere for future \nprocessing and indexing Etc so I would assume we  "
+    } ]
+  }, {
+    "tStartMs": 1516080,
+    "dDurationMs": 11600,
+    "segs": [ {
+      "utf8": "would have a some sort of Q here so let's make \nit a different color here let's make it that"
+    } ]
+  }, {
+    "tStartMs": 1529720,
+    "dDurationMs": 5360,
+    "segs": [ {
+      "utf8": "for now we can say it would be something \nlike Kafka but we're going to circle back  "
+    } ]
+  }, {
+    "tStartMs": 1535080,
+    "dDurationMs": 8200,
+    "segs": [ {
+      "utf8": "to this so as we get so we store the message \nwe return success back to user and we throw  "
+    } ]
+  }, {
+    "tStartMs": 1543280,
+    "dDurationMs": 8960,
+    "segs": [ {
+      "utf8": "it into Kafka for future processing and back \nfrom Kafka we would likely need to have some  "
+    } ]
+  }, {
+    "tStartMs": 1552240,
+    "dDurationMs": 12000,
+    "segs": [ {
+      "utf8": "sort of processor that would retrieve \nthose messages and send them either  "
+    } ]
+  }, {
+    "tStartMs": 1564240,
+    "dDurationMs": 8960,
+    "segs": [ {
+      "utf8": "for indexing for the surage or for the timeline \ngeneration so I'm just going to call it timeline"
+    } ]
+  }, {
+    "tStartMs": 1573200,
+    "dDurationMs": 8960,
+    "segs": [ {
+      "utf8": "processor so that would be a server service \nthat consume messages from Kafka and"
+    } ]
+  }, {
+    "tStartMs": 1582160,
+    "dDurationMs": 8200,
+    "segs": [ {
+      "utf8": "then and then update the user timelines \nand speaking about the user timelines  "
+    } ]
+  }, {
+    "tStartMs": 1590360,
+    "dDurationMs": 6120,
+    "segs": [ {
+      "utf8": "let's just circle back there we would \nneed some we would need a timeline  "
+    } ]
+  }, {
+    "tStartMs": 1596480,
+    "dDurationMs": 7160,
+    "segs": [ {
+      "utf8": "service probably like API service \nare responsible for serving the"
+    } ]
+  }, {
+    "tStartMs": 1603640,
+    "dDurationMs": 13000,
+    "segs": [ {
+      "utf8": "timeline and this timeline service would need \nto return the timeline to the user pretty much  "
+    } ]
+  }, {
+    "tStartMs": 1616640,
+    "dDurationMs": 9240,
+    "segs": [ {
+      "utf8": "instantly so we would need those timelines to \nbe cached so I'm just going to put a r cach"
+    } ]
+  }, {
+    "tStartMs": 1625880,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "here"
+    } ]
+  }, {
+    "tStartMs": 1631400,
+    "dDurationMs": 10280,
+    "segs": [ {
+      "utf8": "and our timeline processor would probably \nbe responsible for consuming tweets and then  "
+    } ]
+  }, {
+    "tStartMs": 1641680,
+    "dDurationMs": 9400,
+    "segs": [ {
+      "utf8": "making sure that they make it to the appropriate \nuser timeline that would exist in the redis cache  "
+    } ]
+  }, {
+    "tStartMs": 1651080,
+    "dDurationMs": 7760,
+    "segs": [ {
+      "utf8": "but again we're gonna drill down to this later I'm \njust trying to build this high level workflow that  "
+    } ]
+  }, {
+    "tStartMs": 1658840,
+    "dDurationMs": 10120,
+    "segs": [ {
+      "utf8": "we can follow does it look good so far yeah looks \ngood please carry on all right sounds good so as  "
+    } ]
+  }, {
+    "tStartMs": 1668960,
+    "dDurationMs": 9080,
+    "segs": [ {
+      "utf8": "I'm thinking about the timeline service right it \nwould need to pull data from reddis but we might  "
+    } ]
+  }, {
+    "tStartMs": 1678040,
+    "dDurationMs": 10440,
+    "segs": [ {
+      "utf8": "also need tweets from other from users that whose \ntweets didn't make it to R perhaps so I would  "
+    } ]
+  }, {
+    "tStartMs": 1688480,
+    "dDurationMs": 7320,
+    "segs": [ {
+      "utf8": "assume we would also need some sort of service \nwith direct access to the tweets because if user  "
+    } ]
+  }, {
+    "tStartMs": 1695800,
+    "dDurationMs": 10400,
+    "segs": [ {
+      "utf8": "is not active for instance one might not have the \ntimeline cached in reddis so we would probably  "
+    } ]
+  }, {
+    "tStartMs": 1706200,
+    "dDurationMs": 5800,
+    "segs": [ {
+      "utf8": "need to just pull it from the database get the \ntweets from the database and then return it to  "
+    } ]
+  }, {
+    "tStartMs": 1712000,
+    "dDurationMs": 11200,
+    "segs": [ {
+      "utf8": "the user so I would just like say that we would \nneed to have some tweet service perhaps just a  "
+    } ]
+  }, {
+    "tStartMs": 1723200,
+    "dDurationMs": 9800,
+    "segs": [ {
+      "utf8": "simple API that sits on top of the Tweet data that \ncan serve tweets based on the user ID so something  "
+    } ]
+  }, {
+    "tStartMs": 1733000,
+    "dDurationMs": 8360,
+    "segs": [ {
+      "utf8": "like that this way our timeline service would have \naccess to First pre-generated timelines as well  "
+    } ]
+  }, {
+    "tStartMs": 1741360,
+    "dDurationMs": 6880,
+    "segs": [ {
+      "utf8": "as if the timeline is not generated it can call \nTweet service and pull the data from reddis and  "
+    } ]
+  }, {
+    "tStartMs": 1748240,
+    "dDurationMs": 7160,
+    "segs": [ {
+      "utf8": "then create a timeline at the real time it would \nbe not desirable but still probably need that  "
+    } ]
+  }, {
+    "tStartMs": 1756640,
+    "dDurationMs": 6160,
+    "segs": [ {
+      "utf8": "okay and user follow that's the last piece that \nI didn't cover yet so I mentioned it would have"
+    } ]
+  }, {
+    "tStartMs": 1762800,
+    "dDurationMs": 6400,
+    "segs": [ {
+      "utf8": "a user graphs service or we can call it"
+    } ]
+  }, {
+    "tStartMs": 1769200,
+    "dDurationMs": 15520,
+    "segs": [ {
+      "utf8": "that that would be an API in front of the \ndatabase it would likely need to be key  "
+    } ]
+  }, {
+    "tStartMs": 1784720,
+    "dDurationMs": 6840,
+    "segs": [ {
+      "utf8": "value database I'm not sure about Cassandra \nlet's call it just key value DB for now  "
+    } ]
+  }, {
+    "tStartMs": 1791560,
+    "dDurationMs": 7800,
+    "segs": [ {
+      "utf8": "that would be storing the user mapping \nand know about who follows who pretty"
+    } ]
+  }, {
+    "tStartMs": 1799360,
+    "dDurationMs": 10080,
+    "segs": [ {
+      "utf8": "much and timeline generation service timeline \nservice would probably need to have access to  "
+    } ]
+  }, {
+    "tStartMs": 1809440,
+    "dDurationMs": 12880,
+    "segs": [ {
+      "utf8": "this database as well to understand to retrieve \nthe user followers because over here if I a user  "
+    } ]
+  }, {
+    "tStartMs": 1822320,
+    "dDurationMs": 8360,
+    "segs": [ {
+      "utf8": "and I try to render and I open a home timeline \nif I passive user or like not active user then  "
+    } ]
+  }, {
+    "tStartMs": 1830680,
+    "dDurationMs": 7400,
+    "segs": [ {
+      "utf8": "my timeline might not be might not be pregenerated \nand I would need to and the timeline service would  "
+    } ]
+  }, {
+    "tStartMs": 1838080,
+    "dDurationMs": 8480,
+    "segs": [ {
+      "utf8": "need to get a list of followers my followers and \nthen retrieve them from the reddis or Cassandra  "
+    } ]
+  }, {
+    "tStartMs": 1846560,
+    "dDurationMs": 9800,
+    "segs": [ {
+      "utf8": "so that kind of covers that workflow if the \ntimeline is not generated okay what else is  "
+    } ]
+  }, {
+    "tStartMs": 1856360,
+    "dDurationMs": 7880,
+    "segs": [ {
+      "utf8": "here okay I think this is high level how it \nwould look like let me just work through the  "
+    } ]
+  }, {
+    "tStartMs": 1864240,
+    "dDurationMs": 6720,
+    "segs": [ {
+      "utf8": "whole workflow one more time just so it's clear \nright so when we post a tweet first thing we do  "
+    } ]
+  }, {
+    "tStartMs": 1870960,
+    "dDurationMs": 8320,
+    "segs": [ {
+      "utf8": "is send a tweet to the Twitter processor and \nif there is Media we obviously handle media  "
+    } ]
+  }, {
+    "tStartMs": 1879280,
+    "dDurationMs": 6080,
+    "segs": [ {
+      "utf8": "and we store the Twitter processor to the \ndatabase and cache so here ideally we want  "
+    } ]
+  }, {
+    "tStartMs": 1885360,
+    "dDurationMs": 8880,
+    "segs": [ {
+      "utf8": "to store in both and use right through cash \nbut I mean we want to return 200k as soon as  "
+    } ]
+  }, {
+    "tStartMs": 1894240,
+    "dDurationMs": 6120,
+    "segs": [ {
+      "utf8": "possible to the user so we probably want to \nreturn to 100 once the data is stored into  "
+    } ]
+  }, {
+    "tStartMs": 1900360,
+    "dDurationMs": 7520,
+    "segs": [ {
+      "utf8": "database and then if cash is not if for some \nreason the right to Cache fails we would want  "
+    } ]
+  }, {
+    "tStartMs": 1907880,
+    "dDurationMs": 6640,
+    "segs": [ {
+      "utf8": "to handle it internally and not block users on \nthe cach so once that's done asynchronously we  "
+    } ]
+  }, {
+    "tStartMs": 1914520,
+    "dDurationMs": 9120,
+    "segs": [ {
+      "utf8": "also push the Tweet to the Q in our case let's \nsay it's Kafka and on the Kafka we would need"
+    } ]
+  }, {
+    "tStartMs": 1923640,
+    "dDurationMs": 13640,
+    "segs": [ {
+      "utf8": "to likely partition it so we will partition our \nKafka on the Twitter ID because the whole I mean  "
+    } ]
+  }, {
+    "tStartMs": 1937280,
+    "dDurationMs": 9040,
+    "segs": [ {
+      "utf8": "we can partition multiple way right the first one \nwe can partition based on the user ID but if we do  "
+    } ]
+  }, {
+    "tStartMs": 1946320,
+    "dDurationMs": 9040,
+    "segs": [ {
+      "utf8": "that then we have a chance that some users can \nbecome become hot and post either too often or  "
+    } ]
+  }, {
+    "tStartMs": 1955360,
+    "dDurationMs": 8200,
+    "segs": [ {
+      "utf8": "in proportionally and we don't want that ideally \nthe system we want to have is to have as lad as  "
+    } ]
+  }, {
+    "tStartMs": 1963560,
+    "dDurationMs": 5960,
+    "segs": [ {
+      "utf8": "even distribution as possible so in our case we \nwant to partition on the Twitter ID so we would  "
+    } ]
+  }, {
+    "tStartMs": 1969520,
+    "dDurationMs": 5680,
+    "segs": [ {
+      "utf8": "push that tweet to Kafka and then we would \nhave a timeline processor that would consume  "
+    } ]
+  }, {
+    "tStartMs": 1975200,
+    "dDurationMs": 12360,
+    "segs": [ {
+      "utf8": "it and update the timeline so how would that look \nlike let me just try to drill down more into that"
+    } ]
+  }, {
+    "tStartMs": 1987560,
+    "dDurationMs": 3720,
+    "segs": [ {
+      "utf8": "um so let"
+    } ]
+  }, {
+    "tStartMs": 1991280,
+    "dDurationMs": 10160,
+    "segs": [ {
+      "utf8": "me let me just so let's say we post a tweet"
+    } ]
+  }, {
+    "tStartMs": 2001440,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "[Music] right"
+    } ]
+  }, {
+    "tStartMs": 2007840,
+    "dDurationMs": 10000,
+    "segs": [ {
+      "utf8": "okay we it gets to the ca or our"
+    } ]
+  }, {
+    "tStartMs": 2017840,
+    "dDurationMs": 8840,
+    "segs": [ {
+      "utf8": "q and then from Q we likely have that's going \nto be our essential place from where multiple  "
+    } ]
+  }, {
+    "tStartMs": 2026680,
+    "dDurationMs": 6800,
+    "segs": [ {
+      "utf8": "functionalities would be plugged in so we can \nhave a service responsible for the indexing and"
+    } ]
+  }, {
+    "tStartMs": 2033480,
+    "dDurationMs": 3480,
+    "segs": [ {
+      "utf8": "search"
+    } ]
+  }, {
+    "tStartMs": 2040080,
+    "dDurationMs": 5000,
+    "segs": [ {
+      "utf8": "uh we can have different sort of \nanalytics also consumed and process"
+    } ]
+  }, {
+    "tStartMs": 2045080,
+    "dDurationMs": 10000,
+    "segs": [ {
+      "utf8": "[Music] further and the main \npiece of functionality would"
+    } ]
+  }, {
+    "tStartMs": 2055080,
+    "dDurationMs": 4720,
+    "segs": [ {
+      "utf8": "be would"
+    } ]
+  }, {
+    "tStartMs": 2059800,
+    "dDurationMs": 7080,
+    "segs": [ {
+      "utf8": "be"
+    } ]
+  }, {
+    "tStartMs": 2069800,
+    "dDurationMs": 5800,
+    "segs": [ {
+      "utf8": "would be the timeline generation and for that I  "
+    } ]
+  }, {
+    "tStartMs": 2075600,
+    "dDurationMs": 5960,
+    "segs": [ {
+      "utf8": "think what makes sense to do here \nis that we would have a cluster of"
+    } ]
+  }, {
+    "tStartMs": 2081560,
+    "dDurationMs": 6540,
+    "segs": [ {
+      "utf8": "[Music]"
+    } ]
+  }, {
+    "tStartMs": 2088100,
+    "dDurationMs": 6820,
+    "segs": [ {
+      "utf8": "consumers that would"
+    } ]
+  }, {
+    "tStartMs": 2094920,
+    "dDurationMs": 14520,
+    "segs": [ {
+      "utf8": "that would consume the tweets and then they \nwould get a list of followers of the user  "
+    } ]
+  }, {
+    "tStartMs": 2109440,
+    "dDurationMs": 8560,
+    "segs": [ {
+      "utf8": "that posted a tweet and create a list of tuples \nlike we can do it in the loop like we receive a  "
+    } ]
+  }, {
+    "tStartMs": 2118000,
+    "dDurationMs": 8800,
+    "segs": [ {
+      "utf8": "tweet then we pull all the users that we need to \npush this tweet to and we create a tuples with  "
+    } ]
+  }, {
+    "tStartMs": 2128480,
+    "dDurationMs": 8560,
+    "segs": [ {
+      "utf8": "with the user ID that posted the Tweet user \nID where this tweet has to go and a tweet ID  "
+    } ]
+  }, {
+    "tStartMs": 2137040,
+    "dDurationMs": 7200,
+    "segs": [ {
+      "utf8": "and then we post all the tuples back to the \nqueue it can be either the kka Q or I think  "
+    } ]
+  }, {
+    "tStartMs": 2144240,
+    "dDurationMs": 8240,
+    "segs": [ {
+      "utf8": "in this scenario it makes sense to use reddis \nchannels that act similar to a queue and from  "
+    } ]
+  }, {
+    "tStartMs": 2152480,
+    "dDurationMs": 5920,
+    "segs": [ {
+      "utf8": "all those channels we can have those channels \nper user from all those channels we would have  "
+    } ]
+  }, {
+    "tStartMs": 2158400,
+    "dDurationMs": 6080,
+    "segs": [ {
+      "utf8": "a more consumers that would consume it from \nthe corresponding Channel and push it into  "
+    } ]
+  }, {
+    "tStartMs": 2164480,
+    "dDurationMs": 10800,
+    "segs": [ {
+      "utf8": "the reddis database where the timeline would \nbe cached so let me just try to draw it so we"
+    } ]
+  }, {
+    "tStartMs": 2175280,
+    "dDurationMs": 6080,
+    "segs": [ {
+      "utf8": "have we have a cluster of"
+    } ]
+  }, {
+    "tStartMs": 2181360,
+    "dDurationMs": 7280,
+    "segs": [ {
+      "utf8": "consumers where the Tweet is going and then we"
+    } ]
+  }, {
+    "tStartMs": 2188640,
+    "dDurationMs": 9000,
+    "segs": [ {
+      "utf8": "would for every single follower we would create a"
+    } ]
+  }, {
+    "tStartMs": 2197640,
+    "dDurationMs": 10560,
+    "segs": [ {
+      "utf8": "[Music] tuple and push it back to the"
+    } ]
+  }, {
+    "tStartMs": 2208200,
+    "dDurationMs": 8480,
+    "segs": [ {
+      "utf8": "queue"
+    } ]
+  }, {
+    "tStartMs": 2221040,
+    "dDurationMs": 11300,
+    "segs": [ {
+      "utf8": "and in this case we can have it \ncan be let's say Redd is [Music]"
+    } ]
+  }, {
+    "tStartMs": 2232340,
+    "dDurationMs": 10740,
+    "segs": [ {
+      "utf8": "channels and now for every single follower we \nwould have a separate reg channel that would  "
+    } ]
+  }, {
+    "tStartMs": 2243080,
+    "dDurationMs": 6160,
+    "segs": [ {
+      "utf8": "be receiving tweets from our main \nqueue and from here we would have  "
+    } ]
+  }, {
+    "tStartMs": 2249240,
+    "dDurationMs": 12480,
+    "segs": [ {
+      "utf8": "a service that would just push it to the \nreddis it would be listening to the redis"
+    } ]
+  }, {
+    "tStartMs": 2261720,
+    "dDurationMs": 11000,
+    "segs": [ {
+      "utf8": "channels"
+    } ]
+  }, {
+    "tStartMs": 2272720,
+    "dDurationMs": 14960,
+    "segs": [ {
+      "utf8": "and and push it to the redice so the redice \nhere would have a format so what kind of  "
+    } ]
+  }, {
+    "tStartMs": 2287680,
+    "dDurationMs": 3440,
+    "segs": [ {
+      "utf8": "data would it be storing it would be \nstoring a mapping key value mapping  "
+    } ]
+  }, {
+    "tStartMs": 2291120,
+    "dDurationMs": 12320,
+    "segs": [ {
+      "utf8": "between the user and a timeline right and \nthis mapping can also be so the way we're"
+    } ]
+  }, {
+    "tStartMs": 2303440,
+    "dDurationMs": 7920,
+    "segs": [ {
+      "utf8": "GNA so in this case the user would be the key \nand the timeline would be the value and the  "
+    } ]
+  }, {
+    "tStartMs": 2311360,
+    "dDurationMs": 17280,
+    "segs": [ {
+      "utf8": "format of the timeline would be a link [Music] \nlist this way we can very fast insert data into  "
+    } ]
+  }, {
+    "tStartMs": 2328640,
+    "dDurationMs": 7480,
+    "segs": [ {
+      "utf8": "the list and remove it from there and both of \nthese operations would take all one operation  "
+    } ]
+  }, {
+    "tStartMs": 2336120,
+    "dDurationMs": 7240,
+    "segs": [ {
+      "utf8": "all1 time and would be pretty fast so does \nthis make sense the design I wrote here for  "
+    } ]
+  }, {
+    "tStartMs": 2343360,
+    "dDurationMs": 9120,
+    "segs": [ {
+      "utf8": "the Tweet processing yeah yeah makes sense to me \nso I think I've covered here the main workflow  "
+    } ]
+  }, {
+    "tStartMs": 2352480,
+    "dDurationMs": 6520,
+    "segs": [ {
+      "utf8": "we've covered the posting a tweet method \nin pretty much pretty granal details here  "
+    } ]
+  }, {
+    "tStartMs": 2359000,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "and the important part is the redit as well \nI think this is a really good optimization  "
+    } ]
+  }, {
+    "tStartMs": 2364160,
+    "dDurationMs": 14000,
+    "segs": [ {
+      "utf8": "by storing timeline as a double link list that \nwould provide us o1 insert and delete time so  "
+    } ]
+  }, {
+    "tStartMs": 2378160,
+    "dDurationMs": 8720,
+    "segs": [ {
+      "utf8": "it pretty much means we can have a link list of \nlet's say 500 tweets for a timeline and as new  "
+    } ]
+  }, {
+    "tStartMs": 2386880,
+    "dDurationMs": 6120,
+    "segs": [ {
+      "utf8": "tweets arrive we can just delete all tweets \nand it's all done in all1 time in the main"
+    } ]
+  }, {
+    "tStartMs": 2393000,
+    "dDurationMs": 11480,
+    "segs": [ {
+      "utf8": "memory I think it's also important so we \nspoke about being about the system be real  "
+    } ]
+  }, {
+    "tStartMs": 2404480,
+    "dDurationMs": 7440,
+    "segs": [ {
+      "utf8": "time is that all these tweets and the whole the \nmain workflow of the Tweet is done in the main  "
+    } ]
+  }, {
+    "tStartMs": 2411920,
+    "dDurationMs": 6400,
+    "segs": [ {
+      "utf8": "memory because we don't want to be blocked on \nwriting to the file system or any sort of slow  "
+    } ]
+  }, {
+    "tStartMs": 2418320,
+    "dDurationMs": 8080,
+    "segs": [ {
+      "utf8": "data sources so ideally what we would like to \noptimize here as we posting a tweet is to make  "
+    } ]
+  }, {
+    "tStartMs": 2426400,
+    "dDurationMs": 6800,
+    "segs": [ {
+      "utf8": "making sure that all the communication on the and \noperations on the Tweet happen in the RAM memory  "
+    } ]
+  }, {
+    "tStartMs": 2433200,
+    "dDurationMs": 10000,
+    "segs": [ {
+      "utf8": "like Fast Access Memory and I think we achieve \nit by by sending tweet to Kafka and then perform  "
+    } ]
+  }, {
+    "tStartMs": 2443200,
+    "dDurationMs": 5640,
+    "segs": [ {
+      "utf8": "multiple operations and Transformations on the \nTweet then we would store it into redish Channel  "
+    } ]
+  }, {
+    "tStartMs": 2448840,
+    "dDurationMs": 7480,
+    "segs": [ {
+      "utf8": "which is also mostly stored in memory and then the \nfinal output which is the timeline would also be  "
+    } ]
+  }, {
+    "tStartMs": 2456320,
+    "dDurationMs": 6880,
+    "segs": [ {
+      "utf8": "in the memory this way majority of users or all \nof them can just have the timeline pregenerated  "
+    } ]
+  }, {
+    "tStartMs": 2463200,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "and updated into Real Time Eugene has covered \na lot of ground here so let's take a second to  "
+    } ]
+  }, {
+    "tStartMs": 2468960,
+    "dDurationMs": 4960,
+    "segs": [ {
+      "utf8": "review the steps he's taken he started with a high \nlevel workflow and made some good decisions such  "
+    } ]
+  }, {
+    "tStartMs": 2473920,
+    "dDurationMs": 5560,
+    "segs": [ {
+      "utf8": "as using a pub subsystem like Kafka to segregate \npublishing and processing of the tweets he did a  "
+    } ]
+  }, {
+    "tStartMs": 2479480,
+    "dDurationMs": 4200,
+    "segs": [ {
+      "utf8": "good job of talking through his assumptions as \nhe worked on the diagram constant communication  "
+    } ]
+  }, {
+    "tStartMs": 2483680,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "with the interview is really important in system \ndesign interview once you have a diagram take your  "
+    } ]
+  }, {
+    "tStartMs": 2488600,
+    "dDurationMs": 4880,
+    "segs": [ {
+      "utf8": "time to talk through it explain how components \nwork together Eugene went back and went over the  "
+    } ]
+  }, {
+    "tStartMs": 2493480,
+    "dDurationMs": 5080,
+    "segs": [ {
+      "utf8": "workflow a second time which helped him catch \na few things he hadn't considered or dived into  "
+    } ]
+  }, {
+    "tStartMs": 2498560,
+    "dDurationMs": 6520,
+    "segs": [ {
+      "utf8": "when you're ready make sure you do a deep dive \non some of the components so the bottom L here  "
+    } ]
+  }, {
+    "tStartMs": 2505080,
+    "dDurationMs": 6440,
+    "segs": [ {
+      "utf8": "I think would be the way we partition data right \nbecause the main entity of our system would be  "
+    } ]
+  }, {
+    "tStartMs": 2511520,
+    "dDurationMs": 8720,
+    "segs": [ {
+      "utf8": "tweets and we would have like billions of them \nevery single day so the bottom link here can be  "
+    } ]
+  }, {
+    "tStartMs": 2520240,
+    "dDurationMs": 7400,
+    "segs": [ {
+      "utf8": "how we store those tweets and how we query them so \nwhat options do we have to mitigate against that"
+    } ]
+  }, {
+    "tStartMs": 2527640,
+    "dDurationMs": 13520,
+    "segs": [ {
+      "utf8": "then so there are multiple ways here \nright the first one is that it's all  "
+    } ]
+  }, {
+    "tStartMs": 2541160,
+    "dDurationMs": 5200,
+    "segs": [ {
+      "utf8": "depends on how we want to partition the \ndata we can partition it per user ID so  "
+    } ]
+  }, {
+    "tStartMs": 2546360,
+    "dDurationMs": 8560,
+    "segs": [ {
+      "utf8": "when we store tweet if we partitioned per \nuser ID we can partition it by tweet ID"
+    } ]
+  }, {
+    "tStartMs": 2554920,
+    "dDurationMs": 8480,
+    "segs": [ {
+      "utf8": "and let's let's think here so if we do a user \nID right it means that all the tweets for the  "
+    } ]
+  }, {
+    "tStartMs": 2563400,
+    "dDurationMs": 6840,
+    "segs": [ {
+      "utf8": "same user would exist on the same server \nand that is very convenient because we can  "
+    } ]
+  }, {
+    "tStartMs": 2570240,
+    "dDurationMs": 7280,
+    "segs": [ {
+      "utf8": "easily query and get all the tweets for a user \nbut at the same time likely it would cause a  "
+    } ]
+  }, {
+    "tStartMs": 2577520,
+    "dDurationMs": 7600,
+    "segs": [ {
+      "utf8": "bottleneck and uneven tweet distribution in our \nsystem which we want to avoid it would be hard  "
+    } ]
+  }, {
+    "tStartMs": 2585120,
+    "dDurationMs": 7920,
+    "segs": [ {
+      "utf8": "to manage the system because like multiple \npopular users can end up on the same server  "
+    } ]
+  }, {
+    "tStartMs": 2593040,
+    "dDurationMs": 6560,
+    "segs": [ {
+      "utf8": "and then the server would be just overloaded \nso and as the main entity of our system is a  "
+    } ]
+  }, {
+    "tStartMs": 2599600,
+    "dDurationMs": 7840,
+    "segs": [ {
+      "utf8": "tweet so I think we should partition based \non the Tweet ID but in this case if we want  "
+    } ]
+  }, {
+    "tStartMs": 2607440,
+    "dDurationMs": 9160,
+    "segs": [ {
+      "utf8": "to retrieve a time a user timeline we would \nneed to query literally every single server  "
+    } ]
+  }, {
+    "tStartMs": 2616600,
+    "dDurationMs": 7000,
+    "segs": [ {
+      "utf8": "every single partition and then get a subset \nof users from every single partition so that  "
+    } ]
+  }, {
+    "tStartMs": 2623600,
+    "dDurationMs": 9240,
+    "segs": [ {
+      "utf8": "wouldn't be very convenient I mean the third \noption here is that we can do a like double  "
+    } ]
+  }, {
+    "tStartMs": 2632840,
+    "dDurationMs": 6120,
+    "segs": [ {
+      "utf8": "double partitioning which means we can try \nto Partition partioned by user ID first and  "
+    } ]
+  }, {
+    "tStartMs": 2638960,
+    "dDurationMs": 12960,
+    "segs": [ {
+      "utf8": "then partitioned by the Tweet ID secondly which \nmeans we would have a like two hash ranks of data"
+    } ]
+  }, {
+    "tStartMs": 2651920,
+    "dDurationMs": 10720,
+    "segs": [ {
+      "utf8": "um so it it means that if a popular user even \nend up on the same server with other popular  "
+    } ]
+  }, {
+    "tStartMs": 2662640,
+    "dDurationMs": 11080,
+    "segs": [ {
+      "utf8": "users they would still be dist attributed \nbecause every single hash range would point  "
+    } ]
+  }, {
+    "tStartMs": 2673720,
+    "dDurationMs": 8800,
+    "segs": [ {
+      "utf8": "to another hash to another hash ring over here I \nmean in theory this sounds like a doable option  "
+    } ]
+  }, {
+    "tStartMs": 2682520,
+    "dDurationMs": 8200,
+    "segs": [ {
+      "utf8": "but I think the problem here is that if we \nwant to move some partitions then it would  "
+    } ]
+  }, {
+    "tStartMs": 2690720,
+    "dDurationMs": 7560,
+    "segs": [ {
+      "utf8": "be just such a complex task for instance if \nyou want to move users from like this segment  "
+    } ]
+  }, {
+    "tStartMs": 2698280,
+    "dDurationMs": 5000,
+    "segs": [ {
+      "utf8": "to the other segment not only we would need \nto move all this data but we would also need  "
+    } ]
+  }, {
+    "tStartMs": 2703280,
+    "dDurationMs": 6160,
+    "segs": [ {
+      "utf8": "to move all the data from the hash ring to \nanother hash ring which is very complex so  "
+    } ]
+  }, {
+    "tStartMs": 2709440,
+    "dDurationMs": 9640,
+    "segs": [ {
+      "utf8": "I think what we can do here is just a mixture \nof partitioning by tweet ID and perhaps pilot  "
+    } ]
+  }, {
+    "tStartMs": 2719080,
+    "dDurationMs": 6120,
+    "segs": [ {
+      "utf8": "like this double hashing functionality which \nis very questionable because it's just very  "
+    } ]
+  }, {
+    "tStartMs": 2725200,
+    "dDurationMs": 8280,
+    "segs": [ {
+      "utf8": "complex to manage but it's still an option \nam I going in the right direction with this  "
+    } ]
+  }, {
+    "tStartMs": 2733480,
+    "dDurationMs": 9640,
+    "segs": [ {
+      "utf8": "yeah yeah I think so yeah I think I think we're \ncoming coming to the end just before we wrap the  "
+    } ]
+  }, {
+    "tStartMs": 2743120,
+    "dDurationMs": 5680,
+    "segs": [ {
+      "utf8": "interview up I just wanted to give you a chance \nto you know think is there anything that you'd  "
+    } ]
+  }, {
+    "tStartMs": 2748800,
+    "dDurationMs": 7080,
+    "segs": [ {
+      "utf8": "kind of refine in your design architecture just \njust before we come to the end of the interview"
+    } ]
+  }, {
+    "tStartMs": 2761200,
+    "dDurationMs": 7720,
+    "segs": [ {
+      "utf8": "sure sure so few more bottlenecks or improvements \nthat we can perform here is I mentioned the  "
+    } ]
+  }, {
+    "tStartMs": 2768920,
+    "dDurationMs": 8480,
+    "segs": [ {
+      "utf8": "user graph and how we would be storing the U \nConnections in in a single table so ideally  "
+    } ]
+  }, {
+    "tStartMs": 2777400,
+    "dDurationMs": 7800,
+    "segs": [ {
+      "utf8": "what we do here is that instead of using a single \ntable we split it into two tables and making sure  "
+    } ]
+  }, {
+    "tStartMs": 2785200,
+    "dDurationMs": 6120,
+    "segs": [ {
+      "utf8": "that one table is dedicated specifically \nfor the user followers and the other one  "
+    } ]
+  }, {
+    "tStartMs": 2791320,
+    "dDurationMs": 11440,
+    "segs": [ {
+      "utf8": "for the [Music] user followes this way we have \nthis B directional connection but at least we  "
+    } ]
+  }, {
+    "tStartMs": 2802760,
+    "dDurationMs": 8000,
+    "segs": [ {
+      "utf8": "can split the responsibility and manage these \ndatabases and scale them separately so I think  "
+    } ]
+  }, {
+    "tStartMs": 2810760,
+    "dDurationMs": 7600,
+    "segs": [ {
+      "utf8": "this would be a good Improvement at the same time \nwhen there is a user that follows the another user  "
+    } ]
+  }, {
+    "tStartMs": 2818360,
+    "dDurationMs": 6680,
+    "segs": [ {
+      "utf8": "we would need to do two wres to two different \ndatabases which might cause some discrepancy  "
+    } ]
+  }, {
+    "tStartMs": 2825040,
+    "dDurationMs": 8760,
+    "segs": [ {
+      "utf8": "but from the scaling perspective that would be a \nreally good improvements also the popular users  "
+    } ]
+  }, {
+    "tStartMs": 2833800,
+    "dDurationMs": 8000,
+    "segs": [ {
+      "utf8": "that I didn't cover so with this design where we \nhave multiple cues and this sort of processing  "
+    } ]
+  }, {
+    "tStartMs": 2841800,
+    "dDurationMs": 7320,
+    "segs": [ {
+      "utf8": "pipeline this wouldn't really work for the popular \nusers because if I have 80 million subscribers and  "
+    } ]
+  }, {
+    "tStartMs": 2849120,
+    "dDurationMs": 6040,
+    "segs": [ {
+      "utf8": "I create 80 million tuples and then push them \nto the queue it would just slow down the whole  "
+    } ]
+  }, {
+    "tStartMs": 2855160,
+    "dDurationMs": 8200,
+    "segs": [ {
+      "utf8": "system so this workflow would likely be for the \ngeneric users that have like let's say under  "
+    } ]
+  }, {
+    "tStartMs": 2863360,
+    "dDurationMs": 7720,
+    "segs": [ {
+      "utf8": "10,000 subscribers and we would also have a list \nof popular users whatever the threshold is maybe  "
+    } ]
+  }, {
+    "tStartMs": 2871080,
+    "dDurationMs": 8560,
+    "segs": [ {
+      "utf8": "more than 10 or 50,000 subscribers and we would \ntreat them differently so as let's say if I a  "
+    } ]
+  }, {
+    "tStartMs": 2879640,
+    "dDurationMs": 7720,
+    "segs": [ {
+      "utf8": "user over here and I want to generate a timeline \nfrom and I have and I follow some popular users  "
+    } ]
+  }, {
+    "tStartMs": 2887360,
+    "dDurationMs": 5920,
+    "segs": [ {
+      "utf8": "then I would get all the tweets from other users \nthrough the main pipeline over here and when it  "
+    } ]
+  }, {
+    "tStartMs": 2893280,
+    "dDurationMs": 9120,
+    "segs": [ {
+      "utf8": "goes to the popular users I would call the Tweet \nservice and retrieve tweets from the popular Ser  "
+    } ]
+  }, {
+    "tStartMs": 2902400,
+    "dDurationMs": 10640,
+    "segs": [ {
+      "utf8": "user from the r database and then just plug them \ninto my timeline this way we can have on demand  "
+    } ]
+  }, {
+    "tStartMs": 2913880,
+    "dDurationMs": 9400,
+    "segs": [ {
+      "utf8": "requests to the tweets that popular users post \nso that's probably a workaround for the popular"
+    } ]
+  }, {
+    "tStartMs": 2923280,
+    "dDurationMs": 3840,
+    "segs": [ {
+      "utf8": "users"
+    } ]
+  }, {
+    "tStartMs": 2927120,
+    "dDurationMs": 11440,
+    "segs": [ {
+      "utf8": "okay so I mean additional Improvement that we \ncan make is the way we store tweets because  "
+    } ]
+  }, {
+    "tStartMs": 2938560,
+    "dDurationMs": 8560,
+    "segs": [ {
+      "utf8": "as we mentioned we'll have a lot of them \nand ideally we want those tweet IDs to be  "
+    } ]
+  }, {
+    "tStartMs": 2947120,
+    "dDurationMs": 9480,
+    "segs": [ {
+      "utf8": "unique and also follow and also support like \ncality which means that we can sort them by  "
+    } ]
+  }, {
+    "tStartMs": 2956600,
+    "dDurationMs": 6360,
+    "segs": [ {
+      "utf8": "the timestamp because this would be a crucial \nfor our system as majority of our data that  "
+    } ]
+  }, {
+    "tStartMs": 2962960,
+    "dDurationMs": 6720,
+    "segs": [ {
+      "utf8": "we need to keep in memory and store is the \nmost recent data so whatever Twitter ID we  "
+    } ]
+  }, {
+    "tStartMs": 2969680,
+    "dDurationMs": 7640,
+    "segs": [ {
+      "utf8": "generate we want to make sure that it's done \nin a way that is globally unique across the  "
+    } ]
+  }, {
+    "tStartMs": 2977320,
+    "dDurationMs": 8520,
+    "segs": [ {
+      "utf8": "system and also support cality and yeah so \nthe way I think Twitter does it is that it"
+    } ]
+  }, {
+    "tStartMs": 2985840,
+    "dDurationMs": 13080,
+    "segs": [ {
+      "utf8": "uses it uses a 64bit user ID \na I'm sorry 64bit tweet ID"
+    } ]
+  }, {
+    "tStartMs": 2998920,
+    "dDurationMs": 7840,
+    "segs": [ {
+      "utf8": "where 64bit tweet"
+    } ]
+  }, {
+    "tStartMs": 3006760,
+    "dDurationMs": 13240,
+    "segs": [ {
+      "utf8": "ID where one bit is a sign bit just to make sure \nthat it's compatible to all the languages because  "
+    } ]
+  }, {
+    "tStartMs": 3020000,
+    "dDurationMs": 6040,
+    "segs": [ {
+      "utf8": "if we have a signed bit it means that the ID is \nalways going to be positive then we can have then  "
+    } ]
+  }, {
+    "tStartMs": 3026040,
+    "dDurationMs": 15880,
+    "segs": [ {
+      "utf8": "I think they have like 41 bit of the Tim stamp \nwhich are like Epoch [Music] seconds and then  "
+    } ]
+  }, {
+    "tStartMs": 3041920,
+    "dDurationMs": 7320,
+    "segs": [ {
+      "utf8": "to be able to scale this ID so Epoch seconds gives \nus cality inside the ID and then the rest we need  "
+    } ]
+  }, {
+    "tStartMs": 3049240,
+    "dDurationMs": 8040,
+    "segs": [ {
+      "utf8": "to make sure that we have enough unique IDs per \nevery single second so the way we can do here is  "
+    } ]
+  }, {
+    "tStartMs": 3057280,
+    "dDurationMs": 6120,
+    "segs": [ {
+      "utf8": "for instance we can have 10 bits for the worker \nID because we'll probably have multiple workers  "
+    } ]
+  }, {
+    "tStartMs": 3063400,
+    "dDurationMs": 16160,
+    "segs": [ {
+      "utf8": "generating these IDs and 12 bits are [Music] \nincrement this way we would support first we  "
+    } ]
+  }, {
+    "tStartMs": 3079560,
+    "dDurationMs": 11600,
+    "segs": [ {
+      "utf8": "would support the cality with work radies we would \nsupport distribution [Music] because we would  "
+    } ]
+  }, {
+    "tStartMs": 3091160,
+    "dDurationMs": 6880,
+    "segs": [ {
+      "utf8": "have multiple workers and we'll provide also ha \nbecause if one of them goes down we are we won't  "
+    } ]
+  }, {
+    "tStartMs": 3098040,
+    "dDurationMs": 10040,
+    "segs": [ {
+      "utf8": "be impacted and at the same time if we have more \nthan one tweet per second we have what is it uh"
+    } ]
+  }, {
+    "tStartMs": 3108080,
+    "dDurationMs": 18520,
+    "segs": [ {
+      "utf8": "4,000 IGS per second [Music] so this way I think \nwe can support what like tens of thousands of  "
+    } ]
+  }, {
+    "tStartMs": 3126600,
+    "dDurationMs": 9880,
+    "segs": [ {
+      "utf8": "unique tweet IDs per second and never have \na a duplicated ID at the same time support  "
+    } ]
+  }, {
+    "tStartMs": 3136480,
+    "dDurationMs": 5080,
+    "segs": [ {
+      "utf8": "the causality because we have seconds this way \nwhen for instance we store messages in Cassandra  "
+    } ]
+  }, {
+    "tStartMs": 3141560,
+    "dDurationMs": 7560,
+    "segs": [ {
+      "utf8": "if we store them in the wide row sorted by the \nepoch type then we can only retrieve a last 20  "
+    } ]
+  }, {
+    "tStartMs": 3149120,
+    "dDurationMs": 9240,
+    "segs": [ {
+      "utf8": "or 100 or five 500 of messages without looking \nat all the older data in the database and this  "
+    } ]
+  }, {
+    "tStartMs": 3158360,
+    "dDurationMs": 7320,
+    "segs": [ {
+      "utf8": "is I guess additional key point to optimize for \nthe most efficient storage for the recent most  "
+    } ]
+  }, {
+    "tStartMs": 3165680,
+    "dDurationMs": 9240,
+    "segs": [ {
+      "utf8": "recent data not for the historical data okay \nyeah that that makes a lot of sense Eugene I  "
+    } ]
+  }, {
+    "tStartMs": 3174920,
+    "dDurationMs": 4000,
+    "segs": [ {
+      "utf8": "think I think we come we've run out of time I \nthink we're going to have to wrap the interview  "
+    } ]
+  }, {
+    "tStartMs": 3178920,
+    "dDurationMs": 5200,
+    "segs": [ {
+      "utf8": "up there as you come to the end of the interview \nyou need to think about the corner cases so in  "
+    } ]
+  }, {
+    "tStartMs": 3184120,
+    "dDurationMs": 4120,
+    "segs": [ {
+      "utf8": "the case of Twitter would your system be able \nto handle uneven traffic distribution with  "
+    } ]
+  }, {
+    "tStartMs": 3188240,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "popular users the most common bottleneck is a \ndatabase so talk about how you could improve  "
+    } ]
+  }, {
+    "tStartMs": 3193160,
+    "dDurationMs": 4400,
+    "segs": [ {
+      "utf8": "database performance talk about the multiple \napproaches and solutions that are possible and  "
+    } ]
+  }, {
+    "tStartMs": 3197560,
+    "dDurationMs": 4960,
+    "segs": [ {
+      "utf8": "their trade-offs Eugene did this really well to \nround off a very impressive interview great job  "
+    } ]
+  }, {
+    "tStartMs": 3202520,
+    "dDurationMs": 8080,
+    "segs": [ {
+      "utf8": "Eugene well done how was it for you did you \nenjoy it oh it was really good yeah a lot of  "
+    } ]
+  }, {
+    "tStartMs": 3210600,
+    "dDurationMs": 6480,
+    "segs": [ {
+      "utf8": "Concepts to cover so I tried my best to fit it \nin the time but yeah had a lot of fun thanks Tom  "
+    } ]
+  }, {
+    "tStartMs": 3217080,
+    "dDurationMs": 5720,
+    "segs": [ {
+      "utf8": "yeah cool it would have been nice to just keep \nkeep going keep going for another half an hour  "
+    } ]
+  }, {
+    "tStartMs": 3222800,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "on that but yeah thanks so much for for doing it \nand I think people are going to find that really  "
+    } ]
+  }, {
+    "tStartMs": 3228560,
+    "dDurationMs": 5320,
+    "segs": [ {
+      "utf8": "really interesting and hopefully really useful \nso thanks a lot again and yeah hopefully we'll  "
+    } ]
+  }, {
+    "tStartMs": 3233880,
+    "dDurationMs": 8400,
+    "segs": [ {
+      "utf8": "see you back on here sounds good thanks Tom bye \nhello really hope you found that useful if you  "
+    } ]
+  }, {
+    "tStartMs": 3242280,
+    "dDurationMs": 4880,
+    "segs": [ {
+      "utf8": "did you can like And subscribe and why not come \nvisit us at IGotAnOffer.com there you can find  "
+    } ]
+  }, {
+    "tStartMs": 3247160,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "more videos useful Frameworks and question guides \nall completely free and you can also book expert  "
+    } ]
+  }, {
+    "tStartMs": 3253160,
+    "dDurationMs": 6960,
+    "segs": [ {
+      "utf8": "feedback oneto one with our coaches from Google \nMeta Amazon Etc thank you and good luck with your"
+    } ]
+  }, {
+    "tStartMs": 3260120,
+    "dDurationMs": 4960,
+    "segs": [ {
+      "utf8": "[Music] interview"
+    } ]
+  }, {
+    "tStartMs": 3265080,
+    "segs": [ {
+      "utf8": "[Music]"
+    } ]
+  } ]
+}

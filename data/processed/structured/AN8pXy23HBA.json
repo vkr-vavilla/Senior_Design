@@ -1,0 +1,63 @@
+{
+  "video_id": "AN8pXy23HBA",
+  "summary": "This interview focuses on API security practices. The employee explains methods such as using HTTPS, OAuth and OpenID Connect for authentication and authorization, implementing the principle of least privilege, handling CORS for front-end interactions, and applying rate limiting to protect the service.",
+  "quality_flags": [
+    "Fewer than 8 training pairs generated due to transcript length."
+  ],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "For today's software engineering interview, please explain how you secure your APIs."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "First, I always use secure protocols like HTTPS. With this, all data is encrypted during transit so no third-party person can read what information is being sent between clients and my server."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, that's a good way to protect customer data. What do you do to control access on the server side?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I use OAuth plus OpenID Connect to handle authentication and authorization. I also only give users access to a certain subset of my endpoints and information, following the principle of least privilege where users can only access exactly what they need and nothing more."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay. And how do you handle APIs you expect to interact with the front end?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "For my APIs that need to interact with a website or front end, I make sure to handle CORS gracefully and only allowlist the domains that I expect to make requests to my backend. Never allow all."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Do you do anything else to protect your service?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I implement rate limiting on both a per API key and per IP level to prevent people from making too many requests to my service and ruining availability for everybody."
+    }
+  ],
+  "training_pairs": [
+    {
+      "question": "For today's software engineering interview, please explain how you secure your APIs.",
+      "answer": "First, I always use secure protocols like HTTPS. With this, all data is encrypted during transit so no third-party person can read what information is being sent between clients and my server.",
+      "follow_up": "What do you do to control access on the server side?"
+    },
+    {
+      "question": "What do you do to control access on the server side?",
+      "answer": "I use OAuth plus OpenID Connect to handle authentication and authorization. I also only give users access to a certain subset of my endpoints and information, following the principle of least privilege where users can only access exactly what they need and nothing more.",
+      "follow_up": "And how do you handle APIs you expect to interact with the front end?"
+    },
+    {
+      "question": "And how do you handle APIs you expect to interact with the front end?",
+      "answer": "For my APIs that need to interact with a website or front end, I make sure to handle CORS gracefully and only allowlist the domains that I expect to make requests to my backend. Never allow all.",
+      "follow_up": "Do you do anything else to protect your service?"
+    },
+    {
+      "question": "Do you do anything else to protect your service?",
+      "answer": "I implement rate limiting on both a per API key and per IP level to prevent people from making too many requests to my service and ruining availability for everybody.",
+      "follow_up": "NONE"
+    }
+  ]
+}

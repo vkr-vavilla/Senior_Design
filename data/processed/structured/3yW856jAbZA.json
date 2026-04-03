@@ -1,0 +1,294 @@
+{
+  "video_id": "3yW856jAbZA",
+  "summary": "This system design mock interview focuses on designing Twitter. The employee, Eugene, clarifies requirements, performs capacity estimation, designs APIs, outlines high-level components, and details database design. He then dives into the architecture for tweet posting, timeline generation, and user following, discussing optimizations for popular users, data partitioning strategies, and unique ID generation.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Hello, welcome to this system design mock interview. Very pleased to say we have a special guest with us today: it's Eugene from one of our favorite channels, Crushing Tech Education. Eugene, thanks for coming on the platform."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Thanks for having me, Tom."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "It's great to have you on. Now, you're going to be doing a classic system design mock interview question with us, but before you do, just quickly give people a quick overview of your background."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Of course. I'm a senior engineer and manager. I started out my career back in 2010 as a software engineer and over the years had an opportunity to work as a DevOps and network engineer, engineering manager, and VP of Technology. I also have my YouTube channel called Crushing Tech Education where I post a lot of system design content. The idea for the channel was to create content that would cover all those deep-dive concepts because that was my frustration back in the day when I tried to learn more about it. I just wouldn't find any deep-dive content, and the majority of the videos would be very shallow and high-level. So, I guess that's my attempt to fix that."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Alright, let's stop chattering and get stuck in, shall we? Eugene, today I want to ask you to design Twitter."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Sounds good. Alright, Twitter, or now it's X.com, right? Let's do it. So first, I'm just going to ask you a few more questions to make sure we are on the same page on what components and workflow you want me to cover. Maybe you can provide me some components that you want me to focus on so I can start from there."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, sure. Let's look at posting a tweet, the timeline, and user following."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so we want to cover three main features, which is pretty much the main workflow, right? So I post a tweet, and then as a result of it, that tweet would probably go to all the followers that I have, and their timeline would be updated. Can a tweet contain any media like video or photo?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, it can contain links, photos, and video."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Alright, so we can have any sort of content on that tweet. And when you say a timeline, there are two types of timelines, right? The first one is a user timeline that consists of the tweets that I post myself, and the second one is the home timeline that would be a mixture of the tweets from the users I follow, but at the same time, my tweets perhaps, and some ads, right?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, correct."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Alright, and do we want to also support that users can follow each other to subscribe to their updates, right?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, cool."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "And do you want me to cover any other concepts like search, retweet, maybe favorite tweets, likes?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, maybe Twitter search, but let's see if we have enough time for that."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Alright, sounds good. Let me just talk a little bit about the assumptions that I have and make sure you can stop me if I'm going in the wrong direction or we have some discrepancy in the thought process. So it's Twitter, right? All the workloads are going to be read-heavy because when people go to Twitter, they mostly read, and they read way more messages and tweets than they write. I would say the ratio is probably going to be like 1 to 10 or 1 to 20, which means for every single tweet I post, I probably read like 20 tweets. And when I post a message, I would need to also likely index it and make sure that it makes it to the search across Twitter and at the same time to all my followers' timelines. So that's likely not going to be instant. Is it okay if we have eventual consistency here? Because I would assume that making sure that a tweet makes it to all the timelines and search would take, I don't know, maybe 10 to 30 seconds. Would that be okay to have eventual consistency?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, I think 30 to 60 seconds is fine. Yeah."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, and so I would also assume that the majority of the searches and tweets read would be the most recent data, right? Because that's what Twitter is used for: reading the most recent news and everything. And we would also need to store historical data, right? If we do a search, we would still want to search for some data that probably was posted like a year ago."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Sure, yes."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Alright, so then, is there anything else you want me to cover or any other comments on the requirements or high-level assumptions?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "I think that's all good for now. Yeah."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Alright, sounds good. Then I'm going to go and just try to briefly do some capacity estimation just so we know how much data we would be storing, how big of a storage and network we would need for the system. Alright, you should be able to see my screen over here. Can you see it?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So, the Twitter tweet itself would be limited because we can't post a really big, a lot of characters there. It's 160, 160 characters as far as I remember, or 180. So I think that would probably be like, what, 10 kilobytes max size. So let me just put some high-level assumptions. It's 280 characters."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "280 characters. They moved it up, but yeah, it's not going to make a big difference there."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Alright, yeah. So let's just assume it can be 10 kilobytes per tweet maximum. And from the user base, how many active users would we want to have, like 100 million or 1 billion?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Say a billion."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Billion users. So let's assume we have 1 billion active users and maybe 200 million active users that post messages daily. And on average, every user has maybe 200 followers."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Alright, so does it look good to you? Does that make sense?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, that makes sense so far."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Alright, so let's try to estimate some storage and network capacity that we would need. So if we have 200 million daily users, we can assume, let's say, 100 million users post messages every day. So we would have 100 million tweets per day. And every tweet would be 10 kilobytes for text, but then you also said that we might have some media in there. So I would assume we would have, let's say, 200 kilobytes per tweet on average with media and pictures. And if that's the case, then we would have 10 terabytes of data per day. So as we have 10 terabytes of data per day, let's just think how many requests per second we would have. So with this, if we have 100 million posts per day, and we're just going to divide it by the number of seconds, that makes us 1,200 requests per second. And this would be an on average. So during the peak time, likely we would have more writes because, let's say, we would have 5 or 10x more writes, which would make it 6 to 12,000 requests per second. And on average, let's say we would need to send, we would need to propagate those tweets to 20 users. Then for every single write, and we have 6,000 requests, 6,000 writes per second, we would need to push that message to 20 followers. That would make it close to about, let's say, 100,000 fan-out messages, which means that pretty much per second, we would need not only to write 6 to 12,000 tweets but also push them out to all the followers, and it would be about 100,000 fan-out messages per second."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, do you want me to go to the API now, or we can skip that?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, let's have a look at the API for the timeline."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Alright, so for the API, I think our API would be relatively straightforward. So yeah, we can cover the tweets and timeline here. So when we post a tweet, we would just use the POST method, I would guess, with the format. We can have a version for the path, and then, let's say, 'tweets'. This would be our POST request, and it would contain a user ID, content, and the media. We would have a separate endpoint for the media because we would want to store media separately and then just propagate the link to the media. So there would likely be a different endpoint for the media, but we would just post it. And we would have, so these are tweet endpoints. Then we'll probably have a few endpoints for the user connections. So it would be, let's say, POST and DELETE for users to follow each other. So when a user follows another, we would use POST, and then when we break the connection and a user unfollows someone, we would use the DELETE verb. The API would probably look like this: 'users', and then perhaps 'user ID', and then 'follow'. And for the timeline, as you mentioned, we would need GET endpoints, right? So we would follow a similar pattern here and call it 'timelines' that would probably take as a parameter a page, page size. We would also need user ID, obviously, but user ID can be passed in the header. And that will be the home timeline. And then there would be a user timeline, right? So it would probably look like this: 'user ID', and we would pass the page and page size here as well. So I think this is high-level how the API would look like. Does it look okay, good enough? Do you want me to cover something else here?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, I think that looks good."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so now as we've covered high-level functionality and methods that we want to implement, let's try to define high-level components. As I think about it, we would need a few components. Our main components would be a tweet service or tweet processor that would be responsible for posting a tweet. So when we post a tweet, we would need to store it and then post it elsewhere for some further processing, indexing, search, and timeline generation. Then the second one would be some sort of user graph that would be responsible for making sure we have all the user connections, and that service would be tracking the users that follow each other and serve as a source of truth for that. And the third one would be a timeline service that would be responsible for generating the timeline, storing them, and then serving them back to users. So based on the requirements, does what I just said about the components make sense?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, I'm on board with that. Yeah."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Alright, sounds good. And now I think we can briefly talk about the database design, if you want, just how the tables would look like."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, I think it would be good to cover the main entities of that. Yes."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Alright, so high-level, our database design would be relatively simple. We have the main entities: a tweet that would need to contain a user ID, tweet ID. We would need to have likely some sort of a timestamp on when the tweet was created and the content. We might also need to have links for the media, but at the same time, I think those links can be inside the content because when we would return the tweet back to the user, we would use those IDs and links to pull the media. So I think high-level, that would be it for the tweet's basic functionality. For the user relation, we have some sort of user relation table that would have a many-to-many mapping for users that follow each other. So I would assume we would have, if we were to use a single table for many-to-many connection between users, then we would just have a user ID, and then, or we can call it follower ID, follower user ID, and then the other one would be a followee user ID. So every single time when someone follows an account, we would need to insert two records in this table: one would be for one user to follow another one, and the other one would be for that user to get a new follower. So it's a bidirectional connection that would require us to write two records for a single follow functionality on Twitter. But again, I think it can be optimized a little bit by separation of the follower and followee data, but we're going to get to it later, I guess, once we go to the main design. Do you think that's good enough for now? And there will obviously be the user table, right? But it's pretty much just high-level user information, so I think we can skip it for now."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, I'm happy with that."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Alright, sounds good. So let me just get then to the high-level design and the components. As you mentioned, we want to cover three main features, right? Posting a tweet, user follow each other, and timeline generation. So I'm just going to go from there and create a few components here for the user action. So let's say this one is going to be 'Post a Tweet'. Then we would have the second feature, 'User Follow', and then we would have 'User Timeline Generation', so 'User Timeline' and 'Home Timeline'. And I'm just going to split it like this. So these would be user requests from the internet, so call it 'Internet', and on the right side, it would be our 'System', just to give a high-level framework."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Alright, so do you want me to cover things like API Gateway, load balancers, authentication, authorization?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "No, I think we can circle back to those at the end if we have time. I think skip for now."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so then I'm going to assume that we'll have load balancers. We'll have some sort of API Gateway that sits in front of the system, load balancers as well. I'm just going to skip that and focus mostly on the service architecture. Is that okay?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, great."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Alright, so starting from posting a tweet, as I mentioned, we would need some sort of Tweet Processor service that would receive the tweet and then make sure that the tweet gets propagated down the system and makes it to the search and other users' timelines. And this service would also need to be backed likely by a database. So let's have a database here. It will have to be a NoSQL database, and since we want to focus on storing the most recent data, we might as well choose Cassandra because it allows wide rows, and they can be sorted by time in our case. So let's just assume we have a persistent database here like Cassandra. We'll likely also need some sort of cache just so we can retrieve records more efficiently if we need to. We can have Redis here. And you also mentioned that we can post media, right? So the Tweet Processor would also need to take care of the media that exists in the tweet. So we would need some sort of Asset Service that the Tweet Processor can call and make sure that the media is handled. So we can call it Asset Service. And you also mentioned long links, so perhaps there could be a URL Shortener Service as well here. Okay, just going to put it here. And so as we receive a tweet, if it has media, we would call the Asset Service, store that media in the object storage, and receive back a UID for that media that would later be used to retrieve that media and return it back to the user. As we store this data, we also need to push it somewhere for future processing and indexing, etc. So I would assume we would have some sort of queue here. For now, we can say it would be something like Kafka, but we're going to circle back to this. So as we get, so we store the message, we return success back to the user, and we throw it into Kafka for future processing. And back from Kafka, we would likely need to have some sort of processor that would retrieve those messages and send them either for indexing for the search or for the timeline generation. So I'm just going to call it Timeline Processor. So that would be a service that consumes messages from Kafka and then updates the user timelines. And speaking about the user timelines, let's just circle back there. We would need some, we would need a Timeline Service, probably like an API service responsible for serving the timeline. And this Timeline Service would need to return the timeline to the user pretty much instantly, so we would need those timelines to be cached. So I'm just going to put a Redis cache here. And our Timeline Processor would probably be responsible for consuming tweets and then making sure that they make it to the appropriate user timeline that would exist in the Redis cache. But again, we're going to drill down to this later. I'm just trying to build this high-level workflow that we can follow. Does it look good so far?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, looks good. Please carry on."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Alright, sounds good. So as I'm thinking about the Timeline Service, it would need to pull data from Redis, but we might also need tweets from other users whose tweets didn't make it to Redis perhaps. So I would assume we would also need some sort of service with direct access to the tweets because if a user is not active, for instance, one might not have the timeline cached in Redis. So we would probably need to just pull it from the database, get the tweets from the database, and then return it to the user. So I would just say that we would need to have some Tweet Service, perhaps just a simple API that sits on top of the tweet data that can serve tweets based on the user ID. This way, our Timeline Service would have access to first, pre-generated timelines, as well as if the timeline is not generated, it can call the Tweet Service and pull the data from Redis and then create a timeline in real-time. It would not be desirable, but still probably needed. Okay, and user follow, that's the last piece that I didn't cover yet. So I mentioned it would have a User Graph Service, or we can call it that, that would be an API in front of the database. It would likely need to be a key-value database. I'm not sure about Cassandra. Let's call it just Key-Value DB for now, that would be storing the user mapping and know about who follows whom, pretty much. And the Timeline Generation Service, Timeline Service, would probably need to have access to this database as well to understand, to retrieve the user followers because if I'm a user and I try to render and I open a home timeline, if I'm a passive user or not active user, then my timeline might not be pre-generated, and the Timeline Service would need to get a list of my followers and then retrieve them from Redis or Cassandra. So that kind of covers that workflow if the timeline is not generated. Okay, what else is here? Okay, I think this is high-level how it would look like. Let me just work through the whole workflow one more time just so it's clear. So when we post a tweet, it gets to Kafka, or our queue. And then from the queue, we likely have that's going to be our essential place from where multiple functionalities would be plugged in. So we can have a service responsible for indexing and search. We can have different sorts of analytics also consumed and processed further. And the main piece of functionality would be the timeline generation. And for that, I think what makes sense to do here is that we would have a cluster of consumers that would consume the tweets, and then they would get a list of followers of the user that posted a tweet and create a list of tuples. We can do it in a loop: we receive a tweet, then we pull all the users that we need to push this tweet to, and we create tuples with the user ID that posted the tweet, the user ID where this tweet has to go, and a tweet ID. And then we post all the tuples back to the queue. It can be either the Kafka queue, or I think in this scenario, it makes sense to use Redis channels that act similar to a queue. And from all those channels, we can have those channels per user. From all those channels, we would have more consumers that would consume it from the corresponding channel and push it into the Redis database where the timeline would be cached. So let me just try to draw it. So we have a cluster of consumers where the tweet is going, and then for every single follower, we would create a tuple and push it back to the queue. And in this case, it can be, let's say, Redis channels. And now for every single follower, we would have a separate Redis channel that would be receiving tweets from our main queue. And from here, we would have a service that would just push it to Redis. It would be listening to the Redis channels and push it to Redis. So the Redis here would have a format. What kind of data would it be storing? It would be storing a mapping, key-value mapping, between the user and a timeline. And this mapping can also be, so the way we're going to, in this case, the user would be the key, and the timeline would be the value. And the format of the timeline would be a linked list. This way, we can very fast insert data into the list and remove it from there, and both of these operations would take O(1) time and would be pretty fast. So does this design I wrote here for the tweet processing make sense?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, makes sense to me."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So I think I've covered the main workflow here. We've covered the posting a tweet method in pretty granular details here, and the important part is Redis as well. I think this is a really good optimization by storing the timeline as a double linked list that would provide us O(1) insert and delete time. So it pretty much means we can have a linked list of, let's say, 500 tweets for a timeline, and as new tweets arrive, we can just delete old tweets, and it's all done in O(1) time in the main memory. I think it's also important, so we spoke about the system being real-time, that all these tweets and the whole main workflow of the tweet is done in the main memory because we don't want to be blocked on writing to the file system or any sort of slow data sources. So ideally, what we would like to optimize here as we're posting a tweet is to make sure that all the communication and operations on the tweet happen in RAM memory, like fast access memory. And I think we achieve it by sending tweets to Kafka and then performing multiple operations and transformations on the tweet. Then we would store it into a Redis channel, which is also mostly stored in memory, and then the final output, which is the timeline, would also be in the memory. This way, the majority of users, or all of them, can just have the timeline pre-generated and updated in real-time."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So what options do we have to mitigate against that then?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So there are multiple ways here. The first one is that it all depends on how we want to partition the data. We can partition it per user ID. So when we store a tweet, if we partitioned per user ID, we can partition it by tweet ID. Let's think here. If we do a user ID, it means that all the tweets for the same user would exist on the same server, and that is very convenient because we can easily query and get all the tweets for a user. But at the same time, likely it would cause a bottleneck and uneven tweet distribution in our system, which we want to avoid. It would be hard to manage the system because multiple popular users can end up on the same server, and then the server would be just overloaded. And as the main entity of our system is a tweet, I think we should partition based on the tweet ID. But in this case, if we want to retrieve a user timeline, we would need to query literally every single server, every single partition, and then get a subset of users from every single partition, so that wouldn't be very convenient. The third option here is that we can do a double partitioning, which means we can try to partition by user ID first and then partition by the tweet ID secondly, which means we would have two hash rings of data. So it means that if a popular user even ends up on the same server with other popular users, they would still be distributed because every single hash range would point to another hash ring. In theory, this sounds like a doable option, but I think the problem here is that if we want to move some partitions, then it would be such a complex task. For instance, if you want to move users from this segment to the other segment, not only would we need to move all this data, but we would also need to move all the data from the hash ring to another hash ring, which is very complex. So I think what we can do here is just a mixture of partitioning by tweet ID and perhaps pilot this double hashing functionality, which is very questionable because it's just very complex to manage, but it's still an option. Am I going in the right direction with this?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, I think so. Yeah, I think we're coming to the end. Just before we wrap the interview up, I just wanted to give you a chance to think, is there anything that you'd refine in your design architecture just before we come to the end of the interview?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Sure, sure. So a few more bottlenecks or improvements that we can perform here. I mentioned the user graph and how we would be storing the connections in a single table. So ideally, what we do here is that instead of using a single table, we split it into two tables, making sure that one table is dedicated specifically for the user followers and the other one for the user followees. This way, we have this bidirectional connection, but at least we can split the responsibility and manage these databases and scale them separately. So I think this would be a good improvement. At the same time, when a user follows another user, we would need to do two writes to two different databases, which might cause some discrepancy, but from the scaling perspective, that would be a really good improvement. Also, the popular users that I didn't cover. So with this design, where we have multiple queues and this sort of processing pipeline, this wouldn't really work for popular users because if I have 80 million subscribers and I create 80 million tuples and then push them to the queue, it would just slow down the whole system. So this workflow would likely be for generic users that have, let's say, under 10,000 subscribers. And we would also have a list of popular users, whatever the threshold is, maybe more than 10 or 50,000 subscribers, and we would treat them differently. So, if I'm a user and I want to generate a timeline and I follow some popular users, then I would get all the tweets from other users through the main pipeline. And when it goes to the popular users, I would call the Tweet Service and retrieve tweets from the popular user from the Redis database and then just plug them into my timeline. This way, we can have on-demand requests to the tweets that popular users post. So that's probably a workaround for the popular users. Okay, so an additional improvement that we can make is the way we store tweets because, as we mentioned, we'll have a lot of them, and ideally, we want those tweet IDs to be unique and also support causality, which means that we can sort them by the timestamp because this would be crucial for our system as the majority of our data that we need to keep in memory and store is the most recent data. So whatever tweet ID we generate, we want to make sure that it's done in a way that is globally unique across the system and also supports causality. And the way I think Twitter does it is that it uses a 64-bit tweet ID where one bit is a sign bit just to make sure that it's compatible with all the languages because if we have a signed bit, it means that the ID is always going to be positive. Then I think they have 41 bits for the timestamp, which are epoch seconds. And then to be able to scale this ID, so epoch seconds gives us causality inside the ID. And then for the rest, we need to make sure that we have enough unique IDs per every single second. So the way we can do here is, for instance, we can have 10 bits for the worker ID because we'll probably have multiple workers generating these IDs, and 12 bits are for increment. This way, we would support causality with worker IDs, we would support distribution because we would have multiple workers, and we'll provide also high availability because if one of them goes down, we won't be impacted. And at the same time, if we have more than one tweet per second, we have, what is it, 4,000 IDs per second. So this way, I think we can support tens of thousands of unique tweet IDs per second and never have a duplicated ID, at the same time support the causality because we have seconds. This way, when, for instance, we store messages in Cassandra, if we store them in the wide row sorted by the epoch type, then we can only retrieve the last 20 or 100 or 500 messages without looking at all the older data in the database. And this is, I guess, an additional key point to optimize for the most efficient storage for the most recent data, not for the historical data."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, yeah, that makes a lot of sense, Eugene. I think we've run out of time. I think we're going to have to wrap the interview up there."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "How was it for you? Did you enjoy it?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Oh, it was really good. A lot of concepts to cover, so I tried my best to fit it in the time, but yeah, had a lot of fun. Thanks, Tom."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, cool. It would have been nice to just keep going for another half an hour on that, but yeah, thanks so much for doing it, and I think people are going to find that really, really interesting and hopefully really useful. So thanks a lot again, and hopefully we'll see you back on here."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Sounds good. Thanks, Tom. Bye."
+    }
+  ],
+  "training_pairs": [
+    {
+      "question": "Before we dive into the system design, could you please give us a quick overview of your background and experience?",
+      "answer": "Of course. I'm a senior engineer and manager. I started my career in 2010 as a software engineer and over the years had an opportunity to work as a DevOps and network engineer, engineering manager, and VP of Technology. I also have my YouTube channel, Crushing Tech Education, where I post a lot of system design content. The idea for the channel was to create content that would cover deep-dive concepts because that was my frustration when trying to learn more about it; I couldn't find deep-dive content, and most videos were shallow and high-level. So, that's my attempt to fix that.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Alright, let's get started. Today, I'd like you to design Twitter. Could you begin by clarifying the key components and workflows you'd like to focus on?",
+      "answer": "Sounds good. First, I'm going to ask a few more questions to ensure we're on the same page. I'd like to focus on posting a tweet, the timeline, and user following. A tweet can contain links, photos, and video. For timelines, there's a user timeline (my own tweets) and a home timeline (a mixture of tweets from users I follow, my tweets, and ads). We also need to support users following each other. For other concepts like search, retweet, or likes, maybe Twitter search if we have time.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "What are your initial assumptions regarding Twitter's workload, consistency, and data storage needs?",
+      "answer": "It's Twitter, so all workloads are going to be read-heavy. People read way more messages than they write, probably a 1:10 or 1:20 ratio. When I post a message, it needs to be indexed for search and propagated to followers' timelines, which won't be instant. I assume eventual consistency is acceptable, with tweets appearing in timelines and search within 30 to 60 seconds. The majority of searches and reads will be for the most recent data, but we also need to store historical data for older searches.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Can you briefly perform some capacity estimation for the system, considering tweet size, user base, and daily activity?",
+      "answer": "The Twitter tweet itself is limited to 280 characters, so I'll assume a maximum size of 10 kilobytes per tweet. For the user base, let's assume 1 billion active users, with 200 million posting messages daily. On average, every user has about 200 followers. This means 100 million tweets per day, which translates to 10 terabytes of data per day if we assume 200 kilobytes per tweet on average with media. For requests per second, 100 million posts per day divided by seconds makes it 1,200 requests per second on average. During peak times, we could see 5 to 10x more writes, leading to 6 to 12,000 requests per second. If we propagate tweets to 20 users per write, that's about 100,000 fan-out messages per second.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Let's look at the API design for the core functionalities like posting tweets, user connections, and timelines.",
+      "answer": "Our API would be relatively straightforward. For posting a tweet, we'd use a POST method to `/v1/tweets` with user ID, content, and media. Media would have a separate endpoint, and we'd propagate a link. For user connections, we'd use POST to `/users/{user ID}/follow` for following and DELETE for unfollowing. For timelines, we'd need GET endpoints: `/timelines` for the home timeline (taking page and page size, user ID in header) and `/users/{user ID}/timeline` for a user's specific timeline (also taking page and page size).",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Now, let's define the high-level components and the database design for the main entities.",
+      "answer": "Our main components would be a Tweet Processor (for storing and propagating tweets), a User Graph service (for tracking user connections), and a Timeline Service (for generating and serving timelines). For database design, the main entities are Tweet (user ID, tweet ID, timestamp, content, media links), User Relation (a many-to-many table with follower ID and followee ID, requiring two records per follow for bidirectional connection), and a basic User Table. We can optimize the user relation table later by separating follower and followee data.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Please walk us through the high-level architecture and the detailed workflow for tweet processing and timeline generation, assuming we can skip API Gateway and load balancers for now.",
+      "answer": "Starting with posting a tweet, it goes to a Tweet Processor. If media is present, it calls an Asset Service to store it in object storage (exposed via CDN) and receives a UID. The tweet is stored in a persistent NoSQL database like Cassandra (for recent data, wide rows sorted by time) and a Redis cache. Success is returned to the user, and the tweet is pushed asynchronously to a queue like Kafka for future processing. A Timeline Processor consumes from Kafka, updating user timelines. The Timeline Service serves timelines, primarily from a Redis cache. If a timeline isn't cached (e.g., for inactive users), it can call a Tweet Service to pull data directly from Cassandra. For user following, a User Graph Service (backed by a Key-Value DB) stores who follows whom. The timeline generation involves a cluster of consumers pulling tweets from Kafka, getting followers from the User Graph Service, creating tuples (poster ID, follower ID, tweet ID), and pushing these tuples to Redis channels (one per follower). More consumers listen to these Redis channels and push the tweets into the Redis database, where timelines are stored as linked lists for O(1) insert/delete, optimizing for real-time, in-memory operations.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Regarding data partitioning, what options do we have to mitigate challenges, especially with a system handling billions of tweets daily?",
+      "answer": "There are multiple ways to partition data. Partitioning by user ID is convenient for querying a user's tweets but risks bottlenecks and uneven distribution if popular users end up on the same server. Partitioning by tweet ID avoids hot servers but requires querying every partition to retrieve a user's timeline, which is inefficient. A third option is double partitioning, first by user ID and then by tweet ID, using two hash rings. This distributes popular users but is very complex to manage, especially when moving partitions. I think a mixture of partitioning by tweet ID and perhaps this double hashing functionality is an option, though its complexity is a concern.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "As we're nearing the end, could you discuss any refinements or additional improvements to your design, particularly concerning bottlenecks like user graphs, popular users, and tweet ID generation?",
+      "answer": "Certainly. For the user graph, instead of a single table, we could split it into two: one for followers and one for followees. This allows separate scaling and management, though it introduces two writes per follow. For popular users, the fan-out approach won't work for millions of followers. We'd treat generic users (under 10,000 subscribers) with the main pipeline, but for popular users (e.g., over 50,000 subscribers), their tweets would be retrieved on-demand by the Timeline Service directly from the Redis database. An additional improvement is tweet ID generation. We need globally unique, causality-supporting IDs. Twitter uses a 64-bit tweet ID: one sign bit, 41 bits for epoch seconds (for causality), 10 bits for worker ID (for distribution and HA), and 12 bits for increment. This supports tens of thousands of unique IDs per second and allows efficient retrieval of recent data from Cassandra by sorting on the epoch timestamp in wide rows.",
+      "follow_up": "NONE"
+    }
+  ]
+}

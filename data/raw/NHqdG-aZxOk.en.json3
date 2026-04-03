@@ -1,0 +1,3685 @@
+{
+  "wireMagic": "pb3",
+  "pens": [ {
+  
+  } ],
+  "wsWinStyles": [ {
+  
+  } ],
+  "wpWinPositions": [ {
+  
+  } ],
+  "events": [ {
+    "tStartMs": 1353,
+    "dDurationMs": 4947,
+    "segs": [ {
+      "utf8": "[Music] hello welcome to another system design \nmock interview this is where we get one of our  "
+    } ]
+  }, {
+    "tStartMs": 6300,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "top coaches to play the role of candidate and take \non a system design question for you to watch and  "
+    } ]
+  }, {
+    "tStartMs": 12000,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "learn with and I'm very pleased to say that today \nwe have Mark with us again Mark how you doing  "
+    } ]
+  }, {
+    "tStartMs": 19260,
+    "dDurationMs": 6540,
+    "segs": [ {
+      "utf8": "great thanks Tom great to have you with us uh \nquickly do you want to just introduce yourself  "
+    } ]
+  }, {
+    "tStartMs": 25800,
+    "dDurationMs": 7440,
+    "segs": [ {
+      "utf8": "and tell people a bit about your background \nsure yeah so I am a former engineering manager  "
+    } ]
+  }, {
+    "tStartMs": 33240,
+    "dDurationMs": 6780,
+    "segs": [ {
+      "utf8": "at Google mostly at Google sometime at Uber and \nuh spent a lot of time on large-scale distributed  "
+    } ]
+  }, {
+    "tStartMs": 40020,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "systems so that's I think what we're going to be \ndoing here and of course I've been doing coaching  "
+    } ]
+  }, {
+    "tStartMs": 45540,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "I'm available as a coach and interview coach but \nI hear the tables have turned so here we go again  "
+    } ]
+  }, {
+    "tStartMs": 52380,
+    "dDurationMs": 5400,
+    "segs": [ {
+      "utf8": "all right well uh let's turn those tables \nlet's crack on with the question and  "
+    } ]
+  }, {
+    "tStartMs": 57780,
+    "dDurationMs": 6180,
+    "segs": [ {
+      "utf8": "yeah Mark the question I want to ask you \ntoday is how would you design TikTok?"
+    } ]
+  }, {
+    "tStartMs": 73620,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "okay TikTok all right uh popular vertical format  "
+    } ]
+  }, {
+    "tStartMs": 79860,
+    "dDurationMs": 7440,
+    "segs": [ {
+      "utf8": "video sharing application uh popular with \nlots of people around the world I guess  "
+    } ]
+  }, {
+    "tStartMs": 88020,
+    "dDurationMs": 9120,
+    "segs": [ {
+      "utf8": "and so uh it's kind of a social media platform and \nuh pretty pretty interesting and pretty complex I  "
+    } ]
+  }, {
+    "tStartMs": 97140,
+    "dDurationMs": 7320,
+    "segs": [ {
+      "utf8": "think so uh tell me a little bit about maybe uh \nuse cases here that we should be thinking about  "
+    } ]
+  }, {
+    "tStartMs": 105840,
+    "dDurationMs": 7020,
+    "segs": [ {
+      "utf8": "yeah sure let's not spend time on the mobile \napp and and content Creation in the app I'd  "
+    } ]
+  }, {
+    "tStartMs": 112860,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "like you to focus on on a back-end distributed \nsystem that supports uploads and downloads"
+    } ]
+  }, {
+    "tStartMs": 120180,
+    "dDurationMs": 8280,
+    "segs": [ {
+      "utf8": "okay that's good uh yeah because certainly the \nthe application is the uh is the the the most  "
+    } ]
+  }, {
+    "tStartMs": 128460,
+    "dDurationMs": 4500,
+    "segs": [ {
+      "utf8": "central point of the whole thing and you could do \nlots of cool things in terms of generating your  "
+    } ]
+  }, {
+    "tStartMs": 132960,
+    "dDurationMs": 6480,
+    "segs": [ {
+      "utf8": "being a Creator so I'm glad we don't have to worry \nabout that that's also not my forte so in terms of  "
+    } ]
+  }, {
+    "tStartMs": 139980,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "uh sign in and sign up and things like \nthat can we kind of skip that too that's  "
+    } ]
+  }, {
+    "tStartMs": 144900,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "going to be pretty standard I think I think \nthat's that's you're right that's the less  "
+    } ]
+  }, {
+    "tStartMs": 149940,
+    "dDurationMs": 6120,
+    "segs": [ {
+      "utf8": "interesting part so let's skip over that yeah \nokay so you want to focus on sort of the video  "
+    } ]
+  }, {
+    "tStartMs": 156060,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "uploads into the system and then streaming \nthe videos or consuming the videos I guess  "
+    } ]
+  }, {
+    "tStartMs": 162900,
+    "dDurationMs": 7620,
+    "segs": [ {
+      "utf8": "absolutely okay so tell me a little bit \nabout you know how many users uh how many  "
+    } ]
+  }, {
+    "tStartMs": 170520,
+    "dDurationMs": 4260,
+    "segs": [ {
+      "utf8": "videos uploaded what's the scale of this of \nthis thing what are we thinking about here  "
+    } ]
+  }, {
+    "tStartMs": 175680,
+    "dDurationMs": 6060,
+    "segs": [ {
+      "utf8": "okay yeah well we've got uh let's say one \nbillion users uh in around 150 countries  "
+    } ]
+  }, {
+    "tStartMs": 183060,
+    "dDurationMs": 9120,
+    "segs": [ {
+      "utf8": "okay and let's assume one billion video views \na day and I think there were I think I saw in a  "
+    } ]
+  }, {
+    "tStartMs": 192180,
+    "dDurationMs": 6120,
+    "segs": [ {
+      "utf8": "recent year there were 10 billion videos uploaded \nin one year so so let's use that figure as well  "
+    } ]
+  }, {
+    "tStartMs": 198840,
+    "dDurationMs": 5460,
+    "segs": [ {
+      "utf8": "okay all right so let me change my little and \nthen go to my little diagram here it's a TikTok  "
+    } ]
+  }, {
+    "tStartMs": 204300,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "system design all right okay so let me let me \ncapture just capture some of this stuff so make  "
+    } ]
+  }, {
+    "tStartMs": 209340,
+    "dDurationMs": 11400,
+    "segs": [ {
+      "utf8": "sure I get this right here so we've got I think \nyou said a billion users uh uh across 150 150  "
+    } ]
+  }, {
+    "tStartMs": 220740,
+    "dDurationMs": 9060,
+    "segs": [ {
+      "utf8": "you said 150 countries yeah I think you said uh a \nbillion videos per day that's right is that right  "
+    } ]
+  }, {
+    "tStartMs": 230340,
+    "dDurationMs": 10860,
+    "segs": [ {
+      "utf8": "yes and you said uh 10 10 billion videos \nuploaded uh last last year or something  "
+    } ]
+  }, {
+    "tStartMs": 241200,
+    "dDurationMs": 7260,
+    "segs": [ {
+      "utf8": "is that something I say yeah yeah okay per year \nall right okay uh all right that makes sense um"
+    } ]
+  }, {
+    "tStartMs": 250680,
+    "dDurationMs": 6900,
+    "segs": [ {
+      "utf8": "um all right that sounds reasonable I \nmean it's that's big and that's good  "
+    } ]
+  }, {
+    "tStartMs": 257580,
+    "dDurationMs": 4020,
+    "segs": [ {
+      "utf8": "because we want it to be big we want \nit to be a big distributed system so  "
+    } ]
+  }, {
+    "tStartMs": 263160,
+    "dDurationMs": 7680,
+    "segs": [ {
+      "utf8": "if I if I think about this app though so \nuploading down streaming viewing even though  "
+    } ]
+  }, {
+    "tStartMs": 270840,
+    "dDurationMs": 5340,
+    "segs": [ {
+      "utf8": "we're not going to talk about the app too much \nor you know we're kind of putting that aside uh  "
+    } ]
+  }, {
+    "tStartMs": 277080,
+    "dDurationMs": 6780,
+    "segs": [ {
+      "utf8": "we probably should think about some uh success \nmetrics so would you do you have any thoughts  "
+    } ]
+  }, {
+    "tStartMs": 283860,
+    "dDurationMs": 3540,
+    "segs": [ {
+      "utf8": "on success metrics do you I mean I can \nthink of some but do you have any yeah  "
+    } ]
+  }, {
+    "tStartMs": 288060,
+    "dDurationMs": 6720,
+    "segs": [ {
+      "utf8": "I'd prefer to hear your thoughts on it yeah \ngive me some suggestions uh okay all right so  "
+    } ]
+  }, {
+    "tStartMs": 295920,
+    "dDurationMs": 4200,
+    "segs": [ {
+      "utf8": "I mean I guess in a classic sort \nof web application kind of thing  "
+    } ]
+  }, {
+    "tStartMs": 301020,
+    "dDurationMs": 8340,
+    "segs": [ {
+      "utf8": "daily active users or even an application phone \napp daily active users make sense I think for  "
+    } ]
+  }, {
+    "tStartMs": 309360,
+    "dDurationMs": 8400,
+    "segs": [ {
+      "utf8": "TikTok the simple metric I guess would probably \nbe let's see so success metric something like  "
+    } ]
+  }, {
+    "tStartMs": 319140,
+    "dDurationMs": 8400,
+    "segs": [ {
+      "utf8": "time and app uh so how long are people spending \nin the app I met I mean I I'm not a heavy TikTok  "
+    } ]
+  }, {
+    "tStartMs": 327540,
+    "dDurationMs": 5340,
+    "segs": [ {
+      "utf8": "user at all but I imagine that people use it in \ndifferent ways some maybe just scroll through the  "
+    } ]
+  }, {
+    "tStartMs": 332880,
+    "dDurationMs": 6480,
+    "segs": [ {
+      "utf8": "videos some watch the entire thing and react and \nshare and do lots more interesting things and then  "
+    } ]
+  }, {
+    "tStartMs": 339360,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "there's the creators but time and app is probably \nthe simplest metric to think about so maximizing  "
+    } ]
+  }, {
+    "tStartMs": 345240,
+    "dDurationMs": 9960,
+    "segs": [ {
+      "utf8": "time and app and uh I think there was some I \ndon't know you might know this do you have a  "
+    } ]
+  }, {
+    "tStartMs": 355200,
+    "dDurationMs": 3600,
+    "segs": [ {
+      "utf8": "do you know how long people spend in the app \ndo you have a do you have a sense of that"
+    } ]
+  }, {
+    "tStartMs": 361320,
+    "dDurationMs": 5340,
+    "segs": [ {
+      "utf8": "um I think let's say like around I think \nlet's say the average is around an hour a day  "
+    } ]
+  }, {
+    "tStartMs": 368040,
+    "dDurationMs": 6120,
+    "segs": [ {
+      "utf8": "okay does that sound okay sound about \nright sure so let's let's assume that  "
+    } ]
+  }, {
+    "tStartMs": 374160,
+    "dDurationMs": 9420,
+    "segs": [ {
+      "utf8": "uh okay that sounds fine here I'm gonna \ntry and just uh where's my trying to oops"
+    } ]
+  }, {
+    "tStartMs": 385320,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "trying to see if I can out well I'll just \nleave this okay so all right so time and app  "
+    } ]
+  }, {
+    "tStartMs": 390900,
+    "dDurationMs": 5580,
+    "segs": [ {
+      "utf8": "okay so having had uh kids and thinking about \nscreen time and all this kind of stuff I can  "
+    } ]
+  }, {
+    "tStartMs": 396480,
+    "dDurationMs": 5460,
+    "segs": [ {
+      "utf8": "imagine enhancing this if I weren't you know sort \nof thinking more about the the the online Health  "
+    } ]
+  }, {
+    "tStartMs": 401940,
+    "dDurationMs": 6420,
+    "segs": [ {
+      "utf8": "maybe maybe I'd want to even as a as a working \nprofessional maybe I wouldn't want to maximize  "
+    } ]
+  }, {
+    "tStartMs": 408360,
+    "dDurationMs": 7020,
+    "segs": [ {
+      "utf8": "the time in my app during business hours I can \nimagine some future thing maybe to maximize the  "
+    } ]
+  }, {
+    "tStartMs": 415380,
+    "dDurationMs": 4320,
+    "segs": [ {
+      "utf8": "time in the app outside of working hours or school \nhours or something like that but that could be a  "
+    } ]
+  }, {
+    "tStartMs": 419700,
+    "dDurationMs": 4560,
+    "segs": [ {
+      "utf8": "that would be a future enhancement I don't I don't \nknow that I would yeah for now let's just focus on  "
+    } ]
+  }, {
+    "tStartMs": 424260,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "this time in app sounds sounds reasonable it's \nalways a good idea to narrow down the scope of  "
+    } ]
+  }, {
+    "tStartMs": 430020,
+    "dDurationMs": 4740,
+    "segs": [ {
+      "utf8": "the question to make it achievable within the hour \nhere Mark did this well confirming that he could  "
+    } ]
+  }, {
+    "tStartMs": 434760,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "just focus on TikTok's back end distributed system \nrather than the TikTok app he made another good  "
+    } ]
+  }, {
+    "tStartMs": 440640,
+    "dDurationMs": 4800,
+    "segs": [ {
+      "utf8": "call in suggesting we skip designing the login \nprocess covering that very standard part of the  "
+    } ]
+  }, {
+    "tStartMs": 445440,
+    "dDurationMs": 4380,
+    "segs": [ {
+      "utf8": "system might have wasted time that Mark wanted to \nspend on more interesting aspects that gave them  "
+    } ]
+  }, {
+    "tStartMs": 449820,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "greater opportunities to impress the interviewer \nof course always confirm your suggestions with  "
+    } ]
+  }, {
+    "tStartMs": 454740,
+    "dDurationMs": 4200,
+    "segs": [ {
+      "utf8": "the interviewer to make sure they're on board \nwith the direction you're taking right so okay  "
+    } ]
+  }, {
+    "tStartMs": 458940,
+    "dDurationMs": 7680,
+    "segs": [ {
+      "utf8": "so time and time and app uh currently about \nan hour per day sounds good all right so  "
+    } ]
+  }, {
+    "tStartMs": 467820,
+    "dDurationMs": 2580,
+    "segs": [ {
+      "utf8": "let me see if I can make some \nmore detailed assumptions here"
+    } ]
+  }, {
+    "tStartMs": 477360,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "some of this stuff I need to make this a little \nbit smaller so I have some room here all right so  "
+    } ]
+  }, {
+    "tStartMs": 483360,
+    "dDurationMs": 9900,
+    "segs": [ {
+      "utf8": "detailed assumptions I'm going to assume that so \nthis is vertical it's a vertical form factor video  "
+    } ]
+  }, {
+    "tStartMs": 493260,
+    "dDurationMs": 8340,
+    "segs": [ {
+      "utf8": "sharing thing as I as I mentioned and typically \nthese videos are like you know they're was it  "
+    } ]
+  }, {
+    "tStartMs": 501600,
+    "dDurationMs": 7320,
+    "segs": [ {
+      "utf8": "called 1080p but they're rotated so like 1080 \npixels by 1900 pixels or something like that so  "
+    } ]
+  }, {
+    "tStartMs": 509520,
+    "dDurationMs": 7620,
+    "segs": [ {
+      "utf8": "those kinds of videos the the typical I think the \nvideo range time range for these things is Clips  "
+    } ]
+  }, {
+    "tStartMs": 517140,
+    "dDurationMs": 7980,
+    "segs": [ {
+      "utf8": "is like three seconds to a minute but uh just for \nsake of simplification maybe we can assume uh 10  "
+    } ]
+  }, {
+    "tStartMs": 525120,
+    "dDurationMs": 6360,
+    "segs": [ {
+      "utf8": "second video on average if that's does that \nseem okay yeah yeah I think that's it works  "
+    } ]
+  }, {
+    "tStartMs": 532800,
+    "dDurationMs": 10680,
+    "segs": [ {
+      "utf8": "and so uh and I think I said 1080 times 1920 \npixels which you know in a video uh a video for 10  "
+    } ]
+  }, {
+    "tStartMs": 543480,
+    "dDurationMs": 9180,
+    "segs": [ {
+      "utf8": "seconds I think we can probably assume a megabyte \nper video if that seems it seems all right uh okay  "
+    } ]
+  }, {
+    "tStartMs": 552660,
+    "dDurationMs": 7020,
+    "segs": [ {
+      "utf8": "so megabyte per video let me just see if there's \nany other things I'm I'm thinking about here  "
+    } ]
+  }, {
+    "tStartMs": 562200,
+    "dDurationMs": 7740,
+    "segs": [ {
+      "utf8": "all right let me so with those assumptions maybe \nI can do some really rough calculations here about  "
+    } ]
+  }, {
+    "tStartMs": 569940,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "in terms of the the scope of this thing and and \nsee if let's let's test this and see expand this  "
+    } ]
+  }, {
+    "tStartMs": 575820,
+    "dDurationMs": 6300,
+    "segs": [ {
+      "utf8": "a little bit to see how big this is going to get \nso if we say that we've got a billion let's look  "
+    } ]
+  }, {
+    "tStartMs": 582120,
+    "dDurationMs": 4560,
+    "segs": [ {
+      "utf8": "at uploads first let's look at uploads because \nthat translates to storage in addition to some  "
+    } ]
+  }, {
+    "tStartMs": 586680,
+    "dDurationMs": 8700,
+    "segs": [ {
+      "utf8": "traffic and it looks uh looks pretty heavy so \nif we say 10 billion videos per year uh then  "
+    } ]
+  }, {
+    "tStartMs": 596100,
+    "dDurationMs": 6840,
+    "segs": [ {
+      "utf8": "if we do the rough math and we divide by \n360 well we divide by 365 days in a year  "
+    } ]
+  }, {
+    "tStartMs": 602940,
+    "dDurationMs": 9540,
+    "segs": [ {
+      "utf8": "and that comes out to approximately let's see 10 \nmillion 365. I'm going to say 30 million per day  "
+    } ]
+  }, {
+    "tStartMs": 613620,
+    "dDurationMs": 11460,
+    "segs": [ {
+      "utf8": "uh 30 million videos upload loaded per day and \nif I if I say uh actually let me let me back  "
+    } ]
+  }, {
+    "tStartMs": 625080,
+    "dDurationMs": 5220,
+    "segs": [ {
+      "utf8": "it let me put that let's hold hold that thought I \nmentioned storage and I want to finish the storage  "
+    } ]
+  }, {
+    "tStartMs": 630300,
+    "dDurationMs": 6360,
+    "segs": [ {
+      "utf8": "calculation first so 10 billion a year times \na megabyte I think I said video per per video  "
+    } ]
+  }, {
+    "tStartMs": 637440,
+    "dDurationMs": 7920,
+    "segs": [ {
+      "utf8": "so if you do a million times 10 billion what you \nwind up with is so 10 billion is you basically  "
+    } ]
+  }, {
+    "tStartMs": 645360,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "10 gigabytes times a thousand would be 10 \nterabytes times a million which would be  "
+    } ]
+  }, {
+    "tStartMs": 650040,
+    "dDurationMs": 9000,
+    "segs": [ {
+      "utf8": "Omega million would be uh petabytes so this is \ngoing to be 10 petabytes of uh of videos per year  "
+    } ]
+  }, {
+    "tStartMs": 659820,
+    "dDurationMs": 9660,
+    "segs": [ {
+      "utf8": "that's just doing doing Simple Math now in reality \nuh we have to factor in possibly some replication  "
+    } ]
+  }, {
+    "tStartMs": 669480,
+    "dDurationMs": 7260,
+    "segs": [ {
+      "utf8": "to have redundancy also possibly we have to have \ndifferent formats for different types of devices  "
+    } ]
+  }, {
+    "tStartMs": 676740,
+    "dDurationMs": 7200,
+    "segs": [ {
+      "utf8": "so you know you could I mean if we just sort of do \na super super simple calculation here I might say  "
+    } ]
+  }, {
+    "tStartMs": 684660,
+    "dDurationMs": 7800,
+    "segs": [ {
+      "utf8": "so devices and replication uh times 10 so then \nwe'll say 100 petabytes per year of storage  "
+    } ]
+  }, {
+    "tStartMs": 692460,
+    "dDurationMs": 8760,
+    "segs": [ {
+      "utf8": "requirements okay so if if that and that's a \nlot that's a lot of storage but a I think that  "
+    } ]
+  }, {
+    "tStartMs": 701220,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "uh these days you can you can scale so this the \nreason I'm mentioning this now when I'm doing this  "
+    } ]
+  }, {
+    "tStartMs": 706920,
+    "dDurationMs": 6600,
+    "segs": [ {
+      "utf8": "calculation now is because it uh helps me think \nabout uh systems that could support this kind of  "
+    } ]
+  }, {
+    "tStartMs": 713520,
+    "dDurationMs": 7620,
+    "segs": [ {
+      "utf8": "scale and just naturally megabytes or uh videos \nor blobs or objects and so I'm already leaning  "
+    } ]
+  }, {
+    "tStartMs": 721140,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "towards a storage solution like a blob storage \nsolution of some some kind and modern solutions  "
+    } ]
+  }, {
+    "tStartMs": 727020,
+    "dDurationMs": 6480,
+    "segs": [ {
+      "utf8": "out scale uh quite well in that in that way so I \nI think this could that gives me sort of an idea  "
+    } ]
+  }, {
+    "tStartMs": 733500,
+    "dDurationMs": 8700,
+    "segs": [ {
+      "utf8": "of what kind of uh you know video storage solution \nI might I might utilize foreign if I think about  "
+    } ]
+  }, {
+    "tStartMs": 742200,
+    "dDurationMs": 4860,
+    "segs": [ {
+      "utf8": "so is that does that seem reasonable so far \nin terms of calculation okay yeah that seems  "
+    } ]
+  }, {
+    "tStartMs": 747060,
+    "dDurationMs": 8400,
+    "segs": [ {
+      "utf8": "okay and then okay and then so now uh I I'm gonna \nput here I need to clarify this just a little bit  "
+    } ]
+  }, {
+    "tStartMs": 756540,
+    "dDurationMs": 5820,
+    "segs": [ {
+      "utf8": "let's let me think also about the that was \nthe raw video data that I was talking about  "
+    } ]
+  }, {
+    "tStartMs": 762360,
+    "dDurationMs": 8220,
+    "segs": [ {
+      "utf8": "let me also just briefly talk about or do a quick \ncalculation on like video what I would call video  "
+    } ]
+  }, {
+    "tStartMs": 770580,
+    "dDurationMs": 8820,
+    "segs": [ {
+      "utf8": "metadata which might be this might be like uh an \nID for a video when was it created how long is it  "
+    } ]
+  }, {
+    "tStartMs": 780660,
+    "dDurationMs": 4500,
+    "segs": [ {
+      "utf8": "maybe a number of likes ultimately because we \nwant to be able to track how many people like  "
+    } ]
+  }, {
+    "tStartMs": 785160,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "this video so so something like that so if I \nthink about that kind of a thing metadata and  "
+    } ]
+  }, {
+    "tStartMs": 791400,
+    "dDurationMs": 10800,
+    "segs": [ {
+      "utf8": "I say let's say it's a kilobyte of data uh for for \nmetadata so now instead of 10 uh 10 petabytes it's  "
+    } ]
+  }, {
+    "tStartMs": 802200,
+    "dDurationMs": 5820,
+    "segs": [ {
+      "utf8": "a factor of that's a factor of a thousand less \nso we're talking about 10 terabytes of metadata  "
+    } ]
+  }, {
+    "tStartMs": 809700,
+    "dDurationMs": 9480,
+    "segs": [ {
+      "utf8": "uh actually I should put metadata here video \nmetadata and so 10 terabytes of video metadata  "
+    } ]
+  }, {
+    "tStartMs": 819180,
+    "dDurationMs": 4200,
+    "segs": [ {
+      "utf8": "and so again I'm mentioning this I'm doing this \nmath just to kind of get an idea of where would  "
+    } ]
+  }, {
+    "tStartMs": 823380,
+    "dDurationMs": 6120,
+    "segs": [ {
+      "utf8": "I put this metadata this information that needs \nto be potentially utilized for purposes of of  "
+    } ]
+  }, {
+    "tStartMs": 829500,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "uh figuring out which videos to show and and \nidentifying the videos and so on and Counting  "
+    } ]
+  }, {
+    "tStartMs": 835260,
+    "dDurationMs": 5340,
+    "segs": [ {
+      "utf8": "stats like likes and so on and so where would \nI put this kind of a thing and so I probably  "
+    } ]
+  }, {
+    "tStartMs": 840600,
+    "dDurationMs": 6600,
+    "segs": [ {
+      "utf8": "because these videos are not I don't need to do \nI think I probably don't need to do super complex  "
+    } ]
+  }, {
+    "tStartMs": 847200,
+    "dDurationMs": 4740,
+    "segs": [ {
+      "utf8": "calculations across the videos they're connected \nto each other so they don't need to relate to  "
+    } ]
+  }, {
+    "tStartMs": 851940,
+    "dDurationMs": 9120,
+    "segs": [ {
+      "utf8": "each other so I probably would use some sort of uh \nnon-relational or or no SQL storage solution for  "
+    } ]
+  }, {
+    "tStartMs": 861060,
+    "dDurationMs": 4800,
+    "segs": [ {
+      "utf8": "this kind of thing this would be like key value \nbasically key value pair storage and there's lots  "
+    } ]
+  }, {
+    "tStartMs": 865860,
+    "dDurationMs": 3240,
+    "segs": [ {
+      "utf8": "of solutions out there for that sort of thing \nbut that's probably where I would put this  "
+    } ]
+  }, {
+    "tStartMs": 871200,
+    "dDurationMs": 8160,
+    "segs": [ {
+      "utf8": "so does that make sense so far yeah makes \nsense so I initially started off by doing  "
+    } ]
+  }, {
+    "tStartMs": 880020,
+    "dDurationMs": 8820,
+    "segs": [ {
+      "utf8": "a uh calculation where I was trying to figure \nout the traffic the incoming traffic and I  "
+    } ]
+  }, {
+    "tStartMs": 888840,
+    "dDurationMs": 3120,
+    "segs": [ {
+      "utf8": "put that aside because I wanted to look at \nstorage first so now let me look at traffic  "
+    } ]
+  }, {
+    "tStartMs": 893160,
+    "dDurationMs": 4560,
+    "segs": [ {
+      "utf8": "so if I say that there's again 10 \nbillion videos uploaded per year  "
+    } ]
+  }, {
+    "tStartMs": 898680,
+    "dDurationMs": 7080,
+    "segs": [ {
+      "utf8": "and they divide that by 365 days in a year \nthen that gets me approximately 30 million  "
+    } ]
+  }, {
+    "tStartMs": 906420,
+    "dDurationMs": 7260,
+    "segs": [ {
+      "utf8": "videos per day and if I then uh divide that by \nthe approximate approximate number of seconds  "
+    } ]
+  }, {
+    "tStartMs": 913680,
+    "dDurationMs": 11760,
+    "segs": [ {
+      "utf8": "in a day which is a hundred thousand then uh \nthat gets me to 30 sorry 300 videos per second"
+    } ]
+  }, {
+    "tStartMs": 928380,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "so we're talking about uploading 300 \nvideos per second if you assume that  "
+    } ]
+  }, {
+    "tStartMs": 933480,
+    "dDurationMs": 5280,
+    "segs": [ {
+      "utf8": "there's some unevenness during the day \nand that might actually translate to  "
+    } ]
+  }, {
+    "tStartMs": 939840,
+    "dDurationMs": 4200,
+    "segs": [ {
+      "utf8": "more like you know you could say a factor of \nlet's pick a factor of three just to make it  "
+    } ]
+  }, {
+    "tStartMs": 944040,
+    "dDurationMs": 10200,
+    "segs": [ {
+      "utf8": "easy and let's just say uh a thousand per second \nat Peak because the 300 per second is an average  "
+    } ]
+  }, {
+    "tStartMs": 955260,
+    "dDurationMs": 7980,
+    "segs": [ {
+      "utf8": "so all right so we've got a thousand videos \nuploaded for uh per per second and what we  "
+    } ]
+  }, {
+    "tStartMs": 963240,
+    "dDurationMs": 6720,
+    "segs": [ {
+      "utf8": "that's that's not a huge deal because if you think \nabout servers that can handle uploads out in the  "
+    } ]
+  }, {
+    "tStartMs": 969960,
+    "dDurationMs": 8160,
+    "segs": [ {
+      "utf8": "cloud that's that's a very very small amount if \nI think about a thousand now per second uh videos  "
+    } ]
+  }, {
+    "tStartMs": 978120,
+    "dDurationMs": 8700,
+    "segs": [ {
+      "utf8": "per second and I multiply that by a megabyte \neach and a megabyte is approximately 10 megabits  "
+    } ]
+  }, {
+    "tStartMs": 987480,
+    "dDurationMs": 5940,
+    "segs": [ {
+      "utf8": "and we I mentioned I think I mentioned that we do \nNetwork traffic and megabits not megabytes so then  "
+    } ]
+  }, {
+    "tStartMs": 993420,
+    "dDurationMs": 8340,
+    "segs": [ {
+      "utf8": "that would give me uh let's see 10 million times \na thousand would be 10 billion or 10 megabits per  "
+    } ]
+  }, {
+    "tStartMs": 1001760,
+    "dDurationMs": 8220,
+    "segs": [ {
+      "utf8": "second would be the the the traffic uh coming \nin Ingress basically that's not a lot uh modern  "
+    } ]
+  }, {
+    "tStartMs": 1009980,
+    "dDurationMs": 7500,
+    "segs": [ {
+      "utf8": "network cards on on servers are 10 gigabits per \nsecond so this is this is not a bottleneck so at  "
+    } ]
+  }, {
+    "tStartMs": 1017480,
+    "dDurationMs": 6060,
+    "segs": [ {
+      "utf8": "least we understand that this is not a big big \nbottleneck now uh I should probably I should do  "
+    } ]
+  }, {
+    "tStartMs": 1023540,
+    "dDurationMs": 4500,
+    "segs": [ {
+      "utf8": "the same thing on the on the way out meaning and \nI realize we're spending a lot of time on on math  "
+    } ]
+  }, {
+    "tStartMs": 1028040,
+    "dDurationMs": 8100,
+    "segs": [ {
+      "utf8": "here but uh what we can assume is that with the \nuh I think you said a billion videos viewed per  "
+    } ]
+  }, {
+    "tStartMs": 1036140,
+    "dDurationMs": 8880,
+    "segs": [ {
+      "utf8": "day and we just did the calculation of 10 billion \nsorry 30 30 million per day but if I say a billion  "
+    } ]
+  }, {
+    "tStartMs": 1045020,
+    "dDurationMs": 7320,
+    "segs": [ {
+      "utf8": "videos viewed per day and I divide that by again \na hundred thousand seconds approximately uh  "
+    } ]
+  }, {
+    "tStartMs": 1052340,
+    "dDurationMs": 9900,
+    "segs": [ {
+      "utf8": "then that's uh going to be let's see 100 thousand \nmillion no sorry uh no no it's a thousand million"
+    } ]
+  }, {
+    "tStartMs": 1065720,
+    "dDurationMs": 9420,
+    "segs": [ {
+      "utf8": "so this is billion uh million so it's it's a \na million thousand videos per day divided by  "
+    } ]
+  }, {
+    "tStartMs": 1075140,
+    "dDurationMs": 9180,
+    "segs": [ {
+      "utf8": "a hundred thousand is going to give us a ten \nthousand uh per second so we're viewing ten  "
+    } ]
+  }, {
+    "tStartMs": 1084320,
+    "dDurationMs": 5820,
+    "segs": [ {
+      "utf8": "thousand videos per second and again if we do \nthat uh similar math you can kind of see this  "
+    } ]
+  }, {
+    "tStartMs": 1090140,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "is a factor of ten of the of the other number \nso instead of 10 gigabits ultimately what this  "
+    } ]
+  }, {
+    "tStartMs": 1096140,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "means is that we would have 100 gigabits \negress which is which is also not a lot  "
+    } ]
+  }, {
+    "tStartMs": 1102380,
+    "dDurationMs": 4560,
+    "segs": [ {
+      "utf8": "so okay I think we've done done with some high \nlevel math I think these are all numbers that  "
+    } ]
+  }, {
+    "tStartMs": 1106940,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "can be worked with and sustained the one \nother math that I didn't really do but I  "
+    } ]
+  }, {
+    "tStartMs": 1112460,
+    "dDurationMs": 4080,
+    "segs": [ {
+      "utf8": "could I could also do is that you know users if \nthere's a billion users you could think about  "
+    } ]
+  }, {
+    "tStartMs": 1117380,
+    "dDurationMs": 6300,
+    "segs": [ {
+      "utf8": "another profile user profile how much would \nthat cost to store and you could imagine that  "
+    } ]
+  }, {
+    "tStartMs": 1123680,
+    "dDurationMs": 7440,
+    "segs": [ {
+      "utf8": "that could be maybe 10 kilobytes or something like \nthat and so that would be uh maybe 10 terabytes or  "
+    } ]
+  }, {
+    "tStartMs": 1131120,
+    "dDurationMs": 6540,
+    "segs": [ {
+      "utf8": "or something of that nature so we could talk about \nthat later I think we can skip that for now it can  "
+    } ]
+  }, {
+    "tStartMs": 1137660,
+    "dDurationMs": 4500,
+    "segs": [ {
+      "utf8": "be useful to do some high level maths to inform \nyour thinking and your solution so make sure you  "
+    } ]
+  }, {
+    "tStartMs": 1142160,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "practice multiplying and dividing big numbers like \nthese as part of your interview preparation as if  "
+    } ]
+  }, {
+    "tStartMs": 1147080,
+    "dDurationMs": 4980,
+    "segs": [ {
+      "utf8": "you're not used to it it's very easy to get lost \nin all the zeros Mark did some solid calculations  "
+    } ]
+  }, {
+    "tStartMs": 1152060,
+    "dDurationMs": 4620,
+    "segs": [ {
+      "utf8": "to work out the storage for the raw data and \nmetadata however he didn't do the Maths for the  "
+    } ]
+  }, {
+    "tStartMs": 1156680,
+    "dDurationMs": 4740,
+    "segs": [ {
+      "utf8": "user data storage requirements instead moving on \nto make the traffic calculations and queries per  "
+    } ]
+  }, {
+    "tStartMs": 1161420,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "second calculations it would have been a better \nidea to finish the storage calculations first as  "
+    } ]
+  }, {
+    "tStartMs": 1166340,
+    "dDurationMs": 4740,
+    "segs": [ {
+      "utf8": "these requirements were more likely to influence \nthe design as a general rule when you're working  "
+    } ]
+  }, {
+    "tStartMs": 1171080,
+    "dDurationMs": 7020,
+    "segs": [ {
+      "utf8": "on storage calculations finish them yeah okay \nso I think we should we should probably move on"
+    } ]
+  }, {
+    "tStartMs": 1184880,
+    "dDurationMs": 6360,
+    "segs": [ {
+      "utf8": "so let me let me just draw a couple boxes here \nsome some shapes here I'm going to draw a little  "
+    } ]
+  }, {
+    "tStartMs": 1191240,
+    "dDurationMs": 9960,
+    "segs": [ {
+      "utf8": "uh TikTok app and then of course we're we're \ngoing to do the typical thing I don't really  "
+    } ]
+  }, {
+    "tStartMs": 1201200,
+    "dDurationMs": 8520,
+    "segs": [ {
+      "utf8": "want to spend too much time on uh you know load \nbalancers here or you know you've got your you're  "
+    } ]
+  }, {
+    "tStartMs": 1209720,
+    "dDurationMs": 10200,
+    "segs": [ {
+      "utf8": "going to have some sort of uh I'm going to call \nthis maybe this is a TikTok uh and like an app  "
+    } ]
+  }, {
+    "tStartMs": 1219920,
+    "dDurationMs": 8160,
+    "segs": [ {
+      "utf8": "server or something like that uh yeah application \nyeah TikTok app service this is the thing that  "
+    } ]
+  }, {
+    "tStartMs": 1228080,
+    "dDurationMs": 3120,
+    "segs": [ {
+      "utf8": "would run in the cloud this would be one of \nmy servers and there'd be multiples of these  "
+    } ]
+  }, {
+    "tStartMs": 1232340,
+    "dDurationMs": 6900,
+    "segs": [ {
+      "utf8": "and you might have well actually let me \nsee I take that I think I take that back  "
+    } ]
+  }, {
+    "tStartMs": 1240020,
+    "dDurationMs": 5280,
+    "segs": [ {
+      "utf8": "I think TikTok we're going to separate these two \nbecause we you asked me to talk about uploads and  "
+    } ]
+  }, {
+    "tStartMs": 1245300,
+    "dDurationMs": 6600,
+    "segs": [ {
+      "utf8": "and viewing and streaming right I think those are \nthe two use cases that we want to spend time on  "
+    } ]
+  }, {
+    "tStartMs": 1251900,
+    "dDurationMs": 7800,
+    "segs": [ {
+      "utf8": "yes so there's going to be some sort of a \nTikTok uh yeah like a Content uh service  "
+    } ]
+  }, {
+    "tStartMs": 1261440,
+    "dDurationMs": 4740,
+    "segs": [ {
+      "utf8": "I guess application Services maybe is maybe \nokay maybe that's all right because it's it's  "
+    } ]
+  }, {
+    "tStartMs": 1266180,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "a service that generates for the application all \nright so let's go ahead and leave that and then  "
+    } ]
+  }, {
+    "tStartMs": 1270860,
+    "dDurationMs": 8700,
+    "segs": [ {
+      "utf8": "let's go ahead and create another one which is \nthe TikTok upload service because we're going  "
+    } ]
+  }, {
+    "tStartMs": 1279560,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "to have we're going to be uploading videos and \nI think I might keep these separate separate  "
+    } ]
+  }, {
+    "tStartMs": 1285860,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "just because they serve slightly different \npurposes and you know microservices architecture  "
+    } ]
+  }, {
+    "tStartMs": 1290960,
+    "dDurationMs": 5820,
+    "segs": [ {
+      "utf8": "best practices you would you might separate these \nthings out uh and this app service when you when  "
+    } ]
+  }, {
+    "tStartMs": 1296780,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "I first opened my application and my my TikTok \napp and I come through the load balancer and I  "
+    } ]
+  }, {
+    "tStartMs": 1301820,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "hit one of these app Services the very first thing \nthat I might see is all of the stuff the videos  "
+    } ]
+  }, {
+    "tStartMs": 1306920,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "Etc and the followers and all these kinds of \nthings but I might be able to if I click on  "
+    } ]
+  }, {
+    "tStartMs": 1312620,
+    "dDurationMs": 4380,
+    "segs": [ {
+      "utf8": "upload or create a new video then I might \nget it redirected to this upload service  "
+    } ]
+  }, {
+    "tStartMs": 1318020,
+    "dDurationMs": 4500,
+    "segs": [ {
+      "utf8": "does that make sense okay yeah these are \nkind of the front ends if you will to the  "
+    } ]
+  }, {
+    "tStartMs": 1322520,
+    "dDurationMs": 12660,
+    "segs": [ {
+      "utf8": "to the services okay okay so let's talk about uh \nlet's talk a little bit more about the databases"
+    } ]
+  }, {
+    "tStartMs": 1336440,
+    "dDurationMs": 10980,
+    "segs": [ {
+      "utf8": "so I think I would like to let's \ntalk about the video database first"
+    } ]
+  }, {
+    "tStartMs": 1349820,
+    "dDurationMs": 6360,
+    "segs": [ {
+      "utf8": "um and I'm I'm I realize I'm already making \ngiving myself not enough room here in this uh  "
+    } ]
+  }, {
+    "tStartMs": 1356180,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "in this screen so I'm going to move stuff around a \nlittle bit make things a little bit more palatable  "
+    } ]
+  }, {
+    "tStartMs": 1364040,
+    "dDurationMs": 3900,
+    "segs": [ {
+      "utf8": "and interview candidates you know I would \nrecommend don't spend too much time on on  "
+    } ]
+  }, {
+    "tStartMs": 1367940,
+    "dDurationMs": 6360,
+    "segs": [ {
+      "utf8": "making things pretty but uh being able to see \nstuff is good all right so uh here we go so  "
+    } ]
+  }, {
+    "tStartMs": 1374300,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "we've got uh this is our so the the one the first \nthing I talked about was the video lob storage  "
+    } ]
+  }, {
+    "tStartMs": 1380480,
+    "dDurationMs": 7020,
+    "segs": [ {
+      "utf8": "and uh that's where the actual Raw videos would \ngo and so this has to be sort of a kind of like  "
+    } ]
+  }, {
+    "tStartMs": 1387500,
+    "dDurationMs": 5940,
+    "segs": [ {
+      "utf8": "a file system almost but I probably would use \nsomething like Amazon S3 for this because that  "
+    } ]
+  }, {
+    "tStartMs": 1393440,
+    "dDurationMs": 4740,
+    "segs": [ {
+      "utf8": "scales really well and it's it lends itself \nnicely to this kind of stuff and it uh you know  "
+    } ]
+  }, {
+    "tStartMs": 1398180,
+    "dDurationMs": 3720,
+    "segs": [ {
+      "utf8": "it's purpose-built for this kind of thing okay \nso that would be the video of The Blob storage  "
+    } ]
+  }, {
+    "tStartMs": 1401900,
+    "dDurationMs": 9060,
+    "segs": [ {
+      "utf8": "and by nature of uh Amazon web services you can \nnicely you can do a couple of really cool things  "
+    } ]
+  }, {
+    "tStartMs": 1412220,
+    "dDurationMs": 10020,
+    "segs": [ {
+      "utf8": "you can replicate the data for better availability \nyou can have Regional uh replicas so that it it  "
+    } ]
+  }, {
+    "tStartMs": 1422240,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "knows it can be sort of more aware of regions \nor you can you can utilize the naming for that  "
+    } ]
+  }, {
+    "tStartMs": 1427460,
+    "dDurationMs": 6900,
+    "segs": [ {
+      "utf8": "and the other thing that you can do is you can \ntier the storage data so we talked about I think  "
+    } ]
+  }, {
+    "tStartMs": 1434360,
+    "dDurationMs": 6300,
+    "segs": [ {
+      "utf8": "I said 100 petabytes of raw data that for a \nyear and so that can accumulate quickly and  "
+    } ]
+  }, {
+    "tStartMs": 1440660,
+    "dDurationMs": 8160,
+    "segs": [ {
+      "utf8": "so uh you know with TikTok videos my I have make \nI'm making assumption that a video's life span is  "
+    } ]
+  }, {
+    "tStartMs": 1448820,
+    "dDurationMs": 4800,
+    "segs": [ {
+      "utf8": "not more than maybe a couple of months for most \nvideos that you don't go back and watch you know  "
+    } ]
+  }, {
+    "tStartMs": 1453620,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "three-year-old videos too much that it's all \nabout the most recent stuff the influencers  "
+    } ]
+  }, {
+    "tStartMs": 1458660,
+    "dDurationMs": 6060,
+    "segs": [ {
+      "utf8": "creators whatever it is which means if that's \ntrue assuming that assumption is true then that  "
+    } ]
+  }, {
+    "tStartMs": 1464720,
+    "dDurationMs": 7500,
+    "segs": [ {
+      "utf8": "means that you can tier your data such that older \ndata or data that hasn't been touched or looked at  "
+    } ]
+  }, {
+    "tStartMs": 1472220,
+    "dDurationMs": 8100,
+    "segs": [ {
+      "utf8": "as often can go into Cold Storage so I'm going to \nput a keyword in here which is this tiered AWS S3  "
+    } ]
+  }, {
+    "tStartMs": 1482180,
+    "dDurationMs": 4980,
+    "segs": [ {
+      "utf8": "so what that means is that if a video is let's \nsay a year old and nobody's really looked at it  "
+    } ]
+  }, {
+    "tStartMs": 1487160,
+    "dDurationMs": 7080,
+    "segs": [ {
+      "utf8": "it could go into really slow offline storage \nwhich means it doesn't cost as much and it's  "
+    } ]
+  }, {
+    "tStartMs": 1494240,
+    "dDurationMs": 5400,
+    "segs": [ {
+      "utf8": "uh it's more cost effective versus stuff that \nis most recently uploaded does that make sense  "
+    } ]
+  }, {
+    "tStartMs": 1500420,
+    "dDurationMs": 7980,
+    "segs": [ {
+      "utf8": "yeah makes sense okay okay so that's kind of like \na blob storage I'm going to use yet another one  "
+    } ]
+  }, {
+    "tStartMs": 1508400,
+    "dDurationMs": 6060,
+    "segs": [ {
+      "utf8": "of these shapes because we're talking about \ntwo different things so then video metadata  "
+    } ]
+  }, {
+    "tStartMs": 1514460,
+    "dDurationMs": 5280,
+    "segs": [ {
+      "utf8": "and uh video metadata I think I mentioned \nthis is things so what would I think about  "
+    } ]
+  }, {
+    "tStartMs": 1519740,
+    "dDurationMs": 4440,
+    "segs": [ {
+      "utf8": "for video metadata actually let me draw \nanother box here because I think it's two  "
+    } ]
+  }, {
+    "tStartMs": 1524180,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "and we can talk about I want to get into that \nin a little bit more but uh video meta data  "
+    } ]
+  }, {
+    "tStartMs": 1530540,
+    "dDurationMs": 4620,
+    "segs": [ {
+      "utf8": "uh I'll get into that later I want to talk \nabout the tables the type of what's actually  "
+    } ]
+  }, {
+    "tStartMs": 1535160,
+    "dDurationMs": 6300,
+    "segs": [ {
+      "utf8": "inside this but video metadata I think whatever \nit might be I think it's going to be I think I  "
+    } ]
+  }, {
+    "tStartMs": 1541460,
+    "dDurationMs": 5220,
+    "segs": [ {
+      "utf8": "mentioned that this is what do we say this \nis going to be 10 terabytes I think I said  "
+    } ]
+  }, {
+    "tStartMs": 1547520,
+    "dDurationMs": 8280,
+    "segs": [ {
+      "utf8": "so I and this is not and I said no SQL storage \nuh no no SQL so it doesn't need to be relational  "
+    } ]
+  }, {
+    "tStartMs": 1555800,
+    "dDurationMs": 4140,
+    "segs": [ {
+      "utf8": "but it's not really blob storage because there \nare some some fields in there that you might  "
+    } ]
+  }, {
+    "tStartMs": 1559940,
+    "dDurationMs": 5580,
+    "segs": [ {
+      "utf8": "want to might want to look at and so on so \nwhat I probably would do is something like  "
+    } ]
+  }, {
+    "tStartMs": 1567380,
+    "dDurationMs": 5460,
+    "segs": [ {
+      "utf8": "uh you could do Cloud spanner although \nthat's more like a SQL thing or you could  "
+    } ]
+  }, {
+    "tStartMs": 1572840,
+    "dDurationMs": 7440,
+    "segs": [ {
+      "utf8": "do AWS you know dynamodb as an example uh \nand and I'm using just to be clear here  "
+    } ]
+  }, {
+    "tStartMs": 1580880,
+    "dDurationMs": 9060,
+    "segs": [ {
+      "utf8": "I am biased for purposes of an initial solution \nto get it off the ground to hosted Solutions like  "
+    } ]
+  }, {
+    "tStartMs": 1589940,
+    "dDurationMs": 7740,
+    "segs": [ {
+      "utf8": "Amazon provides because they take a whole bunch \nof main a mono or maintenance and operational load  "
+    } ]
+  }, {
+    "tStartMs": 1597680,
+    "dDurationMs": 5400,
+    "segs": [ {
+      "utf8": "off of off of uh the engineering team and so as \nan engineering manager I recognize that there's  "
+    } ]
+  }, {
+    "tStartMs": 1603080,
+    "dDurationMs": 5220,
+    "segs": [ {
+      "utf8": "a cost to the engineers that need to be do writing \ncode and I don't want them to reinvent Wheels like  "
+    } ]
+  }, {
+    "tStartMs": 1608300,
+    "dDurationMs": 5820,
+    "segs": [ {
+      "utf8": "lob storage and and uh indexed key value storage \nand things like that so I'd rather use something  "
+    } ]
+  }, {
+    "tStartMs": 1614120,
+    "dDurationMs": 4380,
+    "segs": [ {
+      "utf8": "existing even if initially it means we have to \npay a little bit more maybe we can eventually move  "
+    } ]
+  }, {
+    "tStartMs": 1618500,
+    "dDurationMs": 5940,
+    "segs": [ {
+      "utf8": "that but right now this would be a really good \nsolution because dynamodb scales really nicely in  "
+    } ]
+  }, {
+    "tStartMs": 1624440,
+    "dDurationMs": 4320,
+    "segs": [ {
+      "utf8": "terms of the the rows that you number of rows you \ncan have and so on so these two things together  "
+    } ]
+  }, {
+    "tStartMs": 1629660,
+    "dDurationMs": 7320,
+    "segs": [ {
+      "utf8": "uh if I if I draw yet another box around this and \nyes that's of course that's what's going to happen  "
+    } ]
+  }, {
+    "tStartMs": 1637640,
+    "dDurationMs": 9780,
+    "segs": [ {
+      "utf8": "uh so these two things would make up basically the \nthe the uh the video storage database if you want  "
+    } ]
+  }, {
+    "tStartMs": 1647420,
+    "dDurationMs": 7440,
+    "segs": [ {
+      "utf8": "to call it that okay so this is for the actual \nvideos okay good so far yeah we're good so far  "
+    } ]
+  }, {
+    "tStartMs": 1656120,
+    "dDurationMs": 9120,
+    "segs": [ {
+      "utf8": "okay go ahead yeah I wanted to I wanted to \nask how you think the different regions and  "
+    } ]
+  }, {
+    "tStartMs": 1665240,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "countries could be reflected in your design \nare you are you taking them into account"
+    } ]
+  }, {
+    "tStartMs": 1672740,
+    "dDurationMs": 1680,
+    "segs": [ {
+      "utf8": "yeah good question so"
+    } ]
+  }, {
+    "tStartMs": 1676820,
+    "dDurationMs": 4440,
+    "segs": [ {
+      "utf8": "um yeah so I I think I so the nice thing about  "
+    } ]
+  }, {
+    "tStartMs": 1681980,
+    "dDurationMs": 9300,
+    "segs": [ {
+      "utf8": "another nice feature of some of these existing \nhosted Solutions is that you can include Regional  "
+    } ]
+  }, {
+    "tStartMs": 1693980,
+    "dDurationMs": 6540,
+    "segs": [ {
+      "utf8": "they have Regional features and so that's not \nreally answering your question I think uh if  "
+    } ]
+  }, {
+    "tStartMs": 1700520,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "I think about it that you I can imagine having \ndifferent data centers in different locations  "
+    } ]
+  }, {
+    "tStartMs": 1706760,
+    "dDurationMs": 6660,
+    "segs": [ {
+      "utf8": "because you want the you want the response so if \nyou're in India uh you want the responsiveness  "
+    } ]
+  }, {
+    "tStartMs": 1713420,
+    "dDurationMs": 4440,
+    "segs": [ {
+      "utf8": "to be fast if you're in Europe you want the \nresponsiveness to be fast of the videos if  "
+    } ]
+  }, {
+    "tStartMs": 1717860,
+    "dDurationMs": 7140,
+    "segs": [ {
+      "utf8": "you're in China us same kind of thing and so \nhaving the data local to near to where you are  "
+    } ]
+  }, {
+    "tStartMs": 1725000,
+    "dDurationMs": 7560,
+    "segs": [ {
+      "utf8": "can be uh super well is what you kind of you have \nto do this as a global application and so one of  "
+    } ]
+  }, {
+    "tStartMs": 1732560,
+    "dDurationMs": 5280,
+    "segs": [ {
+      "utf8": "the ways to do that is by by partitioning the data \npossibly based on region or language or things  "
+    } ]
+  }, {
+    "tStartMs": 1737840,
+    "dDurationMs": 4140,
+    "segs": [ {
+      "utf8": "like that and locating the data in different \nplaces so that could be one of the aspects of a  "
+    } ]
+  }, {
+    "tStartMs": 1741980,
+    "dDurationMs": 6600,
+    "segs": [ {
+      "utf8": "kind of a regional you know how would regions and \ncountries play into this uh another one would be  "
+    } ]
+  }, {
+    "tStartMs": 1749840,
+    "dDurationMs": 6900,
+    "segs": [ {
+      "utf8": "kind of related to this is uh we when we get \nto the serving side or the streaming side in  "
+    } ]
+  }, {
+    "tStartMs": 1756740,
+    "dDurationMs": 6600,
+    "segs": [ {
+      "utf8": "order to not overload these these storage systems \nyou really need to have and I guess I better draw  "
+    } ]
+  }, {
+    "tStartMs": 1763340,
+    "dDurationMs": 9120,
+    "segs": [ {
+      "utf8": "this go ahead and draw this so we have it uh some \nsort of a a CDN a Content delivery Network like  "
+    } ]
+  }, {
+    "tStartMs": 1772460,
+    "dDurationMs": 8040,
+    "segs": [ {
+      "utf8": "cloudfront or something like this and what this \ndoes is it's basically a set of caches in uh near  "
+    } ]
+  }, {
+    "tStartMs": 1780500,
+    "dDurationMs": 9240,
+    "segs": [ {
+      "utf8": "the the closer close to the user that cash data \nthat is typically uh popular let's say so videos  "
+    } ]
+  }, {
+    "tStartMs": 1789740,
+    "dDurationMs": 9060,
+    "segs": [ {
+      "utf8": "that are popular in a particular region would be \nin this CDN stored in the CDN and thus made to be  "
+    } ]
+  }, {
+    "tStartMs": 1798800,
+    "dDurationMs": 6660,
+    "segs": [ {
+      "utf8": "available faster and uh the I think the regional \nthe regionality might happen automatically meaning  "
+    } ]
+  }, {
+    "tStartMs": 1805460,
+    "dDurationMs": 7980,
+    "segs": [ {
+      "utf8": "that you probably would get videos created in \nIndia to be more commonly located in the cdns  "
+    } ]
+  }, {
+    "tStartMs": 1813440,
+    "dDurationMs": 5220,
+    "segs": [ {
+      "utf8": "in India versus Europe U.S China whichever it \nmight be so I think that there there's some  "
+    } ]
+  }, {
+    "tStartMs": 1819200,
+    "dDurationMs": 6600,
+    "segs": [ {
+      "utf8": "there's definitely some Regional aspects to \nthis I'm not sure whether I would explicit how  "
+    } ]
+  }, {
+    "tStartMs": 1825800,
+    "dDurationMs": 5640,
+    "segs": [ {
+      "utf8": "explicitly I would partition the data based on a \nregion or language or something like that that I  "
+    } ]
+  }, {
+    "tStartMs": 1831440,
+    "dDurationMs": 4980,
+    "segs": [ {
+      "utf8": "don't know yet that's a good question but I think \nyou would get some you can do it and you would get  "
+    } ]
+  }, {
+    "tStartMs": 1836420,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "some benefits by having this this CDN which is \nkind of necessary for this kind of kind of stuff  "
+    } ]
+  }, {
+    "tStartMs": 1841520,
+    "dDurationMs": 9060,
+    "segs": [ {
+      "utf8": "so I'm not sure if I answered your question yeah \nmore or less yeah please uh please continue okay  "
+    } ]
+  }, {
+    "tStartMs": 1853520,
+    "dDurationMs": 6180,
+    "segs": [ {
+      "utf8": "all right so the piece that we're missing the \npiece that I haven't talked about yet and I'll  "
+    } ]
+  }, {
+    "tStartMs": 1859700,
+    "dDurationMs": 8040,
+    "segs": [ {
+      "utf8": "just mention briefly is well as brief as I can \nuh let me draw and yet another database because  "
+    } ]
+  }, {
+    "tStartMs": 1867740,
+    "dDurationMs": 9480,
+    "segs": [ {
+      "utf8": "we also mentioned uh let's see this is a video \ndatabase I I mentioned kind of like a uh a user  "
+    } ]
+  }, {
+    "tStartMs": 1878720,
+    "dDurationMs": 10200,
+    "segs": [ {
+      "utf8": "user data I'm just going to call that and if \nI I should just think about this for a moment  "
+    } ]
+  }, {
+    "tStartMs": 1889760,
+    "dDurationMs": 5220,
+    "segs": [ {
+      "utf8": "a billion users across 150 countries but they have  "
+    } ]
+  }, {
+    "tStartMs": 1896480,
+    "dDurationMs": 5340,
+    "segs": [ {
+      "utf8": "friends and followers and connections and \nthis is where this whole social graph kind  "
+    } ]
+  }, {
+    "tStartMs": 1901820,
+    "dDurationMs": 6060,
+    "segs": [ {
+      "utf8": "of comes into play that you know a social \nnetwork kind of a thing so because of those  "
+    } ]
+  }, {
+    "tStartMs": 1907880,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "connections and those connections may very well \nspan regions and countries and things like that  "
+    } ]
+  }, {
+    "tStartMs": 1914840,
+    "dDurationMs": 9600,
+    "segs": [ {
+      "utf8": "you uh you probably want to have this user data \nnot be explicitly partitioned out into separate  "
+    } ]
+  }, {
+    "tStartMs": 1924440,
+    "dDurationMs": 8760,
+    "segs": [ {
+      "utf8": "separate databases that can't be talked to each \nother so I I probably would want to put this into  "
+    } ]
+  }, {
+    "tStartMs": 1933200,
+    "dDurationMs": 13080,
+    "segs": [ {
+      "utf8": "some sort of a SQL storage solution and I still \nwould want it to scale so I might use if I'm if  "
+    } ]
+  }, {
+    "tStartMs": 1946280,
+    "dDurationMs": 6780,
+    "segs": [ {
+      "utf8": "I'm going to stick with Amazon here Amazon RDS \nrelational data data store allows you to use SQL  "
+    } ]
+  }, {
+    "tStartMs": 1953060,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "basically use SQL solutions to to store your data \nand I'm I'm hand waving a little bit about the  "
+    } ]
+  }, {
+    "tStartMs": 1958100,
+    "dDurationMs": 9480,
+    "segs": [ {
+      "utf8": "amount of data here I think at a billion users \nand a kilobyte gig terabyte that's a that's is  "
+    } ]
+  }, {
+    "tStartMs": 1967580,
+    "dDurationMs": 8040,
+    "segs": [ {
+      "utf8": "that right a billion is a gig uh kilobyte is \na terabyte and if 10 a kilobyte might be small  "
+    } ]
+  }, {
+    "tStartMs": 1975620,
+    "dDurationMs": 6960,
+    "segs": [ {
+      "utf8": "depending on what's in there but let's say it's a \nkilobyte so a terabyte of data that fits you can  "
+    } ]
+  }, {
+    "tStartMs": 1982580,
+    "dDurationMs": 6360,
+    "segs": [ {
+      "utf8": "do that with with modern uh SQL Solutions that's \npossible but we're starting to get into some  "
+    } ]
+  }, {
+    "tStartMs": 1990260,
+    "dDurationMs": 4440,
+    "segs": [ {
+      "utf8": "some bottlenecks there potentially so that might \nbe something we need to look out for but I'm going  "
+    } ]
+  }, {
+    "tStartMs": 1994700,
+    "dDurationMs": 3780,
+    "segs": [ {
+      "utf8": "to hand wave over that for the moment and say \nthat we can store the user data in a relational  "
+    } ]
+  }, {
+    "tStartMs": 1998480,
+    "dDurationMs": 5580,
+    "segs": [ {
+      "utf8": "database oh something like Google Cloud spanner \nactually scales you know much more broadly than  "
+    } ]
+  }, {
+    "tStartMs": 2004060,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "that and gives you some relational features \nso you could use you could use that too but  "
+    } ]
+  }, {
+    "tStartMs": 2008980,
+    "dDurationMs": 7020,
+    "segs": [ {
+      "utf8": "anyway so user data so that that would be that's \nanother big aspect of this so uh if I talk about  "
+    } ]
+  }, {
+    "tStartMs": 2017200,
+    "dDurationMs": 4380,
+    "segs": [ {
+      "utf8": "if I talk about the upload path and I don't know \nif I need to draw arrows here I probably should  "
+    } ]
+  }, {
+    "tStartMs": 2021580,
+    "dDurationMs": 6600,
+    "segs": [ {
+      "utf8": "probably good idea to draw some arrows uh you know \nthe the the upload that you know you you the app  "
+    } ]
+  }, {
+    "tStartMs": 2028180,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "uploads a video let's say I create a video and \nby the way I'm again I'm glad that you mentioned  "
+    } ]
+  }, {
+    "tStartMs": 2032860,
+    "dDurationMs": 3660,
+    "segs": [ {
+      "utf8": "that we don't have to worry about the app because \nthere's so many cool features in The TikTok app  "
+    } ]
+  }, {
+    "tStartMs": 2036520,
+    "dDurationMs": 5280,
+    "segs": [ {
+      "utf8": "how to create a video I mean you've there's \nthere's this uh duet and uh a feature and  "
+    } ]
+  }, {
+    "tStartMs": 2041800,
+    "dDurationMs": 3900,
+    "segs": [ {
+      "utf8": "there's there's there's you know you can clip \nand trim and you can bring in there's filters  "
+    } ]
+  }, {
+    "tStartMs": 2045700,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "there's all sorts of cool features but once you \nhave the video now you you know upload it and so  "
+    } ]
+  }, {
+    "tStartMs": 2050860,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "the TikTok app would upload that and send that \nto the upload service and then that that has to  "
+    } ]
+  }, {
+    "tStartMs": 2057400,
+    "dDurationMs": 7500,
+    "segs": [ {
+      "utf8": "go from there to two places it really needs \nto go to the uh to the The Blob storage whoops  "
+    } ]
+  }, {
+    "tStartMs": 2065500,
+    "dDurationMs": 7680,
+    "segs": [ {
+      "utf8": "it needs to go to the blob storage and it needs to \ngo to the to the metadata store because you need  "
+    } ]
+  }, {
+    "tStartMs": 2073180,
+    "dDurationMs": 6540,
+    "segs": [ {
+      "utf8": "to be able to to to add the information about \nthe video uh so that you can you can figure  "
+    } ]
+  }, {
+    "tStartMs": 2079720,
+    "dDurationMs": 9180,
+    "segs": [ {
+      "utf8": "out can it be shown does it make sense to show to \npeople there's a yeah so so that's kind of that's  "
+    } ]
+  }, {
+    "tStartMs": 2088900,
+    "dDurationMs": 7200,
+    "segs": [ {
+      "utf8": "roughly the flow of an up that's a very super \nsimplified flow of an upload but what I probably  "
+    } ]
+  }, {
+    "tStartMs": 2096100,
+    "dDurationMs": 7140,
+    "segs": [ {
+      "utf8": "should think about for just a moment is uh what's \nin that data but I I can I can also talk about the  "
+    } ]
+  }, {
+    "tStartMs": 2104200,
+    "dDurationMs": 3960,
+    "segs": [ {
+      "utf8": "let me think about this for a moment what would \nbe better to talk about let me finish the floats  "
+    } ]
+  }, {
+    "tStartMs": 2108160,
+    "dDurationMs": 9660,
+    "segs": [ {
+      "utf8": "let me let me talk about the uh the video uh \nstreaming flow if that's okay yeah go for it"
+    } ]
+  }, {
+    "tStartMs": 2124180,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "because now I'm gonna get this is going to get \nmuch more complicated I think because I think  "
+    } ]
+  }, {
+    "tStartMs": 2129280,
+    "dDurationMs": 5820,
+    "segs": [ {
+      "utf8": "there's some magic that I've completely hand \nwaved over with with that TikTok does and I'm  "
+    } ]
+  }, {
+    "tStartMs": 2135100,
+    "dDurationMs": 7920,
+    "segs": [ {
+      "utf8": "going to just draw a box here and I'm going \nto call this uh I think the feed is called  "
+    } ]
+  }, {
+    "tStartMs": 2143020,
+    "dDurationMs": 6480,
+    "segs": [ {
+      "utf8": "for you so it's a curated customized feed that \nyou get it's the video stream just for you uh  "
+    } ]
+  }, {
+    "tStartMs": 2149500,
+    "dDurationMs": 8820,
+    "segs": [ {
+      "utf8": "so I'm going to call this the for you generator \nmaybe I'll call it that I I think that's yeah and  "
+    } ]
+  }, {
+    "tStartMs": 2159760,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "so let me see if I can I can figure this out \nso if I'm when I load my TikTok when I first go  "
+    } ]
+  }, {
+    "tStartMs": 2164860,
+    "dDurationMs": 6120,
+    "segs": [ {
+      "utf8": "into my TikTok app I'm already seeing a bunch of \ninformation like friends who who I should follow  "
+    } ]
+  }, {
+    "tStartMs": 2171940,
+    "dDurationMs": 6420,
+    "segs": [ {
+      "utf8": "uh I don't know maybe some explore some some \noptions in the in my in my app but the most  "
+    } ]
+  }, {
+    "tStartMs": 2178360,
+    "dDurationMs": 4500,
+    "segs": [ {
+      "utf8": "important thing and the center piece of all is \nI'm already seeing videos so I there's there's no  "
+    } ]
+  }, {
+    "tStartMs": 2182860,
+    "dDurationMs": 5580,
+    "segs": [ {
+      "utf8": "lag there's no clicking on things you I'm already \nas soon as a video is in focus it starts playing  "
+    } ]
+  }, {
+    "tStartMs": 2189100,
+    "dDurationMs": 5820,
+    "segs": [ {
+      "utf8": "and so that means that my app is actually uh \ngetting multiple has already gotten multiple  "
+    } ]
+  }, {
+    "tStartMs": 2194920,
+    "dDurationMs": 7920,
+    "segs": [ {
+      "utf8": "videos by the time I start the app so let's see \nhere if I so if I go to the app service the one  "
+    } ]
+  }, {
+    "tStartMs": 2202840,
+    "dDurationMs": 4620,
+    "segs": [ {
+      "utf8": "of the first things that I think the app service \nhas to or one of the important things I should say  "
+    } ]
+  }, {
+    "tStartMs": 2207460,
+    "dDurationMs": 6180,
+    "segs": [ {
+      "utf8": "that the app service has to do is it has to talk \nto this generator and by the way this generator I  "
+    } ]
+  }, {
+    "tStartMs": 2214300,
+    "dDurationMs": 3720,
+    "segs": [ {
+      "utf8": "this is also going to have to be multiples there's \ngot to be lots of these because we're scaling  "
+    } ]
+  }, {
+    "tStartMs": 2218740,
+    "dDurationMs": 8100,
+    "segs": [ {
+      "utf8": "but this this app service needs to needs to be \nable to talk to some back-end uh algorithm that  "
+    } ]
+  }, {
+    "tStartMs": 2226840,
+    "dDurationMs": 4860,
+    "segs": [ {
+      "utf8": "says what should I show the user what are the cool \nvideos that I what's this for you list that I need  "
+    } ]
+  }, {
+    "tStartMs": 2231700,
+    "dDurationMs": 9720,
+    "segs": [ {
+      "utf8": "to show and I think that this is actually rather \ncomplicated and sophisticated and if I were doing  "
+    } ]
+  }, {
+    "tStartMs": 2241420,
+    "dDurationMs": 11400,
+    "segs": [ {
+      "utf8": "this uh today I would probably employ some sort of \nmachine learning system to figure out what to show  "
+    } ]
+  }, {
+    "tStartMs": 2252820,
+    "dDurationMs": 5340,
+    "segs": [ {
+      "utf8": "the user because there's just too many variables \nto try and build a rule-based system a handcrafted  "
+    } ]
+  }, {
+    "tStartMs": 2258160,
+    "dDurationMs": 5580,
+    "segs": [ {
+      "utf8": "you know if if this this many likes then show \nto them if they're you know I think that that  "
+    } ]
+  }, {
+    "tStartMs": 2263740,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "would get out of hand pretty quickly and I think \nwould be really hard code to maintain so I think I  "
+    } ]
+  }, {
+    "tStartMs": 2268780,
+    "dDurationMs": 7920,
+    "segs": [ {
+      "utf8": "would I would I would think about a an algorithmic \nsolution to this a sort of a either neural network  "
+    } ]
+  }, {
+    "tStartMs": 2276700,
+    "dDurationMs": 8640,
+    "segs": [ {
+      "utf8": "or some sort of a you know a similar similar \ntype of learned online learning solution and so  "
+    } ]
+  }, {
+    "tStartMs": 2285880,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "machine learning solution I guess is \nthat is really that's the over overview  "
+    } ]
+  }, {
+    "tStartMs": 2291880,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "uh and so this TikTok app service needs to \ncontact this and then the question is what is  "
+    } ]
+  }, {
+    "tStartMs": 2297400,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "this thing doing how is it actually figuring out \nwhat these what these videos are that it needs  "
+    } ]
+  }, {
+    "tStartMs": 2302500,
+    "dDurationMs": 3720,
+    "segs": [ {
+      "utf8": "to show because ultimately let's assume it's a \nblack box for now and it does Something Magic  "
+    } ]
+  }, {
+    "tStartMs": 2307300,
+    "dDurationMs": 4020,
+    "segs": [ {
+      "utf8": "ultimately what it's going to do is it's \ngoing to return back to this application  "
+    } ]
+  }, {
+    "tStartMs": 2311320,
+    "dDurationMs": 7560,
+    "segs": [ {
+      "utf8": "service a set of let me draw do a little text \nbox here uh and I'm going to make this small  "
+    } ]
+  }, {
+    "tStartMs": 2318880,
+    "dDurationMs": 7260,
+    "segs": [ {
+      "utf8": "so I can fit stuff but uh this is going to be \nsort of among other things a list of videos  "
+    } ]
+  }, {
+    "tStartMs": 2327220,
+    "dDurationMs": 7440,
+    "segs": [ {
+      "utf8": "uh sort of probably actually video IDs so yes it's \ngoing to return back the list of users it's going  "
+    } ]
+  }, {
+    "tStartMs": 2334660,
+    "dDurationMs": 7620,
+    "segs": [ {
+      "utf8": "to return back you know uh the user profile maybe \nsome some other types of things but I think the  "
+    } ]
+  }, {
+    "tStartMs": 2342280,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "most important thing that's going to return back \nis it's going to return a list of video IDs that  "
+    } ]
+  }, {
+    "tStartMs": 2347320,
+    "dDurationMs": 8760,
+    "segs": [ {
+      "utf8": "the application ultimately should show to the user \nand so uh good good does that make sense so far"
+    } ]
+  }, {
+    "tStartMs": 2356080,
+    "dDurationMs": 9120,
+    "segs": [ {
+      "utf8": "okay so the application contacts talks you know \nreaches the service the service uh builds up  "
+    } ]
+  }, {
+    "tStartMs": 2365200,
+    "dDurationMs": 3960,
+    "segs": [ {
+      "utf8": "what it needs what needs to be shown in terms of \ncontent but but the most important thing is that  "
+    } ]
+  }, {
+    "tStartMs": 2369160,
+    "dDurationMs": 6420,
+    "segs": [ {
+      "utf8": "it gets a list of video IDs to show that are the \nthe uh the best videos to show for this user the  "
+    } ]
+  }, {
+    "tStartMs": 2375580,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "for you list of videos and actually maybe that's \nI could be super explicit about this for you video  "
+    } ]
+  }, {
+    "tStartMs": 2381460,
+    "dDurationMs": 7500,
+    "segs": [ {
+      "utf8": "IDs if I really want to be explicit okay so then \nwhat happens with that so the the application  "
+    } ]
+  }, {
+    "tStartMs": 2388960,
+    "dDurationMs": 7260,
+    "segs": [ {
+      "utf8": "service I think would wind up using uh oh sorry \nI'm trying to draw another arrow here okay so  "
+    } ]
+  }, {
+    "tStartMs": 2396220,
+    "dDurationMs": 7260,
+    "segs": [ {
+      "utf8": "the application service I think would utilize \nthe would get the from those video IDs would  "
+    } ]
+  }, {
+    "tStartMs": 2403480,
+    "dDurationMs": 6480,
+    "segs": [ {
+      "utf8": "get metadata information about the videos how long \nthey are what is the ID the URL for where to find  "
+    } ]
+  }, {
+    "tStartMs": 2409960,
+    "dDurationMs": 7500,
+    "segs": [ {
+      "utf8": "this this this video so that I actually can go and \nfetch it maybe some other things like who created  "
+    } ]
+  }, {
+    "tStartMs": 2417460,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "the the video how many likes it has things like \nthat so this this app service would go straight to  "
+    } ]
+  }, {
+    "tStartMs": 2423220,
+    "dDurationMs": 5940,
+    "segs": [ {
+      "utf8": "this database to get that uh metadata information \nso that it could pass that on to the application  "
+    } ]
+  }, {
+    "tStartMs": 2429820,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "okay and that again I'm going to go and uh you \nknow draw too many arrows here probably don't need  "
+    } ]
+  }, {
+    "tStartMs": 2435580,
+    "dDurationMs": 5400,
+    "segs": [ {
+      "utf8": "that many but it would return turn that list so \nthis would be the metadata now the key the reason  "
+    } ]
+  }, {
+    "tStartMs": 2440980,
+    "dDurationMs": 6900,
+    "segs": [ {
+      "utf8": "I'm drawing this is because the metadata is only \none aspect of course the biggest part of this is  "
+    } ]
+  }, {
+    "tStartMs": 2447880,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "that you actually want the actual videos to be \nto be returned to the to the application so how  "
+    } ]
+  }, {
+    "tStartMs": 2452920,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "is that happening and so that that's really \nhappening in a kind of a direct way so oops  "
+    } ]
+  }, {
+    "tStartMs": 2460300,
+    "dDurationMs": 11400,
+    "segs": [ {
+      "utf8": "need to drum better arrows here so from the \nuh the application is going to get back a  "
+    } ]
+  }, {
+    "tStartMs": 2472240,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "as part of the metadata the list of videos so \nthat let me see if I can draw this better here  "
+    } ]
+  }, {
+    "tStartMs": 2477940,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "or give a little bit of a I'm going to put a \nI need to put somewhere put some text in here  "
+    } ]
+  }, {
+    "tStartMs": 2484180,
+    "dDurationMs": 6840,
+    "segs": [ {
+      "utf8": "and I apologize this is again kind \nof small here but this is video uh uh  "
+    } ]
+  }, {
+    "tStartMs": 2491620,
+    "dDurationMs": 8280,
+    "segs": [ {
+      "utf8": "info or maybe I'll call I'm going to call this \nvideo URLs these are like the The Blob the IDS  "
+    } ]
+  }, {
+    "tStartMs": 2499900,
+    "dDurationMs": 6120,
+    "segs": [ {
+      "utf8": "of where to fetch the the videos because these \nare actual like https or some sort of URLs and  "
+    } ]
+  }, {
+    "tStartMs": 2506020,
+    "dDurationMs": 7680,
+    "segs": [ {
+      "utf8": "I am also hand waving over authentication here \nby the way so you know we're assuming https this  "
+    } ]
+  }, {
+    "tStartMs": 2513700,
+    "dDurationMs": 3960,
+    "segs": [ {
+      "utf8": "is you know secure login et cetera Etc so \nthere's a lot of hand waving going on here  "
+    } ]
+  }, {
+    "tStartMs": 2518320,
+    "dDurationMs": 6180,
+    "segs": [ {
+      "utf8": "so this app service among other things returns \nthese video URLs and then the TikTok app for each  "
+    } ]
+  }, {
+    "tStartMs": 2524500,
+    "dDurationMs": 6480,
+    "segs": [ {
+      "utf8": "of those app video URLs goes and fetches them and \nit fetches them basically by just going to those  "
+    } ]
+  }, {
+    "tStartMs": 2530980,
+    "dDurationMs": 6540,
+    "segs": [ {
+      "utf8": "URLs and it turns out that that URL is going to \nland uh let me draw another little uh shape here  "
+    } ]
+  }, {
+    "tStartMs": 2538900,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "to make this super super explicit pretend \nthere's a little Cloud magic Cloud but the  "
+    } ]
+  }, {
+    "tStartMs": 2544900,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "TikTok application is just going to go go to \nthe cloud and specify this URL get me this URL  "
+    } ]
+  }, {
+    "tStartMs": 2552040,
+    "dDurationMs": 5640,
+    "segs": [ {
+      "utf8": "that will hit a CDN a Content delivery Network \nnow if that content delivery network has the  "
+    } ]
+  }, {
+    "tStartMs": 2557680,
+    "dDurationMs": 7080,
+    "segs": [ {
+      "utf8": "video because it's a popular video uh in its in \nits local cache then it it will just go ahead  "
+    } ]
+  }, {
+    "tStartMs": 2564760,
+    "dDurationMs": 4800,
+    "segs": [ {
+      "utf8": "and uh and deliver that and that's just how \ncdns work this is nothing special I'm not you  "
+    } ]
+  }, {
+    "tStartMs": 2569560,
+    "dDurationMs": 6540,
+    "segs": [ {
+      "utf8": "know I'm not trying to recreate uh it meant \nthe wheel here either so if this if the CDN  "
+    } ]
+  }, {
+    "tStartMs": 2576100,
+    "dDurationMs": 4800,
+    "segs": [ {
+      "utf8": "has it it'll just serve it and it'll be fast \nand for popular videos that's super fast if  "
+    } ]
+  }, {
+    "tStartMs": 2580900,
+    "dDurationMs": 7380,
+    "segs": [ {
+      "utf8": "not then it'll wind up going to actually going \nto the back end storage Service uh like S3 and  "
+    } ]
+  }, {
+    "tStartMs": 2588280,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "going and fetching it and then delivering it and \nthen it'll decide based on whatever its logic is  "
+    } ]
+  }, {
+    "tStartMs": 2593320,
+    "dDurationMs": 6360,
+    "segs": [ {
+      "utf8": "whether to store it it's cash or not and that's \nI'm going to again hand wave over that so uh the  "
+    } ]
+  }, {
+    "tStartMs": 2599680,
+    "dDurationMs": 7680,
+    "segs": [ {
+      "utf8": "the the key thing I wanted to just be clear about \nhere is that from a video serving or perspective  "
+    } ]
+  }, {
+    "tStartMs": 2608380,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "that the application there's a two two parts \nto it there's the actual video data which goes  "
+    } ]
+  }, {
+    "tStartMs": 2613900,
+    "dDurationMs": 4800,
+    "segs": [ {
+      "utf8": "through the CDN and the blobs and then there's \nthe metadata which will which would come through  "
+    } ]
+  }, {
+    "tStartMs": 2618700,
+    "dDurationMs": 4620,
+    "segs": [ {
+      "utf8": "the uh the application service and all of the \ncontent that it returns back to the app here's  "
+    } ]
+  }, {
+    "tStartMs": 2623320,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "here's everything you need to show that's small \nand and structured data that you need to to make  "
+    } ]
+  }, {
+    "tStartMs": 2628840,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "your make your phone application look look good \nso I'm going to stop there does that make sense  "
+    } ]
+  }, {
+    "tStartMs": 2635200,
+    "dDurationMs": 5640,
+    "segs": [ {
+      "utf8": "that makes sense Mark yep marked her a good \nhigh-level diagram he did an excellent job  "
+    } ]
+  }, {
+    "tStartMs": 2640840,
+    "dDurationMs": 3960,
+    "segs": [ {
+      "utf8": "talking the interviewer through the upload and \ndownload flow and then for the video streaming  "
+    } ]
+  }, {
+    "tStartMs": 2644800,
+    "dDurationMs": 4260,
+    "segs": [ {
+      "utf8": "flow 2. you might have noticed that Mark Drew \nlots of arrows to illustrate the flow of data  "
+    } ]
+  }, {
+    "tStartMs": 2649060,
+    "dDurationMs": 3900,
+    "segs": [ {
+      "utf8": "you don't have to do this talking it through \nwith the interviewer is sufficient if you  "
+    } ]
+  }, {
+    "tStartMs": 2652960,
+    "dDurationMs": 5280,
+    "segs": [ {
+      "utf8": "prefer don't feel that your diagram has to be \ntotally self-explanatory that said it's really  "
+    } ]
+  }, {
+    "tStartMs": 2658240,
+    "dDurationMs": 3720,
+    "segs": [ {
+      "utf8": "important to be comfortable with the diagram \ndrawing tool that you're using so that you can  "
+    } ]
+  }, {
+    "tStartMs": 2661960,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "use it to help and enhance your explanation rather \nthan having to struggle with it Mark also covered  "
+    } ]
+  }, {
+    "tStartMs": 2666640,
+    "dDurationMs": 5220,
+    "segs": [ {
+      "utf8": "the download flow for video streaming and how the \nfour you feed is generated algorithmically even  "
+    } ]
+  }, {
+    "tStartMs": 2671860,
+    "dDurationMs": 4260,
+    "segs": [ {
+      "utf8": "though he did this in a very simplified way it was \nimportant to touch on because its key to upmates  "
+    } ]
+  }, {
+    "tStartMs": 2676120,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "TikTok unique this way he prepared the ground to \ndrill down into it later in the interview alright  "
+    } ]
+  }, {
+    "tStartMs": 2682000,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "so if that seems good so far then there's two \nthings I'd like to do if we still have time  "
+    } ]
+  }, {
+    "tStartMs": 2689260,
+    "dDurationMs": 7920,
+    "segs": [ {
+      "utf8": "one of them is I'd like to just talk a little bit \nmore about the the data that I think that's the  "
+    } ]
+  }, {
+    "tStartMs": 2697180,
+    "dDurationMs": 4980,
+    "segs": [ {
+      "utf8": "schema of the data what are the elements of the \ndifferent the two different bits of data metadata  "
+    } ]
+  }, {
+    "tStartMs": 2702160,
+    "dDurationMs": 7200,
+    "segs": [ {
+      "utf8": "really the video metadata and the user metadata I \nwant to talk about those because I think that they  "
+    } ]
+  }, {
+    "tStartMs": 2710440,
+    "dDurationMs": 7860,
+    "segs": [ {
+      "utf8": "they are related to the second thing I want to \ntalk about which is a little bit more thinking  "
+    } ]
+  }, {
+    "tStartMs": 2718300,
+    "dDurationMs": 7200,
+    "segs": [ {
+      "utf8": "around how I might do this this generator if I \nwere to treat it a little bit less as a black  "
+    } ]
+  }, {
+    "tStartMs": 2725500,
+    "dDurationMs": 4800,
+    "segs": [ {
+      "utf8": "box and try to dive a little bit deeper although \nthat's not my really my forte but I but I want  "
+    } ]
+  }, {
+    "tStartMs": 2730300,
+    "dDurationMs": 5460,
+    "segs": [ {
+      "utf8": "to try only kind of take an attempt make an \nattempt at that so if that's okay then then  "
+    } ]
+  }, {
+    "tStartMs": 2735760,
+    "dDurationMs": 4260,
+    "segs": [ {
+      "utf8": "that's that's kind of where I'd like to go from \nhere I'd love to see you drill down in Sedalia"
+    } ]
+  }, {
+    "tStartMs": 2746680,
+    "dDurationMs": 5460,
+    "segs": [ {
+      "utf8": "so let's talk about the video metadata \nuh what's in this video metadata so  "
+    } ]
+  }, {
+    "tStartMs": 2752980,
+    "dDurationMs": 6540,
+    "segs": [ {
+      "utf8": "I think there's so I mean there's there's standard \nstuff that I don't know how much of this I want  "
+    } ]
+  }, {
+    "tStartMs": 2759520,
+    "dDurationMs": 5580,
+    "segs": [ {
+      "utf8": "to spend time on but but I'll but I'll just kind \nof mention it so uh there's there's going to be  "
+    } ]
+  }, {
+    "tStartMs": 2765100,
+    "dDurationMs": 9420,
+    "segs": [ {
+      "utf8": "a video ID which is just a unique identifier for \nthe video there's going to be also a video uh URL  "
+    } ]
+  }, {
+    "tStartMs": 2774520,
+    "dDurationMs": 5580,
+    "segs": [ {
+      "utf8": "which is this thing that I mentioned up here \nthat you would go and fetch and I'm going to  "
+    } ]
+  }, {
+    "tStartMs": 2780880,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "uh I'm gonna mention this but I'm not going \nto write it just because I don't want to use  "
+    } ]
+  }, {
+    "tStartMs": 2786400,
+    "dDurationMs": 5400,
+    "segs": [ {
+      "utf8": "the screens this the space here I mentioned \nbriefly earlier that you might want different  "
+    } ]
+  }, {
+    "tStartMs": 2791800,
+    "dDurationMs": 7260,
+    "segs": [ {
+      "utf8": "encodings depending on you know for a particular \nvideo so during the upload phase and possibly  "
+    } ]
+  }, {
+    "tStartMs": 2800020,
+    "dDurationMs": 7980,
+    "segs": [ {
+      "utf8": "offline asynchronously uh if we want to store \ndifferently encoded forms of the same video  "
+    } ]
+  }, {
+    "tStartMs": 2808000,
+    "dDurationMs": 6900,
+    "segs": [ {
+      "utf8": "then we probably need to have different URLs or \ndifferent blobs for those things and so we might  "
+    } ]
+  }, {
+    "tStartMs": 2814900,
+    "dDurationMs": 8220,
+    "segs": [ {
+      "utf8": "have the original raw uploaded video and we might \nhave a a you know iPhone optimized video when we  "
+    } ]
+  }, {
+    "tStartMs": 2823120,
+    "dDurationMs": 5640,
+    "segs": [ {
+      "utf8": "might have a Mac Book in the windows and a you \nknow something like that so it's so that means  "
+    } ]
+  }, {
+    "tStartMs": 2828760,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "that you might have video URLs instead of as a \nlist instead of just a single one but I'm going  "
+    } ]
+  }, {
+    "tStartMs": 2833800,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "to hand wave over that for now and just say that \nthere's one video URL and a pardon the capital  "
+    } ]
+  }, {
+    "tStartMs": 2840040,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "oops pardon the capitalization I think that's \njust the the way the this this Auto completes  "
+    } ]
+  }, {
+    "tStartMs": 2845200,
+    "dDurationMs": 6060,
+    "segs": [ {
+      "utf8": "here okay so video ID video URL what else do \nwe want to have in here maybe like a creation  "
+    } ]
+  }, {
+    "tStartMs": 2851260,
+    "dDurationMs": 6300,
+    "segs": [ {
+      "utf8": "timestamp when was this thing created uh oh \nprobably uh like a Creator ID who created this  "
+    } ]
+  }, {
+    "tStartMs": 2857560,
+    "dDurationMs": 8760,
+    "segs": [ {
+      "utf8": "video who uploaded this video right we want to \nknow who it is we probably want a uh I'm gonna  "
+    } ]
+  }, {
+    "tStartMs": 2866320,
+    "dDurationMs": 6120,
+    "segs": [ {
+      "utf8": "say like likes maybe we want the number of of \nlikes or maybe it's more generically would be  "
+    } ]
+  }, {
+    "tStartMs": 2872440,
+    "dDurationMs": 4500,
+    "segs": [ {
+      "utf8": "sort of reactions or something like that on this \nvideo like how many you know how many people liked  "
+    } ]
+  }, {
+    "tStartMs": 2876940,
+    "dDurationMs": 4980,
+    "segs": [ {
+      "utf8": "it how many people didn't like it Etc things \nlike that and there's something else that I'm  "
+    } ]
+  }, {
+    "tStartMs": 2881920,
+    "dDurationMs": 6300,
+    "segs": [ {
+      "utf8": "gonna that I want to put in here and uh but I'm \ngonna put just a placeholder in here for now uh  "
+    } ]
+  }, {
+    "tStartMs": 2889900,
+    "dDurationMs": 6480,
+    "segs": [ {
+      "utf8": "because I want to get back to it which is related \nto the the uh algo uh features I'm just gonna call  "
+    } ]
+  }, {
+    "tStartMs": 2896380,
+    "dDurationMs": 4980,
+    "segs": [ {
+      "utf8": "this for now and and let's just leave it at that \nso so I'll put a pin in that and then get back to  "
+    } ]
+  }, {
+    "tStartMs": 2901360,
+    "dDurationMs": 7380,
+    "segs": [ {
+      "utf8": "it so this these are some of the things I could \nthink of for this video uh there might oh there  "
+    } ]
+  }, {
+    "tStartMs": 2908740,
+    "dDurationMs": 3900,
+    "segs": [ {
+      "utf8": "might be something like length or duration of \nthe video you know something like that right  "
+    } ]
+  }, {
+    "tStartMs": 2912640,
+    "dDurationMs": 9420,
+    "segs": [ {
+      "utf8": "some other metadata so that that's what I would \nthink about for the video metadata and uh uh let  "
+    } ]
+  }, {
+    "tStartMs": 2922060,
+    "dDurationMs": 7020,
+    "segs": [ {
+      "utf8": "me now talk a little bit about what I think would \nbe in the user data so I'm going to move make  "
+    } ]
+  }, {
+    "tStartMs": 2929080,
+    "dDurationMs": 7860,
+    "segs": [ {
+      "utf8": "some space here copy this put this up here and \napologies for the type tight spacing here but uh"
+    } ]
+  }, {
+    "tStartMs": 2938380,
+    "dDurationMs": 9840,
+    "segs": [ {
+      "utf8": "uh all right so user metadata so what are the \nthings I could think about so there's the typical  "
+    } ]
+  }, {
+    "tStartMs": 2948940,
+    "dDurationMs": 9960,
+    "segs": [ {
+      "utf8": "the typical stuff about users like a user ID \nsome you know credentials uh you know login  "
+    } ]
+  }, {
+    "tStartMs": 2958900,
+    "dDurationMs": 10200,
+    "segs": [ {
+      "utf8": "credential type of stuff maybe there's some \nthings like you know name age I don't know  "
+    } ]
+  }, {
+    "tStartMs": 2969100,
+    "dDurationMs": 3720,
+    "segs": [ {
+      "utf8": "other other bits of information like that I don't \nwant to get into too much of that that's going  "
+    } ]
+  }, {
+    "tStartMs": 2972820,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "to be pretty typical for any real application but \nthen I think the other thing that we mentioned is  "
+    } ]
+  }, {
+    "tStartMs": 2979720,
+    "dDurationMs": 10260,
+    "segs": [ {
+      "utf8": "because this is such a social network uh graph \nyou probably want to have following user ID IDs  "
+    } ]
+  }, {
+    "tStartMs": 2991000,
+    "dDurationMs": 6540,
+    "segs": [ {
+      "utf8": "uh so these are you know who who are the \npeople that you're following that each user  "
+    } ]
+  }, {
+    "tStartMs": 2997540,
+    "dDurationMs": 3600,
+    "segs": [ {
+      "utf8": "is following you probably want to know that that's \nprobably something that is important to understand  "
+    } ]
+  }, {
+    "tStartMs": 3002640,
+    "dDurationMs": 6120,
+    "segs": [ {
+      "utf8": "uh there's probably also watch I'm gonna say  "
+    } ]
+  }, {
+    "tStartMs": 3010260,
+    "dDurationMs": 7380,
+    "segs": [ {
+      "utf8": "uh video Maybe video history ID or something \nlike that so this is the the watch like your  "
+    } ]
+  }, {
+    "tStartMs": 3017640,
+    "dDurationMs": 3540,
+    "segs": [ {
+      "utf8": "watch History like what are the things that \nyou've watched in the past videos that you've  "
+    } ]
+  }, {
+    "tStartMs": 3021180,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "looked at that you've seen or or have been maybe \nshown so shown or watched not not really sure  "
+    } ]
+  }, {
+    "tStartMs": 3028020,
+    "dDurationMs": 8340,
+    "segs": [ {
+      "utf8": "and then for if you're a Creator you probably \nalso have uh you know uploaded video IDs right  "
+    } ]
+  }, {
+    "tStartMs": 3036360,
+    "dDurationMs": 6420,
+    "segs": [ {
+      "utf8": "like what are the videos that you up that you've \nuploaded so that those to me are things that are  "
+    } ]
+  }, {
+    "tStartMs": 3042780,
+    "dDurationMs": 5820,
+    "segs": [ {
+      "utf8": "important and then let's let's not forget we \ntalked at the very beginning like what would  "
+    } ]
+  }, {
+    "tStartMs": 3048600,
+    "dDurationMs": 6720,
+    "segs": [ {
+      "utf8": "be a success metric here and something that I \nprobably want to track in here is uh time in app  "
+    } ]
+  }, {
+    "tStartMs": 3056820,
+    "dDurationMs": 4440,
+    "segs": [ {
+      "utf8": "so how long has this user been spending in the \nin the TikTok app because I probably need to  "
+    } ]
+  }, {
+    "tStartMs": 3061260,
+    "dDurationMs": 4800,
+    "segs": [ {
+      "utf8": "aggregate that and I need to look at that and be \nable to look at that offline and so on so that's  "
+    } ]
+  }, {
+    "tStartMs": 3066060,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "probably something I need to store and keep track \nof okay so let me see here is there is there what  "
+    } ]
+  }, {
+    "tStartMs": 3072060,
+    "dDurationMs": 9060,
+    "segs": [ {
+      "utf8": "else am I thinking about oh yeah yeah so okay so \nlet's get back to this thing that I mentioned uh  "
+    } ]
+  }, {
+    "tStartMs": 3081960,
+    "dDurationMs": 7740,
+    "segs": [ {
+      "utf8": "foreign into the second point that I \nwanted to make which is the for you algo"
+    } ]
+  }, {
+    "tStartMs": 3092640,
+    "dDurationMs": 3540,
+    "segs": [ {
+      "utf8": "profile I'm going to call it so  "
+    } ]
+  }, {
+    "tStartMs": 3097860,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "and and I'm gonna I should probably change the \nvideo one here as well for you I'll go features  "
+    } ]
+  }, {
+    "tStartMs": 3102960,
+    "dDurationMs": 6840,
+    "segs": [ {
+      "utf8": "so what I'm thinking here so here's how my how I'm \nthinking about this and again I'm not an ml expert  "
+    } ]
+  }, {
+    "tStartMs": 3109800,
+    "dDurationMs": 10320,
+    "segs": [ {
+      "utf8": "by any means I have limited sort of background \nand this kind of stuff but in order to have a  "
+    } ]
+  }, {
+    "tStartMs": 3120120,
+    "dDurationMs": 8460,
+    "segs": [ {
+      "utf8": "machine Learning System be trained and figure out \nuh and be able to make decisions one of the uh one  "
+    } ]
+  }, {
+    "tStartMs": 3128580,
+    "dDurationMs": 8880,
+    "segs": [ {
+      "utf8": "of the things that it needs to take in is a set \nof features and so features could be things like  "
+    } ]
+  }, {
+    "tStartMs": 3139200,
+    "dDurationMs": 11760,
+    "segs": [ {
+      "utf8": "uh the the video I video ID itself the number of \nfollowers the entire following the the the entire  "
+    } ]
+  }, {
+    "tStartMs": 3150960,
+    "dDurationMs": 8340,
+    "segs": [ {
+      "utf8": "network graph it could be it could be content \npreferences it could be language it could be  "
+    } ]
+  }, {
+    "tStartMs": 3161100,
+    "dDurationMs": 6660,
+    "segs": [ {
+      "utf8": "I don't know yeah some some features features \nlike this so things that are sort of specific  "
+    } ]
+  }, {
+    "tStartMs": 3167760,
+    "dDurationMs": 6720,
+    "segs": [ {
+      "utf8": "to this user that help the algorithm figure \nout what types of videos to show to the user  "
+    } ]
+  }, {
+    "tStartMs": 3175260,
+    "dDurationMs": 10020,
+    "segs": [ {
+      "utf8": "so that profile is something that I would want to \nstore per user have the the uh for you generator  "
+    } ]
+  }, {
+    "tStartMs": 3185280,
+    "dDurationMs": 11160,
+    "segs": [ {
+      "utf8": "reference this profile and utilize this this uh \nprofile along against the algo features that were  "
+    } ]
+  }, {
+    "tStartMs": 3196440,
+    "dDurationMs": 4620,
+    "segs": [ {
+      "utf8": "generated for a particular video and that could \nbe length of video it could be content it could  "
+    } ]
+  }, {
+    "tStartMs": 3201060,
+    "dDurationMs": 4740,
+    "segs": [ {
+      "utf8": "be location it could be language it could be \na bunch of different features so that the this  "
+    } ]
+  }, {
+    "tStartMs": 3205800,
+    "dDurationMs": 7380,
+    "segs": [ {
+      "utf8": "generator can essentially uh input the features \nfrom the user and based on that and based on all  "
+    } ]
+  }, {
+    "tStartMs": 3213180,
+    "dDurationMs": 9840,
+    "segs": [ {
+      "utf8": "of the entire database of [Music] algorithmically \nfeature identified videos make a determination as  "
+    } ]
+  }, {
+    "tStartMs": 3223020,
+    "dDurationMs": 5280,
+    "segs": [ {
+      "utf8": "to what the best match is for videos to show \nto the user so that's a lot of hand waving  "
+    } ]
+  }, {
+    "tStartMs": 3229740,
+    "dDurationMs": 5820,
+    "segs": [ {
+      "utf8": "but the idea is that this is essentially uh \nit's a neural network or some sort of other  "
+    } ]
+  }, {
+    "tStartMs": 3235560,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "system uh and I keep referring to neural networks \nit's kind of you know 80s and 90s here but it's  "
+    } ]
+  }, {
+    "tStartMs": 3241560,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "it's a machine learning mechanism that has been \ntrained offline with all the videos that have  "
+    } ]
+  }, {
+    "tStartMs": 3246240,
+    "dDurationMs": 5400,
+    "segs": [ {
+      "utf8": "been uploaded they've all been feature extracted \nfor each of the videos and then those features  "
+    } ]
+  }, {
+    "tStartMs": 3252360,
+    "dDurationMs": 6420,
+    "segs": [ {
+      "utf8": "are fed into the system to train it uh and \nthen there's a there's a matching step where  "
+    } ]
+  }, {
+    "tStartMs": 3258780,
+    "dDurationMs": 4980,
+    "segs": [ {
+      "utf8": "on the Fly we say Okay given this user profile \nwhat are the videos that that we should show"
+    } ]
+  }, {
+    "tStartMs": 3266280,
+    "dDurationMs": 6420,
+    "segs": [ {
+      "utf8": "that's still kind of black boxy still kind of \nhand wavy but I think the the key thing there  "
+    } ]
+  }, {
+    "tStartMs": 3272700,
+    "dDurationMs": 6780,
+    "segs": [ {
+      "utf8": "is that this profile there's two things here that \nI want to think about first off I think the the  "
+    } ]
+  }, {
+    "tStartMs": 3280080,
+    "dDurationMs": 3720,
+    "segs": [ {
+      "utf8": "and there's probably some sort of a I don't \nknow if it's a database I don't really exactly  "
+    } ]
+  }, {
+    "tStartMs": 3283800,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "know what the right right mechanism is is \nhere but uh oh maybe I should put it on its  "
+    } ]
+  }, {
+    "tStartMs": 3288960,
+    "dDurationMs": 7620,
+    "segs": [ {
+      "utf8": "side but anyway there's some sort of a uh ml \ndatabase that's super super hand wavy super  "
+    } ]
+  }, {
+    "tStartMs": 3297360,
+    "dDurationMs": 10440,
+    "segs": [ {
+      "utf8": "you know over overly simplified but there's \nthere's that database but and the input into  "
+    } ]
+  }, {
+    "tStartMs": 3307800,
+    "dDurationMs": 5940,
+    "segs": [ {
+      "utf8": "this generator is the database and all of \nthe uh the the various uh features and so on  "
+    } ]
+  }, {
+    "tStartMs": 3315420,
+    "dDurationMs": 7440,
+    "segs": [ {
+      "utf8": "but when making the determination the uh \nthe for you generator just looks at this  "
+    } ]
+  }, {
+    "tStartMs": 3322860,
+    "dDurationMs": 7680,
+    "segs": [ {
+      "utf8": "profile and all of the information the one \nthing that I think it this is me being naive  "
+    } ]
+  }, {
+    "tStartMs": 3332160,
+    "dDurationMs": 7200,
+    "segs": [ {
+      "utf8": "I think that this will this process of updating \nthe profiles and showing stuff that's relevant to  "
+    } ]
+  }, {
+    "tStartMs": 3339360,
+    "dDurationMs": 8220,
+    "segs": [ {
+      "utf8": "the profile including what have you seen before \netc etc I think that's a slow process by slow I  "
+    } ]
+  }, {
+    "tStartMs": 3347580,
+    "dDurationMs": 5340,
+    "segs": [ {
+      "utf8": "mean it's not real time it doesn't get updated \nright away so if I for example see a video that  "
+    } ]
+  }, {
+    "tStartMs": 3352920,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "I don't like or a follower that I don't want \nanymore and I don't want to see any more videos  "
+    } ]
+  }, {
+    "tStartMs": 3358680,
+    "dDurationMs": 7200,
+    "segs": [ {
+      "utf8": "from a particular user as a user I expect that to \ntake effect immediately I don't want to see any  "
+    } ]
+  }, {
+    "tStartMs": 3365880,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "videos from that user I don't want to see anything \nlike that immediately but if the you know this ml  "
+    } ]
+  }, {
+    "tStartMs": 3370980,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "system is an offline asynchronous system that's \nchurning churning churning so it's gonna it might  "
+    } ]
+  }, {
+    "tStartMs": 3376080,
+    "dDurationMs": 8220,
+    "segs": [ {
+      "utf8": "take a while to catch up to to that so I probably \nwould want a little bit of rule-based boundaries  "
+    } ]
+  }, {
+    "tStartMs": 3384300,
+    "dDurationMs": 6780,
+    "segs": [ {
+      "utf8": "guard rails maybe I could would call it that would \nbe like exclusion profile I'm going to call this  "
+    } ]
+  }, {
+    "tStartMs": 3391080,
+    "dDurationMs": 5460,
+    "segs": [ {
+      "utf8": "it's super hand wavy too but exclusion profile \nmight have in it like followers not to follow  "
+    } ]
+  }, {
+    "tStartMs": 3396540,
+    "dDurationMs": 7740,
+    "segs": [ {
+      "utf8": "anymore follower IDs or user IDs or something like \nthat and so in my in my generator my uh this could  "
+    } ]
+  }, {
+    "tStartMs": 3404280,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "be ML and I could make do the exclusion filtering \nstuff out in this app service here or I could push  "
+    } ]
+  }, {
+    "tStartMs": 3410520,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "that all the way down into this generator here \nbut one way or another a combination of some  "
+    } ]
+  }, {
+    "tStartMs": 3415620,
+    "dDurationMs": 3780,
+    "segs": [ {
+      "utf8": "machine learning stuff which is not going to be \nperfect this sometimes it's hard to reason about  "
+    } ]
+  }, {
+    "tStartMs": 3419400,
+    "dDurationMs": 6540,
+    "segs": [ {
+      "utf8": "how did it figure out make a decision and some \nrule-based logic simple rule-based logic that is  "
+    } ]
+  }, {
+    "tStartMs": 3425940,
+    "dDurationMs": 8040,
+    "segs": [ {
+      "utf8": "that is unambiguous would ultimately filter down \nthe set of video URLs that the user would see yeah  "
+    } ]
+  }, {
+    "tStartMs": 3434700,
+    "dDurationMs": 8580,
+    "segs": [ {
+      "utf8": "that makes sense to me so let's see I've I I've \ntalked a lot about this and and again I haven't  "
+    } ]
+  }, {
+    "tStartMs": 3443280,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "drilled down on this and I know that people are \nwho are watching this who are ml or AI uh you know  "
+    } ]
+  }, {
+    "tStartMs": 3448320,
+    "dDurationMs": 4380,
+    "segs": [ {
+      "utf8": "have have much more knowledge please I mean you're \nyou're absolutely right if I've gotten this wrong  "
+    } ]
+  }, {
+    "tStartMs": 3452700,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "and that's that's on me it's definitely not my \nexpertise uh and I'm oversimplifying here greatly  "
+    } ]
+  }, {
+    "tStartMs": 3458940,
+    "dDurationMs": 6180,
+    "segs": [ {
+      "utf8": "but I think ultimately there's got to be some \nmechanism that generates this stuff based on all  "
+    } ]
+  }, {
+    "tStartMs": 3465120,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "of the attributes of this user including some sort \nof a profile so that's kind of just my the high  "
+    } ]
+  }, {
+    "tStartMs": 3470640,
+    "dDurationMs": 7320,
+    "segs": [ {
+      "utf8": "level uh mechanism that I'm that I'm suggesting \nhere Mark's explanation for the databases was  "
+    } ]
+  }, {
+    "tStartMs": 3477960,
+    "dDurationMs": 4500,
+    "segs": [ {
+      "utf8": "well structured first going high level and then \ndrilling down into the schema afterwards Mark  "
+    } ]
+  }, {
+    "tStartMs": 3482460,
+    "dDurationMs": 4260,
+    "segs": [ {
+      "utf8": "did well talking about the algorithmic generator \nfor the for you feed even though machine learning  "
+    } ]
+  }, {
+    "tStartMs": 3486720,
+    "dDurationMs": 4140,
+    "segs": [ {
+      "utf8": "is outside his area of expertise if the system \nrequires including things that you don't know  "
+    } ]
+  }, {
+    "tStartMs": 3490860,
+    "dDurationMs": 4500,
+    "segs": [ {
+      "utf8": "much about don't just ignore them you can mention \nthem in a simplified way while being upfront with  "
+    } ]
+  }, {
+    "tStartMs": 3495360,
+    "dDurationMs": 6960,
+    "segs": [ {
+      "utf8": "the interviewer about the limits of your expertise \nas Mark was here let me stop here and just kind  "
+    } ]
+  }, {
+    "tStartMs": 3502320,
+    "dDurationMs": 6180,
+    "segs": [ {
+      "utf8": "of ask you uh what other things are you thinking \nabout or whatever things are you wondering about  "
+    } ]
+  }, {
+    "tStartMs": 3508500,
+    "dDurationMs": 6360,
+    "segs": [ {
+      "utf8": "here with this design yeah well I'm wondering \nuh I'm wondering if there'd be any bottlenecks  "
+    } ]
+  }, {
+    "tStartMs": 3515940,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "and yeah I'd also like to hear if if you \nhave any any enhancements you could make"
+    } ]
+  }, {
+    "tStartMs": 3528900,
+    "dDurationMs": 9540,
+    "segs": [ {
+      "utf8": "yeah good questions Okay so I mean I one \nbottleneck which is not so much a so when  "
+    } ]
+  }, {
+    "tStartMs": 3538440,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "I when I think of the term bottleneck I typically \nthink about a performance bottleneck but I I think  "
+    } ]
+  }, {
+    "tStartMs": 3543600,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "I already mentioned there could be just a possibly \na storage bottleneck in terms of keeping all of  "
+    } ]
+  }, {
+    "tStartMs": 3549480,
+    "dDurationMs": 6480,
+    "segs": [ {
+      "utf8": "the user data in one single table uh one one \ndatabase just because of size that could be an  "
+    } ]
+  }, {
+    "tStartMs": 3555960,
+    "dDurationMs": 6480,
+    "segs": [ {
+      "utf8": "issue don't don't know for sure how I might result \nthink about that or think about solving that is I  "
+    } ]
+  }, {
+    "tStartMs": 3562440,
+    "dDurationMs": 8700,
+    "segs": [ {
+      "utf8": "might have to partition the data for the largest \nregions or something which maybe isn't ideal but  "
+    } ]
+  }, {
+    "tStartMs": 3571140,
+    "dDurationMs": 4980,
+    "segs": [ {
+      "utf8": "maybe I'd have to do something like that so that \nmight be that but that's a different question than  "
+    } ]
+  }, {
+    "tStartMs": 3576960,
+    "dDurationMs": 9960,
+    "segs": [ {
+      "utf8": "I think what uh what you're asking about \nand so I think a bottleneck an actual  "
+    } ]
+  }, {
+    "tStartMs": 3586920,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "like a bottleneck in terms of performance \nthat I can think of is This generator here  "
+    } ]
+  }, {
+    "tStartMs": 3593520,
+    "dDurationMs": 7560,
+    "segs": [ {
+      "utf8": "that is generating on the Fly you know in near \nreal time here when this app service is called  "
+    } ]
+  }, {
+    "tStartMs": 3601080,
+    "dDurationMs": 4740,
+    "segs": [ {
+      "utf8": "every time the app sends it a message saying \nhey give me give me and what's next what's next  "
+    } ]
+  }, {
+    "tStartMs": 3607080,
+    "dDurationMs": 5340,
+    "segs": [ {
+      "utf8": "that could be a bottleneck because it has to \nrespond quickly and it has to run in basically  "
+    } ]
+  }, {
+    "tStartMs": 3612420,
+    "dDurationMs": 4740,
+    "segs": [ {
+      "utf8": "in real time or it has to read ahead so so \nlet me let me just make a quick detour here  "
+    } ]
+  }, {
+    "tStartMs": 3617700,
+    "dDurationMs": 5400,
+    "segs": [ {
+      "utf8": "one of the one of the uh the components really \ncool features of TikTok and I think I mentioned  "
+    } ]
+  }, {
+    "tStartMs": 3623100,
+    "dDurationMs": 6960,
+    "segs": [ {
+      "utf8": "it but I I I just I find it fascinating is that \nuh you're in the app and everything is there  "
+    } ]
+  }, {
+    "tStartMs": 3630060,
+    "dDurationMs": 4560,
+    "segs": [ {
+      "utf8": "immediately there's no lag there's no hesitation \nthere's no clicking there's no Spinning Wheel it's  "
+    } ]
+  }, {
+    "tStartMs": 3634620,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "all just right there as you're scrolling in the \napp your videos are scrolling and they're starting  "
+    } ]
+  }, {
+    "tStartMs": 3639720,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "to play as soon as they come into Focus how do \nyou make that happen if you're you know sending  "
+    } ]
+  }, {
+    "tStartMs": 3645600,
+    "dDurationMs": 7020,
+    "segs": [ {
+      "utf8": "a request to some server for a megabyte video \nuh well the answer is you don't uh I think the  "
+    } ]
+  }, {
+    "tStartMs": 3652620,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "answer is that as The TikTok app is running and \nI think it's probably running in the background  "
+    } ]
+  }, {
+    "tStartMs": 3657300,
+    "dDurationMs": 4800,
+    "segs": [ {
+      "utf8": "some it's actually constantly talking to the app \nsurface and saying what are the 10 next videos  "
+    } ]
+  }, {
+    "tStartMs": 3662100,
+    "dDurationMs": 5220,
+    "segs": [ {
+      "utf8": "or the 20 next videos or whatever it might be \nand so it's it's doing a what's called a read  "
+    } ]
+  }, {
+    "tStartMs": 3667320,
+    "dDurationMs": 4860,
+    "segs": [ {
+      "utf8": "ahead so it's pre-computing basically the stuff \nso that it's ready to go and it can send it to  "
+    } ]
+  }, {
+    "tStartMs": 3672180,
+    "dDurationMs": 4860,
+    "segs": [ {
+      "utf8": "back to it right away that's not perfect and \nand there's some issues with that but that's  "
+    } ]
+  }, {
+    "tStartMs": 3677040,
+    "dDurationMs": 9120,
+    "segs": [ {
+      "utf8": "one way to make this this seem extremely alive \nand uh responsive application but that doesn't  "
+    } ]
+  }, {
+    "tStartMs": 3686160,
+    "dDurationMs": 6720,
+    "segs": [ {
+      "utf8": "solve necessarily the bottleneck of the uh this \ngeneration here on how you might generate this  "
+    } ]
+  }, {
+    "tStartMs": 3692880,
+    "dDurationMs": 6060,
+    "segs": [ {
+      "utf8": "list this this uh list of videos to recommend \nand so one thing I could think of doing is  "
+    } ]
+  }, {
+    "tStartMs": 3700440,
+    "dDurationMs": 7560,
+    "segs": [ {
+      "utf8": "it over time when this app service and the \ngenerator start to maybe mature I could imagine  "
+    } ]
+  }, {
+    "tStartMs": 3708000,
+    "dDurationMs": 5940,
+    "segs": [ {
+      "utf8": "moving this logic some of this logic into the \napp onto the popular platform so if we've got  "
+    } ]
+  }, {
+    "tStartMs": 3713940,
+    "dDurationMs": 9540,
+    "segs": [ {
+      "utf8": "you know uh iOS Android Windows Mac and uh maybe \nmaybe web then I could imagine that on the most  "
+    } ]
+  }, {
+    "tStartMs": 3723480,
+    "dDurationMs": 4500,
+    "segs": [ {
+      "utf8": "popular platforms let's let's say iOS let's \nsay iPhone and Android on just mobile devices  "
+    } ]
+  }, {
+    "tStartMs": 3728640,
+    "dDurationMs": 8280,
+    "segs": [ {
+      "utf8": "that you move this generator code into the actual \napplication sorry into the phone onto the phone so  "
+    } ]
+  }, {
+    "tStartMs": 3736920,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "that it can take advantage of maybe even the GPU \non the phone because if this is like a you know  "
+    } ]
+  }, {
+    "tStartMs": 3742080,
+    "dDurationMs": 5220,
+    "segs": [ {
+      "utf8": "it's a math heavy or you know a kind of operation \nyour phones are the smartphones are super powerful  "
+    } ]
+  }, {
+    "tStartMs": 3747300,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "these days so you have a lot of compute power to \nuse there and that could reduce the bottleneck of  "
+    } ]
+  }, {
+    "tStartMs": 3753300,
+    "dDurationMs": 5280,
+    "segs": [ {
+      "utf8": "having these things sort of running out in the \ncloud so that could be one way to solve that  "
+    } ]
+  }, {
+    "tStartMs": 3759960,
+    "dDurationMs": 4080,
+    "segs": [ {
+      "utf8": "so that that would be a bottleneck that I would \nbe thinking about is this is this compute thing  "
+    } ]
+  }, {
+    "tStartMs": 3764040,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "because it oversimplified I'm sure it's much more \nsophisticated complicated than I'm making making  "
+    } ]
+  }, {
+    "tStartMs": 3768960,
+    "dDurationMs": 6840,
+    "segs": [ {
+      "utf8": "out to be so that's that's on the bottleneck side \nyeah that's an interesting answer not to mention  "
+    } ]
+  }, {
+    "tStartMs": 3775800,
+    "dDurationMs": 4020,
+    "segs": [ {
+      "utf8": "the data bottleneck for the user data but the \nmore interesting one was around the algorithmic  "
+    } ]
+  }, {
+    "tStartMs": 3779820,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "for you generation and Mark's solution moving it \nfrom the cloud into the application on the device  "
+    } ]
+  }, {
+    "tStartMs": 3785520,
+    "dDurationMs": 4740,
+    "segs": [ {
+      "utf8": "for mobile applications this can be a powerful \noption to offload compute from your distributed  "
+    } ]
+  }, {
+    "tStartMs": 3790260,
+    "dDurationMs": 11640,
+    "segs": [ {
+      "utf8": "system and onto user's devices you you asked \nabout enhancements so I mean I guess maybe that  "
+    } ]
+  }, {
+    "tStartMs": 3801900,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "would be an enhancement too is to move it to move \nthis move this logic to into the into the phone  "
+    } ]
+  }, {
+    "tStartMs": 3809820,
+    "dDurationMs": 6120,
+    "segs": [ {
+      "utf8": "I think an enhancement that is probably more of a \nproduct enhancement or an application enhancement  "
+    } ]
+  }, {
+    "tStartMs": 3816780,
+    "dDurationMs": 8640,
+    "segs": [ {
+      "utf8": "is that I could imagine a right now you get a 4u \nfeed and it's it's customized to your likes and  "
+    } ]
+  }, {
+    "tStartMs": 3825420,
+    "dDurationMs": 9720,
+    "segs": [ {
+      "utf8": "your preferences and I could imagine in order \nto test out new algorithms and test out new  "
+    } ]
+  }, {
+    "tStartMs": 3838200,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "feeds and so on having an \nalgorithm the the the the generator  "
+    } ]
+  }, {
+    "tStartMs": 3844680,
+    "dDurationMs": 8160,
+    "segs": [ {
+      "utf8": "occasionally pepper the the list of videos with \nsomething that is outside of your uh outside of  "
+    } ]
+  }, {
+    "tStartMs": 3852840,
+    "dDurationMs": 6060,
+    "segs": [ {
+      "utf8": "your uh domain or your interests to kind of give \nyou a taste of something you don't want a lot of  "
+    } ]
+  }, {
+    "tStartMs": 3858900,
+    "dDurationMs": 4800,
+    "segs": [ {
+      "utf8": "that because you don't want people to get a feel \nlike okay I'm getting something that I don't like  "
+    } ]
+  }, {
+    "tStartMs": 3863700,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "or I'm you know I have no idea where this is not \nsomebody I'm following right you don't want that  "
+    } ]
+  }, {
+    "tStartMs": 3868380,
+    "dDurationMs": 4320,
+    "segs": [ {
+      "utf8": "to be super super in your face but you could \nimagine peppering the results every now and  "
+    } ]
+  }, {
+    "tStartMs": 3872700,
+    "dDurationMs": 6660,
+    "segs": [ {
+      "utf8": "then with a little bit of uh of something that is \nnew and unusual uh you know sort of a a surprise  "
+    } ]
+  }, {
+    "tStartMs": 3879360,
+    "dDurationMs": 6180,
+    "segs": [ {
+      "utf8": "unsolicited uh idea for a video or something like \nthat and that would still want I would still want  "
+    } ]
+  }, {
+    "tStartMs": 3885540,
+    "dDurationMs": 4260,
+    "segs": [ {
+      "utf8": "that to go through that filter that I was talking \nabout those guard rails of saying well if this is  "
+    } ]
+  }, {
+    "tStartMs": 3889800,
+    "dDurationMs": 4860,
+    "segs": [ {
+      "utf8": "from a follower that I explicitly said don't look \nat then you know I wouldn't want to see that but  "
+    } ]
+  }, {
+    "tStartMs": 3894660,
+    "dDurationMs": 4020,
+    "segs": [ {
+      "utf8": "but if it's something that you know hasn't \nexplicitly been uh disallowed then maybe  "
+    } ]
+  }, {
+    "tStartMs": 3898680,
+    "dDurationMs": 6360,
+    "segs": [ {
+      "utf8": "it's something that you know you you get to see \nand uh uh is an interesting interesting sort of  "
+    } ]
+  }, {
+    "tStartMs": 3905040,
+    "dDurationMs": 4980,
+    "segs": [ {
+      "utf8": "feature maybe broadens your perspective a little \nbit opens up your mind to some other other ideas  "
+    } ]
+  }, {
+    "tStartMs": 3910020,
+    "dDurationMs": 4560,
+    "segs": [ {
+      "utf8": "you know maybe it's baking or something like \nthat and you haven't watched a lot you know  "
+    } ]
+  }, {
+    "tStartMs": 3914580,
+    "dDurationMs": 4320,
+    "segs": [ {
+      "utf8": "you're not interested in baking I I don't I \ndon't really uh have have a good example here  "
+    } ]
+  }, {
+    "tStartMs": 3918900,
+    "dDurationMs": 5220,
+    "segs": [ {
+      "utf8": "but that could be some that could be kind of \nmore of a product enhancement to to think about  "
+    } ]
+  }, {
+    "tStartMs": 3926820,
+    "dDurationMs": 7260,
+    "segs": [ {
+      "utf8": "and I think from a system perspective I think \nI mentioned earlier one enhancement I could  "
+    } ]
+  }, {
+    "tStartMs": 3934080,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "imagine making is that if you if some of this \narchitectures as this architecture stabilizes you  "
+    } ]
+  }, {
+    "tStartMs": 3939780,
+    "dDurationMs": 7020,
+    "segs": [ {
+      "utf8": "could pick out certain components or aspects that \nare costly that are expensive uh so if the Dynamo  "
+    } ]
+  }, {
+    "tStartMs": 3946800,
+    "dDurationMs": 4980,
+    "segs": [ {
+      "utf8": "turns out to be super expensive or RDS maybe you \ndecide you know what I'm going to go ahead and  "
+    } ]
+  }, {
+    "tStartMs": 3951780,
+    "dDurationMs": 6360,
+    "segs": [ {
+      "utf8": "pay the engineering costs and get my engineers \nto do our own hosting of a MySQL solution or  "
+    } ]
+  }, {
+    "tStartMs": 3958140,
+    "dDurationMs": 4440,
+    "segs": [ {
+      "utf8": "or do it on a different platform or something \nlike that just to kind of reduce costs because  "
+    } ]
+  }, {
+    "tStartMs": 3962580,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "now it's worth it at the scale to to build our own \nsolution so that could be something to think about  "
+    } ]
+  }, {
+    "tStartMs": 3968820,
+    "dDurationMs": 6180,
+    "segs": [ {
+      "utf8": "but that's always a trade-off between the uh you \nknow the the engineering cost and the the sort of  "
+    } ]
+  }, {
+    "tStartMs": 3975000,
+    "dDurationMs": 6600,
+    "segs": [ {
+      "utf8": "service costs that you wind up paying for these \nkinds of solutions okay so okay that's [Music]  "
+    } ]
+  }, {
+    "tStartMs": 3983760,
+    "dDurationMs": 6600,
+    "segs": [ {
+      "utf8": "that's kind of uh uh I I guess that's kind \nof where I would leave it at Mark's idea  "
+    } ]
+  }, {
+    "tStartMs": 3990360,
+    "dDurationMs": 3420,
+    "segs": [ {
+      "utf8": "that you could pepper the four you feed with \na different type of content there's more of a  "
+    } ]
+  }, {
+    "tStartMs": 3993780,
+    "dDurationMs": 4200,
+    "segs": [ {
+      "utf8": "product enhancement than a system enhancement if \nyou're interviewing for an engineering role you'd  "
+    } ]
+  }, {
+    "tStartMs": 3997980,
+    "dDurationMs": 4380,
+    "segs": [ {
+      "utf8": "probably want to come up with a system enhancement \nif possible keep in mind the role and level  "
+    } ]
+  }, {
+    "tStartMs": 4002360,
+    "dDurationMs": 4980,
+    "segs": [ {
+      "utf8": "that you're interviewing for as an individual \ncontributor position more technical depth might be  "
+    } ]
+  }, {
+    "tStartMs": 4007340,
+    "dDurationMs": 4320,
+    "segs": [ {
+      "utf8": "expected while if you're interviewing for say an \nengineering manager role you'll want to consider  "
+    } ]
+  }, {
+    "tStartMs": 4011660,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "things such as cost trade-offs as Mark did here \noverall a great interview from Mark he showed  "
+    } ]
+  }, {
+    "tStartMs": 4017360,
+    "dDurationMs": 4080,
+    "segs": [ {
+      "utf8": "some clear thinking and superb communication \nskills on what was a pretty tricky design  "
+    } ]
+  }, {
+    "tStartMs": 4022700,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "yep let's wrap it up now yeah Jonah just have \na quick look over your design are you are you  "
+    } ]
+  }, {
+    "tStartMs": 4028460,
+    "dDurationMs": 5580,
+    "segs": [ {
+      "utf8": "happy with it do you feel that you you met the \nthe objectives that we laid out at the beginning  "
+    } ]
+  }, {
+    "tStartMs": 4035300,
+    "dDurationMs": 7020,
+    "segs": [ {
+      "utf8": "yeah so you're I think so because I think you \nasked about sort of the upload and and download  "
+    } ]
+  }, {
+    "tStartMs": 4042320,
+    "dDurationMs": 8700,
+    "segs": [ {
+      "utf8": "uh stream uh or streaming aspects of it and we did \nsome capacity there we have sort of a we have the  "
+    } ]
+  }, {
+    "tStartMs": 4051020,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "databases we've got the rough idea of how that's \ngoing to flow through the system I've got a little  "
+    } ]
+  }, {
+    "tStartMs": 4055700,
+    "dDurationMs": 8700,
+    "segs": [ {
+      "utf8": "bit of hand wavy stuff around uh the for you feed \nwhich is sort of the what we show so I feel like  "
+    } ]
+  }, {
+    "tStartMs": 4064400,
+    "dDurationMs": 6420,
+    "segs": [ {
+      "utf8": "this is this is a decent start again I there's so \nmany things and I I you know I imagine the real  "
+    } ]
+  }, {
+    "tStartMs": 4070820,
+    "dDurationMs": 6300,
+    "segs": [ {
+      "utf8": "TikTok architecture is significantly more complex \nI mean people have spent engineering decades  "
+    } ]
+  }, {
+    "tStartMs": 4077120,
+    "dDurationMs": 6360,
+    "segs": [ {
+      "utf8": "building this thing and it's an amazing app so uh \nthere's no way I'm gonna reproduce that in in any  "
+    } ]
+  }, {
+    "tStartMs": 4083480,
+    "dDurationMs": 6660,
+    "segs": [ {
+      "utf8": "amount of time so uh uh yeah kudos to those to \nthose Engineers that's very good uh well I think  "
+    } ]
+  }, {
+    "tStartMs": 4090140,
+    "dDurationMs": 7140,
+    "segs": [ {
+      "utf8": "I think you made a pretty good attempt uh let's \nfinish the interview there and yeah thanks Mark uh  "
+    } ]
+  }, {
+    "tStartMs": 4097280,
+    "dDurationMs": 9120,
+    "segs": [ {
+      "utf8": "you can relax how was it was it was it enjoyable \nthat was fun hard difficult but fun it's a tricky  "
+    } ]
+  }, {
+    "tStartMs": 4106400,
+    "dDurationMs": 6300,
+    "segs": [ {
+      "utf8": "one but uh yeah it was it was good fun uh watching \nyou watching you do it and uh yeah I think  "
+    } ]
+  }, {
+    "tStartMs": 4112700,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "hopefully people will have learned a lot I'm \nsure we'll get lots of comments on it so yeah  "
+    } ]
+  }, {
+    "tStartMs": 4118460,
+    "dDurationMs": 5640,
+    "segs": [ {
+      "utf8": "Mark thanks very much and uh yeah I hope we'll see \nyou again here sometime soon thank you thanks Tom  "
+    } ]
+  }, {
+    "tStartMs": 4125240,
+    "dDurationMs": 4380,
+    "segs": [ {
+      "utf8": "hello I really hope you found that useful if \nyou did you can like and subscribe and why  "
+    } ]
+  }, {
+    "tStartMs": 4129620,
+    "dDurationMs": 4980,
+    "segs": [ {
+      "utf8": "not come visit us at IGotAnOffer.com there \nyou can find more videos useful Frameworks  "
+    } ]
+  }, {
+    "tStartMs": 4134600,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "and questions guys all completely free and you \ncan also book expert feedback one-to-one with  "
+    } ]
+  }, {
+    "tStartMs": 4140480,
+    "dDurationMs": 13260,
+    "segs": [ {
+      "utf8": "our coaches from Google meta Amazon Etc thank \nyou and good luck with your interview foreign"
+    } ]
+  }, {
+    "tStartMs": 4153740,
+    "dDurationMs": 443,
+    "segs": [ {
+      "utf8": "[Music]"
+    } ]
+  } ]
+}

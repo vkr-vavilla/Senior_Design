@@ -1,0 +1,447 @@
+{
+  "video_id": "6ncshuA-jqo",
+  "summary": "This session simulates a technical interview for a senior software engineering role, focusing on data structures and algorithms. The interviewer, Sarf, and candidate, Pratik, discuss fundamental concepts like LinkedList vs. ArrayList, HashMap internals, and sorting algorithms (Merge Sort, Quick Sort). The interview then progresses to problem-solving, where Pratik designs and implements a leaderboard system, addressing optimization, edge cases, and production considerations like concurrency. Finally, Pratik solves the 'largest sum subarray' problem using Kadane's algorithm. The session concludes with constructive feedback from both participants.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "UNKNOWN",
+      "text": "Hi everyone, my name is Roman Zki and I'm a product manager at EPAM Anx. I'm also the host of today's webinar. Today, we'll be joined by two speakers, Sarf and Pratik, and we'll be talking about all things data structures and algorithms for an interview for a position with four plus years of experience. I believe it's going to be a really incredible session to get some hands-on insights on what a real-life interview looks like."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "This video is brought to you with the support of Anx. Anx is a program developed by EPAM, aimed at enhancing and propagating best software engineering practices and processes across the organization and all team levels. It offers a suite of services, tools, and educational programs to continuously improve software development performance, smoothly integrate GNI tools into everyday work, and foster a culture of excellence and innovation among engineering teams. If you enjoy this video, be sure to check out the links in the description and explore more about what Anx has to offer on engineering excellence for your teams. So now, I'd like to give a couple of words to introduce yourself first. For the interviewer, Sarf, the stage is yours."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Hi, hello everyone. My name is Sarf. I'm a lead engineer at EPAM Systems. I have about 14 years of experience in the IT industry. Throughout my journey, I was involved in product development and also worked on Java DSA and system design aspects. Today, I'll be playing the role of the interviewer, conducting the interview on Java DSA."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "Wow, thanks. Such a cool experience. You're such a cool guy, and thank you for joining us today. Now, our candidate, Pratik, the word is for you."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Hi everyone. I'm Pratik Jaab, and I'm from the EPAM Systems team. I'm playing the role of the candidate. Regarding my background, I have nearly seven years of experience in backend development, specifically with Java, DSA, and system design."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Thank you for the introduction. It seems that we are now all set up, so let's jump into the interview process. There we go. The format of this interview will be like this: I'll be asking some theoretical questions, and then we'll go into problem-solving. The idea is for you to tell me about the requirements, the scope, what kind of data structure you'll be using, then go into the edge cases, and then implement it."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, so can you please tell me what is the difference between LinkedList and ArrayList?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay. So, LinkedList basically works on address location and the node part. It stores two things: actual data and the address of the next data. The ArrayList stores data in an actual array internally. If you talk about LinkedList in Java, it uses a doubly LinkedList internally. Basically, it points to the next location of the data as well as the previous location of the data."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And how does memory allocation happen with respect to static versus dynamic? How is it different in ArrayList and how is it different in LinkedList?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "In an ArrayList, it stores the data in continuous memory locations. So, if one element is stored at one location, the exact next location will store the second element. But in a LinkedList, it stores at different memory locations. When it points to the next element, it stores the address of the next memory location into the first node of that particular LinkedList. So, the location is continuous in an ArrayList, but not continuous in a LinkedList. That's why LinkedList is dynamic."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, so let's say if I have a constraint on space, if I have to choose between LinkedList and ArrayList, what kind of data structure would I go with?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I would suggest that if there are constraints in the memory location, then we should go with the LinkedList. Because, according to the structure of the LinkedList, it stores the data at random spaces. So, we can use whichever available space in our memory efficiently by spreading the data and storing its memory location into the current node. That's how we should choose the LinkedList over there."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay. Can you please tell me how the internals of HashMap look like?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay. Internally, the HashMap stores key and value for our usage. But internally, it resolves collisions. Before Java 8, it stored them in a LinkedList, specifically a doubly LinkedList. But in Java 8, it stores them in a binary search tree, where each key will be stored in the binary tree. So, whenever we get a particular element in the HashMap, it searches using the binary search algorithm, which gives us more efficiency compared to the LinkedList."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So, let's say if a collision happens with the key, how does it resolve that? What kind of techniques does it use?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "There are multiple techniques we can use for resolving collisions. Probing is one of the techniques currently used in HashMap. What it does is, it internally calls the hash method, which creates a hash code. According to the hash code, it stores the data. So, whenever a collision happens, it calls the hash method, which creates a hash code, and our data will be stored at a different location for that hash. So, linear probing and cubic probing are different methods we can use if a collision happens."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "You mentioned the LinkedList is being stored, but how does it guarantee that if we have a large set of data, how does it resolve that? Let's say if you have a key with multiple collisions, and you are storing that value. Now, how do you resolve it in a faster way to provide access to the values for that particular key? For example, if you have a key 'XYZ' and corresponding values, and the same key can have multiple values, how can I fetch those in a LinkedList manner?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay. Whenever we have the same key, and let's say the hash code is also calculated to be the same in the hash method, it stores them in a LinkedList in a linear manner. First, it will fetch the full LinkedList for that particular key, and then it will traverse one by one. Once it reaches the particular element we want to fetch, it will return the value of that element. But in that case, the complexity will be O(N)."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "But if I have to optimize it, how can I do that?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "That's why before Java 8, it used a LinkedList for storing the value. But in Java 8, it was improved. Whenever we have a large list, it converts to a binary search tree. And whenever we want to search a node, it searches within that list using the binary search algorithm. When it starts searching, it gives us less time complexity. In a LinkedList, it gives O(N), but in a binary search tree, it gives O(log N). That's why in Java 8, it converted to a binary search tree."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And how are Merge Sort and Quick Sort different? Which one is better?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "We cannot say one is better, but in different scenarios, we can use different algorithms. Let me give a scenario for Quick Sort. Let's say we have a very large number of data sets. Quick Sort divides and then conquers the data. It divides on the basis of one pivot element. This pivot element is decided based on the data; it can be a middle or a lesser element. According to this pivot element, it divides on the basis of smaller elements and larger elements. Then it divides till the end of the list and then conquers by sorting it and merging the data into a single sorted array. Why is Quick Sort not suitable for small data sets? Because we are dividing and then conquering the array, this becomes a heavy operation if we use it for small data sets, because for each and every element, we are dividing and then conquering the data. But in Merge Sort, we cannot say it's good for large data sets, but for small data sets, Merge Sort will be used because it is merging at each and every element. It calculates if it's lesser, it puts the data; if it's greater, it rejects and puts data from a different data set. Merge Sort creates subsets, and Quick Sort creates data sets on the basis of the pivot element."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So, if we consider the complexity, what is the complexity in the worst-case scenario in both cases?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "For Quick Sort, it gives O(N log N), and the same for Merge Sort also, but I'm not sure about Merge Sort."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Can you please share your screen? I'll give you some problem-solving questions. I have shared the problem statement where I want you to design and implement a leaderboard with three methods: `increaseScoreByOne`, `decreaseScoreByOne`, and `getLeader`. For `increaseScoreByOne`, you'll be given a player ID, and you have to increment the current score by one. Similarly, for `decreaseScoreByOne`, the current score will be decreased by one. `getLeader` should return the player ID with the max score. At any point, these three methods will be called. As a service provider, you have to come up with this implementation. As part of this assessment, I'm looking for what kind of data structure you'll be using, what will be the complexity of these three methods, and also identifying the edge cases for these three methods, which you'll be implementing. Your code should be functional."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Let me clarify my understanding. So, I need to design a leaderboard where we will calculate the score of each and every player."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Basically, you have to store the score at your end because that's how you perform these increase and decrease methods. Based on those scores, you'll be giving the `getLeader` information. The data you'll have is only the player ID, which comes as part of your increase and decrease method; nothing else will be coming. This increase method will increase the score by one."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, I have some corner scenarios we should consider. That is, will the player ID be a string or an integer? Which one should I choose?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "You can consider both. It's fine if you consider integer or string. I'll leave that design up to you."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, I will decide this later. And if, let's say, `decreaseScoreByOne` is directly called before any increase, should we decrease the score to a negative number, or should we keep it positive?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "We want to keep the score as positive only, so we'll restrict that."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay. Then, I can use any data structure or my own design class to store this data, right?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, yeah, yeah. I want to see how you'll design it and then talk about the complexity. Then we'll decide whether to go ahead with that approach or not."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "And which one are we prioritizing: space complexity or time complexity? I will think about the solution according to that."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "The focus should be on time complexity first. We'll see if we can optimize space as well."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay. And in case, let's say, we didn't store any data and `getLeader` is called, then what should be our response?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, in that case, I'll leave the design up to you, but it should throw an exception."
+    },
+    {
+      "speaker": "EMPLOYER",
+      "text": "Okay. And even for the decrease, you should throw an exception when the score is negative."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay. So right now, as per my thinking, these will be the scenarios that I will handle. I will ask you in between if any thought comes to my mind. Sure. So, to solve this problem, what I can do? Initially, I will store the data, that is, the player ID and the score. I need to store it. I will store the data in a HashMap because we have a key and value. In the HashMap, the key will be the player ID, and the score will be the value. So, what we will do in `increaseScoreByOne`? We will fetch this player ID. If the score is present, we will increase it by one. So, it will give us a time complexity of O(1) for `increaseScoreByOne`. Now, coming to `decreaseScoreByOne`, the same thing: we will fetch the player ID. If the player ID is present, then we will check the value. If it is greater than zero, then we will decrease it. If it is not greater than zero, or it is zero only, then what we will do is just put it as zero because we don't want the score to be negative. If `decreaseScore` is called and the value is already zero, then we can throw an exception at that particular condition also. So, again, it will give us a time complexity of O(1). Now, coming to `getLeader`, what we will do is sort the map on the basis of the value, whatever is present in the HashMap. After sorting, whichever is the first element, that is, by decreasing order, the first entry in the HashMap, that will be the leader we consider. It may be possible there will be multiple leaders at the same place, right? Or shall we keep it at the same only?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "I want only one player ID to be returned. For now, any one of them should be fine. But let's say if we can have different variations also, like the most recent one or the least recent one, your design should be flexible enough to accommodate those variations. So, sorting the HashMap, this `getLeader` will give us a time complexity of O(N log N)."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Sorry, when you sort it, it won't be O(N). Sorry, that is O(N log N)."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "O(N log N) is very high complexity. What we are looking for is much lesser than that. How can you optimize this? Even if you traverse the map, the complexity will be O(N) only, right? You don't have to sort it. That also will be O(N). But O(N) is very high complexity. Let's say if you have millions of players, then O(N) is very high complexity. So, how can you optimize it?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so you mean to say, let's say, in the HashMap, we find, we create one variable that is `max`, and we traverse the value. Whichever is the max value, that will again give O(N), correct?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, okay. So, in that case, you mean to say that we need a time complexity that is less than O(N), right? Correct. Think of it like a platform service where you'll be providing these three methods, exposing these three methods. What we are looking for is the optimized one, so that the performance for your service will be better. So, think like it should be less than O(N) when it comes to time complexity."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "To find a better solution for this, we can use multiple data structures at the same time, right?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yes, yes, yes. Right now, I give the flexibility to use space. Just focus on the time complexity."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Sure, sure. If you use a TreeMap, the key will be the score, and the value will be the player ID. A TreeMap is already sorting it; we just need to provide the comparator. But again, I could see the TreeMap. How does that comparator work in the TreeMap?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, we can create the comparator within, like, let's say if you use `new TreeMap<Score, PlayerID>`. But again, I could see this will give us a time complexity of O(N log N). It is not giving us O(log N), which is less than O(N), right? Because it is working on the entry set, right? When you go with the..."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Correct, correct. So, we can do like this if we use the comparator over here. In this case, the B and A is score only, right? It does not have the player ID information because the TreeMap sorting, the natural sorting, works on the key, not on the values. As the key over here is the score, it is calling this comparator method every time, so it is giving us O(N log N) for sorting the TreeMap."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, let me just think of the solution."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So, how will you store that element? I mean, how will you store the element in the TreeMap as part of, like, you'll be doing it as part of increase and decrease, right?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "No, no, no. For storing, it is using the HashMap only. But whenever `getLeader` is getting called, it is fetching all values of the HashMap and storing them into the TreeMap. And whenever it is storing to the TreeMap, this particular compare method will get called, and this will sort in the TreeMap only. But the actual data set will be stored in the HashMap only."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So, when you do that insertion and the sorting, the automatic sorting based on the comparator will happen, it will take O(N log N), right? O(N log N)."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, correct, correct, correct. Yeah."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So then, there will be a better way you can optimize sorting, right?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So, what we will do, Sarf, we will create a TreeMap, and we will store the score as a key. And we will store a HashSet of the player ID. So, this will be a set of player IDs, whichever have the same score. Let's say we have players A, B, C, D. Let's say B and D have the same score, five. This will have seven, and this will have... Okay. So, let's say P and D have the same score. This B and D will be saved into the same HashSet. So, whenever this TreeMap will sort the things, whenever we will try to fetch it, we will fetch the last element. As this score is an integer, it will sort automatically in the TreeMap. And whenever we'll try to fetch it, it will fetch only the last element, that is, in the increasing order of the TreeMap."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, so basically, you'll be going ahead with the default sorting, which is in ascending order. You will get the entry. So, the collection you are using is because you can have the same score with multiple players, that's why you're using a collection. But why HashSet? Why not go with the default?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Definitely, because this player ID is unique. This player will not be a duplicate. That's why. And also, you need to perform insertion or deletion on those same, that is, the HashMap for, right? Whenever we will store the insertion and deletion, the actual data set will be the HashMap. We will fetch the value from there, and whenever the increasing and decreasing will happen, then we will update both data sets, that is, HashMap as well as the TreeMap."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so let's say in the `increaseScore`, let's say the `increaseScore` for player A is called. Then it will increase the score to four, right? So, in the TreeMap, the entry for this A to three needs to be deleted, right? So, we need to perform the deletion operation into `increaseScore` as well as `decreaseScore`. That deletion operation will happen using O(log N) time complexity."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So, when you are inserting a new score or deleting a new score, or deleting the old score, at that time, internally it will restructure, so that takes O(log N). So, N is here the score, right? Or what is N here?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "That is a player which has the score in the HashSet. But your TreeMap is on the score, right? Your keys are scores, right? Yeah, yeah. N will be the score. Yeah, yeah, correct. You are correct, Sarf. N will be the score. So, TreeMap is storing the score as a key, and we need to traverse this key. Yeah, that's why N will be the score. Yes."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So, what is the overall complexity when it comes to increase, decrease, and `getLeader`?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "For `getLeader`, it is O(1) only. For `increaseScoreByOne` and `decreaseScoreByOne`, that would be O(log N). So, the overall time complexity will be O(log N)."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Sure, so go ahead with the implementation. You can define your edge cases through your different scenarios through the main method, and then what is the expected outcome of your methods, right? You can list that and then you can execute it as part of your..."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, sure, sure. So, I will create an object-oriented structure over here. So, I will create a separate class for handling all these scenarios, and I will pass the data from the main class with the main method. Got it. Okay, shall I go ahead?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, go ahead."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So, one question, Sarf. `getLeader` will return only a string, right? That is, whichever is the player ID. Okay, we'll return player ID. Player ID with max score."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So, you fetched the current score, then you updated the map with the score. Now I need to update the TreeMap also. So, what I need to do? I need to fetch the map, that is, `sortedMap.get(currentScore)`. I need to fetch it. Then I need to update the TreeMap. `sortedMap.get(currentScore).playerID`. If this is `sortedMap.get(currentScore).playerID`, I need to remove that. Okay. So, existing score, you are removing the current player. Correct, correct, yeah. Score data map.key sorted data map.get current score. This condition is also not required, I guess. I can directly remove that. Remove the player ID. Okay, I will remove from the sorted data map. And what I will do, I will update with the new score. What it obtained with the new score, and then I will update this is the empty HashSet it is initializing. So, I need to get the new score and add to the player ID. Okay, so the same thing I will do for `decreaseCurrentScore`. I will create. Okay, I will, if it is already zero, then I need to throw the exception, right? Yeah. Okay, if it is not, then I will go with the new score. So, `sortedMap.remove()`. Remove it from the TreeMap. Put. Okay, do add here. Okay, same thing has happened with these. Now I need to fetch this. This is the sorted data map. Last entry I need to get it. Last entry is returning things. `dot.getValue()` with new. And if `sortedDataMap` is empty, then we need to throw the exception, right?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So, what I will do, I will create the board. So, let's say if I call that `getLeader` at the top, yeah, so it should throw the error in that case. So, I have added, let's say, the `sortedDataMap` is empty, then it should throw the error. And we can validate that. Yeah, yeah. Shall I comment this thing? Yeah, that's better."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so what I'm doing, I'm storing the... Okay, shall I run the code?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yep, go ahead."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, it is throwing the leaderboard, 'don't have the data.' Okay, now just place this `getLeader` after line number 14."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So, we need to remove from here. Yeah, yeah, there's an exception, right? Yeah, yeah. So, we need to check here that the player ID exists or not. So, before removing that, we need to check if this particular score has the data or not. Right. Okay, contains the player ID, then we need to remove that. The same thing you have to do on the decrease also. We need to check first of all empty, and then we need to check. It will be a `containsKey`, right? Or you can also put it into a... This `contains` method is for the HashSet. Now, what I'm saying is you can club it into a single if statement, right? Instead of having `&&` that will be an AND condition, right? Yeah, yeah, yeah. That is correct. Yeah, yeah, we can add that. But if it is empty, for example, let's say we have added with the AND. If it is empty, it will also check this particular condition, and then it will throw for this particular `get` method. No, so first, how does the evaluation happen? It will first check for empty, right? If it is false, it does not evaluate for other conditions, right? Right, right. Or else, we can directly call the method of the remove over here instead of checking the `contains`. The `remove` will not remove the element. It will not throw the exception if the particular element is not present. So, let's check that. Okay, it may be possible it will throw the exception if we remove these things. So, what we are doing, we are calling `decrease` also, right? So, we need to put the same condition in the `decrease` also. Can we also do this thing? I think you have a condition, right? `sortedMap.putIfAbsent` for new score. Can we also do it for new? Yeah, sorry. Okay, so you want to check for `containsKey` then only go ahead. Will go ahead, correct. And the if condition, I will store the `map.do`. This should be fine, right? I think `containsKey` will be fine, right? You don't have to go ahead with the... Right, I think so. Let me just check. Okay, player one, right? Okay, okay. Let me try to decrease. This is increase. Yeah, yeah, this is the player one only because decrease we are decreasing the player two. Yeah, so let's say, you can increase player two a couple of more times. Okay, so call player two. Do you get the player two after this one more? Yeah. Okay, I'll try that. Get the player two right now. Okay, okay, okay. Right. What will happen if the score is the same? Okay, let me just test. It will give one of them. Okay, but we can test that thing. So, you have player ID one, which is having a score one, two, three, one. That is, this is the increase, this is the decrease. Okay, so this is three. I need to put one more player ID one, right? Okay, now this is the same number, that is, player one and player two. Okay, correct. So, let me just try this thing. It will give one of them. Okay, it is giving me both. Yeah, let me, I have over here, I'm returning both values, right? Yeah, it should give me one of them right now, right? Yeah, it is giving me both. Okay, so let's say, so this is your happy scenario. Let's say if we have to take it to production, what kind of challenges do you see with respect to your code?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So, for example, the main challenge is, let's say we are designing an actual leaderboard, then we should think about large data sets, as well as a large number of requests from many customers or users. So, the main challenge here is we are using an in-memory data structure. If we are designing the application, then we should use something like a cloud cache instead of storing into an in-memory data structure, because we are storing everything in the TreeMap and the HashMap. Instead of doing it like this, we can store it into the cache, which will give us efficient memory utilization for large data sets. Another thing here is that we are doing, if, let's say, we have a large number of requests coming to this particular method, it may be possible it will give us a time lapse because this is not a concurrent execution of this full implementation. We can implement it using concurrency to give us efficient or less..."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So, what kind of challenges do you see with respect to concurrency? What are the challenges coming as part of your concurrency?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "For this data set, we can use the concurrent collection framework. What I meant is, what kind of challenges with respect to, so let's say if two threads are accessing `increase` or `decrease` methods, in that case, let's say two or many threads are accessing the same method, then it will give us concurrent execution, or the data will be flickering between multiple threads. It will not give us synchronized data. It may be possible because we are not using concurrent collections here."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "What about consistency? Do you see consistency issues also?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, yeah, yeah, correct, correct. Consistency. We can also face issues if we get a large number of requests and if we use multi-threading here."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So, what kind of consistency issue do you see?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, updating the leaderboard map as well as updating the sorted data map in case of the `increaseScore` and `decreaseScore` methods. If one thread is increasing the score and another thread is decreasing the score, and in between `getLeader` is getting called, then we can get a false leader, or we can say the wrong data will be returned. A wrong leader will be returned if multiple threads are accessing `increaseScore` and `decreaseScore`."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So, how do you resolve this concurrency issue? What are the ways you can mitigate that?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "We can use the concurrent collection framework for the map as well as TreeMap. And for HashSet, I'm not sure we have a concurrent data set. And whenever we are updating or this particular method is getting called, both or that is `getLeader` also, then we should maintain synchronization by using any lock or synchronization mechanism. Yeah, that thing can handle the consistency issue."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "But let's say if you're using synchronization, it's not helping. There will be some kind of performance bottleneck, right? Because multiple threads, one thread has to wait for another thread to be completed, right? So, here the score is something which is changing, right? Where you are updating your new score for the player ID, right? What can you do to resolve this and still not compromise on the performance?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "The concurrent collection framework is one solution for this. Right, but yeah, the write part is synchronized; the read part is still an issue, right? Yeah, yeah, yeah. So, we can do one thing. We can apply synchronization to a particular block of the code only, which is affecting the current data set. For example, let's say we have one player ID, and we are, like, if I have a player ID one, I have to wait for that particular block to be executed for the player ID to move forward, right? Here, my score is something which is changing, right? What can I do to make my score thread-safe instead of putting the entire block to be synchronized?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So, you mean to say that is only the score? Then we can use `AtomicInteger` over here."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, so `AtomicInteger` will help you to make it thread-safe for the score, right? So, at any point in time, when you are updating the score, it will fetch the latest one, and then you'll be updating the current..."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, so I'll have another problem which I want to give you. I'm good with this problem statement. So, if I have an integer array, I'm sharing with you, and what I wanted is for you to give me the subarray with the largest sum. Basically, you're returning the sum value, but the subarray has to be continuous. So, in this case, if I consider the subarrays like 4, -1, 2, 1, I'll get the largest sum as six, which will be six as my output."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, okay. Let me, that is, what I need to do is the largest sum subarray. Yeah, so for the continuous subarray, basically. Okay, continuous subarray. You have to take the elements which are in a continuous manner. Oh, okay, okay. So, I need to give the largest sum of the subarray. Okay, so what we will do, this can be solved by using Kadane's algorithm. So, what is Kadane's algorithm? What it is doing, it is calculating the max of the array, and whenever it is going to a negative number, it is replacing it with zero. So, it is storing one, it is creating one variable which is initialized as zero, that will be `max`. And again, we will calculate the `currentMax`. What it is doing, it is checking the `max` and the `currentMax`. Whichever is greater, that will be the `max`. But whenever the `currentMax` or the `max` is getting to a negative number, it is coming to zero again. So, it is not maintaining the negative value. It is maintaining the positive value only."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So, what is the advantage of using Kadane's algorithm here?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "For calculating the... If you use brute force, we need to calculate the addition of the combination of each and every element, and then we will decide whichever is the max of the sum, then we will decide that that will be `max`, and we will return that particular max value. But if you use Kadane's algorithm here, the calculation of the sum of the subarray, it is giving us in the time complexity of O(N). So, basically, it is improving the time complexity, right? You have to take two pointers or two loops in order to find the... Yeah, yeah. Basically, Kadane's algorithm is working on the subarray. Instead of the sum, we can pick up any operation also. So, this is a well-known solution, or we can say, a reusable solution for multiple problems. You are knowing whatever the sum, previously checking the current sum, whether this kind of increases or decreases, and accordingly you are updating the value. Yeah, so shall I start implementing?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Sure, go ahead. Let me just run this thing. Okay."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "What is `currentMax` here? `currentMax` calculates the sum of the current value. So, let's say it is coming to the first position, it is calculating 0 plus minus 2. Let's say it is coming to one, it is calculating 0 plus 1, like that. Got it. Okay."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Is it the correct output for the... No, it will be six, right? So, you have 4, -1, 2, 1, that will be six. Okay, this one, right? So, you need to update your `currentMax` with the sum, right? I think it's not `currentMax`, right? You have to see the `currentSum`. Yeah, right, right, right. That is `currentSum`. We can over here, and this `currentMax` I need to update with the sum, correct? `currentMax` is greater than... Yeah, that it should run now. I think you don't require a statement like 78, right? Because what you're doing is you are changing your `currentMax`, checking whether the `currentMax` is greater than your... But your `currentSum` is greater than the `maxSum`, and if it is there, your `maxSum` will be updated. If it is negative, you'll be changing it to zero, right? So, you mean to say this is not required? I mean, this should be above. Yeah, this is not required then, right? But this case will not work for one edge case. Oh, what case here? For the negative scenario, if all numbers are negative. Yeah, then it will not work, right? So, what can you do to change that? Right now, your `currentMax` is zero, right? Yeah, right, right, right. Understood. We can do over here that is we will maintain the `currentMax` again, the minimum value of the integer. And in that case, we will remove this situation, that condition. Or you can put the first element of your array itself. Yeah, that is also fine. Okay, just check the -2, -1, -3, -4, -4. I'll just remove other elements so we can make it as this one. Yeah, from the last, you can remove it. The input array, you have to remove. Yeah, yeah. So, the value should be -1. Just run. First, we need to remove this one, right? Or the arrow. Oh, no, you still need that condition, right? The bottom condition, this one, this one. Yeah, and this condition we need to keep it as the array of zero. The max value will be your array of thing, right? Array of zero. Correct. So, this one also, the array of zero, right? Right. The `currentMax` is zero is fine. I think the max it will return something else in that case. Yeah, so the `currentMax` will be your zero. The value will be zero. Okay, okay. It is returning -1. Yes, that is correct. Yeah, yeah. Anyone, one, that is the sum of this array. Yes, yes. Understood. All right, I'm kind of done with the interview. Over to you. Shall I stop my sharing?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah. So, basically, I evaluated Pratik on the basis of his fundamentals, his problem-solving skills, how he defines the problem statement, then comes up with the problem scope, defines the edge cases, talks about the data structure he used in the problem, and then the complexity. He talked about different approaches, their pros and cons, and then came up with functional code. He also talked about non-functional requirements, where he discussed concurrency and challenges with large data sets. So, different approaches, instead of using in-memory data sets, he'll be using a cache. Then we also looked into another problem statement where we were finding the largest sum for the continuous subarray given the array, and he came up with Kadane's algorithm, where he talked about the advantage of using Kadane's algorithm because it solves with respect to time complexity and also with respect to space complexity. And also, he went through the solutioning of that and identified the edge cases and all. So, he handled that as part of his solution. Guys, thank you both, Sarf and Pratik, for this really great, exciting interview. And now, I would like to ask you to provide some feedback to each other."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Sarf is not acting like he's a leader on me and pressurizing me to solve the problem, so that's why I feel more comfortable from the interviewer, from Sarf. He is giving me more comfortability by discussing with me about the solution and how we can solve the problem in a better way, and what could be the time complexity to solve this kind of problem. So, that is the good thing that I have learned from Sarf: we are going from the start of the problem with the minimum requirement and with a very large data set with the actual application production code. So, that is the main thing which I learned from Sarf. Another thing is that Sarf asked me questions with such a kind of question which I can use multiple data structures and I can utilize multiple data structures in an efficient manner. Because the problem can be solved by using a single data structure also, but Sarf gave me one condition: we need to solve it in the best time complexity. So, I can think on this, and then I have given the solution which is giving us better time complexity by using multiple data structures. So, that is the learning path from me from Sarf. So, Sarf, what will be your verdict?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "I think it's important for a candidate to be confident, talk about their thought process with the interviewer, and ask clarifying questions. Because it's very important when you don't ask clarification questions, some assumptions will be made. The interviewer needs to know your assumptions or the expectation from the interviewer you should know, right? And also, it's very important to define the edge cases, so that way it will give the interviewer a perception that, 'Hey, this person is not thinking narrowly; it is broader thinking where he comes up with the edge cases, defining the scope, and then going ahead with the solution.' And also, I think Pratik has used the right naming conventions. So, when it comes to reading your code, it will be easier for an interviewer or someone to look into your code and understand what is happening within the code. So, I think using the right data structure, right naming convention, I think it's very important. I mean, he came up with all the right ingredients for that interview where he asked questions, clarified, defined the edge cases, came up with a solution. The code was functional. I mean, I think the code was readable also. It was following the SOLID principle. He came up with data encapsulation and all. So, I think it's the right ingredient. So, I think he is suitable for the role."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "If you enjoyed this video and found it helpful, don't forget to check out the links in the description to learn more about Anx and how it's transforming the way that we work. Also, make sure to subscribe to our YouTube channel and share this video with your friends and colleagues using your social media accounts, especially LinkedIn. It really helps us out. It's been Roman Zki here, and it's been a pleasure to have you with us. Thanks for watching, and see you next time. Yeah, oh yeah."
+    }
+  ],
+  "training_pairs": [
+    {
+      "question": "Can you please tell me what is the difference between LinkedList and ArrayList?",
+      "answer": "LinkedList basically works on address location and the node part. It stores actual data and the address of the next data. ArrayList stores data in an actual array internally. In Java, LinkedList uses a doubly LinkedList internally, pointing to both next and previous data locations.",
+      "follow_up": "How does memory allocation happen with respect to static versus dynamic? How is it different in ArrayList and how is it different in LinkedList?"
+    },
+    {
+      "question": "If I have a constraint on space, if I have to choose between LinkedList and ArrayList, what kind of data structure would I go with?",
+      "answer": "If there are constraints in memory location, we should go with the LinkedList. Because, according to the structure of the LinkedList, it stores the data at random spaces. So, we can use whichever available space in our memory efficiently by spreading the data and storing its memory location into the current node. That's how we should choose the LinkedList over there.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Can you please tell me how the internals of HashMap look like?",
+      "answer": "Internally, the HashMap stores key and value. It resolves collisions; before Java 8, it used a doubly LinkedList, but in Java 8, it uses a binary search tree where each key is stored. This allows searching using the binary search algorithm, which is more efficient.",
+      "follow_up": "So, let's say if a collision happens with the key, how does it resolve that? What kind of techniques does it use?"
+    },
+    {
+      "question": "You mentioned the LinkedList is being stored, but how does it guarantee that if we have a large set of data, how does it resolve that? Let's say if you have a key with multiple collisions, and you are storing that value. Now, how do you resolve it in a faster way to provide access to the values for that particular key? For example, if you have a key 'XYZ' and corresponding values, and the same key can have multiple values, how can I fetch those in a LinkedList manner?",
+      "answer": "Whenever we have the same key and the hash code is also the same, it stores them in a LinkedList linearly. It fetches the full LinkedList for that key and then traverses one by one to find the element, resulting in O(N) complexity. To optimize this, Java 8 improved it by converting large lists to a binary search tree, allowing searches in O(log N) time.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "How are Merge Sort and Quick Sort different? Which one is better?",
+      "answer": "One is not inherently better; they suit different scenarios. Quick Sort is for very large datasets, using a divide-and-conquer approach with a pivot element. It's not suitable for small datasets due to heavy division operations. Merge Sort is better for small datasets, merging subsets by calculating and placing elements. Quick Sort creates data sets based on a pivot, while Merge Sort creates subsets.",
+      "follow_up": "So, if we consider the complexity, what is the complexity in the worst-case scenario in both cases?"
+    },
+    {
+      "question": "Design and implement a leaderboard with three methods: `increaseScoreByOne`, `decreaseScoreByOne`, and `getLeader`. `increaseScoreByOne` increments a player's score by one, `decreaseScoreByOne` decrements it by one, and `getLeader` returns the player ID with the maximum score. Your implementation should consider data structure choice, complexity, edge cases, and functional code. The focus should be on time complexity first.",
+      "answer": "Initially, I would use a `HashMap<PlayerID, Score>` for O(1) `increase` and `decrease` operations. For `getLeader`, I would sort the map by value, which would be O(N log N), or traverse it, which is O(N). However, for better performance, I would use a `TreeMap<Score, HashSet<PlayerID>>` where the score is the key (allowing automatic sorting) and a HashSet stores player IDs for players with the same score. This would make `increase` and `decrease` O(log N) and `getLeader` O(1) by fetching the last entry.",
+      "follow_up": "What kind of challenges do you see with respect to concurrency? What are the challenges coming as part of your concurrency?"
+    },
+    {
+      "question": "What kind of consistency issue do you see when multiple threads access `increaseScore` and `decreaseScore` methods, and `getLeader` is called in between?",
+      "answer": "If one thread increases a score and another decreases it, and `getLeader` is called concurrently, we could get a false or wrong leader. This is because the leaderboard map and sorted data map might not be updated synchronously across threads, leading to inconsistent data being returned.",
+      "follow_up": "So, how do you resolve this concurrency issue? What are the ways you can mitigate that?"
+    },
+    {
+      "question": "How can you resolve concurrency issues in the leaderboard design without compromising performance, especially when the score is frequently changing?",
+      "answer": "We can use concurrent collection frameworks for the map and TreeMap. For thread-safe score updates without blocking the entire method, we can use `AtomicInteger` for the score itself. This ensures that when updating the score, it fetches the latest value and updates it atomically, improving performance compared to broad synchronization blocks.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Given an integer array, find the subarray with the largest sum. The subarray has to be continuous. For example, for [4, -1, 2, 1], the largest sum is 6.",
+      "answer": "This problem can be solved using Kadane's algorithm. It calculates the maximum sum of a subarray by iterating through the array. It maintains a `currentMax` sum, adding elements to it. If `currentMax` becomes negative, it resets to zero, as a negative sum would only decrease the total. It also keeps track of a global `maxSum` found so far.",
+      "follow_up": "So, what is the advantage of using Kadane's algorithm here?"
+    },
+    {
+      "question": "What is the advantage of using Kadane's algorithm for finding the largest sum subarray?",
+      "answer": "The main advantage is its time complexity. Kadane's algorithm solves the problem in O(N) time, which is significantly more efficient than a brute-force approach that would involve nested loops and result in O(N^2) complexity. It effectively improves both time and space complexity by making a single pass through the array.",
+      "follow_up": "NONE"
+    }
+  ]
+}

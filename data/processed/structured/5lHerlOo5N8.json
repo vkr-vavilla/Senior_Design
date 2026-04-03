@@ -1,0 +1,37 @@
+{
+  "video_id": "5lHerlOo5N8",
+  "summary": "An employee describes a critical production outage caused by a Java migration, the immediate rollback, and the subsequent root cause analysis and preventative measures.",
+  "quality_flags": [
+    "Number of training pairs is less than the recommended 8-30 due to transcript length."
+  ],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "For today's software engineering interview, describe a time where you deployed code that took down a production environment."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I was working as a software engineer on a network automation team at Amazon and I was in charge of a suite of microservices that handled about 10 million requests per day. I was tasked with migrating a legacy service from Java 8 to Java 17 to improve maintainability and performance. I upgraded to JDK 17 locally, fixed a few issues caused by the differences in encapsulation between JDK 8 and JDK 17, then deployed to a test environment where everything ran well. I deployed to a pre-production environment and let the change bake while people were using it for a week to make sure that everything worked well and there were no edge cases that I had missed with real traffic. After that, I partnered with another engineer for a controlled deployment process. Within five minutes of the production deployment, customers started complaining in Slack that the service was completely down. After confirming the change was related to our recent deployment, I immediately rolled everything back and service was restored."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And what did you do after you fixed the issue in production?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "After service was restored, we worked on finding the root cause, which was a difference in the way that the runtime was set between production and pre-production environments. I wrote a detailed post-mortem document and created alarms and test cases to make sure this never happens again in the future."
+    }
+  ],
+  "training_pairs": [
+    {
+      "question": "Describe a time where you deployed code that took down a production environment.",
+      "answer": "I was working as a software engineer on a network automation team at Amazon and I was in charge of a suite of microservices that handled about 10 million requests per day. I was tasked with migrating a legacy service from Java 8 to Java 17 to improve maintainability and performance. I upgraded to JDK 17 locally, fixed a few issues caused by the differences in encapsulation between JDK 8 and JDK 17, then deployed to a test environment where everything ran well. I deployed to a pre-production environment and let the change bake while people were using it for a week to make sure that everything worked well and there were no edge cases that I had missed with real traffic. After that, I partnered with another engineer for a controlled deployment process. Within five minutes of the production deployment, customers started complaining in Slack that the service was completely down. After confirming the change was related to our recent deployment, I immediately rolled everything back and service was restored.",
+      "follow_up": "And what did you do after you fixed the issue in production?"
+    },
+    {
+      "question": "And what did you do after you fixed the issue in production?",
+      "answer": "After service was restored, we worked on finding the root cause, which was a difference in the way that the runtime was set between production and pre-production environments. I wrote a detailed post-mortem document and created alarms and test cases to make sure this never happens again in the future.",
+      "follow_up": "NONE"
+    }
+  ]
+}

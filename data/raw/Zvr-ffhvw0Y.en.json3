@@ -1,0 +1,2413 @@
+{
+  "wireMagic": "pb3",
+  "pens": [ {
+  
+  } ],
+  "wsWinStyles": [ {
+  
+  } ],
+  "wpWinPositions": [ {
+  
+  } ],
+  "events": [ {
+    "tStartMs": 1209,
+    "dDurationMs": 5211,
+    "segs": [ {
+      "utf8": "[Music] hey guys welcome to another system design \nmock interview I'm excited about this one because  "
+    } ]
+  }, {
+    "tStartMs": 6420,
+    "dDurationMs": 6720,
+    "segs": [ {
+      "utf8": "we have the man from one of our favorite channels \nit is “Jordan has no life” and it's Jordan himself  "
+    } ]
+  }, {
+    "tStartMs": 13140,
+    "dDurationMs": 5940,
+    "segs": [ {
+      "utf8": "how you doing Jordan? well fine thanks for having \nme on so just to give a quick introduction about  "
+    } ]
+  }, {
+    "tStartMs": 19080,
+    "dDurationMs": 4560,
+    "segs": [ {
+      "utf8": "myself like Tom mentioned I run a YouTube \nchannel focused on system design interviews  "
+    } ]
+  }, {
+    "tStartMs": 23640,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "and in addition to that I also work as a software \nengineer I was previously working at Google and  "
+    } ]
+  }, {
+    "tStartMs": 28560,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "now I work at a high frequency Trading Company so \nhopefully I have a decent idea of what's going on  "
+    } ]
+  }, {
+    "tStartMs": 33480,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "when it comes to this particular design anyways \nI'll let it get back to him yeah great to have you  "
+    } ]
+  }, {
+    "tStartMs": 38160,
+    "dDurationMs": 5220,
+    "segs": [ {
+      "utf8": "on Jordan and yeah it is a good channel I know a \nlot of some of our subscribers actually requested  "
+    } ]
+  }, {
+    "tStartMs": 43380,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "you to have to come on here um if you haven't \nseen Jordan's Channel then do go check it out  "
+    } ]
+  }, {
+    "tStartMs": 49080,
+    "dDurationMs": 9000,
+    "segs": [ {
+      "utf8": "all right um should we get straight into \nthe interview let's do it all right yeah so  "
+    } ]
+  }, {
+    "tStartMs": 58080,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "um Jordan has seen the question ahead of this \num I wanted to to try and kind of guarantee  "
+    } ]
+  }, {
+    "tStartMs": 63000,
+    "dDurationMs": 4860,
+    "segs": [ {
+      "utf8": "that we had a high quality answer that was as \nuseful as possible for for you guys Jordan the  "
+    } ]
+  }, {
+    "tStartMs": 67860,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "question I want to ask you today is how would \nyou design a stock trading app such as Robinhood"
+    } ]
+  }, {
+    "tStartMs": 73740,
+    "dDurationMs": 13620,
+    "segs": [ {
+      "utf8": "all right so yeah thanks for letting me \nget into it let's see if I can type at all  "
+    } ]
+  }, {
+    "tStartMs": 89340,
+    "dDurationMs": 5820,
+    "segs": [ {
+      "utf8": "okay that seems to work so I guess like you \nmentioned we're designing a stock trading  "
+    } ]
+  }, {
+    "tStartMs": 95160,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "app I'm going to use Robinhood since the that's \nkind of the one that I know about the most and so  "
+    } ]
+  }, {
+    "tStartMs": 100860,
+    "dDurationMs": 4500,
+    "segs": [ {
+      "utf8": "um you know I guess I'm gonna try and lay out \nideally the requirements of something like this  "
+    } ]
+  }, {
+    "tStartMs": 105360,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "so the ones that I can think of are of course \nthings like sending orders and of course you  "
+    } ]
+  }, {
+    "tStartMs": 111120,
+    "dDurationMs": 5820,
+    "segs": [ {
+      "utf8": "know keeping track of positions that a certain \nyou know client or customer might actually have  "
+    } ]
+  }, {
+    "tStartMs": 116940,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "and also of course this is the one I want to focus \non so I'm going to put two asterisks here showing  "
+    } ]
+  }, {
+    "tStartMs": 123300,
+    "dDurationMs": 8760,
+    "segs": [ {
+      "utf8": "the actual correct price of stock or options the \nreason for that being that I think when it comes  "
+    } ]
+  }, {
+    "tStartMs": 132060,
+    "dDurationMs": 4740,
+    "segs": [ {
+      "utf8": "to actually sending orders and maintaining \nyour customers like actual Holdings that's  "
+    } ]
+  }, {
+    "tStartMs": 136800,
+    "dDurationMs": 4560,
+    "segs": [ {
+      "utf8": "kind of trivial you can do that pretty simply \nwith a couple databases maybe you'll have to  "
+    } ]
+  }, {
+    "tStartMs": 141360,
+    "dDurationMs": 4500,
+    "segs": [ {
+      "utf8": "Shard them a little bit if you really do have a \nton of users but for the most part you know all  "
+    } ]
+  }, {
+    "tStartMs": 145860,
+    "dDurationMs": 4620,
+    "segs": [ {
+      "utf8": "the exchanges have an API you're basically just \nforwarding their orders there I think in reality  "
+    } ]
+  }, {
+    "tStartMs": 150480,
+    "dDurationMs": 3600,
+    "segs": [ {
+      "utf8": "that gets a little bit more complex with payment \nfor order flow and things like that but we're not  "
+    } ]
+  }, {
+    "tStartMs": 154080,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "going to touch upon that too much ideally so I \nguess my question for you Tom then would be what  "
+    } ]
+  }, {
+    "tStartMs": 159840,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "are the type of capacity estimates we're looking \nat basically how many users and how many stocks  "
+    } ]
+  }, {
+    "tStartMs": 164760,
+    "dDurationMs": 9000,
+    "segs": [ {
+      "utf8": "per user were you thinking yeah sure let's say \n100 million users and around 100 stocks per user"
+    } ]
+  }, {
+    "tStartMs": 175800,
+    "dDurationMs": 9060,
+    "segs": [ {
+      "utf8": "100 million and 100 per user okay so I guess \nthat gives me a couple of ideas here in the  "
+    } ]
+  }, {
+    "tStartMs": 184860,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "sense that you know we do have 100 million users \nso obviously we're talking not just a 100 million  "
+    } ]
+  }, {
+    "tStartMs": 191100,
+    "dDurationMs": 5640,
+    "segs": [ {
+      "utf8": "users but since we have 100 million stocks per \nuser we're looking at now let's see what comes  "
+    } ]
+  }, {
+    "tStartMs": 196740,
+    "dDurationMs": 4800,
+    "segs": [ {
+      "utf8": "after a million I want to say a billionaire a \nbillion oh my gosh and then 10 billion after  "
+    } ]
+  }, {
+    "tStartMs": 201540,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "that because it's a hundred so we now have 10 \nbillion positions to basically keep track of  "
+    } ]
+  }, {
+    "tStartMs": 206580,
+    "dDurationMs": 5400,
+    "segs": [ {
+      "utf8": "that's a lot of data to obviously worry about \nwhen multiplying the two of those so yeah a  "
+    } ]
+  }, {
+    "tStartMs": 211980,
+    "dDurationMs": 6660,
+    "segs": [ {
+      "utf8": "lot of positions but I guess from here I am \ngoing to again talk about my main concerns  "
+    } ]
+  }, {
+    "tStartMs": 219720,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "because like I mentioned the part of this problem \nthat I'm really hoping to focus on if that's all  "
+    } ]
+  }, {
+    "tStartMs": 224820,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "right with you Tom is actually showing the correct \nprice of the stock or the option because I think  "
+    } ]
+  }, {
+    "tStartMs": 229500,
+    "dDurationMs": 7080,
+    "segs": [ {
+      "utf8": "that is kind of the the real complexity here so \nmy main concerns are I want each client device  "
+    } ]
+  }, {
+    "tStartMs": 238320,
+    "dDurationMs": 4320,
+    "segs": [ {
+      "utf8": "to have a minimal load because if each \nclient device is connected to too many  "
+    } ]
+  }, {
+    "tStartMs": 242640,
+    "dDurationMs": 3840,
+    "segs": [ {
+      "utf8": "of our servers at one time we could be \ndraining the battery we could be using  "
+    } ]
+  }, {
+    "tStartMs": 246480,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "too much data and that would you know be a \nproblem and then also it would be great if  "
+    } ]
+  }, {
+    "tStartMs": 251400,
+    "dDurationMs": 6480,
+    "segs": [ {
+      "utf8": "um you know we weren't connecting too many systems \nto The Exchange you know limiting our systems  "
+    } ]
+  }, {
+    "tStartMs": 258600,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "with the exchange connectivity the reason \nbeing that you have to pay for that and if  "
+    } ]
+  }, {
+    "tStartMs": 264480,
+    "dDurationMs": 4620,
+    "segs": [ {
+      "utf8": "we're Robinhood we don't want to pay for too much \nof it you know we don't want to be collecting too  "
+    } ]
+  }, {
+    "tStartMs": 269100,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "much data if we can avoid doing it just keeping \nit within our system so yeah do you have any  "
+    } ]
+  }, {
+    "tStartMs": 274860,
+    "dDurationMs": 4980,
+    "segs": [ {
+      "utf8": "questions about just like a general design \nor anything Jordan works at a high frequency  "
+    } ]
+  }, {
+    "tStartMs": 279840,
+    "dDurationMs": 4560,
+    "segs": [ {
+      "utf8": "Trading Company so obviously has a really strong \nknowledge of how these kind of exchanges work you  "
+    } ]
+  }, {
+    "tStartMs": 284400,
+    "dDurationMs": 4320,
+    "segs": [ {
+      "utf8": "would not be expected to know all these things \ninstead you need to ask the interviewer the right  "
+    } ]
+  }, {
+    "tStartMs": 288720,
+    "dDurationMs": 4800,
+    "segs": [ {
+      "utf8": "questions in order to understand how the system \nwill need to work I like that Jordan has already  "
+    } ]
+  }, {
+    "tStartMs": 293520,
+    "dDurationMs": 3960,
+    "segs": [ {
+      "utf8": "clarified the area of the problem that he hopes \nto focus on and explains some of the issues that  "
+    } ]
+  }, {
+    "tStartMs": 297480,
+    "dDurationMs": 3840,
+    "segs": [ {
+      "utf8": "he knows are going to come up over the scope of \nhis design perhaps he could have come up with  "
+    } ]
+  }, {
+    "tStartMs": 301320,
+    "dDurationMs": 4380,
+    "segs": [ {
+      "utf8": "some of the capacity estimates himself but it's \nokay that you ask the interviewer instead let's  "
+    } ]
+  }, {
+    "tStartMs": 305700,
+    "dDurationMs": 3740,
+    "segs": [ {
+      "utf8": "get into it what's the you know what's the general \nbreakdown of the system that you want to go with"
+    } ]
+  }, {
+    "tStartMs": 309440,
+    "dDurationMs": 1000,
+    "segs": [ {
+      "utf8": "[Music]"
+    } ]
+  }, {
+    "tStartMs": 310440,
+    "dDurationMs": 11220,
+    "segs": [ {
+      "utf8": "sure okay um yeah so I've I've kind of thought \nabout having kind of three main pieces for the  "
+    } ]
+  }, {
+    "tStartMs": 321660,
+    "dDurationMs": 6180,
+    "segs": [ {
+      "utf8": "system and I guess I'm gonna write them down but \nthen I'll probably introduce them in a reverse  "
+    } ]
+  }, {
+    "tStartMs": 327840,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "order so the first is some like user layer \nand these are going to be servers that talk  "
+    } ]
+  }, {
+    "tStartMs": 333720,
+    "dDurationMs": 6960,
+    "segs": [ {
+      "utf8": "to our phone slash computers and then I'm \nalso going to have basically an exchange layer  "
+    } ]
+  }, {
+    "tStartMs": 341940,
+    "dDurationMs": 8340,
+    "segs": [ {
+      "utf8": "I can't spell sorry and I think these are going to \nbe the servers that are getting exchange data and  "
+    } ]
+  }, {
+    "tStartMs": 350280,
+    "dDurationMs": 4020,
+    "segs": [ {
+      "utf8": "like I mentioned a really nice thing about kind of \nsplitting these into their own layers is that we  "
+    } ]
+  }, {
+    "tStartMs": 354300,
+    "dDurationMs": 4080,
+    "segs": [ {
+      "utf8": "can scale them independently which is good because \nwe want to keep the exchange layer as small as  "
+    } ]
+  }, {
+    "tStartMs": 358380,
+    "dDurationMs": 6360,
+    "segs": [ {
+      "utf8": "possible and we want to keep the user layer you \nknow perhaps as big as as many client devices  "
+    } ]
+  }, {
+    "tStartMs": 364740,
+    "dDurationMs": 4020,
+    "segs": [ {
+      "utf8": "there are to make sure that each client device \nis just touching one piece of the user layer but  "
+    } ]
+  }, {
+    "tStartMs": 368760,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "I'll get into that in a bit and then we've also \ngot this routing layer so the first thing that I  "
+    } ]
+  }, {
+    "tStartMs": 374640,
+    "dDurationMs": 7260,
+    "segs": [ {
+      "utf8": "am going to try and cover at least in this video \nis the exchange layer and so for background for  "
+    } ]
+  }, {
+    "tStartMs": 381900,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "whoever's watching this because I think it's kind \nof important for something like Robinhood is that  "
+    } ]
+  }, {
+    "tStartMs": 386940,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "most exchanges are not publishing just like \nyou know apple is eighty dollars what they're  "
+    } ]
+  }, {
+    "tStartMs": 392700,
+    "dDurationMs": 8040,
+    "segs": [ {
+      "utf8": "publishing is that apple is you know it's got one \noffer so someone wants to buy it for 79 someone  "
+    } ]
+  }, {
+    "tStartMs": 400740,
+    "dDurationMs": 6780,
+    "segs": [ {
+      "utf8": "wants to buy it for 78.5 someone wants to buy it \nfor 78 and then also on the other side of that  "
+    } ]
+  }, {
+    "tStartMs": 407520,
+    "dDurationMs": 5820,
+    "segs": [ {
+      "utf8": "someone wants to sell it for eighty one dollars \nsomeone wants to sell it for 81.3 dollars and  "
+    } ]
+  }, {
+    "tStartMs": 413340,
+    "dDurationMs": 6660,
+    "segs": [ {
+      "utf8": "someone wants to sell it for it I don't know 81.6 \ndollars so the exchange is never actually giving  "
+    } ]
+  }, {
+    "tStartMs": 420000,
+    "dDurationMs": 5460,
+    "segs": [ {
+      "utf8": "you a price that um you know is going directly to \nthe customer and what we see in Robinhood which  "
+    } ]
+  }, {
+    "tStartMs": 425460,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "is kind of nice it simplifies things for us is \none unified price it's you know basically this  "
+    } ]
+  }, {
+    "tStartMs": 431160,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "guy right here and so as a result of that what \nwe need to basically do is you know take the  "
+    } ]
+  }, {
+    "tStartMs": 436920,
+    "dDurationMs": 6780,
+    "segs": [ {
+      "utf8": "above hopefully you can see me highlighting \nstuff and we need to convert it and another  "
+    } ]
+  }, {
+    "tStartMs": 443700,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "kind of piece of that which makes this hard is \nwhat I just showed above is just one Exchange  "
+    } ]
+  }, {
+    "tStartMs": 450000,
+    "dDurationMs": 6660,
+    "segs": [ {
+      "utf8": "but in reality there are a bunch of exchanges that \nare publishing the same different data you know I  "
+    } ]
+  }, {
+    "tStartMs": 456660,
+    "dDurationMs": 4380,
+    "segs": [ {
+      "utf8": "think maybe this is less so the case for stocks I \nactually can't remember but you know for options  "
+    } ]
+  }, {
+    "tStartMs": 461040,
+    "dDurationMs": 11460,
+    "segs": [ {
+      "utf8": "exchanges you might have like 78.7 and 78.3 and \n78.1 and 81.6 and so basically what this is known  "
+    } ]
+  }, {
+    "tStartMs": 472500,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "as is called like the order book and you know \nthe point is there's all this data throughout  "
+    } ]
+  }, {
+    "tStartMs": 478200,
+    "dDurationMs": 4140,
+    "segs": [ {
+      "utf8": "all these different exchanges and we have to \naggregate it somehow in order to provide just  "
+    } ]
+  }, {
+    "tStartMs": 482340,
+    "dDurationMs": 8340,
+    "segs": [ {
+      "utf8": "one price to our user and that's what we would \ncall the nbdo and the nbbo is basically like what  "
+    } ]
+  }, {
+    "tStartMs": 490680,
+    "dDurationMs": 7500,
+    "segs": [ {
+      "utf8": "I'm gonna say is the the best bid which is like \nyou know the best thing on the left side here the  "
+    } ]
+  }, {
+    "tStartMs": 498180,
+    "dDurationMs": 4620,
+    "segs": [ {
+      "utf8": "best price that people are willing to buy for no \none else is willing to sell for and then also the  "
+    } ]
+  }, {
+    "tStartMs": 502800,
+    "dDurationMs": 6480,
+    "segs": [ {
+      "utf8": "best offer and I think in my mind what I'd like \nto do is probably return to users the best bid  "
+    } ]
+  }, {
+    "tStartMs": 510120,
+    "dDurationMs": 6300,
+    "segs": [ {
+      "utf8": "plus best offer divided by two do you think \nthat seems General generally reasonable  "
+    } ]
+  }, {
+    "tStartMs": 517740,
+    "dDurationMs": 5580,
+    "segs": [ {
+      "utf8": "yeah okay okay sure so yeah I mean there are many \ndifferent ways we can show this we could do like  "
+    } ]
+  }, {
+    "tStartMs": 523320,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "a weighted average or something but for now I'm \ngoing to be focusing on just you know providing  "
+    } ]
+  }, {
+    "tStartMs": 528000,
+    "dDurationMs": 5460,
+    "segs": [ {
+      "utf8": "a really easy evaluation which is just the best \nbid plus the best to offer divided by two you know  "
+    } ]
+  }, {
+    "tStartMs": 533460,
+    "dDurationMs": 4860,
+    "segs": [ {
+      "utf8": "the average of the two in the order book and so \nthe issue now is that we're getting all of this  "
+    } ]
+  }, {
+    "tStartMs": 538320,
+    "dDurationMs": 9660,
+    "segs": [ {
+      "utf8": "feed data per exchange and yeah I mean there are \na lot of exchanges so if you have any issues with  "
+    } ]
+  }, {
+    "tStartMs": 547980,
+    "dDurationMs": 4860,
+    "segs": [ {
+      "utf8": "how I'm handling this so yeah how how are you \ngoing to deal with that you know there's many  "
+    } ]
+  }, {
+    "tStartMs": 552840,
+    "dDurationMs": 5400,
+    "segs": [ {
+      "utf8": "exchanges when you're calculating the base price \nin your publishing layer what's your sure right  "
+    } ]
+  }, {
+    "tStartMs": 559080,
+    "dDurationMs": 2700,
+    "segs": [ {
+      "utf8": "so I guess the issue is you \nknow we have a lot of tickers"
+    } ]
+  }, {
+    "tStartMs": 563820,
+    "dDurationMs": 2940,
+    "segs": [ {
+      "utf8": "and when I say A ticker I mean \nlike symbols you know like  "
+    } ]
+  }, {
+    "tStartMs": 567780,
+    "dDurationMs": 6600,
+    "segs": [ {
+      "utf8": "Apple or Google or meta and those are all the \nstock names and we've also got a lot of data  "
+    } ]
+  }, {
+    "tStartMs": 574380,
+    "dDurationMs": 6120,
+    "segs": [ {
+      "utf8": "and so we probably need some amount of \nsharding um but in my head like you know  "
+    } ]
+  }, {
+    "tStartMs": 580500,
+    "dDurationMs": 4320,
+    "segs": [ {
+      "utf8": "you you need to make sure that all of the \ndata from an individual ticker regardless of  "
+    } ]
+  }, {
+    "tStartMs": 584820,
+    "dDurationMs": 6780,
+    "segs": [ {
+      "utf8": "exchange is going to the same node so personally \nI would like to kind of Shard The Exchange layer  "
+    } ]
+  }, {
+    "tStartMs": 593400,
+    "dDurationMs": 7440,
+    "segs": [ {
+      "utf8": "by ticker symbol and then you know \nwithin one node we'll do some processing"
+    } ]
+  }, {
+    "tStartMs": 602940,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "and ideally what that processing is going to \nlead us to is getting our nbbo and taking the  "
+    } ]
+  }, {
+    "tStartMs": 608700,
+    "dDurationMs": 7080,
+    "segs": [ {
+      "utf8": "average of it so that we can give that back to our \ncustomers Okay so kind of what I was thinking from  "
+    } ]
+  }, {
+    "tStartMs": 615780,
+    "dDurationMs": 6420,
+    "segs": [ {
+      "utf8": "there and you know let me know if you're okay with \nme going down this path is it's not like a trivial  "
+    } ]
+  }, {
+    "tStartMs": 622200,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "task to actually get all of the data from these \nexchanges and like quickly republish it so would  "
+    } ]
+  }, {
+    "tStartMs": 627960,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "you mind if I did like a little brief Deep dive \ninto the algorithm I was hoping to use in order to  "
+    } ]
+  }, {
+    "tStartMs": 633480,
+    "dDurationMs": 7560,
+    "segs": [ {
+      "utf8": "do that yeah please do okay so yeah I mean let me \nknow if you think I'm going in the right direction  "
+    } ]
+  }, {
+    "tStartMs": 641040,
+    "dDurationMs": 6300,
+    "segs": [ {
+      "utf8": "but kind of tentatively my plan was to kind of \nhave something like this so we know each Exchange  "
+    } ]
+  }, {
+    "tStartMs": 648720,
+    "dDurationMs": 12000,
+    "segs": [ {
+      "utf8": "is publishing data and you know on a node we \nneed to know best bid and best asked best ask  "
+    } ]
+  }, {
+    "tStartMs": 660720,
+    "dDurationMs": 9420,
+    "segs": [ {
+      "utf8": "at all times and you know when a new best \nbid or best ask comes in from an exchange  "
+    } ]
+  }, {
+    "tStartMs": 671520,
+    "dDurationMs": 3540,
+    "segs": [ {
+      "utf8": "it means that we need to \nbasically invalidate the old one  "
+    } ]
+  }, {
+    "tStartMs": 676980,
+    "dDurationMs": 3720,
+    "segs": [ {
+      "utf8": "and so what I was thinking is \nactually kind of maintaining like  "
+    } ]
+  }, {
+    "tStartMs": 682080,
+    "dDurationMs": 4260,
+    "segs": [ {
+      "utf8": "a doubly link so basically you know on \none given node let's say just for Apple  "
+    } ]
+  }, {
+    "tStartMs": 687120,
+    "dDurationMs": 6660,
+    "segs": [ {
+      "utf8": "I would do the following I would say like \nexchange one is saying the best bid is eighty  "
+    } ]
+  }, {
+    "tStartMs": 693780,
+    "dDurationMs": 6960,
+    "segs": [ {
+      "utf8": "dollars exchange two is saying the best bid is \neighty one dollars and exchange three is saying  "
+    } ]
+  }, {
+    "tStartMs": 700740,
+    "dDurationMs": 6540,
+    "segs": [ {
+      "utf8": "the best bid is eighty two dollars so that means \nthat you know the national best bid is eighty two  "
+    } ]
+  }, {
+    "tStartMs": 707280,
+    "dDurationMs": 4080,
+    "segs": [ {
+      "utf8": "dollars because that's how much someone is like \nwilling to buy the stock for at the most price  "
+    } ]
+  }, {
+    "tStartMs": 712320,
+    "dDurationMs": 6180,
+    "segs": [ {
+      "utf8": "and so am I thinking from there was to basically \nyou know we want to be able to get that highest  "
+    } ]
+  }, {
+    "tStartMs": 718500,
+    "dDurationMs": 4800,
+    "segs": [ {
+      "utf8": "number as quickly as possible and how I \nwould want to organize these things is in  "
+    } ]
+  }, {
+    "tStartMs": 723300,
+    "dDurationMs": 5460,
+    "segs": [ {
+      "utf8": "a linked list right so shoot I can't draw it \nwould be great if I had my iPad alas I don't  "
+    } ]
+  }, {
+    "tStartMs": 730080,
+    "dDurationMs": 5580,
+    "segs": [ {
+      "utf8": "um so you know we kind of make a linked list but \nthe nice thing about this is that if we ever need  "
+    } ]
+  }, {
+    "tStartMs": 735660,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "to quickly compute the highest value we'll make \nsure that our linked list stays sorted so that 82  "
+    } ]
+  }, {
+    "tStartMs": 741360,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "is always at the top however for our linked list \nto stay sorted we actually need to be pretty smart  "
+    } ]
+  }, {
+    "tStartMs": 747060,
+    "dDurationMs": 6300,
+    "segs": [ {
+      "utf8": "about how we organize things so I think what I \nwould like to do is do a doubly can't spell link  "
+    } ]
+  }, {
+    "tStartMs": 753360,
+    "dDurationMs": 7800,
+    "segs": [ {
+      "utf8": "list with a hash map and the nice thing about this \nhash map is that you know if I say oh shoot a new  "
+    } ]
+  }, {
+    "tStartMs": 761160,
+    "dDurationMs": 6540,
+    "segs": [ {
+      "utf8": "piece of data from exchange 2 is coming in let's \nsay someone bids 83 on Exchange two I could see  "
+    } ]
+  }, {
+    "tStartMs": 767700,
+    "dDurationMs": 6900,
+    "segs": [ {
+      "utf8": "that you know the node for 81 is here because it's \na doubly linked list I could quickly remove 81.  "
+    } ]
+  }, {
+    "tStartMs": 774600,
+    "dDurationMs": 9180,
+    "segs": [ {
+      "utf8": "in constant time so this is O of 1 removes and \nthen what I could do from there is I could shoot  "
+    } ]
+  }, {
+    "tStartMs": 783780,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "how do I scroll down more is the question I \nfigured it out awesome okay what I could do  "
+    } ]
+  }, {
+    "tStartMs": 789540,
+    "dDurationMs": 9540,
+    "segs": [ {
+      "utf8": "from there after I've done that is I could \nthen do an O of log n insert of my new node  "
+    } ]
+  }, {
+    "tStartMs": 800460,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "and in this case we would say okay we'll \ndo 83 why don't we get rid of this guy  "
+    } ]
+  }, {
+    "tStartMs": 807600,
+    "dDurationMs": 6120,
+    "segs": [ {
+      "utf8": "binary search the remaining list and then \nput 83 where it belongs so now we've got 83  "
+    } ]
+  }, {
+    "tStartMs": 814620,
+    "dDurationMs": 6900,
+    "segs": [ {
+      "utf8": "leads to 82 leads to 80 and we know our national \nbest bid is 83 amongst all of our exchanges which  "
+    } ]
+  }, {
+    "tStartMs": 821520,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "is great and then we could do the same exact thing \nfor the offers but obviously you know we want to  "
+    } ]
+  }, {
+    "tStartMs": 827220,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "see the lowest offer not the highest offer and \nthen we could just quickly compute the average"
+    } ]
+  }, {
+    "tStartMs": 835200,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "okay cool Jordan is a very good communicator \nand is giving a textbook performance of how to  "
+    } ]
+  }, {
+    "tStartMs": 840900,
+    "dDurationMs": 4260,
+    "segs": [ {
+      "utf8": "communicate in system design interviews the talks \nthrough his thought process with me very clearly  "
+    } ]
+  }, {
+    "tStartMs": 845160,
+    "dDurationMs": 5400,
+    "segs": [ {
+      "utf8": "he checks in at regular intervals to make sure I'm \non board he's also demonstrating strong technical  "
+    } ]
+  }, {
+    "tStartMs": 850560,
+    "dDurationMs": 4140,
+    "segs": [ {
+      "utf8": "skills his knowledge of the exchange has allowed \nhim to already get into complex considerations  "
+    } ]
+  }, {
+    "tStartMs": 854700,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "such as aggregating the large amount of data \nThe Exchange puts out via a stateful consumer  "
+    } ]
+  }, {
+    "tStartMs": 859620,
+    "dDurationMs": 3900,
+    "segs": [ {
+      "utf8": "these may have some fault tolerance issues down \nthe line so I'm curious to see how he approaches  "
+    } ]
+  }, {
+    "tStartMs": 863520,
+    "dDurationMs": 8160,
+    "segs": [ {
+      "utf8": "that that sound okay yeah um yeah so once the \nthe base price has been calculated how are you  "
+    } ]
+  }, {
+    "tStartMs": 871680,
+    "dDurationMs": 5820,
+    "segs": [ {
+      "utf8": "then going to get it to the user sure okay \nso yeah that's completely fair question and  "
+    } ]
+  }, {
+    "tStartMs": 878400,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "definitely something that's a bit complex \nabout Robin Hood in particular I think  "
+    } ]
+  }, {
+    "tStartMs": 883980,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "my kind of General thinking was and I mentioned \nthis earlier with my concerns is we want to limit  "
+    } ]
+  }, {
+    "tStartMs": 889980,
+    "dDurationMs": 7500,
+    "segs": [ {
+      "utf8": "the number of connections per client the \nreason being that you know we could have  "
+    } ]
+  }, {
+    "tStartMs": 897480,
+    "dDurationMs": 8460,
+    "segs": [ {
+      "utf8": "every single one of our Publishers let's say a \nclient has Apple Google meta the issue is these  "
+    } ]
+  }, {
+    "tStartMs": 905940,
+    "dDurationMs": 5580,
+    "segs": [ {
+      "utf8": "are all different notes right we're sharding by \nthese and so if a client has a hundred stocks  "
+    } ]
+  }, {
+    "tStartMs": 912300,
+    "dDurationMs": 5220,
+    "segs": [ {
+      "utf8": "that would mean they would have a hundred \ndifferent connections to publish your nodes"
+    } ]
+  }, {
+    "tStartMs": 919740,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "which is problematic for multiple reasons it's \nproblematic both on the client end because you  "
+    } ]
+  }, {
+    "tStartMs": 925260,
+    "dDurationMs": 4440,
+    "segs": [ {
+      "utf8": "know they would have to directly communicate \nwith those publisher nodes and that would be  "
+    } ]
+  }, {
+    "tStartMs": 929700,
+    "dDurationMs": 4260,
+    "segs": [ {
+      "utf8": "really bad because you're maintaining a bunch of \nactive server connections whether that's either  "
+    } ]
+  }, {
+    "tStartMs": 933960,
+    "dDurationMs": 4860,
+    "segs": [ {
+      "utf8": "long polling or web sockets or service-cent \nevents and you know that would either drain  "
+    } ]
+  }, {
+    "tStartMs": 938820,
+    "dDurationMs": 4380,
+    "segs": [ {
+      "utf8": "the device battery or it would potentially \njust you know use a ton of network data  "
+    } ]
+  }, {
+    "tStartMs": 943920,
+    "dDurationMs": 3480,
+    "segs": [ {
+      "utf8": "and also it would be bad for the publisher \nnodes because they're doing a decent amount  "
+    } ]
+  }, {
+    "tStartMs": 947400,
+    "dDurationMs": 4440,
+    "segs": [ {
+      "utf8": "of low latency calculations it would be really \ngreat if we could kind of decouple all of that  "
+    } ]
+  }, {
+    "tStartMs": 951840,
+    "dDurationMs": 10500,
+    "segs": [ {
+      "utf8": "logic so that's kind of where I was hoping my user \nlayer would come in so okay um yeah I guess let me  "
+    } ]
+  }, {
+    "tStartMs": 962340,
+    "dDurationMs": 6780,
+    "segs": [ {
+      "utf8": "know if you want to ask anything there yeah sorry \num so yeah how would you want them connected then  "
+    } ]
+  }, {
+    "tStartMs": 969840,
+    "dDurationMs": 7380,
+    "segs": [ {
+      "utf8": "sure so I guess I kind of alluded to this a second \nago that we could be talking about you know either  "
+    } ]
+  }, {
+    "tStartMs": 977220,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "long polling right because we have let's say Let \nme let me bring out the drawing right we've got  "
+    } ]
+  }, {
+    "tStartMs": 982260,
+    "dDurationMs": 9540,
+    "segs": [ {
+      "utf8": "our phone can I draw here yes I can oh can I \ndraw in there maybe not phone great looking  "
+    } ]
+  }, {
+    "tStartMs": 991800,
+    "dDurationMs": 7080,
+    "segs": [ {
+      "utf8": "phone nice job Jordan so we've got our phone and \nthen in addition to that we've got kind of our  "
+    } ]
+  }, {
+    "tStartMs": 998880,
+    "dDurationMs": 5640,
+    "segs": [ {
+      "utf8": "user layer and I'll see if I can draw in here it \nwould be awesome but I don't know that I can so"
+    } ]
+  }, {
+    "tStartMs": 1007040,
+    "dDurationMs": 4020,
+    "segs": [ {
+      "utf8": "user layer and so the question is you \nknow how do we want these two connected  "
+    } ]
+  }, {
+    "tStartMs": 1011900,
+    "dDurationMs": 4260,
+    "segs": [ {
+      "utf8": "my personal opinion I think because \nreally we have three options right we  "
+    } ]
+  }, {
+    "tStartMs": 1016160,
+    "dDurationMs": 4800,
+    "segs": [ {
+      "utf8": "can you know the user layer is constantly \ngoing to be publishing values and so that  "
+    } ]
+  }, {
+    "tStartMs": 1020960,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "makes us decide between basically where is my \ncursor right now it's making us decide between  "
+    } ]
+  }, {
+    "tStartMs": 1028400,
+    "dDurationMs": 4980,
+    "segs": [ {
+      "utf8": "websockets which is a real-time protocol it's \nmaking us decide between server sent events"
+    } ]
+  }, {
+    "tStartMs": 1035420,
+    "dDurationMs": 6360,
+    "segs": [ {
+      "utf8": "and it's also you know we have the choice to \nuse long polling where we basically open an HTTP  "
+    } ]
+  }, {
+    "tStartMs": 1041780,
+    "dDurationMs": 7980,
+    "segs": [ {
+      "utf8": "request on the user layer and then we maintain \nthat for the whole session and yeah that's um an  "
+    } ]
+  }, {
+    "tStartMs": 1049760,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "option as well personally I think I lean towards \nwebsockets the reason being that these are too  "
+    } ]
+  }, {
+    "tStartMs": 1055280,
+    "dDurationMs": 7440,
+    "segs": [ {
+      "utf8": "directional and they also reconnect automatically \nand you don't have to send request headers every  "
+    } ]
+  }, {
+    "tStartMs": 1062720,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "single time which is nice and the reason I care \nabout it being too directional is that our phone  "
+    } ]
+  }, {
+    "tStartMs": 1067820,
+    "dDurationMs": 12300,
+    "segs": [ {
+      "utf8": "is going to be you know phone is sending a ticker \nrequests to user layer and the user layer in turn  "
+    } ]
+  }, {
+    "tStartMs": 1080120,
+    "dDurationMs": 6420,
+    "segs": [ {
+      "utf8": "is going to be responding with basically you \nknow the the prices of the stock or the option  "
+    } ]
+  }, {
+    "tStartMs": 1087200,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "and I think that's you know pretty important just \nin the sense that you know being able to make sure  "
+    } ]
+  }, {
+    "tStartMs": 1092960,
+    "dDurationMs": 3960,
+    "segs": [ {
+      "utf8": "that connection is as fast as possible is going to \nensure that we're getting as much data as possible  "
+    } ]
+  }, {
+    "tStartMs": 1096920,
+    "dDurationMs": 6900,
+    "segs": [ {
+      "utf8": "and maintaining a low latency on our phone and \nalso just by keeping one connection between a user  "
+    } ]
+  }, {
+    "tStartMs": 1103820,
+    "dDurationMs": 7500,
+    "segs": [ {
+      "utf8": "device ideally and the user layer of our server \nI think that would be really really useful to us  "
+    } ]
+  }, {
+    "tStartMs": 1111320,
+    "dDurationMs": 8160,
+    "segs": [ {
+      "utf8": "and then ideally what I would want to do is you \nknow it's important yet again that we actually go  "
+    } ]
+  }, {
+    "tStartMs": 1119480,
+    "dDurationMs": 8820,
+    "segs": [ {
+      "utf8": "ahead and Shard our user layer because we have \n100 million users and that's a lot of devices  "
+    } ]
+  }, {
+    "tStartMs": 1129080,
+    "dDurationMs": 8460,
+    "segs": [ {
+      "utf8": "so in the ideal case scenario for sharding what \nwe would have is you know we would you know we're  "
+    } ]
+  }, {
+    "tStartMs": 1137540,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "horizontally scaling out we have many different \nuser layer servers but in the ideal case all  "
+    } ]
+  }, {
+    "tStartMs": 1143420,
+    "dDurationMs": 8040,
+    "segs": [ {
+      "utf8": "of the users or rather one user layer server \nwould keep a ton of basically all of the the  "
+    } ]
+  }, {
+    "tStartMs": 1151460,
+    "dDurationMs": 8520,
+    "segs": [ {
+      "utf8": "Common Stocks between the users connected to \nthem so for example if I had like um user one  "
+    } ]
+  }, {
+    "tStartMs": 1160880,
+    "dDurationMs": 8340,
+    "segs": [ {
+      "utf8": "and user two and they were connected to the \nsame you know layer server a ideally user one"
+    } ]
+  }, {
+    "tStartMs": 1171380,
+    "dDurationMs": 8820,
+    "segs": [ {
+      "utf8": "stocks intersect user 2 stocks would \nbe very high would be large because  "
+    } ]
+  }, {
+    "tStartMs": 1181100,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "you know we ideally want to be fetching the same \nstock prices on the same user layer servers in  "
+    } ]
+  }, {
+    "tStartMs": 1186800,
+    "dDurationMs": 4380,
+    "segs": [ {
+      "utf8": "practice though I think that's just kind of \nhard to implement and so for that reason I  "
+    } ]
+  }, {
+    "tStartMs": 1191180,
+    "dDurationMs": 6900,
+    "segs": [ {
+      "utf8": "think I'm just going to go ahead and propose \na pretty simple round robin load balancing so  "
+    } ]
+  }, {
+    "tStartMs": 1198080,
+    "dDurationMs": 3540,
+    "segs": [ {
+      "utf8": "I'm still thinking about the kind of eventual \ndesign that I'm going to draw up here and I  "
+    } ]
+  }, {
+    "tStartMs": 1201620,
+    "dDurationMs": 5460,
+    "segs": [ {
+      "utf8": "will draw that out in completion probably once \nI explain my my thinking for the original piece  "
+    } ]
+  }, {
+    "tStartMs": 1208040,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "um but yeah ideally I'm gonna have a load balancer \nbetween the phone and the user layer and that is  "
+    } ]
+  }, {
+    "tStartMs": 1213800,
+    "dDurationMs": 4380,
+    "segs": [ {
+      "utf8": "probably just going to do some sort of round robin \nload balancing to make sure that a certain user  "
+    } ]
+  }, {
+    "tStartMs": 1218180,
+    "dDurationMs": 6840,
+    "segs": [ {
+      "utf8": "layer server isn't getting overloaded by too many \nclients perhaps we could do that round robin in  "
+    } ]
+  }, {
+    "tStartMs": 1225020,
+    "dDurationMs": 4200,
+    "segs": [ {
+      "utf8": "kind of like a weighted way where we consider how \nmany different tickers that user layer server is  "
+    } ]
+  }, {
+    "tStartMs": 1229220,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "already fetching because it's possible that we \nhave like power users who get a ton of tickers  "
+    } ]
+  }, {
+    "tStartMs": 1234260,
+    "dDurationMs": 5460,
+    "segs": [ {
+      "utf8": "that they're requesting but for the most part \nI think this approach should generally work  "
+    } ]
+  }, {
+    "tStartMs": 1241220,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "um yeah let me know if you have any questions \nabout the the sharding on the user layer server  "
+    } ]
+  }, {
+    "tStartMs": 1246380,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "yeah interesting um yeah I wanted to ask \nwhat what if one of these user servers went  "
+    } ]
+  }, {
+    "tStartMs": 1252260,
+    "dDurationMs": 6960,
+    "segs": [ {
+      "utf8": "down like how can how can you make sure this \nthis piece of the system is false tolerant  "
+    } ]
+  }, {
+    "tStartMs": 1260420,
+    "dDurationMs": 5820,
+    "segs": [ {
+      "utf8": "sure um yeah that's that's a fair \nquestion so let's see let's write that out  "
+    } ]
+  }, {
+    "tStartMs": 1268160,
+    "dDurationMs": 5640,
+    "segs": [ {
+      "utf8": "and I will drag down a little bit so okay \nwe're talking about fault tolerance down  "
+    } ]
+  }, {
+    "tStartMs": 1273800,
+    "dDurationMs": 4560,
+    "segs": [ {
+      "utf8": "which is definitely a tough piece here because \nwe want our system to be redundant in the face  "
+    } ]
+  }, {
+    "tStartMs": 1278360,
+    "dDurationMs": 6480,
+    "segs": [ {
+      "utf8": "of any hardware issues or networking issues um \nI think it's hopefully pretty clear on a phone  "
+    } ]
+  }, {
+    "tStartMs": 1284840,
+    "dDurationMs": 5340,
+    "segs": [ {
+      "utf8": "when their user layer stops sending updates \num what we could do is have our websocket  "
+    } ]
+  }, {
+    "tStartMs": 1290180,
+    "dDurationMs": 6960,
+    "segs": [ {
+      "utf8": "connection occasionally send Heartbeats \nand if our phone stops receiving them"
+    } ]
+  }, {
+    "tStartMs": 1299420,
+    "dDurationMs": 3600,
+    "segs": [ {
+      "utf8": "then you know it's going to want to go \nahead and just establish a new connection  "
+    } ]
+  }, {
+    "tStartMs": 1304040,
+    "dDurationMs": 4800,
+    "segs": [ {
+      "utf8": "um yeah and I think that's pretty simple for the \nmost part it can go through the load balancer it  "
+    } ]
+  }, {
+    "tStartMs": 1308840,
+    "dDurationMs": 6180,
+    "segs": [ {
+      "utf8": "is definitely true that if a user layer server \nwith a lot of users goes down that we could in  "
+    } ]
+  }, {
+    "tStartMs": 1315020,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "theory have a Thundering Herd if we were to load \nbalance poorly where all of our kind of phones try  "
+    } ]
+  }, {
+    "tStartMs": 1320900,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "and reconnect to the different user layer server \nand it overloads it but I mean that's kind of the  "
+    } ]
+  }, {
+    "tStartMs": 1325580,
+    "dDurationMs": 5340,
+    "segs": [ {
+      "utf8": "point of using round robin load balancing is that \nthat shouldn't happen and so I think that just by  "
+    } ]
+  }, {
+    "tStartMs": 1330920,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "making sure to use Heartbeats And if we really \nwanted to we could even have like a zookeeper  "
+    } ]
+  }, {
+    "tStartMs": 1335600,
+    "dDurationMs": 9360,
+    "segs": [ {
+      "utf8": "layer which keeps track of the status of each user \nlayer server and that would help us to confirm  "
+    } ]
+  }, {
+    "tStartMs": 1344960,
+    "dDurationMs": 4380,
+    "segs": [ {
+      "utf8": "that the user layer server is like actually \ndown and it's not like an issue with the phone  "
+    } ]
+  }, {
+    "tStartMs": 1349340,
+    "dDurationMs": 7620,
+    "segs": [ {
+      "utf8": "or something um but yeah I think using heartbeats \nideally should give us a pretty good sense of um  "
+    } ]
+  }, {
+    "tStartMs": 1356960,
+    "dDurationMs": 7500,
+    "segs": [ {
+      "utf8": "you know kind of making sure that all the devices \nare getting the updates they need okay Jordan  "
+    } ]
+  }, {
+    "tStartMs": 1364460,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "could you could you explain to me how the user \nlayer actually connects to the publishing layer"
+    } ]
+  }, {
+    "tStartMs": 1373900,
+    "dDurationMs": 1000,
+    "segs": [ {
+      "utf8": "[Music]"
+    } ]
+  }, {
+    "tStartMs": 1374900,
+    "dDurationMs": 10980,
+    "segs": [ {
+      "utf8": "sure so um yeah like I mentioned I wanted to talk \nabout three pieces right here and I've spoken  "
+    } ]
+  }, {
+    "tStartMs": 1385880,
+    "dDurationMs": 3720,
+    "segs": [ {
+      "utf8": "about two of them right now and then I'll draw \nit all out at the end we've got our user layer  "
+    } ]
+  }, {
+    "tStartMs": 1390200,
+    "dDurationMs": 7080,
+    "segs": [ {
+      "utf8": "got our exchange layer and the third piece is \nthis routing layer right here and so that is  "
+    } ]
+  }, {
+    "tStartMs": 1397280,
+    "dDurationMs": 7920,
+    "segs": [ {
+      "utf8": "what I will now talk about and so my thinking for \nthe routing layer was in theory you know you have  "
+    } ]
+  }, {
+    "tStartMs": 1407120,
+    "dDurationMs": 1920,
+    "segs": [ {
+      "utf8": "let's say we've got X User servers  "
+    } ]
+  }, {
+    "tStartMs": 1410240,
+    "dDurationMs": 4980,
+    "segs": [ {
+      "utf8": "and we've got y publisher servers or \nexchange servers let's call them that"
+    } ]
+  }, {
+    "tStartMs": 1419840,
+    "dDurationMs": 3180,
+    "segs": [ {
+      "utf8": "and what we know is that every single user server  "
+    } ]
+  }, {
+    "tStartMs": 1424820,
+    "dDurationMs": 9240,
+    "segs": [ {
+      "utf8": "is probably connecting or at least use your server \nprobably wants like at least 100 tickers right  "
+    } ]
+  }, {
+    "tStartMs": 1434060,
+    "dDurationMs": 4500,
+    "segs": [ {
+      "utf8": "because we know it's connected to at least one \nUser it's probably got many users in reality we  "
+    } ]
+  }, {
+    "tStartMs": 1438560,
+    "dDurationMs": 9240,
+    "segs": [ {
+      "utf8": "could be looking at thousands of tickers you may \nwant thousands of tickers or Integrity data cases  "
+    } ]
+  }, {
+    "tStartMs": 1449180,
+    "dDurationMs": 5940,
+    "segs": [ {
+      "utf8": "and you know that's that's going to be problematic \nI think especially potentially for the publisher  "
+    } ]
+  }, {
+    "tStartMs": 1455120,
+    "dDurationMs": 4980,
+    "segs": [ {
+      "utf8": "server if nothing else I mean the user server \nit may be problematic too but you know that's  "
+    } ]
+  }, {
+    "tStartMs": 1460100,
+    "dDurationMs": 4980,
+    "segs": [ {
+      "utf8": "what we have the sharding for I think for \nthe publishing server though the issue is  "
+    } ]
+  }, {
+    "tStartMs": 1465680,
+    "dDurationMs": 7140,
+    "segs": [ {
+      "utf8": "you know let's say a thousand user or not even \na thousand we have a hundred million users let's  "
+    } ]
+  }, {
+    "tStartMs": 1472820,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "say out of our 100 million users every single \none of them owns Apple or maybe 10 of them  "
+    } ]
+  }, {
+    "tStartMs": 1477740,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "owns Apple we could potentially have 10 million \ndevices or 10 million user servers or something  "
+    } ]
+  }, {
+    "tStartMs": 1484880,
+    "dDurationMs": 7140,
+    "segs": [ {
+      "utf8": "asking for Apple and if that happens that could \nbog down our publisher our Apple publisher  "
+    } ]
+  }, {
+    "tStartMs": 1492020,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "and so I would prefer that not happen \nand ideally you know continue to make  "
+    } ]
+  }, {
+    "tStartMs": 1497120,
+    "dDurationMs": 3240,
+    "segs": [ {
+      "utf8": "it so that all of our different layers \nof our service can scale independently  "
+    } ]
+  }, {
+    "tStartMs": 1500360,
+    "dDurationMs": 5280,
+    "segs": [ {
+      "utf8": "and so what I would like to do in this type \nof case is ADD kind of like an intermediary  "
+    } ]
+  }, {
+    "tStartMs": 1506960,
+    "dDurationMs": 6840,
+    "segs": [ {
+      "utf8": "routing or communication or whatever you want \nto call it a layer and so I was thinking about  "
+    } ]
+  }, {
+    "tStartMs": 1513800,
+    "dDurationMs": 5400,
+    "segs": [ {
+      "utf8": "how I would like to do this and I think a lot \nof people might end up just going with like a  "
+    } ]
+  }, {
+    "tStartMs": 1519200,
+    "dDurationMs": 5640,
+    "segs": [ {
+      "utf8": "message broker here I think something like Kafka \ndoes make sense specifically because it's a log  "
+    } ]
+  }, {
+    "tStartMs": 1524840,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "based message broker so all of the pieces of data \nthat we publish would be persistent on disk which  "
+    } ]
+  }, {
+    "tStartMs": 1530540,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "might be nice for future kind of logging or \ndiagnosis or metrics or anything like that  "
+    } ]
+  }, {
+    "tStartMs": 1537380,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "um and also it would be nice just because then \nyou only have to publish to one place and you know  "
+    } ]
+  }, {
+    "tStartMs": 1542300,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "many different consumers can get the message but \ntruthfully the more I thought about it I actually  "
+    } ]
+  }, {
+    "tStartMs": 1547340,
+    "dDurationMs": 7080,
+    "segs": [ {
+      "utf8": "think that maybe a better solution would be to use \nsomething like a redis cache and so again we can  "
+    } ]
+  }, {
+    "tStartMs": 1554420,
+    "dDurationMs": 6060,
+    "segs": [ {
+      "utf8": "kind of scale these caches independently and you \nknow use a load balancer as a zookeeper cluster  "
+    } ]
+  }, {
+    "tStartMs": 1560480,
+    "dDurationMs": 7020,
+    "segs": [ {
+      "utf8": "to make sure of which cache is maintaining kind of \nthe the data for which takers but all this reddish  "
+    } ]
+  }, {
+    "tStartMs": 1567500,
+    "dDurationMs": 6060,
+    "segs": [ {
+      "utf8": "cat redis cash is going to hold is actually \ngoing to be the you know like option valuation  "
+    } ]
+  }, {
+    "tStartMs": 1574640,
+    "dDurationMs": 6120,
+    "segs": [ {
+      "utf8": "or the most recent one and so what \nit'll do is you know publisher says  "
+    } ]
+  }, {
+    "tStartMs": 1580760,
+    "dDurationMs": 6840,
+    "segs": [ {
+      "utf8": "like publish your Tesla says hey the \nthe price for Tesla is now 450 dollars  "
+    } ]
+  }, {
+    "tStartMs": 1589400,
+    "dDurationMs": 9780,
+    "segs": [ {
+      "utf8": "um after listening to The Exchange so it \nExchange data comes in sorry you can't  "
+    } ]
+  }, {
+    "tStartMs": 1599180,
+    "dDurationMs": 8280,
+    "segs": [ {
+      "utf8": "spell go to the publisher who publishes 450 \nwho goes to the routing communication layer  "
+    } ]
+  }, {
+    "tStartMs": 1608600,
+    "dDurationMs": 6600,
+    "segs": [ {
+      "utf8": "which again is nice because we can kind of scale \nreplicate and do anything we need independently  "
+    } ]
+  }, {
+    "tStartMs": 1615200,
+    "dDurationMs": 4200,
+    "segs": [ {
+      "utf8": "there and so that's going to be the routing \ncommunication layer for Tesla which is now  "
+    } ]
+  }, {
+    "tStartMs": 1619400,
+    "dDurationMs": 8940,
+    "segs": [ {
+      "utf8": "going to update its value maybe it was you know \n4 45 before and now it's updated to 450. and then  "
+    } ]
+  }, {
+    "tStartMs": 1628340,
+    "dDurationMs": 5460,
+    "segs": [ {
+      "utf8": "yet again what you could do is use something \nlike a server sent event or even a long poll  "
+    } ]
+  }, {
+    "tStartMs": 1633800,
+    "dDurationMs": 8160,
+    "segs": [ {
+      "utf8": "and that's going to go to our user servers which \nthen finally end up going to our client device"
+    } ]
+  }, {
+    "tStartMs": 1644060,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "um yeah let me know if you think that's okay and \nthen hopefully we can almost get to the full-on  "
+    } ]
+  }, {
+    "tStartMs": 1649820,
+    "dDurationMs": 8580,
+    "segs": [ {
+      "utf8": "drawing of the design okay yeah [Music] um I did \nhave I did have another question I wanted to ask  "
+    } ]
+  }, {
+    "tStartMs": 1658400,
+    "dDurationMs": 8640,
+    "segs": [ {
+      "utf8": "about what can we do if a publisher goes down for \nsure um yeah that's that's really fair and that's  "
+    } ]
+  }, {
+    "tStartMs": 1667040,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "probably the other big piece of fault tolerance \nis making sure that our intermediary routing  "
+    } ]
+  }, {
+    "tStartMs": 1672140,
+    "dDurationMs": 7140,
+    "segs": [ {
+      "utf8": "communication layer and our actual um publishing \nlayer are also fault tolerant for the routing  "
+    } ]
+  }, {
+    "tStartMs": 1679280,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "communication layer routing there I think it's \njust a matter of using replication you know our  "
+    } ]
+  }, {
+    "tStartMs": 1685280,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "Publishers can it's no big deal if each publisher \nis publishing to like three places instead of one  "
+    } ]
+  }, {
+    "tStartMs": 1689960,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "it's a big deal if our publisher is publishing \nto you know a thousand places instead of one so  "
+    } ]
+  }, {
+    "tStartMs": 1695960,
+    "dDurationMs": 7200,
+    "segs": [ {
+      "utf8": "I think using replication 3x or something like \nthat totally fine um but as for the publishing  "
+    } ]
+  }, {
+    "tStartMs": 1703160,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "layer the kind of interesting thing is again \nmy solution is going to be replication however  "
+    } ]
+  }, {
+    "tStartMs": 1710300,
+    "dDurationMs": 5940,
+    "segs": [ {
+      "utf8": "um kind of the interesting thing to note is that \nour Publishers are stateful so it's very important  "
+    } ]
+  }, {
+    "tStartMs": 1716240,
+    "dDurationMs": 6720,
+    "segs": [ {
+      "utf8": "that every single kind of publisher or rather the \nbackup for a given publisher is also receiving the  "
+    } ]
+  }, {
+    "tStartMs": 1722960,
+    "dDurationMs": 5280,
+    "segs": [ {
+      "utf8": "same messages that are you know kind of primary \npublisher is because otherwise it's going to be  "
+    } ]
+  }, {
+    "tStartMs": 1728240,
+    "dDurationMs": 6060,
+    "segs": [ {
+      "utf8": "the case that you know what we would see is one \npublisher goes down and then the other one is  "
+    } ]
+  }, {
+    "tStartMs": 1734300,
+    "dDurationMs": 5400,
+    "segs": [ {
+      "utf8": "going to have to take a little bit to warm up \nand get data from the exchanges before it can  "
+    } ]
+  }, {
+    "tStartMs": 1739700,
+    "dDurationMs": 5340,
+    "segs": [ {
+      "utf8": "actually start publishing out stock and option \nvaluations so I think what that means to me is  "
+    } ]
+  }, {
+    "tStartMs": 1745040,
+    "dDurationMs": 5640,
+    "segs": [ {
+      "utf8": "that personally I think we should use something \ncalled State machine replication here where rather  "
+    } ]
+  }, {
+    "tStartMs": 1750680,
+    "dDurationMs": 7140,
+    "segs": [ {
+      "utf8": "than doing our typical form of replication \nwhere you know like one publisher would send  "
+    } ]
+  }, {
+    "tStartMs": 1757820,
+    "dDurationMs": 5580,
+    "segs": [ {
+      "utf8": "all of its state to the next what I think we \ncould actually do is have our backup publishers"
+    } ]
+  }, {
+    "tStartMs": 1765440,
+    "dDurationMs": 6420,
+    "segs": [ {
+      "utf8": "uh basically listening to The Exchange and \nideally by listening to The Exchange getting  "
+    } ]
+  }, {
+    "tStartMs": 1771860,
+    "dDurationMs": 4560,
+    "segs": [ {
+      "utf8": "the same type of information locally \nthat the primary publisher would have  "
+    } ]
+  }, {
+    "tStartMs": 1776420,
+    "dDurationMs": 9780,
+    "segs": [ {
+      "utf8": "and then for example if our communication \nlayer receives no update slash heartbeat  "
+    } ]
+  }, {
+    "tStartMs": 1786740,
+    "dDurationMs": 9720,
+    "segs": [ {
+      "utf8": "from our publishing layer slash exchange layer \nthen you know we go to zookeeper we say oh shoot  "
+    } ]
+  }, {
+    "tStartMs": 1796460,
+    "dDurationMs": 7140,
+    "segs": [ {
+      "utf8": "do we think this thing is down if it is down \nthen we switch to our backup that seem okay"
+    } ]
+  }, {
+    "tStartMs": 1805700,
+    "dDurationMs": 6420,
+    "segs": [ {
+      "utf8": "yeah Okay cool so that makes sense Jordan's \nalmost 30 minutes into the interview and he  "
+    } ]
+  }, {
+    "tStartMs": 1812120,
+    "dDurationMs": 3840,
+    "segs": [ {
+      "utf8": "hasn't yet started drawing we normally recommend \nthat you want to be drawing your diagram after  "
+    } ]
+  }, {
+    "tStartMs": 1815960,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "20 minutes or earlier Jordan's taking another \napproach he's first talking through the various  "
+    } ]
+  }, {
+    "tStartMs": 1820640,
+    "dDurationMs": 5220,
+    "segs": [ {
+      "utf8": "considerations in good teacher and as an interview \nI encourage this by asking lots of questions that  "
+    } ]
+  }, {
+    "tStartMs": 1825860,
+    "dDurationMs": 4200,
+    "segs": [ {
+      "utf8": "means he now has a great foundation on which to \ndraw his diagram but another interviewer might  "
+    } ]
+  }, {
+    "tStartMs": 1830060,
+    "dDurationMs": 4860,
+    "segs": [ {
+      "utf8": "have wanted to see some design mapping earlier \nyeah please go ahead it was yeah I was hoping  "
+    } ]
+  }, {
+    "tStartMs": 1834920,
+    "dDurationMs": 5940,
+    "segs": [ {
+      "utf8": "to you know we've kind of done all this background \nnow and I think what I'm hoping to kind of do from  "
+    } ]
+  }, {
+    "tStartMs": 1840860,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "here is is draw this out all in one aggregated \ndiagram to to Really tie it all together and then  "
+    } ]
+  }, {
+    "tStartMs": 1847160,
+    "dDurationMs": 3960,
+    "segs": [ {
+      "utf8": "you know if you have any questions from there \nfeel free to ask me more but yeah hopefully  "
+    } ]
+  }, {
+    "tStartMs": 1851120,
+    "dDurationMs": 4340,
+    "segs": [ {
+      "utf8": "this really ties things together now that \nwe've kind of done a lot of abstract talking"
+    } ]
+  }, {
+    "tStartMs": 1855460,
+    "dDurationMs": 1000,
+    "segs": [ {
+      "utf8": "[Music]"
+    } ]
+  }, {
+    "tStartMs": 1856460,
+    "dDurationMs": 13320,
+    "segs": [ {
+      "utf8": "so I've got um what I'll consider to be my \nclient device over here AKA a phone very  "
+    } ]
+  }, {
+    "tStartMs": 1869780,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "simple and you know that phone is going to be \nshowing things like apple is currently 81 Google  "
+    } ]
+  }, {
+    "tStartMs": 1876440,
+    "dDurationMs": 10860,
+    "segs": [ {
+      "utf8": "is currently 200 and meta is 21. Okay so we've \ngot our phone right here seems simple enough  "
+    } ]
+  }, {
+    "tStartMs": 1887300,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "how do we make sure that these prices are actually \ngetting to it well like I mentioned the first kind  "
+    } ]
+  }, {
+    "tStartMs": 1893060,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "of aspect of it is that we want to establish \nsome sort of websocket connection so I'm not  "
+    } ]
+  }, {
+    "tStartMs": 1897980,
+    "dDurationMs": 5280,
+    "segs": [ {
+      "utf8": "going to use a direct Arrow here because these \nare two directional so the first thing is that  "
+    } ]
+  }, {
+    "tStartMs": 1903260,
+    "dDurationMs": 6540,
+    "segs": [ {
+      "utf8": "well I guess it would have to effectively request \nto get a websocket in the first place and so what  "
+    } ]
+  }, {
+    "tStartMs": 1909800,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "we would do is request some load balancer \nI think and I mentioned I wanted to do this  "
+    } ]
+  }, {
+    "tStartMs": 1914720,
+    "dDurationMs": 6360,
+    "segs": [ {
+      "utf8": "in a round robin way so that our user layer isn't \nhandling too much but we've got our load balancer  "
+    } ]
+  }, {
+    "tStartMs": 1921800,
+    "dDurationMs": 7260,
+    "segs": [ {
+      "utf8": "and then ideally what this is going to \ndo is you know maintain a connection with  "
+    } ]
+  }, {
+    "tStartMs": 1929600,
+    "dDurationMs": 8640,
+    "segs": [ {
+      "utf8": "just one user server where from then on you know \nwe can go ahead and perform more requests so  "
+    } ]
+  }, {
+    "tStartMs": 1938240,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "just give me a moment to think this through but \nhere would be an example of like user server one  "
+    } ]
+  }, {
+    "tStartMs": 1944600,
+    "dDurationMs": 6480,
+    "segs": [ {
+      "utf8": "but you know we're horizontally scaling \nthis out so we might have a user server  "
+    } ]
+  }, {
+    "tStartMs": 1952580,
+    "dDurationMs": 6420,
+    "segs": [ {
+      "utf8": "X over here that we're not connected to in this \nparticular case so for this guy you know this is  "
+    } ]
+  }, {
+    "tStartMs": 1959000,
+    "dDurationMs": 7260,
+    "segs": [ {
+      "utf8": "going to be a websocket connection where one of \nthe types of things that you might do is say like  "
+    } ]
+  }, {
+    "tStartMs": 1966920,
+    "dDurationMs": 9360,
+    "segs": [ {
+      "utf8": "give me the price of Apple and then in response \ndown the websocket chain you would say apple is  "
+    } ]
+  }, {
+    "tStartMs": 1977300,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "I don't know eighty dollars so yeah \nthat would be kind of the example of  "
+    } ]
+  }, {
+    "tStartMs": 1982220,
+    "dDurationMs": 4560,
+    "segs": [ {
+      "utf8": "the user layer and ideally we could all \nscan this scale this out independently  "
+    } ]
+  }, {
+    "tStartMs": 1988100,
+    "dDurationMs": 4800,
+    "segs": [ {
+      "utf8": "um now in addition to that we've kind of \nstarted building out our user layer my next  "
+    } ]
+  }, {
+    "tStartMs": 1992900,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "goal ideally is going to be to build out our \ncommunication layer so again I mentioned these  "
+    } ]
+  }, {
+    "tStartMs": 1998900,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "were like a bunch of different redis instances \nimagine that we have replicas and partitions  "
+    } ]
+  }, {
+    "tStartMs": 2004600,
+    "dDurationMs": 6840,
+    "segs": [ {
+      "utf8": "right here but I'm going to just kind of write \nthis out kind of freehand communication layer  "
+    } ]
+  }, {
+    "tStartMs": 2013420,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "and so yeah again this is that is I think \nit doesn't have to be redis but the reason  "
+    } ]
+  }, {
+    "tStartMs": 2019300,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "I like that in particular is it just keeps \nthings relatively fast All rights and reads  "
+    } ]
+  }, {
+    "tStartMs": 2024820,
+    "dDurationMs": 5280,
+    "segs": [ {
+      "utf8": "are coming in and out of memory it's \neffectively a cache sharded by ticker  "
+    } ]
+  }, {
+    "tStartMs": 2030700,
+    "dDurationMs": 7500,
+    "segs": [ {
+      "utf8": "or some combination of tickers trotted by \nticker and you know maintains connections for us"
+    } ]
+  }, {
+    "tStartMs": 2040240,
+    "dDurationMs": 9480,
+    "segs": [ {
+      "utf8": "um cool and then so that is effectively going \nto be publishing out to our user servers let  "
+    } ]
+  }, {
+    "tStartMs": 2049720,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "me grab another arrow right here and the nice \nthing about this is this is kind of managing  "
+    } ]
+  }, {
+    "tStartMs": 2056260,
+    "dDurationMs": 9240,
+    "segs": [ {
+      "utf8": "um all of our network connections so managing \noverhead of networking ideally perhaps this  "
+    } ]
+  }, {
+    "tStartMs": 2065500,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "is a little bit over engineered but you know I'm \ngonna go with it for now and then the last thing  "
+    } ]
+  }, {
+    "tStartMs": 2070540,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "that we've got of course is going to be our \nPublishers which are listening to The Exchange  "
+    } ]
+  }, {
+    "tStartMs": 2076360,
+    "dDurationMs": 10020,
+    "segs": [ {
+      "utf8": "keeping data in memory and so this is going to \nbe like Tesla primary and then we've also got um"
+    } ]
+  }, {
+    "tStartMs": 2089440,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "Tesla secondary and then we've got our"
+    } ]
+  }, {
+    "tStartMs": 2097120,
+    "dDurationMs": 6360,
+    "segs": [ {
+      "utf8": "Apple primary and we've got our  "
+    } ]
+  }, {
+    "tStartMs": 2105040,
+    "dDurationMs": 6060,
+    "segs": [ {
+      "utf8": "Apple secondary and these guys like \nI mentioned are all just listening to  "
+    } ]
+  }, {
+    "tStartMs": 2111100,
+    "dDurationMs": 11760,
+    "segs": [ {
+      "utf8": "UDP feed which is coming from many many \ndifferent exchanges blah blah blah over here and"
+    } ]
+  }, {
+    "tStartMs": 2125140,
+    "dDurationMs": 7620,
+    "segs": [ {
+      "utf8": "qdp feed or rather I think I should mark this \nas exchange one because you know for example for  "
+    } ]
+  }, {
+    "tStartMs": 2132760,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "options what I understand they're I think 16 or 17 \ndifferent exchanges that you have to be aware of  "
+    } ]
+  }, {
+    "tStartMs": 2140020,
+    "dDurationMs": 9360,
+    "segs": [ {
+      "utf8": "exchange too um change too \nand then also exchange three"
+    } ]
+  }, {
+    "tStartMs": 2153400,
+    "dDurationMs": 4440,
+    "segs": [ {
+      "utf8": "and then all of these guys are \nin turn going to be publishing  "
+    } ]
+  }, {
+    "tStartMs": 2158500,
+    "dDurationMs": 7320,
+    "segs": [ {
+      "utf8": "to just about every single one of \nour kind of exchange layer right here  "
+    } ]
+  }, {
+    "tStartMs": 2166720,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "and so it's important to recognize that you know \nwe're able to kind of aggregate these results  "
+    } ]
+  }, {
+    "tStartMs": 2172600,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "into not only just an nbbo but then one price \nthat we can send to the rest of our application  "
+    } ]
+  }, {
+    "tStartMs": 2179980,
+    "dDurationMs": 6660,
+    "segs": [ {
+      "utf8": "let's see over there hopefully you're starting \nto get the point at this point but you know  "
+    } ]
+  }, {
+    "tStartMs": 2187780,
+    "dDurationMs": 8400,
+    "segs": [ {
+      "utf8": "everyone is receiving all of the data to \ndo okay and then yeah from there in turn  "
+    } ]
+  }, {
+    "tStartMs": 2197500,
+    "dDurationMs": 7860,
+    "segs": [ {
+      "utf8": "um we've got probably we need some sort \nof coordination service like a zookeeper  "
+    } ]
+  }, {
+    "tStartMs": 2205360,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "which is going to you know keep track of all \nof our partitions it's going to be connected  "
+    } ]
+  }, {
+    "tStartMs": 2210520,
+    "dDurationMs": 7440,
+    "segs": [ {
+      "utf8": "to everything has a sense of what tickers are \nlocated where and then of course we've got just  "
+    } ]
+  }, {
+    "tStartMs": 2217960,
+    "dDurationMs": 4980,
+    "segs": [ {
+      "utf8": "our primaries at the moment publishing \nover here to our communication layer  "
+    } ]
+  }, {
+    "tStartMs": 2223780,
+    "dDurationMs": 3600,
+    "segs": [ {
+      "utf8": "and then the last piece of this because even \nthough I called it trivial I should still  "
+    } ]
+  }, {
+    "tStartMs": 2227380,
+    "dDurationMs": 8460,
+    "segs": [ {
+      "utf8": "probably write it down is actually going to be \num you know like in orders slash position service"
+    } ]
+  }, {
+    "tStartMs": 2237940,
+    "dDurationMs": 2880,
+    "segs": [ {
+      "utf8": "um so for this one in particular I think  "
+    } ]
+  }, {
+    "tStartMs": 2240820,
+    "dDurationMs": 3420,
+    "segs": [ {
+      "utf8": "there probably would still be \na load balancer in between them"
+    } ]
+  }, {
+    "tStartMs": 2246580,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "and ideally what we would want to do with this \nload balancer is use something like consistent  "
+    } ]
+  }, {
+    "tStartMs": 2251740,
+    "dDurationMs": 9180,
+    "segs": [ {
+      "utf8": "hashing the reason being that you know if someone \nis constantly trying to request what stocks  "
+    } ]
+  }, {
+    "tStartMs": 2260920,
+    "dDurationMs": 4380,
+    "segs": [ {
+      "utf8": "or positions they're holding it's probably not \nchanged and so it'd be great if we could actually  "
+    } ]
+  }, {
+    "tStartMs": 2266500,
+    "dDurationMs": 6720,
+    "segs": [ {
+      "utf8": "you know cache that on our orders and position \nservice like for example if you know this guy  "
+    } ]
+  }, {
+    "tStartMs": 2273220,
+    "dDurationMs": 5940,
+    "segs": [ {
+      "utf8": "was split into three different servers it would \nbe great if for my particular user I was always  "
+    } ]
+  }, {
+    "tStartMs": 2279160,
+    "dDurationMs": 5820,
+    "segs": [ {
+      "utf8": "going to This Server right here because then \nthe result of my query would already be cached  "
+    } ]
+  }, {
+    "tStartMs": 2284980,
+    "dDurationMs": 4260,
+    "segs": [ {
+      "utf8": "but yeah in the background I would imagine that \nfor your orders and position service there's  "
+    } ]
+  }, {
+    "tStartMs": 2289240,
+    "dDurationMs": 6480,
+    "segs": [ {
+      "utf8": "basically two endpoints one of which is taking \nyour order to the Exchange to get a position and  "
+    } ]
+  }, {
+    "tStartMs": 2295720,
+    "dDurationMs": 6180,
+    "segs": [ {
+      "utf8": "then you know upon receiving a successful response \nto that is probably going to go ahead and write  "
+    } ]
+  }, {
+    "tStartMs": 2301900,
+    "dDurationMs": 8040,
+    "segs": [ {
+      "utf8": "to some sort of database see if I can draw that \nout I personally think MySQL is fine here I just  "
+    } ]
+  }, {
+    "tStartMs": 2309940,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "you know there aren't that many interactions with \nthis people on like a Robinhood app or not trading  "
+    } ]
+  }, {
+    "tStartMs": 2315640,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "that frequently that I think your database is \ngoing to be your bottleneck I think it's it's  "
+    } ]
+  }, {
+    "tStartMs": 2320740,
+    "dDurationMs": 4380,
+    "segs": [ {
+      "utf8": "more significant to figure out the challenge of \nproviding base prices and I think something like  "
+    } ]
+  }, {
+    "tStartMs": 2325720,
+    "dDurationMs": 8640,
+    "segs": [ {
+      "utf8": "um you know just Shard by user ID and then have \na positions table which you know for every single  "
+    } ]
+  }, {
+    "tStartMs": 2334360,
+    "dDurationMs": 8220,
+    "segs": [ {
+      "utf8": "given user has a row like user ID and stock ID and \nyou know maybe some metadata like the price they  "
+    } ]
+  }, {
+    "tStartMs": 2342580,
+    "dDurationMs": 3720,
+    "segs": [ {
+      "utf8": "bought it at or something but truthfully it's \nyou know that's kind of semantics from there  "
+    } ]
+  }, {
+    "tStartMs": 2346840,
+    "dDurationMs": 8520,
+    "segs": [ {
+      "utf8": "so yeah this is kind of the the design I'm \ngonna stick with and perhaps double down upon  "
+    } ]
+  }, {
+    "tStartMs": 2357040,
+    "dDurationMs": 8880,
+    "segs": [ {
+      "utf8": "um yeah let me know if you have any questions \nabout it okay yeah interesting um yeah well  "
+    } ]
+  }, {
+    "tStartMs": 2366640,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "I think I think I think it looks like a good \ndesign to me um I'm coming to the end of the  "
+    } ]
+  }, {
+    "tStartMs": 2372160,
+    "dDurationMs": 4740,
+    "segs": [ {
+      "utf8": "interview so we're gonna have to wrap it up but \nbefore we do is there anything you'd like to  "
+    } ]
+  }, {
+    "tStartMs": 2377740,
+    "dDurationMs": 5460,
+    "segs": [ {
+      "utf8": "just take a minute to look at it is there anything \nyou'd like to refine or or add to the design  "
+    } ]
+  }, {
+    "tStartMs": 2384040,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "yeah for sure I am you know considering we don't \nhave too much time left I'm not really sure how  "
+    } ]
+  }, {
+    "tStartMs": 2389740,
+    "dDurationMs": 4800,
+    "segs": [ {
+      "utf8": "much I can refine at this point but I definitely \nthink um you know if there are one area I'd  "
+    } ]
+  }, {
+    "tStartMs": 2394540,
+    "dDurationMs": 3420,
+    "segs": [ {
+      "utf8": "like to think about a little bit more it would \nprobably be this communication layer right here  "
+    } ]
+  }, {
+    "tStartMs": 2399160,
+    "dDurationMs": 4860,
+    "segs": [ {
+      "utf8": "um I'm pretty confident that redis is a decently \ngood technology to use here just because we really  "
+    } ]
+  }, {
+    "tStartMs": 2404020,
+    "dDurationMs": 4620,
+    "segs": [ {
+      "utf8": "only care about the most recent data point \nwe don't need a full cue if for some reason  "
+    } ]
+  }, {
+    "tStartMs": 2408640,
+    "dDurationMs": 7020,
+    "segs": [ {
+      "utf8": "you know a consumer of the data is delayed it's \nnot important to get old data though I do just  "
+    } ]
+  }, {
+    "tStartMs": 2415660,
+    "dDurationMs": 5340,
+    "segs": [ {
+      "utf8": "wonder if you know what the best way to kind of \nscale this thing out is ensure fault tolerance  "
+    } ]
+  }, {
+    "tStartMs": 2422260,
+    "dDurationMs": 4020,
+    "segs": [ {
+      "utf8": "um you know kind of make sure that we're \nhorizontally scaling out each layer separately  "
+    } ]
+  }, {
+    "tStartMs": 2426280,
+    "dDurationMs": 4140,
+    "segs": [ {
+      "utf8": "independently in a good way that minimizes the \namount of resources that we're using keeps our  "
+    } ]
+  }, {
+    "tStartMs": 2430420,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "costs down so you know nothing specific \nto necessarily change about this part but  "
+    } ]
+  }, {
+    "tStartMs": 2435580,
+    "dDurationMs": 5340,
+    "segs": [ {
+      "utf8": "I would probably just want to think it through a \nlittle bit more to ultimately make sure that I'm  "
+    } ]
+  }, {
+    "tStartMs": 2440920,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "making this system as flexible as possible \num but yeah I think I think that's about it  "
+    } ]
+  }, {
+    "tStartMs": 2447460,
+    "dDurationMs": 5220,
+    "segs": [ {
+      "utf8": "okay well let's then end the interview there \nthen I was happy with Jordan's design decided  "
+    } ]
+  }, {
+    "tStartMs": 2452680,
+    "dDurationMs": 3540,
+    "segs": [ {
+      "utf8": "to wrap up the interview but another interview I \nmight have spent a few more minutes with Jordan  "
+    } ]
+  }, {
+    "tStartMs": 2456220,
+    "dDurationMs": 4500,
+    "segs": [ {
+      "utf8": "to dive a bit deeper into certain aspects perhaps \nI could have grilled them a bit more on the fault  "
+    } ]
+  }, {
+    "tStartMs": 2460720,
+    "dDurationMs": 4140,
+    "segs": [ {
+      "utf8": "tolerance of the system because even though his \napproach there seemed to be generally good it  "
+    } ]
+  }, {
+    "tStartMs": 2464860,
+    "dDurationMs": 4320,
+    "segs": [ {
+      "utf8": "might have been interesting to look at it in a bit \nmore detail in any case Jordan made a smart choice  "
+    } ]
+  }, {
+    "tStartMs": 2469180,
+    "dDurationMs": 4500,
+    "segs": [ {
+      "utf8": "in breaking a system into three different layers \nto scale independently while also considering the  "
+    } ]
+  }, {
+    "tStartMs": 2473680,
+    "dDurationMs": 4740,
+    "segs": [ {
+      "utf8": "load that it would have on client devices overall \na really strong design and a very impressive  "
+    } ]
+  }, {
+    "tStartMs": 2478420,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "interview from Jordan great job that's great \nthanks for doing that how was it did you have fun  "
+    } ]
+  }, {
+    "tStartMs": 2485080,
+    "dDurationMs": 5940,
+    "segs": [ {
+      "utf8": "of course always a great time making \nsystems so no claims no issues there great  "
+    } ]
+  }, {
+    "tStartMs": 2491800,
+    "dDurationMs": 5100,
+    "segs": [ {
+      "utf8": "well thanks for coming on and yeah hope we \ncan have you back on here one day because  "
+    } ]
+  }, {
+    "tStartMs": 2497440,
+    "dDurationMs": 4320,
+    "segs": [ {
+      "utf8": "I really enjoyed it and I think everyone \nwill get a lot out of that so thanks a lot  "
+    } ]
+  }, {
+    "tStartMs": 2502360,
+    "dDurationMs": 5280,
+    "segs": [ {
+      "utf8": "yeah absolutely and you know if you are watching \nthis happen to enjoy the interview and want to  "
+    } ]
+  }, {
+    "tStartMs": 2507640,
+    "dDurationMs": 4740,
+    "segs": [ {
+      "utf8": "check out some more feel free to go look at \nmy channel I've got plenty on there and like  "
+    } ]
+  }, {
+    "tStartMs": 2512380,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "I mentioned I have no life so there's going to be \na lot more see you guys all right cheers Jordan  "
+    } ]
+  }, {
+    "tStartMs": 2519160,
+    "dDurationMs": 4380,
+    "segs": [ {
+      "utf8": "hello I really hope you found that useful \nif you did you can like and subscribe and  "
+    } ]
+  }, {
+    "tStartMs": 2523540,
+    "dDurationMs": 5220,
+    "segs": [ {
+      "utf8": "why not come visit us at IGotAnOffer.com there \nyou can find more videos useful frameworks and  "
+    } ]
+  }, {
+    "tStartMs": 2528760,
+    "dDurationMs": 5700,
+    "segs": [ {
+      "utf8": "questions guides all completely free and you \ncan also book expert feedback one-to-one with  "
+    } ]
+  }, {
+    "tStartMs": 2534460,
+    "dDurationMs": 6460,
+    "segs": [ {
+      "utf8": "our coaches from Google Meta Amazon Etc thank \nyou and good luck with your interview [Music]"
+    } ]
+  }, {
+    "tStartMs": 2547780,
+    "dDurationMs": 532,
+    "segs": [ {
+      "utf8": "thank you [Music]"
+    } ]
+  } ]
+}

@@ -1,0 +1,2605 @@
+{
+  "wireMagic": "pb3",
+  "pens": [ {
+  
+  } ],
+  "wsWinStyles": [ {
+  
+  } ],
+  "wpWinPositions": [ {
+  
+  } ],
+  "events": [ {
+    "tStartMs": 2000,
+    "dDurationMs": 4600,
+    "segs": [ {
+      "utf8": "hello thanks for joining us for another system \ndesign mock interview uh first just a quick  "
+    } ]
+  }, {
+    "tStartMs": 6600,
+    "dDurationMs": 4320,
+    "segs": [ {
+      "utf8": "reminder if you are preparing for an interview \nthen do check out our platform IGotAnOffer.com  "
+    } ]
+  }, {
+    "tStartMs": 10920,
+    "dDurationMs": 5440,
+    "segs": [ {
+      "utf8": "where you can find prep materials and you can also \nget onetoone coaching with ex-FAANG interviewers  "
+    } ]
+  }, {
+    "tStartMs": 16360,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "to help you nail the interview and get that job \nuh okay my candidate today was hired by Google  "
+    } ]
+  }, {
+    "tStartMs": 22240,
+    "dDurationMs": 5960,
+    "segs": [ {
+      "utf8": "after he was top coder of the month on algorithm \ntrack of top coder he also scored in the top 50  "
+    } ]
+  }, {
+    "tStartMs": 28200,
+    "dDurationMs": 4320,
+    "segs": [ {
+      "utf8": "in the final round of Google code Jam um and \nsince then he's done all sorts of things he's  "
+    } ]
+  }, {
+    "tStartMs": 32520,
+    "dDurationMs": 5320,
+    "segs": [ {
+      "utf8": "become one of the most interesting people online \ntalking about system design and related topics um  "
+    } ]
+  }, {
+    "tStartMs": 37840,
+    "dDurationMs": 4160,
+    "segs": [ {
+      "utf8": "he's also a host of the YouTube channel SysDesign \nMeetup which you are welcome to get involved in  "
+    } ]
+  }, {
+    "tStartMs": 42000,
+    "dDurationMs": 6960,
+    "segs": [ {
+      "utf8": "yourself um let's bring him on Dima, thank you \nso much for doing this interview with us today  "
+    } ]
+  }, {
+    "tStartMs": 48960,
+    "dDurationMs": 5400,
+    "segs": [ {
+      "utf8": "good to be here thank you Tom I'll do a lot and \nI do have tons of pleasure and satisfaction from  "
+    } ]
+  }, {
+    "tStartMs": 54360,
+    "dDurationMs": 5560,
+    "segs": [ {
+      "utf8": "having people become better engineers and pass \ninterviews with my callers so let's record this  "
+    } ]
+  }, {
+    "tStartMs": 60840,
+    "dDurationMs": 6160,
+    "segs": [ {
+      "utf8": "yeah great thanks for doing this and uh yeah demr \nis going to um play the role of the candidate but  "
+    } ]
+  }, {
+    "tStartMs": 67000,
+    "dDurationMs": 4160,
+    "segs": [ {
+      "utf8": "um he he loves kind of helping people get \nbetter interviews and get better at system  "
+    } ]
+  }, {
+    "tStartMs": 71160,
+    "dDurationMs": 5480,
+    "segs": [ {
+      "utf8": "design first and foremost um so he will kind of \nstep out of character at some points during the  "
+    } ]
+  }, {
+    "tStartMs": 76640,
+    "dDurationMs": 5240,
+    "segs": [ {
+      "utf8": "interview and to give you tips on on what kind \nof considerations you should be you should be  "
+    } ]
+  }, {
+    "tStartMs": 81880,
+    "dDurationMs": 7960,
+    "segs": [ {
+      "utf8": "making um okay that sound about right anything you \nwant to add or should we crack straight on excited  "
+    } ]
+  }, {
+    "tStartMs": 90480,
+    "dDurationMs": 7640,
+    "segs": [ {
+      "utf8": "let's do it okay well dimma um the question I \nwanted to ask you today is how would you design"
+    } ]
+  }, {
+    "tStartMs": 98120,
+    "dDurationMs": 10440,
+    "segs": [ {
+      "utf8": "Uber all righty well we start from certain \nrequirements to make sure we're solving the same"
+    } ]
+  }, {
+    "tStartMs": 108560,
+    "dDurationMs": 8280,
+    "segs": [ {
+      "utf8": "problem um usually in an interview \nthere's a section called f FRS and  "
+    } ]
+  }, {
+    "tStartMs": 116840,
+    "dDurationMs": 4960,
+    "segs": [ {
+      "utf8": "nfrs functional nonfunctional requirements \npersonally I don't necessarily like these  "
+    } ]
+  }, {
+    "tStartMs": 121800,
+    "dDurationMs": 5200,
+    "segs": [ {
+      "utf8": "terms that much but they do help so let's \nlet's talk about what we need to solve"
+    } ]
+  }, {
+    "tStartMs": 127000,
+    "dDurationMs": 15360,
+    "segs": [ {
+      "utf8": "for let's first not forget that Uber is a \ndecided Marketplace so we have uh writers  "
+    } ]
+  }, {
+    "tStartMs": 142360,
+    "dDurationMs": 9240,
+    "segs": [ {
+      "utf8": "they B wres um basically if I'm a rer I \nam at Point a or I plan to be at Point a  "
+    } ]
+  }, {
+    "tStartMs": 151600,
+    "dDurationMs": 6440,
+    "segs": [ {
+      "utf8": "right now sometime soon maybe in the future \nand what I do is I use the app to call a cap  "
+    } ]
+  }, {
+    "tStartMs": 158040,
+    "dDurationMs": 7480,
+    "segs": [ {
+      "utf8": "to call a car call a taxi call an Uber to \nget from certain point B from A to B now or"
+    } ]
+  }, {
+    "tStartMs": 165520,
+    "dDurationMs": 10280,
+    "segs": [ {
+      "utf8": "later um there also are the drivers which is \na totally different part of a conversation  "
+    } ]
+  }, {
+    "tStartMs": 175800,
+    "dDurationMs": 5280,
+    "segs": [ {
+      "utf8": "because Uber again is a two-sided Marketplace \nso there no let's put aside the conversation  "
+    } ]
+  }, {
+    "tStartMs": 181080,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "about contractors versus full-time employees \nbasically we we're going to like not touch  "
+    } ]
+  }, {
+    "tStartMs": 186000,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "regulation we got a bunch of people who have \nsigned up for the platform so that they can  "
+    } ]
+  }, {
+    "tStartMs": 192000,
+    "dDurationMs": 3880,
+    "segs": [ {
+      "utf8": "be given rights I assume they pass all the \nbackground checks and they are allowed to  "
+    } ]
+  }, {
+    "tStartMs": 195880,
+    "dDurationMs": 12360,
+    "segs": [ {
+      "utf8": "do so and they also have the app open they \ndo drive people from A to B um and uh so to  "
+    } ]
+  }, {
+    "tStartMs": 208240,
+    "dDurationMs": 4720,
+    "segs": [ {
+      "utf8": "me the most interesting part of uber is how \nto how to connect these two because solving  "
+    } ]
+  }, {
+    "tStartMs": 212960,
+    "dDurationMs": 6480,
+    "segs": [ {
+      "utf8": "for only only this only writers or only \ndrivers is not as fun as doing the whole  "
+    } ]
+  }, {
+    "tStartMs": 219440,
+    "dDurationMs": 3880,
+    "segs": [ {
+      "utf8": "thing as closing the loop but for the sake of \ncompleten let's talk about what the writers can"
+    } ]
+  }, {
+    "tStartMs": 223320,
+    "dDurationMs": 12600,
+    "segs": [ {
+      "utf8": "do um well book a right from us a GPS of \ncourse from the way so that I can book the  "
+    } ]
+  }, {
+    "tStartMs": 235920,
+    "dDurationMs": 12000,
+    "segs": [ {
+      "utf8": "right from where I am right now or from \na given point provided Point uh I can uh  "
+    } ]
+  }, {
+    "tStartMs": 247920,
+    "dDurationMs": 13280,
+    "segs": [ {
+      "utf8": "set custom time I can change the right \nMidway I can cancel it before or Midway  "
+    } ]
+  }, {
+    "tStartMs": 261200,
+    "dDurationMs": 5120,
+    "segs": [ {
+      "utf8": "there are tons of issues to worry about \nwhen it comes to like if it's an airport  "
+    } ]
+  }, {
+    "tStartMs": 266320,
+    "dDurationMs": 5400,
+    "segs": [ {
+      "utf8": "transfer pickup certain pickup points proper \nterminal locations if there is a parking lot  "
+    } ]
+  }, {
+    "tStartMs": 271720,
+    "dDurationMs": 4640,
+    "segs": [ {
+      "utf8": "to enter uh that's a big problem itself \nuh I'm not sure we need to go there but  "
+    } ]
+  }, {
+    "tStartMs": 276360,
+    "dDurationMs": 7920,
+    "segs": [ {
+      "utf8": "I need to I need to put it here pick up \ndrop of points Al to be honest this would"
+    } ]
+  }, {
+    "tStartMs": 284280,
+    "dDurationMs": 4240,
+    "segs": [ {
+      "utf8": "be shared"
+    } ]
+  }, {
+    "tStartMs": 288520,
+    "dDurationMs": 11040,
+    "segs": [ {
+      "utf8": "requirements and also the important \nthing here is that we have ratings"
+    } ]
+  }, {
+    "tStartMs": 302160,
+    "dDurationMs": 3960,
+    "segs": [ {
+      "utf8": "um and when I provide"
+    } ]
+  }, {
+    "tStartMs": 306120,
+    "dDurationMs": 10160,
+    "segs": [ {
+      "utf8": "right so the way it works I think is uh when \nI'm the WR when I'm the driver I start my day  "
+    } ]
+  }, {
+    "tStartMs": 316280,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "I start my shift or what not I I'm back \nin business after lunch and uh I open the  "
+    } ]
+  }, {
+    "tStartMs": 322280,
+    "dDurationMs": 7200,
+    "segs": [ {
+      "utf8": "app and I Mark myself as as available which \nwhich is kind of my first requirement right"
+    } ]
+  }, {
+    "tStartMs": 335240,
+    "dDurationMs": 9800,
+    "segs": [ {
+      "utf8": "out of business one hold and then what \nneeds to happen is Uber is a company  "
+    } ]
+  }, {
+    "tStartMs": 345040,
+    "dDurationMs": 4320,
+    "segs": [ {
+      "utf8": "doesn't request rights other writers \ndo so what happens when I'm marking  "
+    } ]
+  }, {
+    "tStartMs": 349360,
+    "dDurationMs": 6800,
+    "segs": [ {
+      "utf8": "myself as as available U I'm going to \nstart with s I'm going to call them"
+    } ]
+  }, {
+    "tStartMs": 356160,
+    "dDurationMs": 10520,
+    "segs": [ {
+      "utf8": "bids the requests to be the request \nfrom particular writer to be taken  "
+    } ]
+  }, {
+    "tStartMs": 366680,
+    "dDurationMs": 5360,
+    "segs": [ {
+      "utf8": "from point A to point B I should also \nadd here that uh we have different car"
+    } ]
+  }, {
+    "tStartMs": 372040,
+    "dDurationMs": 14120,
+    "segs": [ {
+      "utf8": "types x black uh large and pets or whatnot \nchildren and I should also add that"
+    } ]
+  }, {
+    "tStartMs": 386160,
+    "dDurationMs": 3680,
+    "segs": [ {
+      "utf8": "uh number of"
+    } ]
+  }, {
+    "tStartMs": 389840,
+    "dDurationMs": 10240,
+    "segs": [ {
+      "utf8": "people can be different so as a as a writer of \ncourse I I Mark myself available in a particular  "
+    } ]
+  }, {
+    "tStartMs": 400080,
+    "dDurationMs": 3200,
+    "segs": [ {
+      "utf8": "car the system knows that the system \nknows I'm driving like a Mercedes-Benz  "
+    } ]
+  }, {
+    "tStartMs": 403280,
+    "dDurationMs": 5640,
+    "segs": [ {
+      "utf8": "E-class which means I can take let's say up \nto four people as a driver you mean all yeah  "
+    } ]
+  }, {
+    "tStartMs": 408920,
+    "dDurationMs": 6400,
+    "segs": [ {
+      "utf8": "as a apologist as a driver as a driver yeah \nyou need to just change that it says Rider  "
+    } ]
+  }, {
+    "tStartMs": 415320,
+    "dDurationMs": 5800,
+    "segs": [ {
+      "utf8": "just for oh thank you just not to confuse \nthe viewers yeah you're absolutely right"
+    } ]
+  }, {
+    "tStartMs": 421120,
+    "dDurationMs": 7640,
+    "segs": [ {
+      "utf8": "so do not confuse the"
+    } ]
+  }, {
+    "tStartMs": 428760,
+    "dDurationMs": 4400,
+    "segs": [ {
+      "utf8": "viewers"
+    } ]
+  }, {
+    "tStartMs": 433160,
+    "dDurationMs": 3800,
+    "segs": [ {
+      "utf8": "writers"
+    } ]
+  }, {
+    "tStartMs": 436960,
+    "dDurationMs": 6920,
+    "segs": [ {
+      "utf8": "drivers so what happens with there's a \nthere's a separate conversation behind  "
+    } ]
+  }, {
+    "tStartMs": 443880,
+    "dDurationMs": 5840,
+    "segs": [ {
+      "utf8": "the scenes that has to do with with \nthe price uh price creation uh we  "
+    } ]
+  }, {
+    "tStartMs": 449720,
+    "dDurationMs": 4120,
+    "segs": [ {
+      "utf8": "need need to talk about this eventually \nI don't think it's the time is right now  "
+    } ]
+  }, {
+    "tStartMs": 453840,
+    "dDurationMs": 5520,
+    "segs": [ {
+      "utf8": "but there is a there's a price it's in \nthe shareed requirements price setting"
+    } ]
+  }, {
+    "tStartMs": 459360,
+    "dDurationMs": 14280,
+    "segs": [ {
+      "utf8": "engine plus search pricing search pricing is \na very clever idea it's that if we have a hot  "
+    } ]
+  }, {
+    "tStartMs": 473640,
+    "dDurationMs": 6800,
+    "segs": [ {
+      "utf8": "Marketplace if if it's Christmas or if it's some \nI don't know large sport sport event uh because  "
+    } ]
+  }, {
+    "tStartMs": 480440,
+    "dDurationMs": 5240,
+    "segs": [ {
+      "utf8": "we have so many so much more writers than drivers \nthe price gets higher so that the the drivers make  "
+    } ]
+  }, {
+    "tStartMs": 485680,
+    "dDurationMs": 7360,
+    "segs": [ {
+      "utf8": "extra money and the market works out this thing \nbut from what I understand from what I know Uber  "
+    } ]
+  }, {
+    "tStartMs": 493040,
+    "dDurationMs": 7000,
+    "segs": [ {
+      "utf8": "by Design does not let people bid on prices Uber \nsays the price itself so it's other platforms  "
+    } ]
+  }, {
+    "tStartMs": 500040,
+    "dDurationMs": 4760,
+    "segs": [ {
+      "utf8": "other platforms probably let you like put the \namount as the as the writer and potential as  "
+    } ]
+  }, {
+    "tStartMs": 504800,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "a driver until the orders match like in the order \nbook but with Uber it's it's fixed price computed  "
+    } ]
+  }, {
+    "tStartMs": 509840,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "by the platform given the current conditions \nuh what's important here is that when I am the  "
+    } ]
+  }, {
+    "tStartMs": 515600,
+    "dDurationMs": 5720,
+    "segs": [ {
+      "utf8": "driver and and I receive the bid I'm not entirely \npositive I've not it's been a while since I've  "
+    } ]
+  }, {
+    "tStartMs": 521320,
+    "dDurationMs": 6080,
+    "segs": [ {
+      "utf8": "seen this interface from the inside but I don't \nthink the driver knows a lot about the right  "
+    } ]
+  }, {
+    "tStartMs": 527400,
+    "dDurationMs": 6160,
+    "segs": [ {
+      "utf8": "because I think from the product perspective there \nused to be uh there was a failure mode when if you  "
+    } ]
+  }, {
+    "tStartMs": 533560,
+    "dDurationMs": 4440,
+    "segs": [ {
+      "utf8": "want to go to a certain region where drivers \ndon't want to go to you cannot order a order  "
+    } ]
+  }, {
+    "tStartMs": 538000,
+    "dDurationMs": 5360,
+    "segs": [ {
+      "utf8": "a car there order a uber there there so I think \nwhat they would tell you as a driver is you need  "
+    } ]
+  }, {
+    "tStartMs": 543360,
+    "dDurationMs": 4880,
+    "segs": [ {
+      "utf8": "to pick up somebody at a certain point it's going \nto be on the map on your phone so I know how far  "
+    } ]
+  }, {
+    "tStartMs": 548240,
+    "dDurationMs": 6520,
+    "segs": [ {
+      "utf8": "how far it is chances are it's going to be sent to \nme while I'm driving a current passenger so that  "
+    } ]
+  }, {
+    "tStartMs": 554760,
+    "dDurationMs": 4880,
+    "segs": [ {
+      "utf8": "Uber is a platform really wants their drivers to \nbe driving full-time so when I'm completing the  "
+    } ]
+  }, {
+    "tStartMs": 559640,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "ride my phone will start buzzing me with potential \noptions and I think I don't think it's going to  "
+    } ]
+  }, {
+    "tStartMs": 564680,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "tell me where or is the next potential writer \ngoing but it's going to tell me if it's a short  "
+    } ]
+  }, {
+    "tStartMs": 570560,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "ride or a long ride and I also think there's a big \nimportant feature which was ultimately introduced  "
+    } ]
+  }, {
+    "tStartMs": 575600,
+    "dDurationMs": 6520,
+    "segs": [ {
+      "utf8": "and people loved it drivers loved it when they \ncan Mark themselves as going home so that on the  "
+    } ]
+  }, {
+    "tStartMs": 582120,
+    "dDurationMs": 6320,
+    "segs": [ {
+      "utf8": "one hand you cannot I'm sort of making this up but \nit's fine on the one hand I mean I I I have some I  "
+    } ]
+  }, {
+    "tStartMs": 588440,
+    "dDurationMs": 4240,
+    "segs": [ {
+      "utf8": "have some knowledge but I'm also making indicated \nguesses the way it works is on the one hand you  "
+    } ]
+  }, {
+    "tStartMs": 592680,
+    "dDurationMs": 4120,
+    "segs": [ {
+      "utf8": "don't want to penalize the writers who go to to \nthe area where drivers don't want to go they would  "
+    } ]
+  }, {
+    "tStartMs": 596800,
+    "dDurationMs": 6920,
+    "segs": [ {
+      "utf8": "be embarrassing and insane so the way works is we \nthe platform Uber the platform does not tell that  "
+    } ]
+  }, {
+    "tStartMs": 603720,
+    "dDurationMs": 4440,
+    "segs": [ {
+      "utf8": "driver that this potential customer potential \nRider wants to go to certain region they don't  "
+    } ]
+  }, {
+    "tStartMs": 608160,
+    "dDurationMs": 4600,
+    "segs": [ {
+      "utf8": "want to go to but at the same time when it's like \nlate in my shift and I probably plan to be going  "
+    } ]
+  }, {
+    "tStartMs": 612760,
+    "dDurationMs": 6160,
+    "segs": [ {
+      "utf8": "home I can hit the platform that hey I would much \nrather be going towards that direction so if I'm  "
+    } ]
+  }, {
+    "tStartMs": 618920,
+    "dDurationMs": 4760,
+    "segs": [ {
+      "utf8": "living in a town and I'm like north of it because \nthat's where the airport is I can probably start  "
+    } ]
+  }, {
+    "tStartMs": 623680,
+    "dDurationMs": 9000,
+    "segs": [ {
+      "utf8": "marking myself as please take me to the rights \nhome but not Vice person so on heading help"
+    } ]
+  }, {
+    "tStartMs": 632680,
+    "dDurationMs": 21800,
+    "segs": [ {
+      "utf8": "mode yeah so receive pickup location time most \noften now um how long the right is PL to be how"
+    } ]
+  }, {
+    "tStartMs": 654480,
+    "dDurationMs": 7640,
+    "segs": [ {
+      "utf8": "far and uh yeah I guess that's \nit how many people maybe doesn't"
+    } ]
+  }, {
+    "tStartMs": 662120,
+    "dDurationMs": 3720,
+    "segs": [ {
+      "utf8": "matter but not too"
+    } ]
+  }, {
+    "tStartMs": 665840,
+    "dDurationMs": 8520,
+    "segs": [ {
+      "utf8": "much all right so now if this makes \nsense I think it mostly does so far  "
+    } ]
+  }, {
+    "tStartMs": 674360,
+    "dDurationMs": 3480,
+    "segs": [ {
+      "utf8": "um let's talk about what we're \nactually optimizing for these  "
+    } ]
+  }, {
+    "tStartMs": 677840,
+    "dDurationMs": 7320,
+    "segs": [ {
+      "utf8": "for function requirements um I think \nthe way I would put it nonfunctional"
+    } ]
+  }, {
+    "tStartMs": 685160,
+    "dDurationMs": 11120,
+    "segs": [ {
+      "utf8": "requirements my goal the objective \nis to keep the writers the drivers  "
+    } ]
+  }, {
+    "tStartMs": 696280,
+    "dDurationMs": 4960,
+    "segs": [ {
+      "utf8": "busy oh I think I think there also would also be a"
+    } ]
+  }, {
+    "tStartMs": 701240,
+    "dDurationMs": 13560,
+    "segs": [ {
+      "utf8": "rating my goal is to get the driver Vis that's \nthe number one priority from what I understand  "
+    } ]
+  }, {
+    "tStartMs": 714800,
+    "dDurationMs": 7360,
+    "segs": [ {
+      "utf8": "about the right share in business it's always \nthe provider of the of the service the drivers  "
+    } ]
+  }, {
+    "tStartMs": 722160,
+    "dDurationMs": 8800,
+    "segs": [ {
+      "utf8": "who are in shot Supply so whatever I \ncan do algorithmically design wise um  "
+    } ]
+  }, {
+    "tStartMs": 730960,
+    "dDurationMs": 6040,
+    "segs": [ {
+      "utf8": "financially whatever I can do to keep them more \nengaged especially when it's most needed by the  "
+    } ]
+  }, {
+    "tStartMs": 737000,
+    "dDurationMs": 6680,
+    "segs": [ {
+      "utf8": "writers I should be doing that in terms of \nCIS design for from the algorithm setpoint  "
+    } ]
+  }, {
+    "tStartMs": 743680,
+    "dDurationMs": 5000,
+    "segs": [ {
+      "utf8": "the most interesting part I think would be \nto to improve the algorithms of suggesting  "
+    } ]
+  }, {
+    "tStartMs": 748680,
+    "dDurationMs": 5800,
+    "segs": [ {
+      "utf8": "which drivers get get routed to which \nwriters because that's my bur and but  "
+    } ]
+  }, {
+    "tStartMs": 754480,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "that's my algorithm so I'm thinking out loud \nhere how to how to approach the problem of"
+    } ]
+  }, {
+    "tStartMs": 759640,
+    "dDurationMs": 7000,
+    "segs": [ {
+      "utf8": "logistics so like let's let's \nfocus on the on the on the mention"
+    } ]
+  }, {
+    "tStartMs": 766640,
+    "dDurationMs": 8160,
+    "segs": [ {
+      "utf8": "problem uh write"
+    } ]
+  }, {
+    "tStartMs": 774800,
+    "dDurationMs": 9560,
+    "segs": [ {
+      "utf8": "driver full disclosure I have no idea how it works \nI'm going to be making guesses which is probably  "
+    } ]
+  }, {
+    "tStartMs": 784360,
+    "dDurationMs": 4560,
+    "segs": [ {
+      "utf8": "what you guys should be doing in an interview \nso let's let's start to postulate it from first  "
+    } ]
+  }, {
+    "tStartMs": 788920,
+    "dDurationMs": 8120,
+    "segs": [ {
+      "utf8": "principles um when I don't know what to say I \nwill start saying the most obvious things and  "
+    } ]
+  }, {
+    "tStartMs": 797040,
+    "dDurationMs": 6440,
+    "segs": [ {
+      "utf8": "go with the flow the most obvious thing is that \nimagine I'm the writer I'm taking my phone I'm  "
+    } ]
+  }, {
+    "tStartMs": 803480,
+    "dDurationMs": 9280,
+    "segs": [ {
+      "utf8": "going to call they up I expect some nearby who \nare either Idol or are about to complete their  "
+    } ]
+  }, {
+    "tStartMs": 812760,
+    "dDurationMs": 10200,
+    "segs": [ {
+      "utf8": "trip I'm expecting them to be notified of my \nrequest of my right yeah request um in practice  "
+    } ]
+  }, {
+    "tStartMs": 822960,
+    "dDurationMs": 6560,
+    "segs": [ {
+      "utf8": "I'm almost positive the way it's going to work \ninternally it's that my write request is not  "
+    } ]
+  }, {
+    "tStartMs": 829520,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "sent to all the drivers in the area at the same \ntime I don't really want my drivers to feel like  "
+    } ]
+  }, {
+    "tStartMs": 834680,
+    "dDurationMs": 3960,
+    "segs": [ {
+      "utf8": "like they had to compete for the right I don't \nfeel like I don't want to design the system so  "
+    } ]
+  }, {
+    "tStartMs": 838640,
+    "dDurationMs": 3680,
+    "segs": [ {
+      "utf8": "that that from the product standpoint from the \nux standpoint if I'm the driver who wants to  "
+    } ]
+  }, {
+    "tStartMs": 842320,
+    "dDurationMs": 6560,
+    "segs": [ {
+      "utf8": "make money I'm distracted and frantically Ty \nin yes yes accept the right once uh once I'm  "
+    } ]
+  }, {
+    "tStartMs": 848880,
+    "dDurationMs": 4720,
+    "segs": [ {
+      "utf8": "about to drop off this particular passenger \nand I'm looking for the next one in fact now  "
+    } ]
+  }, {
+    "tStartMs": 853600,
+    "dDurationMs": 4840,
+    "segs": [ {
+      "utf8": "that I think about it one obvious thing would \nbe maybe a lot of drivers would actually enter  "
+    } ]
+  }, {
+    "tStartMs": 858440,
+    "dDurationMs": 6280,
+    "segs": [ {
+      "utf8": "this automatically accept rise mode I'm not \nsure if Uber works this way it might even be  "
+    } ]
+  }, {
+    "tStartMs": 864720,
+    "dDurationMs": 5080,
+    "segs": [ {
+      "utf8": "against certain regulations but if I'm the \nassistant designer I would argue that let's  "
+    } ]
+  }, {
+    "tStartMs": 869800,
+    "dDurationMs": 16120,
+    "segs": [ {
+      "utf8": "extend this also consider some automatically \naccept rights until I don't know t plus 2 hours"
+    } ]
+  }, {
+    "tStartMs": 885920,
+    "dDurationMs": 7520,
+    "segs": [ {
+      "utf8": "5m. so obviously if I'm the driver I have \na good rating I have a good car everything  "
+    } ]
+  }, {
+    "tStartMs": 893440,
+    "dDurationMs": 6480,
+    "segs": [ {
+      "utf8": "fits U the platform if the platform knows \nmy default is to accept the right it's like  "
+    } ]
+  }, {
+    "tStartMs": 899920,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "with Airbnb if you have instant look if \nthis driver yeah I could I could put this"
+    } ]
+  }, {
+    "tStartMs": 904960,
+    "dDurationMs": 11480,
+    "segs": [ {
+      "utf8": "here if it's a platform I know that the writer \nhas request at the right and there is a driver  "
+    } ]
+  }, {
+    "tStartMs": 916440,
+    "dDurationMs": 5400,
+    "segs": [ {
+      "utf8": "available in in their vicinity who's idle or \nabout to be idle soon and who has this instant  "
+    } ]
+  }, {
+    "tStartMs": 921840,
+    "dDurationMs": 6840,
+    "segs": [ {
+      "utf8": "book feature on I will just send this writer \nthe this request and assume that the request  "
+    } ]
+  }, {
+    "tStartMs": 928680,
+    "dDurationMs": 4560,
+    "segs": [ {
+      "utf8": "is taken at the start of the interview you want \nto clarify the scope of the question with the  "
+    } ]
+  }, {
+    "tStartMs": 933240,
+    "dDurationMs": 4480,
+    "segs": [ {
+      "utf8": "interviewer as DEA probably should have done \nhere before jumping in for example did we want  "
+    } ]
+  }, {
+    "tStartMs": 937720,
+    "dDurationMs": 5600,
+    "segs": [ {
+      "utf8": "to focus on just the ride Hing app or include \nUber Eats Etc are we trying to design Uber as  "
+    } ]
+  }, {
+    "tStartMs": 943320,
+    "dDurationMs": 4520,
+    "segs": [ {
+      "utf8": "it is now or a new improved version if you're \ngoing to make assumptions clarify them with  "
+    } ]
+  }, {
+    "tStartMs": 947840,
+    "dDurationMs": 4360,
+    "segs": [ {
+      "utf8": "the interviewer Dema covers the functional \nand nonfunctional requirements in a lot of  "
+    } ]
+  }, {
+    "tStartMs": 952200,
+    "dDurationMs": 4160,
+    "segs": [ {
+      "utf8": "detail if he was interviewing at Uber this would \nprobably be the right way to go because it's a  "
+    } ]
+  }, {
+    "tStartMs": 956360,
+    "dDurationMs": 4160,
+    "segs": [ {
+      "utf8": "very product first company and an Uber interview \nviwer will want to see that you're capable of  "
+    } ]
+  }, {
+    "tStartMs": 960520,
+    "dDurationMs": 4960,
+    "segs": [ {
+      "utf8": "anticipating specific product needs and adapting \naccordingly if you are interviewing at another  "
+    } ]
+  }, {
+    "tStartMs": 965480,
+    "dDurationMs": 3800,
+    "segs": [ {
+      "utf8": "company such as Google you'd probably want to \nbe a bit quicker on the requirements to give  "
+    } ]
+  }, {
+    "tStartMs": 969280,
+    "dDurationMs": 5920,
+    "segs": [ {
+      "utf8": "yourself more time on your design I think QX WIS \nI would say I would do it like this like this so  "
+    } ]
+  }, {
+    "tStartMs": 975200,
+    "dDurationMs": 6760,
+    "segs": [ {
+      "utf8": "we're going to be talking about the algorithm \nplus ux and then we'll start drawing stuff uh"
+    } ]
+  }, {
+    "tStartMs": 981960,
+    "dDurationMs": 10240,
+    "segs": [ {
+      "utf8": "um so from the the way I usually \ndo it is I would say like life of a"
+    } ]
+  }, {
+    "tStartMs": 992200,
+    "dDurationMs": 9040,
+    "segs": [ {
+      "utf8": "right what what what happens to the \nright as it progresses through the"
+    } ]
+  }, {
+    "tStartMs": 1001240,
+    "dDurationMs": 17760,
+    "segs": [ {
+      "utf8": "system first of all it's requested by \nwriter then the system starts looking for a"
+    } ]
+  }, {
+    "tStartMs": 1019000,
+    "dDurationMs": 8400,
+    "segs": [ {
+      "utf8": "driver um let's design so the main idea here is \nthat I don't really want to be sent in the same  "
+    } ]
+  }, {
+    "tStartMs": 1027400,
+    "dDurationMs": 5240,
+    "segs": [ {
+      "utf8": "R to multiple drivers currently simultaneously \nbecause I don't want them to be distracted  "
+    } ]
+  }, {
+    "tStartMs": 1032640,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "so even if even if uh let's say there are no \ninstantly bookable drivers and there are five  "
+    } ]
+  }, {
+    "tStartMs": 1037560,
+    "dDurationMs": 4600,
+    "segs": [ {
+      "utf8": "drivers around me I would still not want to send \na request to all of them simultaneously because  "
+    } ]
+  }, {
+    "tStartMs": 1042160,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "as a driver once I'm seeing the invitation \nto accept the right let's say I want this  "
+    } ]
+  }, {
+    "tStartMs": 1048160,
+    "dDurationMs": 8000,
+    "segs": [ {
+      "utf8": "driver to have 10 15 seconds well 5 10 seconds to \naccept this right and they don't need to compete  "
+    } ]
+  }, {
+    "tStartMs": 1056160,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "with each other so like if I'm the driver I'm \ndropping you off and someone else is about to  "
+    } ]
+  }, {
+    "tStartMs": 1061200,
+    "dDurationMs": 5120,
+    "segs": [ {
+      "utf8": "take a ride from from near where I am and I'm \nseeing the notification hey there's a there's  "
+    } ]
+  }, {
+    "tStartMs": 1066320,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "a person next to us Mark who needs a write as a I \nwould like to design the ux and the flow so that  "
+    } ]
+  }, {
+    "tStartMs": 1072560,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "once as a driver I see this notification I have \nthe next let's say 7even seconds to decide if I  "
+    } ]
+  }, {
+    "tStartMs": 1077480,
+    "dDurationMs": 5320,
+    "segs": [ {
+      "utf8": "accept this right or no for the next 7 seconds \nonce it was sent to me this request this request  "
+    } ]
+  }, {
+    "tStartMs": 1082800,
+    "dDurationMs": 4760,
+    "segs": [ {
+      "utf8": "is potentially mine it's not being routed to \nany other driver so either I accept it within  "
+    } ]
+  }, {
+    "tStartMs": 1087560,
+    "dDurationMs": 5000,
+    "segs": [ {
+      "utf8": "let's say 7 seconds or I don't in which case the \nsystem finds the next potential driver so let's  "
+    } ]
+  }, {
+    "tStartMs": 1092560,
+    "dDurationMs": 10400,
+    "segs": [ {
+      "utf8": "say we're going to have a two two State two- tier \nprocess if instant book not available Pi a driver"
+    } ]
+  }, {
+    "tStartMs": 1102960,
+    "dDurationMs": 8000,
+    "segs": [ {
+      "utf8": "nearby M AI for selection send them the"
+    } ]
+  }, {
+    "tStartMs": 1110960,
+    "dDurationMs": 14960,
+    "segs": [ {
+      "utf8": "request wait I don't know 7 Seconds \ngo to up find driver and be nerdy"
+    } ]
+  }, {
+    "tStartMs": 1125920,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "here if a driver is"
+    } ]
+  }, {
+    "tStartMs": 1131800,
+    "dDurationMs": 11600,
+    "segs": [ {
+      "utf8": "found If a driver who accept it is found go to"
+    } ]
+  }, {
+    "tStartMs": 1143400,
+    "dDurationMs": 10080,
+    "segs": [ {
+      "utf8": "peov so imagine there are no instantly \nbookable drivers yet I pick a driver  "
+    } ]
+  }, {
+    "tStartMs": 1153480,
+    "dDurationMs": 7880,
+    "segs": [ {
+      "utf8": "I send in this D request wait for 7 \nseconds if if no confirmation within  "
+    } ]
+  }, {
+    "tStartMs": 1161360,
+    "dDurationMs": 6400,
+    "segs": [ {
+      "utf8": "this 7 seconds I'm going back to here \nin which case I'm looking for the next  "
+    } ]
+  }, {
+    "tStartMs": 1167760,
+    "dDurationMs": 9200,
+    "segs": [ {
+      "utf8": "driver and instant book gets priority \nif an instant book driver is a varable"
+    } ]
+  }, {
+    "tStartMs": 1176960,
+    "dDurationMs": 5240,
+    "segs": [ {
+      "utf8": "nearby I would"
+    } ]
+  }, {
+    "tStartMs": 1182200,
+    "dDurationMs": 17960,
+    "segs": [ {
+      "utf8": "say same thing but I give them like four seconds \nthat up seven if no explicit rejection is this  "
+    } ]
+  }, {
+    "tStartMs": 1200160,
+    "dDurationMs": 4640,
+    "segs": [ {
+      "utf8": "idea clear I just made this up it could be totally \noff but my point is that if you have people who  "
+    } ]
+  }, {
+    "tStartMs": 1204800,
+    "dDurationMs": 4720,
+    "segs": [ {
+      "utf8": "who are who are in this hot standby mode and \nthey they committed to accept every right I  "
+    } ]
+  }, {
+    "tStartMs": 1209520,
+    "dDurationMs": 5120,
+    "segs": [ {
+      "utf8": "give them like four seconds to say no and if \nthose guys aren't available I book a person  "
+    } ]
+  }, {
+    "tStartMs": 1214640,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "who is not autoc confirming and I give them \n7 Seconds to confirm now we get to the pickup"
+    } ]
+  }, {
+    "tStartMs": 1219800,
+    "dDurationMs": 11760,
+    "segs": [ {
+      "utf8": "mode um so to be honest in terms of sis \ndesign our job is mostly done here pickup  "
+    } ]
+  }, {
+    "tStartMs": 1231560,
+    "dDurationMs": 3360,
+    "segs": [ {
+      "utf8": "is pretty much Google Maps navigations or \nways or Apple Maps I don't think we need  "
+    } ]
+  }, {
+    "tStartMs": 1234920,
+    "dDurationMs": 4400,
+    "segs": [ {
+      "utf8": "to design this we can use a third party \napp of course if we're a company such as  "
+    } ]
+  }, {
+    "tStartMs": 1239320,
+    "dDurationMs": 6040,
+    "segs": [ {
+      "utf8": "Uber we have our own mapping technology \nand and uh driving skilles what I serving  "
+    } ]
+  }, {
+    "tStartMs": 1245360,
+    "dDurationMs": 6200,
+    "segs": [ {
+      "utf8": "capacities what I think we should mention here \nexplicitly is the location is shared in real"
+    } ]
+  }, {
+    "tStartMs": 1251560,
+    "dDurationMs": 18120,
+    "segs": [ {
+      "utf8": "time moreover maybe tweaked to allow for uh \ntraffic lights uh curb site pickup details  "
+    } ]
+  }, {
+    "tStartMs": 1269680,
+    "dDurationMs": 5960,
+    "segs": [ {
+      "utf8": "Etc because I can totally imagine the first \nversion of uber to be using let's say some  "
+    } ]
+  }, {
+    "tStartMs": 1275640,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "standard Google Maps application and then I can \ntotally imagine some standard is failure modes  "
+    } ]
+  }, {
+    "tStartMs": 1280800,
+    "dDurationMs": 6520,
+    "segs": [ {
+      "utf8": "when let's say tiny road is one way and you \nprobably want to be picking up the the writer  "
+    } ]
+  }, {
+    "tStartMs": 1287320,
+    "dDurationMs": 5440,
+    "segs": [ {
+      "utf8": "like 10 meters to the north because that's \nwhere it's easy to pick up this this person  "
+    } ]
+  }, {
+    "tStartMs": 1292760,
+    "dDurationMs": 3760,
+    "segs": [ {
+      "utf8": "so it's it's a separate conversation I don't \nthink we should go there it's it's a bit too  "
+    } ]
+  }, {
+    "tStartMs": 1296520,
+    "dDurationMs": 6600,
+    "segs": [ {
+      "utf8": "low level but fundamentally in the pickup mode \nuntil until the match has been confirmed until  "
+    } ]
+  }, {
+    "tStartMs": 1303120,
+    "dDurationMs": 4760,
+    "segs": [ {
+      "utf8": "we know both of the GPS uh coordinates \nof both people of both phones and until  "
+    } ]
+  }, {
+    "tStartMs": 1307880,
+    "dDurationMs": 7240,
+    "segs": [ {
+      "utf8": "we know that the the driver has started the \nright we're still on the pickup mode pickup  "
+    } ]
+  }, {
+    "tStartMs": 1315120,
+    "dDurationMs": 13480,
+    "segs": [ {
+      "utf8": "mode pickup mode uh can still cancel \nfrom either side might be for a Fe and"
+    } ]
+  }, {
+    "tStartMs": 1328600,
+    "dDurationMs": 8320,
+    "segs": [ {
+      "utf8": "U we in in this case if it cancel go back to  "
+    } ]
+  }, {
+    "tStartMs": 1336920,
+    "dDurationMs": 11040,
+    "segs": [ {
+      "utf8": "the starting point once approved once \nthe right is confirmed go to INR note"
+    } ]
+  }, {
+    "tStartMs": 1348560,
+    "dDurationMs": 9440,
+    "segs": [ {
+      "utf8": "confirmed includes but is not limited \nto GPS manual confirmation by the"
+    } ]
+  }, {
+    "tStartMs": 1358000,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "driver perhaps driver perhaps a"
+    } ]
+  }, {
+    "tStartMs": 1363880,
+    "dDurationMs": 12080,
+    "segs": [ {
+      "utf8": "code I know there's a feature when oh uh there's \na feature when uh in certain locations in certain  "
+    } ]
+  }, {
+    "tStartMs": 1375960,
+    "dDurationMs": 3680,
+    "segs": [ {
+      "utf8": "jurisdictions you don't really trust people \npeople to trust each other so the platform  "
+    } ]
+  }, {
+    "tStartMs": 1379640,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "need to confirm that it's it's actually the the \ncorrect Rider got into the correct car and the  "
+    } ]
+  }, {
+    "tStartMs": 1384560,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "way Uber solves for this is they have a code like \na four-digit code or QR code so the the writer  "
+    } ]
+  }, {
+    "tStartMs": 1389720,
+    "dDurationMs": 6640,
+    "segs": [ {
+      "utf8": "needs to share this with the driver and only once \nthat is confirmed the WR can start um yeah I think  "
+    } ]
+  }, {
+    "tStartMs": 1396360,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "I think this is mostly taken care of I could go I \ncould go on with the part where you like Liberty  "
+    } ]
+  }, {
+    "tStartMs": 1401280,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "or something but I think we're good enough what \ndo you say what would you say shall we shall we  "
+    } ]
+  }, {
+    "tStartMs": 1406320,
+    "dDurationMs": 9440,
+    "segs": [ {
+      "utf8": "get to shall we get to Dr let's start designing \nyeah I think I think we we've covered enough there"
+    } ]
+  }, {
+    "tStartMs": 1415760,
+    "dDurationMs": 11000,
+    "segs": [ {
+      "utf8": "um do I have oh these are apps do I have \npictures okay fine I have a rectangle you  "
+    } ]
+  }, {
+    "tStartMs": 1426760,
+    "dDurationMs": 5600,
+    "segs": [ {
+      "utf8": "work at mirror so you should have everything \nright I know right well it's a personal account  "
+    } ]
+  }, {
+    "tStartMs": 1432360,
+    "dDurationMs": 6920,
+    "segs": [ {
+      "utf8": "it's it's a free version I have a lot more \nokay Labs enabled so um I'm going to start  "
+    } ]
+  }, {
+    "tStartMs": 1439280,
+    "dDurationMs": 4720,
+    "segs": [ {
+      "utf8": "from the writer which is the user because I \nthink it's it's where the flow mostly it's  "
+    } ]
+  }, {
+    "tStartMs": 1444000,
+    "dDurationMs": 8240,
+    "segs": [ {
+      "utf8": "it's where the more most intense flow \nhappens all right s design diagrams and"
+    } ]
+  }, {
+    "tStartMs": 1452240,
+    "dDurationMs": 12120,
+    "segs": [ {
+      "utf8": "boxes there are many ways to approach this and \nhonestly I it's been a while since I was doing  "
+    } ]
+  }, {
+    "tStartMs": 1464360,
+    "dDurationMs": 8160,
+    "segs": [ {
+      "utf8": "this as a candidate but a lot of times so the the \nfirst high level question to ask is are we are we  "
+    } ]
+  }, {
+    "tStartMs": 1472520,
+    "dDurationMs": 6960,
+    "segs": [ {
+      "utf8": "using any cloud provider like Amazon a US Google \nCloud Microsoft Azure something else or are we  "
+    } ]
+  }, {
+    "tStartMs": 1479480,
+    "dDurationMs": 4960,
+    "segs": [ {
+      "utf8": "are we totally bare metal like our own Hardware a \ngood design is of course agnostic to this but it's  "
+    } ]
+  }, {
+    "tStartMs": 1484440,
+    "dDurationMs": 7080,
+    "segs": [ {
+      "utf8": "worth mentioning that so I'm going to I'm going \nto do something like this I'm going to have a"
+    } ]
+  }, {
+    "tStartMs": 1491520,
+    "dDurationMs": 13600,
+    "segs": [ {
+      "utf8": "dashed angle should be far thicker \nby the way yeah that's like my"
+    } ]
+  }, {
+    "tStartMs": 1505120,
+    "dDurationMs": 9840,
+    "segs": [ {
+      "utf8": "cloud misclick uh the way it always happens \nthe first box inside this thinky is a low"
+    } ]
+  }, {
+    "tStartMs": 1514960,
+    "dDurationMs": 8960,
+    "segs": [ {
+      "utf8": "balancer a lot people a lot of people Miss \nwhat low balancers actually do so it's a  "
+    } ]
+  }, {
+    "tStartMs": 1523920,
+    "dDurationMs": 12520,
+    "segs": [ {
+      "utf8": "it's a cluster which is traditionally denoted \nby having a couple of them yeah lb cluster I  "
+    } ]
+  }, {
+    "tStartMs": 1536440,
+    "dDurationMs": 10400,
+    "segs": [ {
+      "utf8": "think I can s it back uh the way it works is my \nrequest hits one of the instances of this loow"
+    } ]
+  }, {
+    "tStartMs": 1546840,
+    "dDurationMs": 11640,
+    "segs": [ {
+      "utf8": "balancer can make it thicker um in the case \nof uber it's not that important because extra  "
+    } ]
+  }, {
+    "tStartMs": 1558480,
+    "dDurationMs": 6560,
+    "segs": [ {
+      "utf8": "let's say 2300 millisecond latency extra like \n3 seconds would not make things very different  "
+    } ]
+  }, {
+    "tStartMs": 1565040,
+    "dDurationMs": 4840,
+    "segs": [ {
+      "utf8": "but realistically what you want to do is you \nwant the request from the user to enter your  "
+    } ]
+  }, {
+    "tStartMs": 1569880,
+    "dDurationMs": 5720,
+    "segs": [ {
+      "utf8": "private Network as soon as possible so lot \nbalances not are not only used to to sh your  "
+    } ]
+  }, {
+    "tStartMs": 1575600,
+    "dDurationMs": 4200,
+    "segs": [ {
+      "utf8": "your backend servers so that you can you \ncan add more of them they also serve to  "
+    } ]
+  }, {
+    "tStartMs": 1579800,
+    "dDurationMs": 4080,
+    "segs": [ {
+      "utf8": "to make sure that they ENT use your device \nthe request from there enters my system as  "
+    } ]
+  }, {
+    "tStartMs": 1583880,
+    "dDurationMs": 4040,
+    "segs": [ {
+      "utf8": "soon as possible and whatever Network calls \nhappen behind the scenes they happen with my  "
+    } ]
+  }, {
+    "tStartMs": 1587920,
+    "dDurationMs": 4640,
+    "segs": [ {
+      "utf8": "own network which is controlled by me which \nis low which is low latency High throughput  "
+    } ]
+  }, {
+    "tStartMs": 1592560,
+    "dDurationMs": 7240,
+    "segs": [ {
+      "utf8": "far more reliable that's what w balancer \ndoes here then it would fundamentally"
+    } ]
+  }, {
+    "tStartMs": 1599800,
+    "dDurationMs": 7800,
+    "segs": [ {
+      "utf8": "uh there's a big thing to say to be \nsaid here about uh G sharding I'll  "
+    } ]
+  }, {
+    "tStartMs": 1607600,
+    "dDurationMs": 3880,
+    "segs": [ {
+      "utf8": "get there in a moment so fundamentally I \nwould say like hypothetically this could  "
+    } ]
+  }, {
+    "tStartMs": 1611480,
+    "dDurationMs": 8040,
+    "segs": [ {
+      "utf8": "this could literally be something like uh \nyou can do it text this could literally"
+    } ]
+  }, {
+    "tStartMs": 1619520,
+    "dDurationMs": 13200,
+    "segs": [ {
+      "utf8": "be api. uber.com hypothetically that's that's the \nresource where the request comes to if if if it's  "
+    } ]
+  }, {
+    "tStartMs": 1632720,
+    "dDurationMs": 6720,
+    "segs": [ {
+      "utf8": "HTTP is of course hgps to be safe and secure \nto be not interceptable at least not easily  "
+    } ]
+  }, {
+    "tStartMs": 1639440,
+    "dDurationMs": 7480,
+    "segs": [ {
+      "utf8": "interceptable now behind the scenes internally \nit should still be next to the arrow behind the  "
+    } ]
+  }, {
+    "tStartMs": 1646920,
+    "dDurationMs": 9800,
+    "segs": [ {
+      "utf8": "scenes internally what happens is I would argue \nuh for many reasons low balancing and regulation  "
+    } ]
+  }, {
+    "tStartMs": 1656720,
+    "dDurationMs": 7920,
+    "segs": [ {
+      "utf8": "different cities have their different have their \nown uh shs have their own specific sets of sets  "
+    } ]
+  }, {
+    "tStartMs": 1664640,
+    "dDurationMs": 10240,
+    "segs": [ {
+      "utf8": "of servers to serve the cities so it's like a \nper location Uber server what I'm doing here  "
+    } ]
+  }, {
+    "tStartMs": 1674880,
+    "dDurationMs": 8160,
+    "segs": [ {
+      "utf8": "is I'm starting to get some work of routing the \ntraffic done on the low balancer level because  "
+    } ]
+  }, {
+    "tStartMs": 1683040,
+    "dDurationMs": 6320,
+    "segs": [ {
+      "utf8": "once you once the writer once once my phone talks \nto law balancer first of all the phone knows where  "
+    } ]
+  }, {
+    "tStartMs": 1689360,
+    "dDurationMs": 4880,
+    "segs": [ {
+      "utf8": "I am I assume there are some GPS coordinates \nI so if I'm in Austin it knows I'm in Austin  "
+    } ]
+  }, {
+    "tStartMs": 1694240,
+    "dDurationMs": 4000,
+    "segs": [ {
+      "utf8": "if I'm in Singapore it knows I'm in Singapore \nso the request of the law balancer even even if  "
+    } ]
+  }, {
+    "tStartMs": 1698240,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "it hits the same end point the same high level \ntop level end point there's enough metadata for  "
+    } ]
+  }, {
+    "tStartMs": 1702920,
+    "dDurationMs": 7920,
+    "segs": [ {
+      "utf8": "the law balancer to already decide that I'm \ndrawing multiple of these because they also"
+    } ]
+  }, {
+    "tStartMs": 1710840,
+    "dDurationMs": 11880,
+    "segs": [ {
+      "utf8": "shed they know that the request would go to let's \nsay um Austin I'm not sure Austin has Uber by the  "
+    } ]
+  }, {
+    "tStartMs": 1722720,
+    "dDurationMs": 7720,
+    "segs": [ {
+      "utf8": "way so we can say it's there wasn't there was a \nnew article a couple years ago that that wasn't  "
+    } ]
+  }, {
+    "tStartMs": 1730440,
+    "dDurationMs": 7040,
+    "segs": [ {
+      "utf8": "that is it doesn't so let's say it's New York New \nYork and let's say keep keep waging this thingy  "
+    } ]
+  }, {
+    "tStartMs": 1737480,
+    "dDurationMs": 9200,
+    "segs": [ {
+      "utf8": "and let's say there is something else which is \nSan Francisco why not let's say it's let's say  "
+    } ]
+  }, {
+    "tStartMs": 1746680,
+    "dDurationMs": 7640,
+    "segs": [ {
+      "utf8": "it's Brin because we're International so the \nlot balancer at the moment it needs to make  "
+    } ]
+  }, {
+    "tStartMs": 1754320,
+    "dDurationMs": 6080,
+    "segs": [ {
+      "utf8": "a decision where to where to pass this request \nto it can decide which which which Uber location  "
+    } ]
+  }, {
+    "tStartMs": 1760400,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "it goes to and there could be like in Europe \nthere could be gdpr rules so for example per  "
+    } ]
+  }, {
+    "tStartMs": 1765080,
+    "dDurationMs": 4760,
+    "segs": [ {
+      "utf8": "location data for burden cannot leave burden not \nleave Germany um I cannot comment on this right  "
+    } ]
+  }, {
+    "tStartMs": 1769840,
+    "dDurationMs": 7040,
+    "segs": [ {
+      "utf8": "now I what so far the only thing I'm saying \nis that the moment the like my my request my  "
+    } ]
+  }, {
+    "tStartMs": 1776880,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "tab gets to the actual backend service here \nit's already tied to a particular location I  "
+    } ]
+  }, {
+    "tStartMs": 1782760,
+    "dDurationMs": 7120,
+    "segs": [ {
+      "utf8": "think it's fine now this this is a tricky part \nwhen people draw multiple things multiple boxes  "
+    } ]
+  }, {
+    "tStartMs": 1789880,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "like like I did here it means a couple things \none thing it means is that if one of them dies  "
+    } ]
+  }, {
+    "tStartMs": 1795760,
+    "dDurationMs": 5120,
+    "segs": [ {
+      "utf8": "the system is still up and running that's called \nhigh availability that's called resiliency that's  "
+    } ]
+  }, {
+    "tStartMs": 1800880,
+    "dDurationMs": 4400,
+    "segs": [ {
+      "utf8": "called durability well durability is mostly about \nnot losing the data but still we need multiple of  "
+    } ]
+  }, {
+    "tStartMs": 1805280,
+    "dDurationMs": 6960,
+    "segs": [ {
+      "utf8": "this that one of them can die and then once \nonce we commit to having multiple notes um  "
+    } ]
+  }, {
+    "tStartMs": 1812240,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "it's a very it's a very delicate conversation \nhow to how to proceed here because in terms  "
+    } ]
+  }, {
+    "tStartMs": 1817400,
+    "dDurationMs": 5280,
+    "segs": [ {
+      "utf8": "of the system design architecture logically we \ncan treat this as a single box and then decide  "
+    } ]
+  }, {
+    "tStartMs": 1822680,
+    "dDurationMs": 6320,
+    "segs": [ {
+      "utf8": "how to best make sure it runs in a way that is \nhighly available so nodes can die but it's still  "
+    } ]
+  }, {
+    "tStartMs": 1829000,
+    "dDurationMs": 7240,
+    "segs": [ {
+      "utf8": "functional and durable so that once no once nodes \ndie they don't lose any data so let's pretend for  "
+    } ]
+  }, {
+    "tStartMs": 1836240,
+    "dDurationMs": 6160,
+    "segs": [ {
+      "utf8": "a moment logically that the whole Burly is \nserved by a single by a single instance of  "
+    } ]
+  }, {
+    "tStartMs": 1842400,
+    "dDurationMs": 5840,
+    "segs": [ {
+      "utf8": "an Uber server for buring uh as a high-profile \nengineer I would actually go as far as saying  "
+    } ]
+  }, {
+    "tStartMs": 1848240,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "that it's not impossible because the total \namount of traffic to This Server when it comes"
+    } ]
+  }, {
+    "tStartMs": 1853280,
+    "dDurationMs": 5280,
+    "segs": [ {
+      "utf8": "to okay that's this this deserves this warrant's  "
+    } ]
+  }, {
+    "tStartMs": 1858560,
+    "dDurationMs": 9080,
+    "segs": [ {
+      "utf8": "drawing you have the so-called Riot \npath which are the mutations State"
+    } ]
+  }, {
+    "tStartMs": 1867640,
+    "dDurationMs": 5080,
+    "segs": [ {
+      "utf8": "changes and you have the read"
+    } ]
+  }, {
+    "tStartMs": 1872720,
+    "dDurationMs": 9320,
+    "segs": [ {
+      "utf8": "path that's immutable"
+    } ]
+  }, {
+    "tStartMs": 1882040,
+    "dDurationMs": 9760,
+    "segs": [ {
+      "utf8": "request for example when I'm just opening the \napp I really I literally want to see how many  "
+    } ]
+  }, {
+    "tStartMs": 1891800,
+    "dDurationMs": 4880,
+    "segs": [ {
+      "utf8": "cars are there available I don't need to go \nto the right path I can go to the read path  "
+    } ]
+  }, {
+    "tStartMs": 1896680,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "and read path is super easy to scale because \nthat's what that's where strong versus vention  "
+    } ]
+  }, {
+    "tStartMs": 1902680,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "consistency comes them to play read path can \nbe eventually consistent if I if I literally  "
+    } ]
+  }, {
+    "tStartMs": 1907360,
+    "dDurationMs": 5640,
+    "segs": [ {
+      "utf8": "open the Uber app to see how many cars are there \naround me if my data if the data I'm seeing is 3  "
+    } ]
+  }, {
+    "tStartMs": 1913000,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "five seconds behind heck even 30 seconds behind \nthe product still doesn't suck it still fulfills  "
+    } ]
+  }, {
+    "tStartMs": 1917920,
+    "dDurationMs": 5240,
+    "segs": [ {
+      "utf8": "all the requirements so the truth is that this \nis super easy to scale because it can can be  "
+    } ]
+  }, {
+    "tStartMs": 1923160,
+    "dDurationMs": 12080,
+    "segs": [ {
+      "utf8": "eventually consistent where as the right path \ncan be eventually consistent the right path is  "
+    } ]
+  }, {
+    "tStartMs": 1935240,
+    "dDurationMs": 6960,
+    "segs": [ {
+      "utf8": "where potential data races collisions happen on \nthe on the r path if if both of us open the app  "
+    } ]
+  }, {
+    "tStartMs": 1942200,
+    "dDurationMs": 4320,
+    "segs": [ {
+      "utf8": "in the same location and we see slightly different \npictures that's okay on the right path if both of  "
+    } ]
+  }, {
+    "tStartMs": 1946520,
+    "dDurationMs": 5840,
+    "segs": [ {
+      "utf8": "us order right we get to different servers here \nyou get to server a I get to server B and somehow  "
+    } ]
+  }, {
+    "tStartMs": 1952360,
+    "dDurationMs": 5480,
+    "segs": [ {
+      "utf8": "these servers are not in line with what's going \non and the same driver accepts AR rise from both  "
+    } ]
+  }, {
+    "tStartMs": 1957840,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "of us that's a disaster that's a catastrophe \nthat's what should be prevented so logically  "
+    } ]
+  }, {
+    "tStartMs": 1963000,
+    "dDurationMs": 6680,
+    "segs": [ {
+      "utf8": "the right path is where this single source of \nTruth sing singular like mut slog so to speak  "
+    } ]
+  }, {
+    "tStartMs": 1969680,
+    "dDurationMs": 7680,
+    "segs": [ {
+      "utf8": "synchronized section that's where it happens uh \nso I'm going to put it here and say should be"
+    } ]
+  }, {
+    "tStartMs": 1977360,
+    "dDurationMs": 8240,
+    "segs": [ {
+      "utf8": "synchronized single source of"
+    } ]
+  }, {
+    "tStartMs": 1985600,
+    "dDurationMs": 10000,
+    "segs": [ {
+      "utf8": "Truth and so one of the most difficult problems of \nsystem design is how to how to build synchronized  "
+    } ]
+  }, {
+    "tStartMs": 1995600,
+    "dDurationMs": 5600,
+    "segs": [ {
+      "utf8": "s of Truth systems that are distributed but \nlogically for now we can we can pretend there's  "
+    } ]
+  }, {
+    "tStartMs": 2001200,
+    "dDurationMs": 6880,
+    "segs": [ {
+      "utf8": "a single machine and again as a high performance \nperson I know it's possible if you if you take  "
+    } ]
+  }, {
+    "tStartMs": 2008080,
+    "dDurationMs": 5440,
+    "segs": [ {
+      "utf8": "all the read path ques this these guys if you take \nthem out of scope for now if you if if you pretend  "
+    } ]
+  }, {
+    "tStartMs": 2013520,
+    "dDurationMs": 4960,
+    "segs": [ {
+      "utf8": "there is enough machines that are only eventually \nconsistent they can be behind the world time they  "
+    } ]
+  }, {
+    "tStartMs": 2018480,
+    "dDurationMs": 4120,
+    "segs": [ {
+      "utf8": "cannot be up to date they might be like 5 Seconds \n10 seconds 15 seconds behind the actual state of  "
+    } ]
+  }, {
+    "tStartMs": 2022600,
+    "dDurationMs": 6120,
+    "segs": [ {
+      "utf8": "the fleet uh we ignore them for now they just work \nthat's not difficult for the right path I'm going  "
+    } ]
+  }, {
+    "tStartMs": 2028720,
+    "dDurationMs": 5000,
+    "segs": [ {
+      "utf8": "to claim that the total number of requests for \nnew rights per second within the whole city of  "
+    } ]
+  }, {
+    "tStartMs": 2033720,
+    "dDurationMs": 5560,
+    "segs": [ {
+      "utf8": "burlin is going to be quite small if you look \nback into all the state transitions so you go  "
+    } ]
+  }, {
+    "tStartMs": 2039280,
+    "dDurationMs": 8320,
+    "segs": [ {
+      "utf8": "to we have pickup mode find the driver mode then \nwe get the INRI mode etc etc then you can have to  "
+    } ]
+  }, {
+    "tStartMs": 2047600,
+    "dDurationMs": 5960,
+    "segs": [ {
+      "utf8": "confirm the right and you may like leave a tip \nif you look at all the state transitions that  "
+    } ]
+  }, {
+    "tStartMs": 2053560,
+    "dDurationMs": 5360,
+    "segs": [ {
+      "utf8": "needs to be correctly synchronized with with \none another that needs to be that need to be  "
+    } ]
+  }, {
+    "tStartMs": 2058920,
+    "dDurationMs": 4240,
+    "segs": [ {
+      "utf8": "respected the invariance such as no writer can \nno driver can accept two writers at the same  "
+    } ]
+  }, {
+    "tStartMs": 2063160,
+    "dDurationMs": 6560,
+    "segs": [ {
+      "utf8": "time I'm going to claim that for a single C of \nBurling the number of mutating cures per second  "
+    } ]
+  }, {
+    "tStartMs": 2069720,
+    "dDurationMs": 7000,
+    "segs": [ {
+      "utf8": "is actually quite small it is certainly way under \none way under 1,000 I just cannot possibly imagine  "
+    } ]
+  }, {
+    "tStartMs": 2076720,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "that on the right path in terms of synchronizing \ndrivers and Riders you order more than one 1,000  "
+    } ]
+  }, {
+    "tStartMs": 2081880,
+    "dDurationMs": 6320,
+    "segs": [ {
+      "utf8": "rids per second so that's actually something \none machine can handle uh in practice there will  "
+    } ]
+  }, {
+    "tStartMs": 2088200,
+    "dDurationMs": 8160,
+    "segs": [ {
+      "utf8": "be more complexities here let me try to explain \nthis in this limited amount of time we have left  "
+    } ]
+  }, {
+    "tStartMs": 2096360,
+    "dDurationMs": 6000,
+    "segs": [ {
+      "utf8": "in practice is so the r path is a picture of all \nthe cars available so to speak the right path is"
+    } ]
+  }, {
+    "tStartMs": 2102360,
+    "dDurationMs": 12920,
+    "segs": [ {
+      "utf8": "the right wrer to driver matching State machine"
+    } ]
+  }, {
+    "tStartMs": 2115280,
+    "dDurationMs": 11520,
+    "segs": [ {
+      "utf8": "synchronization we also have something \nin the middle which is synchronizing"
+    } ]
+  }, {
+    "tStartMs": 2129360,
+    "dDurationMs": 5480,
+    "segs": [ {
+      "utf8": "specific data uh the data specifically particular"
+    } ]
+  }, {
+    "tStartMs": 2134840,
+    "dDurationMs": 11640,
+    "segs": [ {
+      "utf8": "right let me explain that's important uh I believe \nUber has this feature share my right so I can as a  "
+    } ]
+  }, {
+    "tStartMs": 2146480,
+    "dDurationMs": 6600,
+    "segs": [ {
+      "utf8": "writer I can request a WR get matched to a driver \nget matched with the driver get into the car is  "
+    } ]
+  }, {
+    "tStartMs": 2153080,
+    "dDurationMs": 4800,
+    "segs": [ {
+      "utf8": "a right to the airport and I want my peers my \nwife or what not to do not be worried so I can  "
+    } ]
+  }, {
+    "tStartMs": 2157880,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "share them I can send the link with them right \nthrough the Uber app so that they can watch in in  "
+    } ]
+  }, {
+    "tStartMs": 2162560,
+    "dDurationMs": 5360,
+    "segs": [ {
+      "utf8": "real time where my where my location is of course \ninternally even if you don't share your right Uber  "
+    } ]
+  }, {
+    "tStartMs": 2167920,
+    "dDurationMs": 7560,
+    "segs": [ {
+      "utf8": "backend Services absolutely do know where every \ndriver Rider pair is the point is this potential  "
+    } ]
+  }, {
+    "tStartMs": 2175480,
+    "dDurationMs": 6760,
+    "segs": [ {
+      "utf8": "component this guy sees a lot more traffic if if \nthe state changes such as right requested right  "
+    } ]
+  }, {
+    "tStartMs": 2182240,
+    "dDurationMs": 4120,
+    "segs": [ {
+      "utf8": "canceled Right started right ended for these I \nbelieve the traffic would be quite small for the  "
+    } ]
+  }, {
+    "tStartMs": 2186360,
+    "dDurationMs": 7280,
+    "segs": [ {
+      "utf8": "whole city in New York it's likely under three \ndigits maybe maybe low four digits for this the  "
+    } ]
+  }, {
+    "tStartMs": 2193640,
+    "dDurationMs": 6560,
+    "segs": [ {
+      "utf8": "for the data specific to individual rights the \nQPS is far larger because like in a perfect in a  "
+    } ]
+  }, {
+    "tStartMs": 2200200,
+    "dDurationMs": 6320,
+    "segs": [ {
+      "utf8": "simple terms you can imagine that let's say every \nfive or 10 seconds the car the driver uh updates  "
+    } ]
+  }, {
+    "tStartMs": 2206520,
+    "dDurationMs": 6960,
+    "segs": [ {
+      "utf8": "their position their coordinates connecting to \nthe server in deck so the traffic here this is  "
+    } ]
+  }, {
+    "tStartMs": 2213480,
+    "dDurationMs": 4360,
+    "segs": [ {
+      "utf8": "the most the most important part thing to keep \nright this is where conf can have this is where  "
+    } ]
+  }, {
+    "tStartMs": 2217840,
+    "dDurationMs": 4800,
+    "segs": [ {
+      "utf8": "we need to maintain the invariant when the \nsame driver cannot pick up two Riders this  "
+    } ]
+  }, {
+    "tStartMs": 2222640,
+    "dDurationMs": 4960,
+    "segs": [ {
+      "utf8": "here the traffic is manageable by even a single \nmachine here we have a lot more traffic even if  "
+    } ]
+  }, {
+    "tStartMs": 2227600,
+    "dDurationMs": 5640,
+    "segs": [ {
+      "utf8": "it's let's say every 5 Seconds there's a beacon \nfrom every single uh driver currently driving  "
+    } ]
+  }, {
+    "tStartMs": 2233240,
+    "dDurationMs": 4000,
+    "segs": [ {
+      "utf8": "for Uber or waiting to pick up someone and for \nevery single Rider who is at least waiting for  "
+    } ]
+  }, {
+    "tStartMs": 2237240,
+    "dDurationMs": 7360,
+    "segs": [ {
+      "utf8": "the right or in the right that can easily be \nthousands of this driving life so you you can  "
+    } ]
+  }, {
+    "tStartMs": 2244600,
+    "dDurationMs": 6080,
+    "segs": [ {
+      "utf8": "easily get tens of thousands of requests per \nsecond here but the trick is for this part you  "
+    } ]
+  }, {
+    "tStartMs": 2250680,
+    "dDurationMs": 6040,
+    "segs": [ {
+      "utf8": "don't you cannot potentially have the data from \none right colliding the data from from the other  "
+    } ]
+  }, {
+    "tStartMs": 2256720,
+    "dDurationMs": 5320,
+    "segs": [ {
+      "utf8": "right there's no conflict there's no there's no \npath there's no room for for conflicts there's no  "
+    } ]
+  }, {
+    "tStartMs": 2262040,
+    "dDurationMs": 7360,
+    "segs": [ {
+      "utf8": "confusion you can break your your your logical in \nvariance here but not here so this basically what  "
+    } ]
+  }, {
+    "tStartMs": 2269400,
+    "dDurationMs": 9000,
+    "segs": [ {
+      "utf8": "I'm drawing right now would be logically speaking \na different subcomponents of uh of this per"
+    } ]
+  }, {
+    "tStartMs": 2278400,
+    "dDurationMs": 10560,
+    "segs": [ {
+      "utf8": "location of this per location Uber server so this \nis a fleet of servers I've I've ploted a couple  "
+    } ]
+  }, {
+    "tStartMs": 2288960,
+    "dDurationMs": 6480,
+    "segs": [ {
+      "utf8": "of them I would argue that in practice for this \nlogic but let's actually let's start from let's  "
+    } ]
+  }, {
+    "tStartMs": 2295440,
+    "dDurationMs": 5120,
+    "segs": [ {
+      "utf8": "start botom up for the for the read path you \ncan add as many machines as you want they just  "
+    } ]
+  }, {
+    "tStartMs": 2300560,
+    "dDurationMs": 6080,
+    "segs": [ {
+      "utf8": "subscribe the feed feed of internal updates and \nuh it's like a CDN more or less to get to get  "
+    } ]
+  }, {
+    "tStartMs": 2306640,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "snapshot of of which cars are currently available \nin in berl you get to one of many of these notes  "
+    } ]
+  }, {
+    "tStartMs": 2311680,
+    "dDurationMs": 4720,
+    "segs": [ {
+      "utf8": "and you get the data that is somewhat accurate \nyou just scale this as necessary I would argue  "
+    } ]
+  }, {
+    "tStartMs": 2316400,
+    "dDurationMs": 6680,
+    "segs": [ {
+      "utf8": "there could be dozens of them maybe five five \nto 10 for Bry maybe 15 for New York maybe 50  "
+    } ]
+  }, {
+    "tStartMs": 2323080,
+    "dDurationMs": 6120,
+    "segs": [ {
+      "utf8": "or 100 if you don't write your code correctly but \nthat's that's a large number for these things you  "
+    } ]
+  }, {
+    "tStartMs": 2329200,
+    "dDurationMs": 7520,
+    "segs": [ {
+      "utf8": "need as a large number of them too but each so \nthese notes are all identical in logic they all  "
+    } ]
+  }, {
+    "tStartMs": 2336720,
+    "dDurationMs": 4760,
+    "segs": [ {
+      "utf8": "interchangeable they're all funable if one of them \ndies you just replace it by a new one uh they they  "
+    } ]
+  }, {
+    "tStartMs": 2341480,
+    "dDurationMs": 7000,
+    "segs": [ {
+      "utf8": "all serve the same purpose and have the same data \nfor these logic um if one node dies what happens  "
+    } ]
+  }, {
+    "tStartMs": 2348480,
+    "dDurationMs": 7160,
+    "segs": [ {
+      "utf8": "is you start the traffic from your writers drivers \nand active rights you sh this traffic so that a  "
+    } ]
+  }, {
+    "tStartMs": 2355640,
+    "dDurationMs": 6320,
+    "segs": [ {
+      "utf8": "particular data point in a particular time goes to \na particular server you can use consistent hashen  "
+    } ]
+  }, {
+    "tStartMs": 2361960,
+    "dDurationMs": 5440,
+    "segs": [ {
+      "utf8": "to send send it to two or three machines just to \nmake sure if one dies they is lost but honestly  "
+    } ]
+  }, {
+    "tStartMs": 2367400,
+    "dDurationMs": 5240,
+    "segs": [ {
+      "utf8": "that's not important because if if a machine dies \nwell what's the worst that can happen for the next  "
+    } ]
+  }, {
+    "tStartMs": 2372640,
+    "dDurationMs": 4400,
+    "segs": [ {
+      "utf8": "I would say half a minute you lose track of this \nbig and keep alive messages of where the driver  "
+    } ]
+  }, {
+    "tStartMs": 2377040,
+    "dDurationMs": 5400,
+    "segs": [ {
+      "utf8": "is no big deal on a company scale so this is also \nstraightforward although you need to work on your  "
+    } ]
+  }, {
+    "tStartMs": 2382440,
+    "dDurationMs": 5920,
+    "segs": [ {
+      "utf8": "sharting properly for this part you need to be \nsuper careful if you're a ninja engineer if if  "
+    } ]
+  }, {
+    "tStartMs": 2388360,
+    "dDurationMs": 4520,
+    "segs": [ {
+      "utf8": "your Uber is a startup that just need needs \nto launch somehow I would sincerely suggest  "
+    } ]
+  }, {
+    "tStartMs": 2392880,
+    "dDurationMs": 5000,
+    "segs": [ {
+      "utf8": "that we just have a single machine for the whole \nburing that that handles this if it dies until  "
+    } ]
+  }, {
+    "tStartMs": 2397880,
+    "dDurationMs": 4240,
+    "segs": [ {
+      "utf8": "it TR starts or until a new machine starts on \na backup for a couple seconds no new rights can  "
+    } ]
+  }, {
+    "tStartMs": 2402120,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "be requested no new rights can be confirmed or \ncanceled or whatnot but in practice if you're if  "
+    } ]
+  }, {
+    "tStartMs": 2407040,
+    "dDurationMs": 4200,
+    "segs": [ {
+      "utf8": "you are the big Uber itself you don't do it on a \nsingle machine that's too dangerous you have a few  "
+    } ]
+  }, {
+    "tStartMs": 2411240,
+    "dDurationMs": 5560,
+    "segs": [ {
+      "utf8": "of them the standard technique is to use data \nrections have a have an odd number of machines  "
+    } ]
+  }, {
+    "tStartMs": 2416800,
+    "dDurationMs": 4280,
+    "segs": [ {
+      "utf8": "stand traditionally would be three or five so \nthat they always are in touch with each other  "
+    } ]
+  }, {
+    "tStartMs": 2421080,
+    "dDurationMs": 4720,
+    "segs": [ {
+      "utf8": "they always know which one is the is the main \none who whose word matters most in a democratic  "
+    } ]
+  }, {
+    "tStartMs": 2425800,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "setum so that if one of these machines dies if \nit's not the leader that's okay it's it's it's  "
+    } ]
+  }, {
+    "tStartMs": 2430960,
+    "dDurationMs": 4760,
+    "segs": [ {
+      "utf8": "replaced and kept up to date if the leader dies \nwithin a split second another leader is elected  "
+    } ]
+  }, {
+    "tStartMs": 2435720,
+    "dDurationMs": 6920,
+    "segs": [ {
+      "utf8": "and they guarantee that all the invariant we \nneed to we need to respect are being respected  "
+    } ]
+  }, {
+    "tStartMs": 2442640,
+    "dDurationMs": 6600,
+    "segs": [ {
+      "utf8": "that's my high level diagram DEA has laid out a \nvery convincing highle design and explained his  "
+    } ]
+  }, {
+    "tStartMs": 2449240,
+    "dDurationMs": 5400,
+    "segs": [ {
+      "utf8": "thinking clearly throughout one potential area \nof improvement is at senior level a lot of focus  "
+    } ]
+  }, {
+    "tStartMs": 2454640,
+    "dDurationMs": 5600,
+    "segs": [ {
+      "utf8": "is put onto protocols dimma mentioned https in \nrelation to the connection from the user's phone  "
+    } ]
+  }, {
+    "tStartMs": 2460240,
+    "dDurationMs": 4440,
+    "segs": [ {
+      "utf8": "to the load balancer and Beyond but he didn't \nmention web sockets he would have done well  "
+    } ]
+  }, {
+    "tStartMs": 2464680,
+    "dDurationMs": 3520,
+    "segs": [ {
+      "utf8": "to mention there should have been a persistent \nconnection opened from the driver's phone and  "
+    } ]
+  }, {
+    "tStartMs": 2468200,
+    "dDurationMs": 5600,
+    "segs": [ {
+      "utf8": "the rider's phone sharing the location coordinates \nusing a single API call to achieve this would have  "
+    } ]
+  }, {
+    "tStartMs": 2473800,
+    "dDurationMs": 7760,
+    "segs": [ {
+      "utf8": "been wasteful yeah that's uh that's interesting \nI wanted to uh ask you what metrics are you going  "
+    } ]
+  }, {
+    "tStartMs": 2481560,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "to be tracking here like how are you going to \nknow if the system is behaving as it should do"
+    } ]
+  }, {
+    "tStartMs": 2493520,
+    "dDurationMs": 5800,
+    "segs": [ {
+      "utf8": "oh that's a big question there are there are tons \nof directions there are tons of ways to postulate  "
+    } ]
+  }, {
+    "tStartMs": 2499320,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "the question actually so like bottom up as an \nengineer I want to make sure that my system is up  "
+    } ]
+  }, {
+    "tStartMs": 2504480,
+    "dDurationMs": 7320,
+    "segs": [ {
+      "utf8": "and running so I would look at I would look at the \ntraffic numbers everywhere traffic numbers here  "
+    } ]
+  }, {
+    "tStartMs": 2511800,
+    "dDurationMs": 6720,
+    "segs": [ {
+      "utf8": "traffic numbers to every single location traffic \nnumbers from within internal systems to all these  "
+    } ]
+  }, {
+    "tStartMs": 2518520,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "components all these three if any of them drop \nsomething something is wrong that's something  "
+    } ]
+  }, {
+    "tStartMs": 2524400,
+    "dDurationMs": 7720,
+    "segs": [ {
+      "utf8": "I can totally totally monitor myself as a as a \nhigher level C designer I would also argue we  "
+    } ]
+  }, {
+    "tStartMs": 2532120,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "need to track user facing metrics I want to know \nhow many rides are currently taking place I would  "
+    } ]
+  }, {
+    "tStartMs": 2538360,
+    "dDurationMs": 4960,
+    "segs": [ {
+      "utf8": "imagine the the office like imagine berlan has has \nan Uber office I don't think it's the case but it  "
+    } ]
+  }, {
+    "tStartMs": 2543320,
+    "dDurationMs": 5720,
+    "segs": [ {
+      "utf8": "doesn't matter I would imagine there's going to be \na large screen to monitor real-time metrics with  "
+    } ]
+  }, {
+    "tStartMs": 2549040,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "tons of charts it will be like active real-time \nnumber of number of riots happening right now  "
+    } ]
+  }, {
+    "tStartMs": 2554200,
+    "dDurationMs": 4840,
+    "segs": [ {
+      "utf8": "there will be like this daily sine wave because \nthere is more at night than in the afternoon and  "
+    } ]
+  }, {
+    "tStartMs": 2559040,
+    "dDurationMs": 4120,
+    "segs": [ {
+      "utf8": "if suddenly it goes below what you would expect \nor above you what you would expect this should  "
+    } ]
+  }, {
+    "tStartMs": 2563160,
+    "dDurationMs": 5400,
+    "segs": [ {
+      "utf8": "trigger an alarm an alert somebody should look \ninto this I would look into the length of the  "
+    } ]
+  }, {
+    "tStartMs": 2568560,
+    "dDurationMs": 5160,
+    "segs": [ {
+      "utf8": "rights if the traffic pattern has changed I \nwould look into the ratings of drivers and  "
+    } ]
+  }, {
+    "tStartMs": 2573720,
+    "dDurationMs": 7240,
+    "segs": [ {
+      "utf8": "writers are we are we clearly like I will not \ndeteriorate in performance for the end users I  "
+    } ]
+  }, {
+    "tStartMs": 2580960,
+    "dDurationMs": 4960,
+    "segs": [ {
+      "utf8": "would absolutely look at more fine grain metrics \nsuch as like average distance from the rider to a  "
+    } ]
+  }, {
+    "tStartMs": 2585920,
+    "dDurationMs": 4120,
+    "segs": [ {
+      "utf8": "driver average pickup time because in practice \nthis is a very high level picture in practice  "
+    } ]
+  }, {
+    "tStartMs": 2590040,
+    "dDurationMs": 4200,
+    "segs": [ {
+      "utf8": "there's going to be tons of a testing behind the \nscenes if my engineering team has designed a new  "
+    } ]
+  }, {
+    "tStartMs": 2594240,
+    "dDurationMs": 5800,
+    "segs": [ {
+      "utf8": "meion algorithm that is presumably making pickups \nfaster chances far is being a tested for parts of  "
+    } ]
+  }, {
+    "tStartMs": 2600040,
+    "dDurationMs": 4680,
+    "segs": [ {
+      "utf8": "drivers and I want to see how how it performs \nhow it behaves so they can make a decisions on  "
+    } ]
+  }, {
+    "tStartMs": 2604720,
+    "dDurationMs": 6960,
+    "segs": [ {
+      "utf8": "how to roll it out and went so yeah tons of cool \nstuff thank you for a good question yeah thanks  "
+    } ]
+  }, {
+    "tStartMs": 2611680,
+    "dDurationMs": 6880,
+    "segs": [ {
+      "utf8": "for the answer um also yeah just before we wind \nthis up um are there any other kind of features  "
+    } ]
+  }, {
+    "tStartMs": 2618560,
+    "dDurationMs": 4400,
+    "segs": [ {
+      "utf8": "that that you think might be interesting to \nadd and and how how would they affect your"
+    } ]
+  }, {
+    "tStartMs": 2622960,
+    "dDurationMs": 8880,
+    "segs": [ {
+      "utf8": "design um yeah let me reflect let me look \nback at this as as I slowly exit the mode  "
+    } ]
+  }, {
+    "tStartMs": 2631840,
+    "dDurationMs": 7520,
+    "segs": [ {
+      "utf8": "of someone who was interviewed and I enter the \nmode of the like in hiring Committee Member um  "
+    } ]
+  }, {
+    "tStartMs": 2639360,
+    "dDurationMs": 4280,
+    "segs": [ {
+      "utf8": "I think I've I've tried to give your listeners \nthe best possible experience of seeing how how  "
+    } ]
+  }, {
+    "tStartMs": 2643640,
+    "dDurationMs": 4480,
+    "segs": [ {
+      "utf8": "the real interview looks like in practice if I'm \nbeing an interviewed like this I would absolutely  "
+    } ]
+  }, {
+    "tStartMs": 2648120,
+    "dDurationMs": 7360,
+    "segs": [ {
+      "utf8": "ask what are we designing for real because nobody \ndesigns Ubers these days from scratch either it's  "
+    } ]
+  }, {
+    "tStartMs": 2655480,
+    "dDurationMs": 7880,
+    "segs": [ {
+      "utf8": "a smaller startup so that it's it's not a dup a \nreplica of uber but rather some some more targeted  "
+    } ]
+  }, {
+    "tStartMs": 2663360,
+    "dDurationMs": 4840,
+    "segs": [ {
+      "utf8": "news product I don't know maybe it's a maybe \nit's a Richa pickup maybe they are allowed to  "
+    } ]
+  }, {
+    "tStartMs": 2668200,
+    "dDurationMs": 6520,
+    "segs": [ {
+      "utf8": "use pedestrian roads maybe they have drones maybe \nthey have extra regulations on what what business  "
+    } ]
+  }, {
+    "tStartMs": 2674720,
+    "dDurationMs": 4200,
+    "segs": [ {
+      "utf8": "Advantage they have compared to the Uber itself \nin which case the design should absolutely be  "
+    } ]
+  }, {
+    "tStartMs": 2678920,
+    "dDurationMs": 6200,
+    "segs": [ {
+      "utf8": "focused on this particular tailored like tailored \nown mode on the other hand if you really need to  "
+    } ]
+  }, {
+    "tStartMs": 2685120,
+    "dDurationMs": 3960,
+    "segs": [ {
+      "utf8": "design Uber well I can I can guarantee you as \nsomeone who's in the industry for a long time  "
+    } ]
+  }, {
+    "tStartMs": 2689080,
+    "dDurationMs": 4120,
+    "segs": [ {
+      "utf8": "this is not how Uber looks like on a high level \nyes but as we all know from Twitter and Elon  "
+    } ]
+  }, {
+    "tStartMs": 2693200,
+    "dDurationMs": 5760,
+    "segs": [ {
+      "utf8": "Musk high level whiteboard designs have little \nto do with what systems look like behind the  "
+    } ]
+  }, {
+    "tStartMs": 2698960,
+    "dDurationMs": 5400,
+    "segs": [ {
+      "utf8": "scenes so for the for the interview conversation \nI think that's approximately what I would imagine  "
+    } ]
+  }, {
+    "tStartMs": 2704360,
+    "dDurationMs": 5680,
+    "segs": [ {
+      "utf8": "candidates should draw when ask this question \nbut if I'm interviewing given I'm a couple levels  "
+    } ]
+  }, {
+    "tStartMs": 2710040,
+    "dDurationMs": 4600,
+    "segs": [ {
+      "utf8": "above the senior staff level I will probably be \nhaving a more product first conversation I think  "
+    } ]
+  }, {
+    "tStartMs": 2714640,
+    "dDurationMs": 3840,
+    "segs": [ {
+      "utf8": "I managed to strike the balance and actually \ntalk about consistency about data flows about  "
+    } ]
+  }, {
+    "tStartMs": 2718480,
+    "dDurationMs": 5240,
+    "segs": [ {
+      "utf8": "databases somehow but yeah it's it's a really \nbig can of worms and if I can leave you with one  "
+    } ]
+  }, {
+    "tStartMs": 2723720,
+    "dDurationMs": 4600,
+    "segs": [ {
+      "utf8": "thing here you got to read your interview you \ngot to figure out what this particular compan  "
+    } ]
+  }, {
+    "tStartMs": 2728320,
+    "dDurationMs": 6280,
+    "segs": [ {
+      "utf8": "is looking for Uber in particular is well known \nUber is a company is well known for looking for  "
+    } ]
+  }, {
+    "tStartMs": 2734600,
+    "dDurationMs": 4760,
+    "segs": [ {
+      "utf8": "product first Engineers if you actually talk \nto the to your interviewer about hey I need  "
+    } ]
+  }, {
+    "tStartMs": 2739360,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "to optimize like curbside pickup I need to suggest \npickup spots because that's where writers are more  "
+    } ]
+  }, {
+    "tStartMs": 2745600,
+    "dDurationMs": 3880,
+    "segs": [ {
+      "utf8": "happy to be picked up compared to other pickup \nspots where they complain like they were they  "
+    } ]
+  }, {
+    "tStartMs": 2749480,
+    "dDurationMs": 4760,
+    "segs": [ {
+      "utf8": "were honked at this is super useful this gives you \ntons of bonus points for Uber for other companies  "
+    } ]
+  }, {
+    "tStartMs": 2754240,
+    "dDurationMs": 6240,
+    "segs": [ {
+      "utf8": "do your homework but yeah tons of ways to go \nfrom here Dema gives some very useful advice and  "
+    } ]
+  }, {
+    "tStartMs": 2760480,
+    "dDurationMs": 4480,
+    "segs": [ {
+      "utf8": "insight here for those of you with interviews \ncoming up so let's recap quickly be sure to  "
+    } ]
+  }, {
+    "tStartMs": 2764960,
+    "dDurationMs": 3880,
+    "segs": [ {
+      "utf8": "clarify at the beginning what problem you're \ntrying to solve in this case are we designing  "
+    } ]
+  }, {
+    "tStartMs": 2768840,
+    "dDurationMs": 5720,
+    "segs": [ {
+      "utf8": "Uber or a new improved Uber for example generally \nthe more senior your level the more product first  "
+    } ]
+  }, {
+    "tStartMs": 2774560,
+    "dDurationMs": 4920,
+    "segs": [ {
+      "utf8": "your approach should be but try to figure out what \nyour target company is looking for Uber is known  "
+    } ]
+  }, {
+    "tStartMs": 2779480,
+    "dDurationMs": 4760,
+    "segs": [ {
+      "utf8": "for hiring product first Engineers but that's not \nthe case at every company this is where doing mock  "
+    } ]
+  }, {
+    "tStartMs": 2784240,
+    "dDurationMs": 4280,
+    "segs": [ {
+      "utf8": "interviews with ex interviewers from your target \ncompany can be very helpful you can do that with  "
+    } ]
+  }, {
+    "tStartMs": 2788520,
+    "dDurationMs": 7240,
+    "segs": [ {
+      "utf8": "our coaches at IGotAnOffer.com Dima yeah I think \nwe can we can finish it there unless uh there's  "
+    } ]
+  }, {
+    "tStartMs": 2795760,
+    "dDurationMs": 4640,
+    "segs": [ {
+      "utf8": "anything else you want to you want to comment on \nor any other advice that you want to give to the"
+    } ]
+  }, {
+    "tStartMs": 2800400,
+    "dDurationMs": 7800,
+    "segs": [ {
+      "utf8": "viewers um well I'm still in the in the excited \nmode so I I would say one thing I did not do and  "
+    } ]
+  }, {
+    "tStartMs": 2808200,
+    "dDurationMs": 4400,
+    "segs": [ {
+      "utf8": "you guys should is talking about databases \nI've deliberately voted the topic because  "
+    } ]
+  }, {
+    "tStartMs": 2812600,
+    "dDurationMs": 5920,
+    "segs": [ {
+      "utf8": "the high level the high level picture trumps uh \nthe choice of like S no SQL and stuff like that  "
+    } ]
+  }, {
+    "tStartMs": 2818520,
+    "dDurationMs": 5840,
+    "segs": [ {
+      "utf8": "but fundamentally yeah I do hope it's helpful \nplease spend your time with you Tom and all the  "
+    } ]
+  }, {
+    "tStartMs": 2824360,
+    "dDurationMs": 5880,
+    "segs": [ {
+      "utf8": "best hello really hope you found that useful \nif you did you can like And subscribe and why  "
+    } ]
+  }, {
+    "tStartMs": 2830240,
+    "dDurationMs": 5040,
+    "segs": [ {
+      "utf8": "not come visit us at IGotAnoffer.com there \nyou can find more videos useful Frameworks  "
+    } ]
+  }, {
+    "tStartMs": 2835280,
+    "dDurationMs": 4840,
+    "segs": [ {
+      "utf8": "and question guides all completely free \nand you can also book expert feedback  "
+    } ]
+  }, {
+    "tStartMs": 2840120,
+    "dDurationMs": 6280,
+    "segs": [ {
+      "utf8": "one to one with our coaches from Google meta \nAmazon Etc thank you and good luck with your"
+    } ]
+  }, {
+    "tStartMs": 2846400,
+    "dDurationMs": 12360,
+    "segs": [ {
+      "utf8": "interview"
+    } ]
+  } ]
+}

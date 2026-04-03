@@ -217,10 +217,17 @@ TRANSCRIPT:
         contents=prompt
     )
 
-    # Save the feedback to the session
-    await db.interviews.update_one(
-        {"_id": ObjectId(session_id)},
-        {"$set": {"feedback": response.text}}
-    )
+    # Save the feedback to the correct collection with the correct _id type
+    try:
+        oid = ObjectId(session_id)
+        await db.interviews.update_one(
+            {"_id": oid},
+            {"$set": {"feedback": response.text}}
+        )
+    except Exception:
+        await db.chat_sessions.update_one(
+            {"_id": session_id},
+            {"$set": {"feedback": response.text}}
+        )
 
     return FeedbackResponse(feedback=response.text)
