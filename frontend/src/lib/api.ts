@@ -92,7 +92,7 @@ export const interviewApi = {
       difficulty: string;
     },
     token: string
-  ): Promise<{ interview_id: string; resume_filename: string; resume_text_preview: string }> {
+  ): Promise<{ interview_id: string }> {
     const formData = new FormData();
     formData.append('resume', data.resume);
     formData.append('job_description', data.jobDescription);
@@ -109,17 +109,7 @@ export const interviewApi = {
     });
 
     if (!response.ok) {
-      let detail: unknown;
-      try {
-        detail = await response.json();
-      } catch {
-        detail = await response.text();
-      }
-      const message =
-        typeof detail === 'object' && detail !== null && 'detail' in detail
-          ? String((detail as { detail: unknown }).detail)
-          : `Upload failed with status ${response.status}`;
-      throw new ApiError(response.status, message, detail);
+      throw new Error('Failed to create interview');
     }
 
     return response.json();
@@ -129,27 +119,32 @@ export const interviewApi = {
     return apiRequest('GET', '/interview/sessions', undefined, token);
   },
 
-  async getSession(interviewId: string, token: string): Promise<unknown> {
-    return apiRequest('GET', `/interview/${interviewId}`, undefined, token);
+  async getSession(sessionId: string, token: string): Promise<unknown> {
+    return apiRequest('GET', `/interview/${sessionId}`, undefined, token);
   },
 
-  async downloadResume(interviewId: string, token: string, filename: string = 'resume.pdf'): Promise<void> {
+  async downloadResume(interviewId: string, token: string, filename: string) {
     const response = await fetch(`${API_URL}/interview/${interviewId}/resume`, {
+      method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
+
     if (!response.ok) {
-      throw new Error(`Download failed with status ${response.status}`);
+      throw new Error('Failed to download resume');
     }
+
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = filename;
+    a.download = filename || 'resume.pdf';
     document.body.appendChild(a);
     a.click();
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
   },
 };
+
+

@@ -7,6 +7,7 @@ import { LoadingPage } from '@/components/ui/LoadingSpinner';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { interviewApi } from '@/lib/api';
 import { Brain, Briefcase, ChevronRight, Clock, FileText, Layers, Play, Shuffle, Upload, X } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
@@ -20,6 +21,22 @@ const DIFFICULTY_LEVELS = [
   { value: 'easy', label: 'Easy' },
   { value: 'medium', label: 'Medium' },
   { value: 'hard', label: 'Hard' },
+];
+
+const TARGET_COMPANIES = [
+  'General',
+  'Google',
+  'Meta',
+  'Amazon',
+  'Apple',
+  'Microsoft',
+  'Netflix',
+  'Tesla',
+  'NVIDIA',
+  'Stripe',
+  'Uber',
+  'Airbnb',
+  'LinkedIn',
 ];
 
 const POPULAR_ROLES = [
@@ -62,6 +79,7 @@ export default function DashboardPage() {
   const { user, token, isLoading } = useAuthContext();
 
   const [role, setRole] = useState('Software Engineer');
+  const [targetCompany, setTargetCompany] = useState('General');
   const [interviewType, setInterviewType] = useState('technical');
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
   const [resumeFile, setResumeFile] = useState<File | null>(null);
@@ -69,6 +87,8 @@ export default function DashboardPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
   const [isDragging, setIsDragging] = useState(false);
+  const [sessions, setSessions] = useState<any[]>([]);
+  const [isFetchingSessions, setIsFetchingSessions] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -76,6 +96,21 @@ export default function DashboardPage() {
       router.push('/login');
     }
   }, [user, isLoading, router]);
+
+  useEffect(() => {
+    async function fetchRecent() {
+      if (!token) return;
+      try {
+        const data = await interviewApi.getSessions(token);
+        setSessions((data as any[]).slice(0, 3));
+      } catch (err) {
+        console.error('Failed to fetch sessions', err);
+      } finally {
+        setIsFetchingSessions(false);
+      }
+    }
+    fetchRecent();
+  }, [token]);
 
   if (isLoading) return <LoadingPage />;
   if (!user) return null;
@@ -122,6 +157,7 @@ export default function DashboardPage() {
         const params = new URLSearchParams({
           role: role.trim(),
           type: interviewType,
+          company: targetCompany,
           difficulty,
           interviewId: result.interview_id,
         });
@@ -135,6 +171,7 @@ export default function DashboardPage() {
       const params = new URLSearchParams({
         role: role.trim(),
         type: interviewType,
+        company: targetCompany,
         difficulty,
       });
       router.push(`/interview?${params.toString()}`);
@@ -202,6 +239,21 @@ export default function DashboardPage() {
                         {r}
                       </button>
                     ))}
+                  </div>
+                </div>
+
+                {/* Target Company */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Select
+                    label="Target Company"
+                    options={TARGET_COMPANIES.map(c => ({ value: c, label: c }))}
+                    value={targetCompany}
+                    onChange={(e) => setTargetCompany(e.target.value)}
+                  />
+                  <div className="flex items-end mb-1">
+                    <p className="text-xs text-slate-500 italic pb-2">
+                       {"AI will tailor questions to this company's specific interview style."}
+                    </p>
                   </div>
                 </div>
 
@@ -405,23 +457,59 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Recent Sessions Placeholder */}
+            {/* Recent Sessions List */}
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-              <div className="flex items-center gap-2 mb-4">
-                <Clock className="w-4 h-4 text-slate-400" />
-                <h3 className="font-semibold text-white text-sm">Recent Sessions</h3>
-              </div>
-              <div className="flex flex-col items-center justify-center py-8 gap-3 text-center">
-                <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center">
-                  <Layers className="w-5 h-5 text-slate-600" />
+              <div className="flex items-center justify-between gap-2 mb-4">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-slate-400" />
+                  <h3 className="font-semibold text-white text-sm">Recent Sessions</h3>
                 </div>
-                <div>
-                  <p className="text-slate-400 text-sm font-medium">Session history coming soon</p>
-                  <p className="text-slate-600 text-xs mt-1">
-                    Complete a session to see it here
-                  </p>
-                </div>
+                <Link href="/history" className="text-xs text-indigo-400 hover:text-indigo-300 font-medium">
+                  View All
+                </Link>
               </div>
+              
+              {isFetchingSessions ? (
+                <div className="py-8 text-center text-slate-500 text-xs animate-pulse">
+                  Loading history...
+                </div>
+              ) : sessions.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 gap-3 text-center">
+                  <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center">
+                    <Layers className="w-5 h-5 text-slate-600" />
+                  </div>
+                  <div>
+                    <p className="text-slate-400 text-sm font-medium">No sessions yet</p>
+                    <p className="text-slate-600 text-xs mt-1">
+                      Practice to see your logs here
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {sessions.map((s) => (
+                    <Link
+                      key={s._id}
+                      href={`/history/${s._id}`}
+                      className="block p-3 rounded-xl bg-slate-800/30 border border-slate-700/50 hover:border-indigo-500/50 hover:bg-slate-800/50 transition-all group"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold text-white group-hover:text-indigo-300 truncate pr-2">
+                          {s.role || 'General Mock'}
+                        </span>
+                        <ChevronRight className="w-3 h-3 text-slate-600 group-hover:text-indigo-400" />
+                      </div>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-[10px] text-slate-500 capitalize">{s.interview_type || 'technical'}</span>
+                        <span className="text-slate-700 text-[10px]">•</span>
+                        <span className="text-[10px] text-slate-500">
+                          {new Date(s.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                        </span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

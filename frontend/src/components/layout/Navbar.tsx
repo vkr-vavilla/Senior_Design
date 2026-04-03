@@ -62,20 +62,19 @@ export function Navbar() {
           {/* User Section */}
           <div className="flex items-center gap-3">
             {user && (
-              <div className="hidden sm:flex items-center gap-3">
-                <Link
-                  href="/history"
-                  className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
-                  title="View Past Interviews"
-                >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+              <Link
+                href="/history"
+                className="hidden sm:flex items-center gap-3 hover:bg-slate-800/50 p-1.5 rounded-xl transition-colors group"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
                     {initials}
                   </div>
-                  <span className="text-sm text-slate-300 font-medium hover:text-white transition-colors">
+                  <span className="text-sm text-slate-300 font-medium group-hover:text-white transition-colors">
                     {user.name}
                   </span>
-                </Link>
-              </div>
+                </div>
+              </Link>
             )}
             <button
               onClick={logout}
