@@ -15,6 +15,8 @@ import { ContainerScroll } from '@/components/ui/container-scroll-animation';
 import CelestialSphere from '@/components/ui/celestial-sphere';
 import { FeatureCards } from '@/components/ui/FeatureCards';
 import { AISessionCard } from '@/components/ui/RobotHUD';
+import { Logo } from '@/components/ui/Logo';
+import { RotatingText } from '@/components/ui/RotatingText';
 
 const ROBOT_SCENE = 'https://prod.spline.design/PyzDhpQ9E5f1E3MT/scene.splinecode';
 
@@ -40,24 +42,8 @@ export default function LandingPage() {
         <div className="relative flex items-center justify-between px-4 py-2.5 rounded-2xl bg-slate-950/80 backdrop-blur-2xl border border-white/[0.07] shadow-2xl shadow-black/50">
 
           {/* ── Brand ── */}
-          <Link href="/" className="flex items-center gap-3 cursor-pointer group">
-            {/* Logo mark with online dot */}
-            <div className="relative flex-shrink-0">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/40 group-hover:shadow-indigo-500/60 transition-shadow duration-300">
-                <Bot className="w-4 h-4 text-white" />
-              </div>
-              <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-slate-950 shadow-sm shadow-emerald-400/60 animate-pulse" />
-            </div>
-
-            {/* Brand wordmark — Space Grotesk */}
-            <div className="flex items-baseline gap-[3px] font-brand">
-              <span className="text-[15px] font-600 tracking-[0.12em] uppercase text-slate-300 leading-none">
-                Final
-              </span>
-              <span className="text-[15px] font-700 tracking-[0.12em] uppercase leading-none bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
-                Round
-              </span>
-            </div>
+          <Link href="/" className="cursor-pointer">
+            <Logo size="md" />
           </Link>
 
           {/* ── Nav actions ── */}
@@ -109,7 +95,10 @@ export default function LandingPage() {
               >
                 Land Your
                 <br />
-                <span className="gradient-text">Dream Job</span>
+                <RotatingText
+                  className="gradient-text inline-block min-h-[1.1em]"
+                  words={['Dream Job', 'Top Offer', 'Big Tech Role', 'FAANG Seat', 'Next Chapter']}
+                />
                 <br />
                 <span className="text-slate-300 text-4xl sm:text-5xl lg:text-[3rem] xl:text-6xl font-semibold">
                   with AI Interviews
@@ -424,17 +413,9 @@ export default function LandingPage() {
       <footer className="py-10 border-t border-slate-800/40 bg-slate-950/70 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-md shadow-indigo-500/30">
-                <Bot className="w-3.5 h-3.5 text-white" />
-              </div>
-              <div className="flex items-baseline gap-[3px] font-brand">
-                <span className="text-[13px] font-semibold tracking-[0.12em] uppercase text-slate-400">Final</span>
-                <span className="text-[13px] font-bold tracking-[0.12em] uppercase bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">Round</span>
-              </div>
-            </div>
+            <Logo size="sm" showTagline={false} showStatus={false} />
             <p className="text-slate-500 text-sm">
-              &copy; {new Date().getFullYear()} Final Round. Built with AI to help you succeed.
+              &copy; {new Date().getFullYear()} FinalRound. Built with AI to help you succeed.
             </p>
             <div className="flex items-center gap-6 text-sm text-slate-500">
               <Link href="/login" className="hover:text-slate-300 transition-colors duration-200 cursor-pointer">

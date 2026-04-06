@@ -6,7 +6,8 @@ import { Input, Select } from '@/components/ui/Input';
 import { LoadingPage } from '@/components/ui/LoadingSpinner';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { interviewApi } from '@/lib/api';
-import { Brain, Briefcase, ChevronRight, Clock, FileText, Layers, Play, Shuffle, Upload, X } from 'lucide-react';
+import { RecentSessions } from '@/components/dashboard/RecentSessions';
+import { Brain, Briefcase, ChevronRight, FileText, Play, Shuffle, Upload, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
@@ -131,13 +132,24 @@ export default function DashboardPage() {
         setIsUploading(false);
       }
     } else {
-      // No resume — go directly (basic flow without context)
-      const params = new URLSearchParams({
-        role: role.trim(),
-        type: interviewType,
-        difficulty,
-      });
-      router.push(`/interview?${params.toString()}`);
+      // No resume — create a lightweight session so it appears in history
+      setIsUploading(true);
+      try {
+        const result = await interviewApi.startInterview(
+          { role: role.trim(), interviewType, difficulty },
+          token
+        );
+        const params = new URLSearchParams({
+          role: role.trim(),
+          type: interviewType,
+          difficulty,
+          interviewId: result.interview_id,
+        });
+        router.push(`/interview?${params.toString()}`);
+      } catch (err) {
+        setUploadError(err instanceof Error ? err.message : 'Failed to start session');
+        setIsUploading(false);
+      }
     }
   };
 
@@ -405,24 +417,7 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Recent Sessions Placeholder */}
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-              <div className="flex items-center gap-2 mb-4">
-                <Clock className="w-4 h-4 text-slate-400" />
-                <h3 className="font-semibold text-white text-sm">Recent Sessions</h3>
-              </div>
-              <div className="flex flex-col items-center justify-center py-8 gap-3 text-center">
-                <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center">
-                  <Layers className="w-5 h-5 text-slate-600" />
-                </div>
-                <div>
-                  <p className="text-slate-400 text-sm font-medium">Session history coming soon</p>
-                  <p className="text-slate-600 text-xs mt-1">
-                    Complete a session to see it here
-                  </p>
-                </div>
-              </div>
-            </div>
+            {token && <RecentSessions token={token} />}
           </div>
         </div>
       </main>

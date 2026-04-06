@@ -2,9 +2,10 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Bot, LayoutDashboard, Plus, LogOut } from 'lucide-react';
+import { LayoutDashboard, Plus, LogOut } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
+import { Logo } from '@/components/ui/Logo';
 
 export function Navbar() {
   const { user, logout } = useAuthContext();
@@ -29,11 +30,8 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/dashboard" className="flex items-center gap-2 shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
-              <Bot className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-lg font-bold text-white tracking-tight">Final Round</span>
+          <Link href="/dashboard">
+            <Logo size="md" />
           </Link>
 
           {/* Nav Links */}

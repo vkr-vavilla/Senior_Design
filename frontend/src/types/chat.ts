@@ -16,3 +16,15 @@ export interface ChatChunk {
   chunk: string;
   done: boolean;
 }
+
+export interface Session {
+  _id: string;
+  role: string;
+  interview_type: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  messages: { role: string; content: string }[];
+  feedback: string | null;
+  created_at: string;
+  resume_filename?: string;
+  job_description?: string;
+}
