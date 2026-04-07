@@ -5,11 +5,18 @@ client: AsyncIOMotorClient = None
 db = None
 
 
+import certifi
+
 async def connect_db():
     global client, db
-    client = AsyncIOMotorClient(MONGODB_URI)
-    db = client[DB_NAME]
-    print(f"Connected to MongoDB: {DB_NAME}")
+    try:
+        client = AsyncIOMotorClient(MONGODB_URI, tlsCAFile=certifi.where())
+        db = client[DB_NAME]
+        # Trigger a test command to verify connection early
+        await client.admin.command('ismaster')
+        print(f"Connected to MongoDB: {DB_NAME}")
+    except Exception as e:
+        print(f"Failed to connect to MongoDB: {e}")
 
 
 async def close_db():
