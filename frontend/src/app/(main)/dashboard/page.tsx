@@ -397,15 +397,15 @@ export default function DashboardPage() {
               <div className="space-y-3">
                 {[
                   {
-                    icon: '💡',
+                    icon: '•',
                     text: 'Answer questions with structured responses (STAR method for behavioral)',
                   },
                   {
-                    icon: '🎯',
+                    icon: '•',
                     text: 'Be specific — use real examples and concrete numbers when possible',
                   },
                   {
-                    icon: '⏱️',
+                    icon: '•',
                     text: 'Aim for 2-4 minute answers — not too brief, not too long',
                   },
                 ].map((tip, i) => (

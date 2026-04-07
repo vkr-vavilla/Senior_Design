@@ -1,11 +1,11 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Plus, LogOut } from 'lucide-react';
+import { Logo } from '@/components/ui/Logo';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
-import { Logo } from '@/components/ui/Logo';
+import { LayoutDashboard, LogOut, Plus } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export function Navbar() {
   const { user, logout } = useAuthContext();
@@ -60,14 +60,19 @@ export function Navbar() {
           {/* User Section */}
           <div className="flex items-center gap-3">
             {user && (
-              <div className="hidden sm:flex items-center gap-3">
+              <Link
+                href="/history"
+                className="hidden sm:flex items-center gap-3 p-1 rounded-xl transition-all duration-300 group hover:bg-white/5 active:scale-95"
+              >
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
                     {initials}
                   </div>
-                  <span className="text-sm text-slate-300 font-medium">{user.name}</span>
+                  <span className="text-sm text-slate-300 font-medium group-hover:text-white transition-colors">
+                    {user.name}
+                  </span>
                 </div>
-              </div>
+              </Link>
             )}
             <button
               onClick={logout}
