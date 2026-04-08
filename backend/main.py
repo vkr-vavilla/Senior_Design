@@ -12,7 +12,7 @@ async def lifespan(app: FastAPI):
     await close_db()
 
 
-app = FastAPI(title="PrepAI API", lifespan=lifespan)
+app = FastAPI(title="FinalRound", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
