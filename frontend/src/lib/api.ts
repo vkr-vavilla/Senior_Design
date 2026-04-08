@@ -1,4 +1,5 @@
 import type { LoginCredentials, RegisterData, User } from '@/types/auth';
+import type { Session } from '@/types/chat';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -115,12 +116,23 @@ export const interviewApi = {
     return response.json();
   },
 
-  async getSessions(token: string): Promise<unknown[]> {
+  async startInterview(
+    data: { role: string; interviewType: string; difficulty: string },
+    token: string
+  ): Promise<{ interview_id: string }> {
+    return apiRequest('POST', '/interview/start', {
+      role: data.role,
+      interview_type: data.interviewType,
+      difficulty: data.difficulty,
+    }, token);
+  },
+
+  async getSessions(token: string): Promise<Session[]> {
     return apiRequest('GET', '/interview/sessions', undefined, token);
   },
 
-  async getSession(sessionId: string, token: string): Promise<unknown> {
-    return apiRequest('GET', `/interview/${sessionId}`, undefined, token);
+  async getSession(interviewId: string, token: string): Promise<Session> {
+    return apiRequest('GET', `/interview/${interviewId}`, undefined, token);
   },
 
   async downloadResume(interviewId: string, token: string, filename: string) {

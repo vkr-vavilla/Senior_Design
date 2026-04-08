@@ -110,7 +110,7 @@ export default function HistoryPage() {
               return (
                 <Link
                   key={session._id}
-                  href={`/history/${session._id}`}
+                  href={`/interview/${session._id}/feedback`}
                   className="block group"
                 >
                   <div className="bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl p-5 sm:p-6 transition-all group-hover:bg-slate-800/50">

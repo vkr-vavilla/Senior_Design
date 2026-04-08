@@ -63,18 +63,13 @@ export function useInterviewChat(): UseInterviewChatReturn {
         wsRef.current.close();
       }
 
-      // Try to use existing interviewId or generate a fresh one for standalone session
-      const idToUse = config.interviewId || generateId();
-      setSessionId(idToUse);
-
-      const params = new URLSearchParams({ token });
+      // If we have an interviewId from the resume flow, use it as the session ID immediately
       if (config.interviewId) {
-        params.append('interview_id', config.interviewId);
-      } else {
-        params.append('client_session_id', idToUse);
+        setSessionId(config.interviewId);
       }
 
-      const ws = new WebSocket(`${WS_URL}/chat/ws?${params.toString()}`);
+      const interviewIdParam = config.interviewId ? `&interview_id=${config.interviewId}` : '';
+      const ws = new WebSocket(`${WS_URL}/chat/ws?token=${token}${interviewIdParam}`);
       wsRef.current = ws;
 
       ws.onopen = () => {
@@ -143,18 +138,11 @@ export function useInterviewChat(): UseInterviewChatReturn {
         }
       };
 
-      ws.onclose = (event) => {
+      ws.onclose = () => {
         setIsConnected(false);
         setIsStreaming(false);
         stopTimer();
-
-        // Try to extract session ID from close event or generate one
-        // The backend saves the session on close
-        setSessionId((prev) => prev || generateId());
-
-        if (!sessionEnded) {
-          setSessionEnded(true);
-        }
+        setSessionEnded(true);
       };
 
       ws.onerror = (error) => {
@@ -164,7 +152,7 @@ export function useInterviewChat(): UseInterviewChatReturn {
         stopTimer();
       };
     },
-    [startTimer, stopTimer, sessionId, sessionEnded]
+    [startTimer, stopTimer]
   );
 
   const sendMessage = useCallback((text: string) => {

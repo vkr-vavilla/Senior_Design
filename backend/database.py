@@ -17,8 +17,6 @@ async def connect_db():
         print(f"Connected to MongoDB: {DB_NAME}")
     except Exception as e:
         print(f"Failed to connect to MongoDB: {e}")
-        # We don't raise here to allow the app to start, 
-        # but subsequent DB ops will fail predictably.
 
 
 async def close_db():
