@@ -1,0 +1,288 @@
+{
+  "video_id": "VvZf7lISfgs",
+  "summary": "This mock interview focuses on designing the system for Netflix, specifically the core product (videos and users). The discussion covers scope clarification, user activity data for recommendations, system requirements like high availability and low latency, user base estimation (200 million), and detailed data storage estimations for video content, static content, and user metadata. The employee proposes using blob storage for video content, Postgres with caching for static content and sharded Postgres for user metadata, and discusses the rationale behind these choices, including tradeoffs and global distribution with CDNs. The interview concludes with a debrief on performance and areas for improvement.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Hi everyone, we're here today for another Exponent mock interview with Andreas. Thanks so much for being here with us today, Andreas. Would you quickly introduce yourself to our viewers?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, I'd be happy to. Hey everyone, my name is Andreas. I'm a software engineer currently at Modern Health, which is a mental health tech startup."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Awesome, all right, so let's get right into it. The question today is design Netflix. Netflix is composed of things common to a lot of tech platforms: you have users, they can find some sort of video content like movies and TV shows, and then they want to watch that content. Including those things, are we designing the high-level system to include everything from subscriptions, users, search, and videos, or would you like me to focus only on a particular part?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Let's focus on the core product for now. That would be the videos and the users that you described, and you can ignore other features like search or subscriptions."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, awesome. So, when you say users and videos, do we want to worry about authentication, or just users in relation to the videos?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "You specifically need to focus on the user activity data. That's the data that would go into their video recommendation engine. You'll need to be able to find a way to both aggregate and process the user activity data that's on the website."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, awesome. Great. Given those things, will I need to come up with some sort of algorithm for this recommendation engine?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Not in this case, that'll be outside of scope for this question. But I'd like you to be able to focus on how the data will be gathered and processed for those recommendations."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, great. So we have this video service, we have a recommendation engine. For the video streaming service, I'm guessing it'll be important that we have high availability, even with a tradeoff of maybe not as great consistency, but decent consistency, because we'll want fast, low latencies around the world. Is that correct?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, that's correct. You should definitely account for that in your design."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, awesome. So low latency and global. Great. Now that we have all these things, for the recommendation engine, do you think we can run that as a background asynchronous job?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, that sounds great."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, awesome. So, building a list of requirements here. Outside of these cases, a larger question is, when transitioning to scale, how many users can we assume Netflix has?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Maybe about 200 million."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, cool. 200 million users. I'd like to take us, based off of this number, through some data storage estimations, and then we'll come organically to some of the architectural decisions along the way, if that sounds good to you."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Sure, perfect."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, awesome. So we have a few different types of data that we're going to need. Our types of data are going to be video content, like static content tied to the video, so things like the names of the movies, descriptions, thumbnails, maybe a cast list, since we're doing movies and shows. Then we'll also need user metadata, so like when they last watched a show, or when the last watch timestamp is, so we can return them to the place in the movie that they were watching. Maybe likes on a movie, like we can thumbs up or thumbs down a movie on Netflix. Then the last bit that we talked about: we have this user metadata, the video static content, the video content itself, and then these activity logs. Although we might actually have some overlapping user metadata, I think we can probably do all sorts of tracking events like clicks, impressions, scrolls, and we can fine-tune that a little more based off of what we're trying to optimize for in the recommendations. But since that is probably a lot larger in scope, for now I'll keep that out of scope if that's okay with you, and if we have extra time, we can go into it."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, that makes sense."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Great. In terms of some of the size of these, we can start with this video content. So we have 200 million users. How many movies and shows can we estimate that Netflix has?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Let's say about 10,000."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, great. So 10,000 videos. Given we can estimate that movies are on average two hours, and each episode of a show is maybe 20 to 40 minutes, can we say a video is then on average an hour long overall?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So that would be assuming that it's strictly about half movies and half TV shows, right?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yes, is that an all right assumption?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, cool. Given that, Netflix also supports different levels of definition. We have standard definition and high-definition versions. Let's say standard definition is 10 gigabytes an hour, and high-definition is 20 gigabytes an hour. Given that we have an hour average per video, and 30 gigabytes per hour of video, then given all of that, we can estimate around 300,000 gigabytes, or 300 terabytes."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, awesome. Given that, this is a lot smaller than a lot of other video stores, luckily, because it's not user-generated content like YouTube or Facebook video. So we have a ceiling on the amount of videos that are being hosted. Given that requirement or assumption, we could probably use something like blob storage, like Amazon S3 or Google Cloud Services, and then we can just store and replicate the content there if that sounds okay."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, so why is blob storage in particular better for this type of data?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, in this case, since we're just hosting, rather than using an RDBMS for example, I think it makes sense to be able to put it in blob stores. If we had larger amounts of data, we could just have ever-increasing blob stores, and that would not be great for us to be able to sort through and find and index. But in this case, since we have a static, top-level amount of that, I think it is okay for us to be able to search across all of that. Also, we don't want to just store it inline because they're pretty large files individually."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, yeah, that makes sense."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Awesome, great. I'll start also, as we're going through this, some of the design. So we have this blob store here. We can assume we're adding this in some sort of API or client that can upload the videos into the blob store. If that's all right, we'll just not go too deep into that, but we can assume on our side we can upload videos into our system."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Sure, okay, cool."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And so now we have this blob store. Now we'll probably want to take a look at the static content since we have these videos stored. For the video static content, we'll need to store things like titles, descriptions, cast list, all of those sorts of things. That will actually be correlated with the number of videos in this case, because per video we're just storing this metadata about the video. So in that case, we can probably just store these in a standard relational database, or we could also use a document store. But in my case, I think I would go with something like Postgres, and then we'll probably want to add a cache to it just so that we can make reads faster to the client. It's not too much data. Does that sound okay to you?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Sure, yes. Brief question about this: what would you be caching?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "In this case, caching the most frequently accessed activity, or for a given user, let's say they access a series a lot or a certain show that they've been watching, we'd cache that as they go to watch it so that when they go on subsequent views, we don't have to re-render all of that."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Ah, okay, yeah, that makes sense. So it'll make their user experience faster then."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yes, 100%. So that latency we were talking about, trying to increase the speed of all these parts of the service. Cool."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And so we'll have the Postgres here, I'll call this the static content. Then we'll have a bunch of API services. We can assume in this case that from the client, the users are making calls to the APIs, and it would be great to assume we're creating a distributed system with horizontal scaling, or we could just add more of these services as we go. Then also, we'll have a cache, just with a standard write-through, so as they go to make the call, we'll update the cache and then go to Postgres. Cool. Great, so we have that. Our final type of data that we talked about was the user metadata. This user metadata will be all sorts of things we talked about, like user watched, last watch timestamps, likes. In this case, since the metadata is tied to the number of videos as well, that will be the lower amount. But since it's tied to both the amount of videos and the amount of users, and the amount of users is going to keep increasing at a higher rate than the amount of videos, hopefully that's what we hope with our service. Since we have 200 million users in this case, that's a lot more than 10,000. We can assume, based off of 200 million users, that we'll have maybe a thousand videos watched per user per lifetime for their time on our application. Given that, which is about 10% of our total content we assumed earlier, and given that, per video, let's say we store all of this information – user watched, likes, and things like that – per video, we're going to say maybe it's 100 bytes. Does that all seem okay so far as far as assumptions?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, great. Then from there, we have that puts us at 100 kilobytes times 200 million users, which is about 20 terabytes. Great, so we have 20 terabytes of data here. But this is our video content, which is actually more than this, which is great. So that means we don't have to do anything too crazy. But since we'll need to be able to query it in this case, whereas our video content we just needed to pull it from a store, I don't think we need to actually store it in an S3 bucket. I think we can go ahead with something like Postgres in this case, since we're already using that right here in video static content. So we've got Postgres, and we will need it to be highly available because we are using that, like we talked about, we want low latency. We have the option of going NoSQL with something like Cassandra, but I think in this case we should do RDBMS. If we're going to do that route, we definitely need to shard the system. I would say we could shard it based off of the user metadata, which in this case we could index it based off of user ID, I think would make sense since it's so user-focused data. Then each shard, we can say, is 1 to 10 terabytes of data, and so that way we can have really quick reads and writes on the related data. So to recap, that means that each shard is actually assigned to a range of user IDs, right?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yes, exactly. Gotcha. Okay, great point. Not an individual user ID for each shard, that would be a lot."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so that makes a lot of sense. Is there a particular reason why you chose to use Postgres instead of NoSQL?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, I think in this case, although it's more complex for us to set up a sharded system, NoSQL out of the box would allow us to do a lot of this stuff. I think to be able to make complex queries on this large set of data, and also for the background jobs we're running, we'll want to use Postgres instead of NoSQL. It's, in my opinion, the advantage of how we should use Postgres versus using NoSQL."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Right, okay, that makes sense. Cool."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "All right, awesome. So now here, I'll go ahead and also add this up here. So connected also to our API Services. Oh yeah, and we can use an in-memory cache for this, maybe like Redis or Memcached. I don't know if I mentioned that before, but we'll cache also on both of these pieces of content. So this isn't the static content, this is the user metadata."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, great. And this is Postgres also. Okay, awesome. Yeah, actually, I'm realizing as we're going through this, one thing I wanted to mention is since we have these horizontally distributed services, we'll want a load balancer to sit in front of them to be able to distribute the load evenly between all of them. And this would be the load from users, right, not from internal servers?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, yes, great point. I think if we wanted to, since we'll have asynchronous jobs, I imagine that we won't need to balance load from those. However, I could see if we are uploading a lot of information, we might want to consider adding a load balancer on this side, on the backend calls to upload videos. I think that's a great point."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, great. Are there any ways that we can probably improve the speed of the requests?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, in this case, we have this, and as I talked about this Redis cache, that's how this will come in. We'll want to make sure that because we're using this write-through caching, that will have speed on both of these for the user metadata as well as the static content."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, great. So that would be for each user, you basically cache the most recent metadata for them?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, exactly. Keeping that hopefully would increase our availability in that case."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Gotcha, okay. Now that we have all this put together, there's probably one last consideration also when you're talking about speed and lowering latency: the global nature of these videos. Since we're serving them all around the world, how can we make this fast? Because right now we were assuming maybe one data center, and we have users all over the world."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "In this case, we can also add a CDN between our blob store over here and the end client. We can add relevant content, run a job that I'll call maybe 'CDN populator,' and that'll connect to the CDN itself. From the CDN, we'll serve the most relevant content to users that are around the world based off of where they're geographically located. For example, if 'Bridger 10' came out in the US and a bunch of people were watching that, we'd probably want to cache that there. The populator will take care of that geographic population of each of the individual CDNs based off of the geographic location."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, thanks so much, Andreas. That was really great. I think now would be a good time to debrief a little bit. What do you think went well, and what do you think you would want to improve on more in the future?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, I definitely think it was cool walking through how Netflix works. I think a lot of times we don't think about all that goes on behind the scenes because it's so seamless when we're using it, or hopefully it is. I would say there were a lot of calculations, so keeping my head on straight for that, I'll give myself a pat on the back for that. If I were to improve on something, I would probably say the manner in which I go through all of this. I would probably actually do these rather than congruently; it felt a little jarring even myself going through it, going back and forth between them. Instead, I would summarize all the calculations and thoughts I had and then go to the board to design it. That would be what immediately comes to mind for improvement."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, yeah, I definitely agree with a lot of those points, actually. I particularly thought that you did a really good job of considering what the user experience would be like and trying to incorporate those considerations into your design. For example, you thought about how the user might want really low latency and their videos to load really quickly, so you did a lot of caching to try and ensure that. You also talked about how we're going to have users that are all over the world, and the media might vary depending on where in the world they are, so having a globally distributed CDN helps a lot with that. Those are both really great considerations. You also did a fantastic job of considering tradeoffs. I always think that being able to analyze a system using the CAP theorem is a great way to decide what to optimize for in design versus what is okay to sacrifice on a little bit, and you did a fantastic job of that. I agree sometimes it can be a little bit confusing to start out with trying to list out all of the detailed calculations, and perhaps as you're working through the higher-level design, knowing how different components connect to each other can help you work out the details a little bit more. So I think it's okay that once you've gathered the requirements and asked all of your clarified questions, it's okay to start out with some of the higher-level components if it helps you better conceptualize the idea in your head. How does that all sound?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, I completely agree. Thanks for the feedback."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, otherwise, this is a really interesting interview to do with you. So, well done. Thank you."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "And thanks everybody who's watching, and good luck on your upcoming interviews."
+    }
+  ],
+  "training_pairs": [
+    {
+      "question": "Are we designing the high-level system to include everything from subscriptions, users, search, and videos, or would you like me to focus only on a particular part?",
+      "answer": "Let's focus on the core product for now. That would be the videos and the users that you described, and you can ignore other features like search or subscriptions.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "When you say users and videos, do we want to worry about authentication, or just users in relation to the videos?",
+      "answer": "You specifically need to focus on the user activity data. That's the data that would go into their video recommendation engine. You'll need to be able to find a way to both aggregate and process the user activity data that's on the website.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Given those things, will I need to come up with some sort of algorithm for this recommendation engine?",
+      "answer": "Not in this case, that'll be outside of scope for this question. But I'd like you to be able to focus on how the data will be gathered and processed for those recommendations.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "For the video streaming service, I'm guessing it'll be important that we have high availability, even with a tradeoff of maybe not as great consistency, but decent consistency, because we'll want fast, low latencies around the world. Is that correct?",
+      "answer": "Yes, that's correct. You should definitely account for that in your design.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "When transitioning to scale, how many users can we assume Netflix has?",
+      "answer": "Maybe about 200 million.",
+      "follow_up": "Okay, cool. 200 million users. I'd like to take us, based off of this number, through some data storage estimations, and then we'll come organically to some of the architectural decisions along the way, if that sounds good to you."
+    },
+    {
+      "question": "Given that, this is a lot smaller than a lot of other video stores, luckily, because it's not user-generated content like YouTube or Facebook video. So we have a ceiling on the amount of videos that are being hosted. Given that requirement or assumption, we could probably use something like blob storage, like Amazon S3 or Google Cloud Services, and then we can just store and replicate the content there if that sounds okay.",
+      "answer": "Yeah, so why is blob storage in particular better for this type of data?",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "For the video static content, we'll need to store things like titles, descriptions, cast list, all of those sorts of things. That will actually be correlated with the number of videos in this case, because per video we're just storing this metadata about the video. So in that case, we can probably just store these in a standard relational database, or we could also use a document store. But in my case, I think I would go with something like Postgres, and then we'll probably want to add a cache to it just so that we can make reads faster to the client. It's not too much data. Does that sound okay to you?",
+      "answer": "Sure, yes. Brief question about this: what would you be caching?",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "So to recap, that means that each shard is actually assigned to a range of user IDs, right?",
+      "answer": "Yes, exactly. Gotcha. Okay, great point. Not an individual user ID for each shard, that would be a lot.",
+      "follow_up": "Is there a particular reason why you chose to use Postgres instead of NoSQL?"
+    },
+    {
+      "question": "Is there a particular reason why you chose to use Postgres instead of NoSQL?",
+      "answer": "Yeah, I think in this case, although it's more complex for us to set up a sharded system, NoSQL out of the box would allow us to do a lot of this stuff. I think to be able to make complex queries on this large set of data, and also for the background jobs we're running, we'll want to use Postgres instead of NoSQL. It's, in my opinion, the advantage of how we should use Postgres versus using NoSQL.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Are there any ways that we can probably improve the speed of the requests?",
+      "answer": "Yes, in this case, we have this, and as I talked about this Redis cache, that's how this will come in. We'll want to make sure that because we're using this write-through caching, that will have speed on both of these for the user metadata as well as the static content.",
+      "follow_up": "Okay, great. So that would be for each user, you basically cache the most recent metadata for them?"
+    },
+    {
+      "question": "Now that we have all this put together, there's probably one last consideration also when you're talking about speed and lowering latency: the global nature of these videos. Since we're serving them all around the world, how can we make this fast? Because right now we were assuming maybe one data center, and we have users all over the world.",
+      "answer": "In this case, we can also add a CDN between our blob store over here and the end client. We can add relevant content, run a job that I'll call maybe 'CDN populator,' and that'll connect to the CDN itself. From the CDN, we'll serve the most relevant content to users that are around the world based off of where they're geographically located. For example, if 'Bridger 10' came out in the US and a bunch of people were watching that, we'd probably want to cache that there. The populator will take care of that geographic population of each of the individual CDNs based off of the geographic location.",
+      "follow_up": "NONE"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "video_id": "g-FwmMoEFXw",
+  "summary": "The interviewer asks the employee to design an autocomplete system for Google Search, prioritizing fast responses and scale. The employee explains using a trie data structure and a cache for frequent prefixes. The interviewer then asks about ranking possibilities, to which the employee responds with an asynchronous pipeline and frequency of search as the primary ranking factor.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "For today's software engineering interview, design autocomplete for Google search. My top two priorities are fast responses and scale. For scale, we're going to make sure we're using a horizontally scalable design from the beginning, using ECS plus an application load balancer. For speed, we're going to be doing everything in memory using a trie. Can you explain how that trie works?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "A trie is an extremely effective data structure if you want to do things like store words or phrases character by character. Each character has a pointer to the next possible characters until you reach a completed word. For example, if somebody types 'po', we see that we have 'port' and 'pork' as possible things they could be searching for. So, you'll query that data structure for every request. We'll also introduce a cache to store frequent prefixes that get looked up a lot. This is helpful if something's trending and people keep looking up the same prefixes, which is actually very common in real-world search."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And how will you rank the possibilities you get from the trie?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Every time a search is completed, we'll send an event to an asynchronous pipeline, which can update our trie later. The primary ranking factor will be frequency of search."
+    }
+  ],
+  "training_pairs": [
+    {
+      "question": "For today's software engineering interview, design autocomplete for Google search. My top two priorities are fast responses and scale. For scale, we're going to make sure we're using a horizontally scalable design from the beginning, using ECS plus an application load balancer. For speed, we're going to be doing everything in memory using a trie. Can you explain how that trie works?",
+      "answer": "A trie is an extremely effective data structure if you want to do things like store words or phrases character by character. Each character has a pointer to the next possible characters until you reach a completed word. For example, if somebody types 'po', we see that we have 'port' and 'pork' as possible things they could be searching for. So, you'll query that data structure for every request. We'll also introduce a cache to store frequent prefixes that get looked up a lot. This is helpful if something's trending and people keep looking up the same prefixes, which is actually very common in real-world search.",
+      "follow_up": "And how will you rank the possibilities you get from the trie?"
+    },
+    {
+      "question": "And how will you rank the possibilities you get from the trie?",
+      "answer": "Every time a search is completed, we'll send an event to an asynchronous pipeline, which can update our trie later. The primary ranking factor will be frequency of search.",
+      "follow_up": "NONE"
+    }
+  ]
+}

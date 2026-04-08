@@ -1,0 +1,619 @@
+{
+  "video_id": "-5XD9OH4w-4",
+  "summary": "This chunk features the introduction of the host, interviewer, and candidate, followed by the start of a technical interview focused on AWS. The candidate discusses their experience migrating a project to AWS Lambdas, the benefits of cloud providers, the shared responsibility model, and strategies to prevent unexpected costs or attacks on AWS. The discussion covers microservices versus monolithic applications, including their pros and cons. It then transitions to clean code principles, focusing on what makes code high quality, specific principles like YAGNI, KISS, DRY, and the importance of SOLID's Dependency Inversion. Finally, the conversation delves into testing Node.js applications, explaining the testing pyramid (unit, integration, end-to-end tests), their differences, and the challenges, particularly the flakiness of end-to-end tests. The discussion covers various testing methodologies including performance and load testing, handling synchronous operations in unit tests, and principles for deciding what to test. It then shifts to Node.js specific topics, explaining Semantic Versioning (SemVer), dependency management with caret and tilde, and the purpose of `package-lock.json` versus `npm-shrinkwrap.json`.",
+  "quality_flags": [
+    "Employee's explanation of the code execution order is cut off at the end of the chunk."
+  ],
+  "turns": [
+    {
+      "speaker": "UNKNOWN",
+      "text": "Do you know about AWS Budgets service? I want to hear why we need package work. Just an interesting question. In what ways do you use AI tools to boost your productivity? Yeah, this is an interesting response, this is the first time I hear it."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "Hi everyone, my name is Roman Zatisi from Enx, and I'm hosting the English-speaking community here on the YouTube channel today. It's really great to have you here joining us for the interview. Today, we are going to be talking about things about Node.js. But before we start, I'd like to introduce what Enx is. Actually, Enx is a program developed by EPAM that is aimed at enhancing and propagating the best software engineering practices and processes across the whole organization, the teams, and on an individual level. It offers lots of services, tools, and educational programs to continuously improve software development performance and also integrate J-tools into everyday working processes. It's also about a culture of excellence and innovation among the engineering teams. So today, it's an amazing session, and we have an interviewer, Victor Saroka, here and our interview candidate, Shak. The topic would be Node.js. I'd like to give a couple of words to introduce, first of all, our interviewer, Victor Saroka."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Hey Roman, thank you for the great introduction. I'm happy to be here. I've been working at EPAM for about 10 years, so I have a bunch of experience. Specifically, I'm looking forward to this interview for this role. I think I'm well prepared, so it's going to be really interesting questions. I think it's going to be fun. Thank you very much for the introduction."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "Thank you for joining us today, and of course, our candidate, Shak Zod."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, I am Shak Zod. I've been working at EPAM for like two and a half years as a Node.js developer, and I'm pretty excited to be here and participate in this event."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "Great, thank you so much for the introduction. So, we are all set up, both interviewer and candidate are in. I'd like to announce the kickoff, and I, as a host, will disappear in the background. The stage is yours, guys."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So, let's proceed with some general questions. I usually like to ask them at the start of any interview. I just want you to talk about your experience, some challenges that you face, probably describe the problem that you are most proud of to resolve – not necessarily a problem, but a challenge that you had and that you successfully passed. Do you think that this is like the greatest of your achievements?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, I can start with my experience. At EPAM, I had a project with AWS in it, but we used to have only EC2 instances. Everything was running on EC2 instances, but it was not really effective for our case because we didn't have a lot of loads, and we were wasting some of our money. We decided to move to AWS Lambdas, and it was pretty difficult for us to do that because of many unexpected things that were occurring during the process. But eventually, we did that, so I'm really proud of that."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Good. I also actually wanted to ask about AWS; it's one of my questions, by the way, for this interview. Since you mentioned it, let's proceed with it. I wanted to ask you about what makes AWS and other cloud providers game-changers right now. Why don't we want to implement everything ourselves to reduce money, you know, at all? Just pay for our own infrastructure, our own use, don't depend on a cloud that can, you know, just raise the prices one day, and then we are in debt."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I guess it is the time that is very crucial because when you use something like AWS, you don't need to spend a lot of time building your own infrastructure, finding proper specialists, and so on. Probably most big companies tend to spend that time implementing real features to provide to their users and to get feedback and profit quicker, faster. Yes, I think that is the most important thing with clouds."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, and specifically to AWS, are you aware of the term 'shared responsibility model' of the cloud providers? What does it mean?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "If I'm not mistaken, it is like a diagram that represents what is the responsibility of AWS and what is the responsibility of the customer, us. Like about security, for example, physical security of the machines is on the AWS side, so the customers don't need to think about that at all. And the security, for example, in the application that is hosted in AWS, that is already the thing that customers need to think about."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, this is correct. So, I wanted to understand that when we talk about security, AWS does not magically make our application secure. Something like you said, the physical one is on their side, but something that we set up is on our side. This is why they wanted to make it really clear. So, yes."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Good. Let's talk about AWS Lambda service, like you said. Is it ideal for each and every task, or would you consider it only for certain kinds of tasks and come up with some other solutions for other cases? I just want to understand the pros and cons of this service."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "AWS Lambdas have some limits, limits of time that it runs. If I'm not mistaken, it's 30 seconds if you use Lambdas with API Gateway. So it is not enough for really big, really complex operations. That's why AWS Lambda is mostly preferred for quick, small tasks that need to be done."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Do you prefer any real-life examples? Sure, if you have such, go ahead."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Lambdas are really flexible, and they can be used with multiple other services of AWS. One of them is S3. So you can set up a trigger for Lambda when you publish a file, for example, in S3, and you don't need any server for that. So you don't need a server to listen to or check S3. Lambda in this case is really effective because it will be just triggered when the file is uploaded, and you operate the file."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, multiple questions on AWS. We will move further. So, with regard to many startups, it's not news that they prefer to choose AWS. Sometimes I see some articles that somebody is in great debt because overnight the application went popular, and this AWS executed many times than expected. Other cases like DDoS attacks, etc. What would you do in order to prevent such cases as a developer for AWS services?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Probably we need to use some services for security to prevent those attacks. I don't really remember the name of that service, but AWS itself really has those kinds of services."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, it's called AWS Shield. Indeed, it's a number of services. And also, do you know about AWS Budgets service?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "AWS Budgets is a service to help you plan your budget. You can set up a budget for each service, for example, and set up a value, for example, $10. So if you spend more than $10, you will be getting an email to your..."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, let's proceed with another question similar to this topic. AWS services are usually used for microservice applications. Can you tell me what these microservice applications are about, and can you compare them with monolithic applications? Also, provide some pros and cons for each approach."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, I used to work in a microservice project. A microservice is like a smaller version of a monolith, but with a particular purpose, like manipulating users or a subscription service. So, a microservice has a particular domain it's responsible for. From a technical side, it usually has its own database and its own server, so it's isolated from other parts of the application. One of the most important pros of microservices is that different parts of your application are not dependent on each other. If one of them stops working for some reason, other parts of your application can easily continue, which is not usually possible with a monolithic application. However, microservices can sometimes be difficult to maintain because you will have a server for each microservice. If you have 20 microservices, you'll have 20 servers and 20 databases to maintain. So, for maintainability, you'll need specialists."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, I think we covered this topic. You mentioned important aspects. Let's proceed with a general question before we jump into the next topic. I just wanted to understand how you define clean code and code quality. What do you look for when you review pull requests to determine if the code is high quality?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I usually look if I understand it quickly. If I can understand the code by reading it once, it's written pretty well. But if I spend three or four times reading it and five to ten minutes trying to understand it, it's a bit complicated. Also, from a clean code perspective, I look at the naming of variables and functions to ensure they are clear. I also consider if functions do only one thing and achieve their goal."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "What principles do you know and follow in your daily routine about writing code to ensure it's high quality? For example, DRY, KISS, YAGNI, SOLID."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I usually use YAGNI, which stands for 'You Ain't Gonna Need It'. It's about not writing code for the future, like thinking 'I'll need it next week, so I'll write it right now.' That's usually a bad practice. Also, KISS, 'Keep It Simple, Stupid.' It's about the complexity of the code; you don't need to write difficult code, you need to write simple, understandable code. DRY, 'Don't Repeat Yourself,' means trying to reuse code. These are probably the main ones."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And regarding SOLID, what do you find to be the most important principle to definitely follow in your practice? Ideally, we want to follow them all, but sometimes it's not feasible. I just want to understand from your perspective how you work with SOLID and follow it."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I have a favorite one: Dependency Inversion. When I started working on my recent project, I was mostly working with tests. Most of our classes were importing modules and using them in functions within the class, so there was no dependency injection. It was really difficult to test those functions. I worked with that a lot, using dependency injection to implement Dependency Inversion from SOLID, and that was really useful. I keep complying with that principle most of the time."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Understood. By the way, I also wanted to transition to testing, which is also about quality. How do you ensure that Node.js applications are tested? What types of tests do you write, and what types of tests can you write to make it even better? I just want to understand the ways to test Node.js applications."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "There's a testing pyramid I can start with. It consists of unit tests, integration tests, and end-to-end tests. In practice, in Node.js projects, the pyramid is very correct from my perspective because we usually write most of the unit tests first, then integration tests, which are fewer than unit tests, and in the end, we usually write end-to-end tests. I can compare them if you want."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, please go ahead."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Unit tests are usually written for a small piece of code, like a simple function or method. They test it without any outside dependencies. We usually mock dependencies if the function has some. If we don't mock them, for example, if a function calls another function from another class, it usually becomes an integration test. Integration tests check how two or more parts of the application work together. The last one, end-to-end tests, is the really difficult one for me. It usually tests real use cases or user paths, for example, user login or user registration, and it calls real endpoints of the backend one by one to pass that user case."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And why did you say that it's difficult for you?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Because it is complicated. You need to think about a lot of details and call many endpoints to test and pass the scenario. When you write a unit test, you just test one simple function, and it's much easier."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Regarding end-to-end tests, have you encountered problems with unstable tests, where they sometimes run but then fail for other reasons?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "You mean flakiness of the tests? Yes, this is one of the problems with them. It's a known factor, and everybody knows about it. Sometimes, for example, if the database is down, your test will fail. With unit tests, you won't have such a problem. But as you said, this is the most real test, and sometimes it can give you such results just because of other factors, like a third-party service being down."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Right, but I guess that is the purpose of intent tests: to see if the whole application works together. If you get an error and your tests fail, I guess I would go into it and check if everything is working. It's like an alarm for me. Yeah, I understood, I agree. So, what about other types of tests, especially for Node.js backend stuff? Did you write any tests to test the performance of your Node.js application? Was there some load testing as well? What was your experience with this? Did you find some issues with it and eventually make it better?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Actually, in my recent project, we used to write end-to-end tests that were also used as load tests. So, I can say that I used to write load tests that we were running to find the limits of our application. For example, the login scenario: how many logins per second or per minute our application can handle. I guess that's the purpose of load tests."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Good, it's enough here. Can you tell me how you deal with synchronous stuff in unit tests? For example, like you know, there are some timers, some and other calls like you said. How do you deal with that in unit tests?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I usually mock them using the framework opportunities. I usually use Jest for tests, and it has lots of opportunities to mock, whether a single function or you can also mock a whole module."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Also, I'm just interested to understand what you decide to test and what not to test. For example, you have the application, right? What would you definitely not test overall, not specifically about the backend, but overall in unit testing? What is it that we usually don't want to test? For example, imagine you have a class with a public interface, but you definitely have some methods for..."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, we usually don't test private ones, private methods. Usually, they are tested when we test public methods because they are called from the public methods. So, yeah, we usually don't do that."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, you know, as we're in JavaScript, we can technically do it. Like, we can suppress this. Yeah, we can. I did this way for testing using our internal tool, AutoCode, to test the users' tasks. You know, I just want to make sure that they did it well. But again, this is like to check that somebody did the right thing, and I specifically put there like `TS ignore error`, you know, that it is complaining that it is private, you cannot access it. But we understand in JavaScript we can access almost everything. Just for an interesting fact. So, let's proceed with code coverage. How do you treat this metric, and what value do you consider good?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I usually like 100%, but yes, most people think that 100% can be reached with some stupid tests that don't test anything, just to cover all the lines of the code. But that can be done for me, that can be done for 80%. So, for example, 80% can also be reached that way. But if I would need to set a limit, I would set 100%, and after that, it is my responsibility, if I am a team lead for example, to control that."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, this is an interesting response; this is the first time I've heard it. You know, I don't mind. I mean, in case, like I said, if we can achieve it pretty fairly easily, why not? The more, the better, I think. I understand that people complain about 100% because, you know, they think that sometimes it's really hard. But technically speaking, you are correct, we can achieve it, and sometimes projects might also decide this. And this is not everything in our control. I mean, sometimes I've heard that some projects want 100%. So, it's interesting that you said that 100% in our project. So, got it there for two years, and it is in my blood already. Okay, let's proceed with Node.js related stuff. Let's start with the 'SemVer' term. Can you explain what it is, why it's needed, and its different use cases?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, it is Semantic Versioning that is used for versioning npm packages, usually. We have three numbers: the first one is the major, so it is usually incremented when some major changes are made to the application. The second one is minor, for minor changes to the application. And the third one is patch, which is like a minor bug fix and something like that."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Uh-huh. So, can you tell me about... Imagine I want to install a certain third-party dependency, and I want to install it so I can have any patch version, but I don't want changes in the major and minor versions. How can I achieve that?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "We have two symbols for that. We have a caret and we have a tilde. Oh, I'm lost right now, which one is for what? Yeah, I guess the caret is for minor and patch, like we can update minor and patch if you use caret. And if you use tilde, it updates only the patch version. Yeah, I guess that's correct."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And can you tell me why do we need this `package-lock.json` file? And also, we have `npm-shrinkwrap.json`, which is kind of about the same. Frankly speaking, I don't know myself the whole difference about `npm-shrinkwrap.json` and `package-lock.json`. I use `package-lock.json` in my project, and it works fine for me. But, you know, if you know, please qualify, and I will check additionally after this interview. But at least I want to hear why we need `package-lock.json`."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "`package-lock.json` is a file that contains a tree of dependencies of our project. We usually need it when we work together with multiple developers, for example. Let's say I installed a new dependency into the project, and when I install it with npm, npm updates the tree in `package-lock.json` also. I push it to GitHub, and for example, you pull it and try to `npm install` as well. In this case, if we don't have `package-lock.json`, you might install some different version of the package because we usually use the caret and tilde that we already discussed. Without `package-lock.json`, for example, I might have the first patch version, and you might have the ninth patch version, and they might be different in some cases, which may lead to some problems. But `package-lock.json` explicitly sets the version without any carets or tildes, so you install the particular version of the package. So, it solves that problem, like developers usually say, 'it works on my laptop, it should work.' If we talk about `npm-shrinkwrap.json`, it is almost the same file, but it is usually used when you write some npm packages yourself, when you publish your package to npm registries. This is because `package-lock.json` is usually not uploaded to the npm registry when you publish your package, but `npm-shrinkwrap.json` is uploaded there, and it guarantees that other..."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "People who download your package use the same versions of the packages in your project. Perfect, yeah, good to know. Thanks for the answer here. Another use case: I move further. I think you also had this case example where you want to install a new package, and then you have an error that says, 'I cannot install this package because it relies on some other package that needs to be updated.' For example, for a Forge application or an Express application, I'm just thinking on the spot. What can we do to make this error go away and still install the dependency? For example, I cover, right? Or peer dependency. We can skip the check of peer dependencies. Did you have such needs, such experience?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I haven't used any peer dependencies before, but I have read about them. I know a bit why we need them, but I didn't have any experience with them. Maybe it's more for frontend development, especially as I write more frontend code. But I see right now, for example, we have versions of the package React. My project uses version 17, version 18 is out there, and many packages are already updated to it. So sometimes when I install a package, I see such errors that they require React 18. But I see that they can actually work with 17. So, only after checking this 500%, I do this override in order to make this error go away during the installation."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, let's proceed with general concepts of Node.js. Let's jump a little bit deep. Sometimes I hear candidates don't know about it, but how do you understand libuv? What is libuv in Node.js?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "It is a library that is mostly responsible for asynchronous operations in Node.js, because Node.js itself is a single-threaded environment and it cannot work asynchronously. Libuv gives that opportunity to Node.js, and this involves the event loop mostly. I guess we need to talk about that also."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, we'll talk about it right now, but I just want to ask an interesting question: What language is libuv written in? Oh, I guess C++ or something. And by the way, did you know that you can also write Node.js programs using C++ and then include them in Node.js and execute them? Really? I haven't done it myself, of course, but I've heard that especially for mobile development, sometimes people do that. Maybe it's more native. Okay. But yeah, going back to your statement about the event loop, let's talk about it. It's the heart of Node.js, and this understanding might sometimes be crucial for the correct logic of the application. So, can you tell me about the event loop in more detail? Everything that you can tell about it, and after it, I might ask some additional questions."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "The event loop's heart is its phases. It has six phases and two side phases. When we run our `index.js` file using `node index.js`, Node.js goes through the file and evaluates everything. It first runs the asynchronous operations, it runs the timers if we have any, and so on. If we talk about phases, there are six phases. The first one is timers, responsible for timers like `setTimeout` and `setInterval`. The next one is pending callbacks, which is for any callbacks that are ready to be executed after some operation. The third one is the idle phase, when we wait... oh, I'm really lost in this phase. I would move to the next one. The fourth one is polling, when we expect some I/O operations to come to our event loop. The next one is check, when we run our `setImmediate` callbacks, callbacks that are set with the `setImmediate` function. And the last one is the close phase, when we run the callbacks of any closing operations, like if we have any sockets. For example, sockets usually have an event, like `on close`, where we pass a callback, and that callback is usually executed in this phase."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "What about the microtask queue? I forgot to tell about them."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Microtasks are usually promises, mostly. We also have another side phase: `process.nextTick`. These are the side phases. Promises are usually executed after each phase; after each phase, we check if we have any promise callbacks that we need to execute. `process.nextTick` is almost the same, but they are different in how they are declared. Also, if I'm not mistaken, `process.nextTick` is checked after each line of code. I read that somewhere and remember it, but it might not be correct. I also might be wrong here, maybe after each of these phases that you mentioned, these are checked. By the way, what do you think is executed first: `nextTick` or promises?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "I guess nextTick. Yes, that's correct. Actually, with regard to this question, it might be quite broad. So, let's look at an example that will check your knowledge of this process. For that, I'm going to present the screen. Okay, now we're at the editor. Here, you see some code execution of different approaches: synchronous, asynchronous, promises, nextTick. Can you go over this code and explain the execution order, and not only the order, but most importantly, why some code will execute first rather than the other?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, it looks really complex. Let's try. So we have `console.log`, `setImmediate`, `setTimeout`, `promise`, `nextTick`. First of all, we need to start with synchronous operations. These are `console.log` (number one), and the next one is number four because the body of the promise is synchronous also. The next one is number 10. So, numbers one, four, and 10 are all the synchronous operations. Now we go into promises and nextTicks. Timers will be completed in the end. Now it is nine, I guess, because `process.nextTick` is usually before promises. Next is number five, which is the first promise and its `console.log`. Then number eight, because `nextTick`... oh, yes, promise is before `nextTick` in this case because when we go into the promise queue, the microtask queue, we need to complete it and then move to the next one. So we need to complete the promise queue first: five, eight, seven, and then six. I guess so. So what do we have left? Eight, five, three, and two left. Yes, I guess we have written down everything else. So, `setTimeout` and `setImmediate` will be first... or let me think. These two are really tricky because even when we run these two only together, the result may differ from time to time because it depends on the..."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "machine where we are running it. So, timers is the first phase, set timeout is the fifth phase, so I guess timers will be first. I'm really lost here. Okay, let's double-check, but I think yeah, it's 14, 10, and 5, 8, 7. Yeah, so you're correct. If you say that it might sometimes be different, this time you will walk. Yeah, but at least we understand that this might happen. And also, when I was preparing for this interview, I got into such cases. So, good that you mention it. And also here, we see the important concept. Even though you started in the phase explaining the point that timers seem like first, but this is actually, in this codebase, they almost executed waiters because the priority of next tick and promises here are higher, and it checks often. Okay, good. So, I am stopping sharing the screen, and we can proceed with other topics. Let's talk about CORS. How do I understand CORS? Why sometimes we see this problem in the browser but don't see this problem in Postman, for example?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, CORS is Cross-Origin Sharing or Cross-Origin Resource Sharing, I guess. It is something like a policy that exists only in browsers, as you said, and we don't have it in other tools. What does it do? When you request an endpoint from a backend application, usually, mostly if CORS is enabled on the backend side, the browser makes a pre-flight request. It is sent to the backend firstly before the main request to check if the requesting site can access the data. For example, the backend might accept only certain domains or certain HTTP methods, and so on. So, for example, if the backend configured CORS to accept only domain.com, and if you are requesting the backend from domain2.com, you will not get the data because you are not in the list of the backend's CORS configuration. But why don't we get it in Postman? Because this check, when we send that option, that pre-flight request, it is done by the browser itself. So, it is the browser's responsibility to control this process. That's why we don't have that kind of errors in Postman."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, by the way, sometimes when I run some applications, connect to the backend from the UI, I see this CORS error, and it's complaining, 'Access-Control-Allow-Origin is set to *.' And this is not working. Talking from your experience, do you consider it best practice to allow it for everyone, or to fine-tune it and only allow it to only domains that are needed?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "The best practice is to set the domains that should get the data because when we write backend, we usually know who will be requesting the endpoints and the server, and we can specify those domains. But maybe I have not seen those cases, but maybe there are cases when we don't know the domains beforehand, and maybe they can change from time to time. In those cases, maybe the star is more efficient."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So, let's switch to another important topic: AI. Right now, it's on everybody's radar, I think. With that, I just want to check whether you use it already in your day-to-day work, and if yes, in what ways do you use AI tools to boost your productivity?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, AI is everywhere nowadays, and I also use it. I usually use AI, and yes, I guess I use it every day because maybe I got that lazy to Google something. Even if I have any problem, anything that I don't know, I usually use AI. It is something like a new Google for me. Also, it gives some code snippets, sometimes the useful ones. And of course, you cannot just copy and paste them; you need to change them to comply with your project, but they are really useful nowadays."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "By the way, what specific services do you use? I mean, even with Pal Z, you can choose what tool you can use, like GPT, or whatever, Llama."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I usually use conversational ChatGPT, and that's it, nothing more yet."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And do you use some techniques when you form your prompts? Like, did you hear about zero-shot prompting or few-shot prompting? Maybe you know about them and can talk from your experience about them."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Not really, I haven't heard of them. I usually use my own techniques."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, yeah, but I just wanted to say that it's basically about the same. Maybe you use it already but without knowing that it's called few-shot prompting. Basically, when you need several queries here to achieve the result, and you give examples, etcetera."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, that is the process of my conversation with AI. I ask for something, it gives not a full answer usually, and then I need to ask more questions, more specific questions, and more details."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And the last question here, do you know about the temperature parameter that can also affect the outcome of your prompts?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, but I haven't changed it ever when I use AI. But I used it to work with it in my recent project when we integrated AI with our own project. And at that time, I used it to play with that, setting it higher or lower. And yes, the temperature simply is how creative the answer of AI will be, I guess."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, yeah, I think we've done great so far. Frankly speaking, I could proceed for hours having conversations with you because I feel like it's more like a conversation rather than an interview. So, I'm really impressed by your level and skills you showed. But I think we have a limit, so that's why I'm passing the word to Roman."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, guys, that was a great experience to listen to you. You've touched a very important topic from my point of view: AI. It is now not only a buzzword but the thing that is really happening and how it is changing the industry. And me, as a part of Enx and Anywhere Club, I would like to make a couple of announcements regarding AI and the courses that we provide. Let me now share my screen and introduce the courses catalog of Anywhere Club. So, basically about AI in development, I would recommend two of them. First is Prompt Engineering Foundations, which is actually the entry-level course on how to write prompts. It provides an overall overview of the basics of using AI and LLMs, and the essentials of prompt tuning, formatting prompts, fine-tuning the prompts, and ethics on prompt engineering. So, this is the entry-level course for all technical specializations, not only developers but also QA business analysts. The second one that I would like to introduce is Enx AI Supported Software Engineering. Of course, this is the main program that is best sold right now. So, this is a self-paced learning journey designed to integrate artificial intelligence tools into your software development practices day on day basis. This course..."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "It's great for beginners and intermediate learners. It's about 7 hours and includes five modules, 14 theory lessons, and nine practical tasks. You can practice in the language you're used to: JavaScript, Java, Python, C#. Enroll now to transform your approach to software engineering. That was my little part, by the way. Prompt engineering is for everyone. I already passed it, and I can definitely recommend this one. The advice I provide to anyone who asks me how to work at EPAM is to show these courses because actually, when you send a CV to EPAM and say that you've passed the Prompt Engineering Basics at EPAM from Anywhere Club or assisted development, this is a huge plus among all the other CVs that are sent."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Now, I think it is time to proceed to the practical part of the interview. Okay, so let's proceed with a task that I think is going to show your level of working with a popular framework for Node.js. By the way, you are not limited here to a specific one; you can choose from what you use on a daily basis and are most proficient in. I just want to understand that you are capable of writing a minimal server using your favorite Node.js framework. It can be Express, etc., or I'm happy that I saw in your CV you are also proficient in. But what I want from you is basically to write a simple HTTP server that has basic CRUD operations for creating a user, editing it, retrieving information about a particular user by ID, and also removing this user. I also want to see error handling, so you can add error handling specifically for CRUD operations, but I also want you to consider writing some basic error handling mechanisms in case you did not catch some errors in routes. Can you please proceed with that and also comment on your reasoning, why you make certain decisions here?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, let's write a simple server then with Express because it's easier to do it with that. It's simpler. First of all, we need to import Express. Of course, we need to install it first, which we won't be doing here. Then, we need to make an instance of Express here and to make it listen to a particular port, for example, 8000, we need to use this method. We can also pass a callback to log it, something like 'listening at port'. Okay, so what should we have here? We need a router, yes. It should be a user router. Let's call it `userRouter`. Express, I guess, was something like this. I haven't used Express recently. It has a router class, yes, it has a router class, and I guess it creates an Express function. Okay, I guess it's correct. Then we need to use this router in our application. We can do it by using the `use` method, which is for middleware, and we need to pass here the URL. I guess we need to do it like this: `/user`. Okay, let's try `userRouter`. Sorry, it is there. Now we need to add some routes to our router. We will need to first post some users, so we will have a callback here. Let's just have an array of users. So we will have `request`, `response`, and also `next`, but we don't need `next` right now. We can get some body of the request and let's just put it in the `users` array. We may want to respond somehow, `send` or `status`. Usually, we send 201 for creating endpoints. We can also send a message, 'created user'. We can be adding other endpoints. Let me just copy and paste it here. So it will be `GET`. Now we will be sending our array. We might want to update the user. We can do it by using a `PUT` endpoint. I will not write the logic here. We will need to find the user here. Oh, we need to update the URL here because we will need to get an ID of the user. We find the user by ID in this array, update it, and we may want to return it, something like 'updated user'. Also, to make it a full CRUD operation, we need to delete the user as well. So again, we will need an ID to find the user, delete it, and we might want to return something like 'is deleted: true or false'. Okay, we have full CRUD. We use this router in our application, and we now need an error handler. Express itself has an error handler middleware that accepts the error as a first parameter here and everything else `next`. So this middleware will be called only when we have an error that is not caught anyhow, and when we don't send any request or when we don't send any response from our server. We will need to handle the error. Let's just log it for now, and we might want to respond somehow, for example, `status 500`, `send 'unexpected error'`."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, this is pretty much it. Do we need anything else? No, no. Assuming that, of course, it's a codebase for on-the-spot, it's definitely not the best practice, but it works well in order to have a simple, basic server in place for CRUD operations. I just want to discuss further this example and talk about how you would do it for a production-ready application, for example. But let's start small. I see you named the resource here 'user'. Most often, I see that it's called 'users' in plural. What do you think about this idea? What approach do you follow in your practice?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I guess usually in REST APIs, we use singular words, not plural ones. So, if you go by the principles of REST, we need to name them singularly."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, okay. By the way, what principles of REST? We're jumping in here about some. For example, did you hear about Richardson's Maturity Model about REST, or are you following specific best practices that you know, or the principles of REST that you just read from the definition of this pattern?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I haven't heard about Richardson's principles, never. I know some principles of RESTful APIs for them to be fully RESTful. For that, they need to be cacheable, they need to be a layered system, which means that when you add some layers between your server and front, nothing gets broken. And there was something like a uniform interface. There are overall five or six principles of REST to be a RESTful API."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, got it. We discussed this one about error handling. What practices do you use if you write this for production for specific routes? You did the error handling in one place and also sent a 500 status. Would you send this 500 status all the time, or would you consider some other statuses upon different conditions to be sent?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I would probably be looking for the type of the error. I would have different errors, for example, 'not found error' or 'bad request error', and I would check it here in my error handler. Depending on the type of the error, I would return the particular status."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Because, for example, for a not found error, we need to send 404. For a bad request, we usually send 403, or 400. I remember 403 for unauthenticated something. Oh, yes, oh, yes. I just want to clarify often that as a front-end developer, for example, for the front end, it would be convenient for me to understand why it's a bad request. I mean, not just, 'No, I tried to create a user.' But I just want to understand why it's considered a bad request, for me to have more information. How would you, as a backend developer, for example, if I'm talking to you, make it so for me to have more context-specific messages? For example, you have a bunch of different routes: it can be posts, it can be messages, it can be users. But specifically for the user, I want to understand why it's a bad request for the user."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Usually, for example, when a bad request happens, when incoming data is incorrect or invalid, it's a different type. In this case, we usually check it here in our handler of the endpoints. If we find any invalid parameter or invalid field coming in, we usually throw an error, for example, and pass a message here. This would be, for example, a not found error. I would pass a message something like, 'Name should be a text.' In my handler, I would pass this same message in the body of the response, like this: 'message' and 'error'."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "By the way, talking from your experience, did you use methods or approaches like schema validation for input? How can you explain what it is and why it is needed?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I don't really remember how it works in Express, but in Fastify, for example, I have been working with it recently, mostly with it, and it has its own validation, whereas Express doesn't. So, in Express, we need to install something outside of the box. But in Fastify, what we do is set some rules for each field that may come from the front-end side. For example, the name of the user: it should be text, it should contain no more than 100 symbols, and it is mandatory, it is required for a POST request. For a PUT request, it is not required; it becomes optional. So, for each endpoint, we write our own validation."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So, final questions. Not going to be in much detail, and of course, I understand we didn't discuss many important topics like authentication, cookies, etc. But let's proceed with a question to understand different alternatives to HTTP, for example, WebSockets, GraphQL, and also long polling, short polling. Can you just describe all these approaches and why they make sense in certain conditions, and in what cases would you use them, and in what cases you wouldn't use them? Just to not hear only good things about them, but also some criticism that will help you decide not to use them in certain conditions."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Probably, I haven't worked with WebSockets and I haven't done any polling. But I know that WebSockets are usually used in messaging applications, and it makes a connection between two sides and helps to share data. That's what I know about it. But I have worked with GraphQL a bit, and it is somehow similar to REST, but there are really big differences. The main advantage of GraphQL is that we can make one request to get data. So, for example, it is usually called `/graphql`, and that's it. You send a GET HTTP request to that server and describe the data that you want to get. So, you don't need to write tens of GET requests to get particular data as in REST, because in REST you need to write each endpoint to get users, to get subscriptions, to get games, for example, and so on. But in GraphQL, you will have only one endpoint, and the front-end side can describe what they want to see in the request or in the response."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "What is the disadvantage of GraphQL? Let me provide you some use case I had in the past recently. As usual, I see some services that you need to subscribe to, in order to use, also provide some GraphQL API. But they also provide some limits for the usage of this API, because if we think, an API can be constructed in a way to have some data query constructed in a way that you can try to reach everything, and also circular dependencies. When you, for example, from one user request another user, and in this user request, another user, for example, if we think about some social media network platform, right? So, did you have such cases when you need to account for such edge cases for GraphQL, or did you mostly use GraphQL rather than implementing it yourself?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I haven't implemented it, and I guess I know what you are talking about. Probably, it is the most popular problem about GraphQL. It's called the N+1 problem. Yes, I have faced it before, but now I don't remember what it was about or how to solve it."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "No problem, just great that you heard about it. This is something about our work, that we have a lot of information; we hear it occasionally. At least in my routine, I just make sure that at least I know roughly what it is about, and in case if needed, I will double-check it additionally, especially now with AI tools, it's really easy. With that said, yes, thank you very much for the answers."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "access to all of them, and you don't share your internal information to the LLMs as you do in the public versions. Now, let's get back to the interview, and I would like to ask you to provide some feedback to each other. I would like first to introduce Victor."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I want to say that I think the interview went well. Of course, I asked some deep questions to understand the limits of Shakat. I think you now understand some areas that you can improve based on this interview. But I think for a middle position, you did a great job. And most importantly, as usual, you already have this production experience. We can talk about theory for days, but what is usually important for me is that you already write some production code for real projects. So you have such experience, and of course, you have it. But yeah, just for this interview, we discussed general topics about some quality, about testing, and Shakat managed to answer them great. Also, an important topic right now, even for EPAM as well, I mean, as well as for other industries like clouds. And Shakat also has experience with clouds, with AWS specifically, which is the most popular cloud right now. And yeah, we did not touch a lot about frameworks, not just frameworks, but Shakat wrote some sample application for Express, and we discussed some potential areas that can be improved for production to be considered production-ready. And of course, we discussed the heart of the Node.js event loop, and Shakat was capable of managing it perfectly. So overall, I think Shakat did a great job. That's all that I can say."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Thank you so much. Now, I think that Shakat, you could also share a couple of thoughts about the interview process."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "It was a pleasure to participate in this interview, you know, because it was more like just a conversation with a person about some experience of mine. And also, during the interview, I got some details that will be really useful and helpful in my further career and experience. Thank you very much for your feedback."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So Victor, what's the verdict?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Like I said, I think it went well, so I would hire Shakat. But all the compensation stuff is not on me."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So what I would like to say, going back to the courses and the programs that I announced, I would like to remind you about Anyware Club and INX. This is a great career path for those who want to pass interviews to EPAM or to any other tech companies like IOM. And also for the teams that already work inside the process, how to implement the AI. This is also very important from our point of view, and it is a real bestseller from our perspective. All the links will be available in the description. Like, share, repost, and stay tuned."
+    }
+  ],
+  "training_pairs": [
+    {
+      "question": "So, let's proceed with some general questions. I usually like to ask them at the start of any interview. I just want you to talk about your experience, some challenges that you face, probably describe the problem that you are most proud of to resolve – not necessarily a problem, but a challenge that you had and that you successfully passed. Do you think that this is like the greatest of your achievements?",
+      "answer": "Yes, I can start with my experience. At EPAM, I had a project with AWS in it, but we used to have only EC2 instances. Everything was running on EC2 instances, but it was not really effective for our case because we didn't have a lot of loads, and we were wasting some of our money. We decided to move to AWS Lambdas, and it was pretty difficult for us to do that because of many unexpected things that were occurring during the process. But eventually, we did that, so I'm really proud of that.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "What makes AWS and other cloud providers game-changers right now? Why don't we want to implement everything ourselves to reduce money, you know, at all? Just pay for our own infrastructure, our own use, don't depend on a cloud that can, you know, just raise the prices one day, and then we are in debt.",
+      "answer": "I guess it is the time that is very crucial because when you use something like AWS, you don't need to spend a lot of time building your own infrastructure, finding proper specialists, and so on. Probably most big companies tend to spend that time implementing real features to provide to their users and to get feedback and profit quicker, faster. Yes, I think that is the most important thing with clouds.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Specifically to AWS, are you aware of the term 'shared responsibility model' of the cloud providers? What does it mean?",
+      "answer": "If I'm not mistaken, it is like a diagram that represents what is the responsibility of AWS and what is the responsibility of the customer, us. Like about security, for example, physical security of the machines is on the AWS side, so the customers don't need to think about that at all. And the security, for example, in the application that is hosted in AWS, that is already the thing that customers need to think about.",
+      "follow_up": "Yeah, this is correct. So, I wanted to understand that when we talk about security, AWS does not magically make our application secure. Something like you said, the physical one is on their side, but something that we set up is on our side. This is why they wanted to make it really clear. So, yes."
+    },
+    {
+      "question": "Is AWS Lambda service ideal for each and every task, or would you consider it only for certain kinds of tasks and come up with some other solutions for other cases? I just want to understand the pros and cons of this service.",
+      "answer": "AWS Lambdas have some limits, limits of time that it runs. If I'm not mistaken, it's 30 seconds if you use Lambdas with API Gateway. So it is not enough for really big, really complex operations. That's why AWS Lambda is mostly preferred for quick, small tasks that need to be done. Lambdas are really flexible, and they can be used with multiple other services of AWS. One of them is S3. So you can set up a trigger for Lambda when you publish a file, for example, in S3, and you don't need any server for that. So you don't need a server to listen to or check S3. Lambda in this case is really effective because it will be just triggered when the file is uploaded, and you operate the file.",
+      "follow_up": "Do you prefer any real-life examples? Sure, if you have such, go ahead."
+    },
+    {
+      "question": "With regard to many startups, it's not news that they prefer to choose AWS. Sometimes I see some articles that somebody is in great debt because overnight the application went popular, and this AWS executed many times than expected. Other cases like DDoS attacks, etc. What would you do in order to prevent such cases as a developer for AWS services?",
+      "answer": "Probably we need to use some services for security to prevent those attacks. I don't really remember the name of that service, but AWS itself really has those kinds of services. AWS Budgets is a service to help you plan your budget. You can set up a budget for each service, for example, and set up a value, for example, $10. So if you spend more than $10, you will be getting an email to your...",
+      "follow_up": "Yeah, it's called AWS Shield. Indeed, it's a number of services. And also, do you know about AWS Budgets service?"
+    },
+    {
+      "question": "AWS services are usually used for microservice applications. Can you tell me what these microservice applications are about, and can you compare them with monolithic applications? Also, provide some pros and cons for each approach.",
+      "answer": "A microservice is like a smaller version of a monolith, but with a particular purpose, like manipulating users or a subscription service. It has its own database and server, isolated from other parts of the application. A key pro is that different parts are not dependent on each other, allowing other parts to continue working if one fails, unlike monoliths. However, microservices can be difficult to maintain because each service requires its own server and database, leading to many components to manage and requiring specialists.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "How do you define clean code and code quality? What do you look for when you review pull requests to determine if the code is high quality?",
+      "answer": "I usually look if I understand it quickly. If I can understand the code by reading it once, it's written pretty well. But if I spend three or four times reading it and five to ten minutes trying to understand it, it's a bit complicated. Also, from a clean code perspective, I look at the naming of variables and functions to ensure they are clear. I also consider if functions do only one thing and achieve their goal.",
+      "follow_up": "What principles do you know and follow in your daily routine about writing code to ensure it's high quality? For example, DRY, KISS, YAGNI, SOLID."
+    },
+    {
+      "question": "What principles do you know and follow in your daily routine about writing code to ensure it's high quality? For example, DRY, KISS, YAGNI, SOLID.",
+      "answer": "I usually use YAGNI, which stands for 'You Ain't Gonna Need It'. It's about not writing code for the future. Also, KISS, 'Keep It Simple, Stupid,' means writing simple, understandable code. DRY, 'Don't Repeat Yourself,' means trying to reuse code. These are probably the main ones.",
+      "follow_up": "And regarding SOLID, what do you find to be the most important principle to definitely follow in your practice? Ideally, we want to follow them all, but sometimes it's not feasible. I just want to understand from your perspective how you work with SOLID and follow it."
+    },
+    {
+      "question": "And regarding SOLID, what do you find to be the most important principle to definitely follow in your practice? Ideally, we want to follow them all, but sometimes it's not feasible. I just want to understand from your perspective how you work with SOLID and follow it.",
+      "answer": "I have a favorite one: Dependency Inversion. When I started working on my recent project, I was mostly working with tests. Most of our classes were importing modules and using them in functions within the class, so there was no dependency injection. It was really difficult to test those functions. I worked with that a lot, using dependency injection to implement Dependency Inversion from SOLID, and that was really useful. I keep complying with that principle most of the time.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "How do you ensure that Node.js applications are tested? What types of tests do you write, and what types of tests can you write to make it even better? I just want to understand the ways to test Node.js applications.",
+      "answer": "There's a testing pyramid I can start with. It consists of unit tests, integration tests, and end-to-end tests. In practice, in Node.js projects, the pyramid is very correct from my perspective because we usually write most of the unit tests first, then integration tests, which are fewer than unit tests, and in the end, we usually write end-to-end tests. I can compare them if you want.",
+      "follow_up": "Yeah, please go ahead."
+    },
+    {
+      "question": "Please compare unit, integration, and end-to-end tests.",
+      "answer": "Unit tests are usually written for a small piece of code, like a simple function or method, testing it without any outside dependencies, often mocking them. If we don't mock dependencies and a function calls another from a different class, it becomes an integration test. Integration tests check how two or more parts of the application work together. End-to-end tests are the really difficult ones for me. They usually test real use cases or user paths, like user login, and call real backend endpoints one by one to pass that user case.",
+      "follow_up": "And why did you say that it's difficult for you?"
+    },
+    {
+      "question": "And why did you say that end-to-end tests are difficult for you?",
+      "answer": "Because it is complicated. You need to think about a lot of details and call many endpoints to test and pass the scenario. When you write a unit test, you just test one simple function, and it's much easier.",
+      "follow_up": "Regarding end-to-end tests, have you encountered problems with unstable tests, where they sometimes run but then fail for other reasons?"
+    },
+    {
+      "question": "Regarding end-to-end tests, have you encountered problems with unstable tests, where they sometimes run but then fail for other reasons?",
+      "answer": "You mean flakiness of the tests? Yes, this is one of the problems with them. It's a known factor, and everybody knows about it. Sometimes, for example, if the database is down, your test will fail. With unit tests, you won't have such a problem. But as you said, this is the most real test, and sometimes it can give you such results just because of other factors, like a third-party service being down.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Did you write any tests to test the performance of your Node.js application? Was there some load testing as well? What was your experience with this? Did you find some issues with it and eventually make it better?",
+      "answer": "Actually, in my recent project, we used to write end-to-end tests that were also used as load tests. So, I can say that I used to write load tests that we were running to find the limits of our application. For example, the login scenario: how many logins per second or per minute our application can handle. I guess that's the purpose of load tests.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Can you tell me how you deal with synchronous stuff in unit tests? For example, like you know, there are some timers, some and other calls like you said. How do you deal with that in unit tests?",
+      "answer": "I usually mock them using the framework opportunities. I usually use Jest for tests, and it has lots of opportunities to mock, whether a single function or you can also mock a whole module.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "What do you decide to test and what not to test? For example, you have the application, right? What would you definitely not test overall, not specifically about the backend, but overall in unit testing? What is it that we usually don't want to test? For example, imagine you have a class with a public interface, but you definitely have some methods for...",
+      "answer": "Yes, we usually don't test private ones, private methods. Usually, they are tested when we test public methods because they are called from the public methods. So, yeah, we usually don't do that.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "How do you treat the code coverage metric, and what value do you consider good?",
+      "answer": "I usually like 100%, but yes, most people think that 100% can be reached with some stupid tests that don't test anything, just to cover all the lines of the code. But that can be done for me, that can be done for 80%. So, for example, 80% can also be reached that way. But if I would need to set a limit, I would set 100%, and after that, it is my responsibility, if I am a team lead for example, to control that.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Can you explain what Semantic Versioning (SemVer) is, why it's needed, and its different use cases?",
+      "answer": "Yes, it is Semantic Versioning that is used for versioning npm packages, usually. We have three numbers: the first one is the major, so it is usually incremented when some major changes are made to the application. The second one is minor, for minor changes to the application. And the third one is patch, which is like a minor bug fix and something like that.",
+      "follow_up": "Imagine I want to install a certain third-party dependency, and I want to install it so I can have any patch version, but I don't want changes in the major and minor versions. How can I achieve that?"
+    },
+    {
+      "question": "Imagine I want to install a certain third-party dependency, and I want to install it so I can have any patch version, but I don't want changes in the major and minor versions. How can I achieve that?",
+      "answer": "We have two symbols for that. We have a caret and we have a tilde. Oh, I'm lost right now, which one is for what? Yeah, I guess the caret is for minor and patch, like we can update minor and patch if you use caret. And if you use tilde, it updates only the patch version. Yeah, I guess that's correct.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Why do we need this `package-lock.json` file? And also, we have `npm-shrinkwrap.json`, which is kind of about the same. Frankly speaking, I don't know myself the whole difference about `npm-shrinkwrap.json` and `package-lock.json`. I use `package-lock.json` in my project, and it works fine for me. But, you know, if you know, please qualify, and I will check additionally after this interview. But at least I want to hear why we need `package-lock.json`.",
+      "answer": "`package-lock.json` is a file that contains a tree of dependencies of our project. We usually need it when we work together with multiple developers, for example. Let's say I installed a new dependency into the project, and when I install it with npm, npm updates the tree in `package-lock.json` also. I push it to GitHub, and for example, you pull it and try to `npm install` as well. In this case, if we don't have `package-lock.json`, you might install some different version of the package because we usually use the caret and tilde that we already discussed. Without `package-lock.json`, for example, I might have the first patch version, and you might have the ninth patch version, and they might be different in some cases, which may lead to some problems. But `package-lock.json` explicitly sets the version without any carets or tildes, so you install the particular version of the package. So, it solves that problem, like developers usually say, 'it works on my laptop, it should work.' If we talk about `npm-shrinkwrap.json`, it is almost the same file, but it is usually used when you write some npm packages yourself, when you publish your package to npm registries. This is because `package-lock.json` is usually not uploaded to the npm registry when you publish your package, but `npm-shrinkwrap.json` is uploaded there, and it guarantees that other...",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "What can we do to resolve installation errors when a new package relies on an outdated dependency, especially concerning peer dependencies? Have you encountered such situations?",
+      "answer": "I haven't directly used peer dependencies, but I understand their purpose. I often face similar issues with React versions; for example, my project uses React 17, but a new package requires React 18. After thorough verification, I sometimes use an override to resolve these installation errors, as the package often works with the older version.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "How do you understand libuv? What is libuv in Node.js?",
+      "answer": "Libuv is a library primarily responsible for asynchronous operations in Node.js. Since Node.js is a single-threaded environment and cannot inherently work asynchronously, libuv provides this capability, largely through the event loop.",
+      "follow_up": "What language is libuv written in?"
+    },
+    {
+      "question": "Can you tell me about the Node.js event loop in more detail? Describe its phases and everything you can tell about it, including microtasks.",
+      "answer": "The event loop's core consists of six main phases and two side phases. When a Node.js file is executed, it processes asynchronous operations and timers. The six phases are: 1. **Timers:** Handles `setTimeout` and `setInterval`. 2. **Pending Callbacks:** Executes callbacks ready after an operation. 3. **Idle Phase:** (I'm a bit lost on this one). 4. **Polling:** Waits for I/O operations. 5. **Check:** Runs `setImmediate` callbacks. 6. **Close Callbacks:** Executes callbacks for closing operations, such as socket `on close` events. Microtasks are primarily promises, and we also have `process.nextTick` as a side phase. Promises are typically executed after each main event loop phase. `process.nextTick` is similar but differs in declaration; I recall reading it might be checked after each line of code or after each event loop phase, but I'm not entirely certain.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "What do you think is executed first: `nextTick` or promises? And now, I'm presenting a code example with synchronous, asynchronous, promises, and `nextTick`. Can you go over this code and explain the execution order, and more importantly, why some code executes before others?",
+      "answer": "NextTick. Okay, this code looks complex. Starting with synchronous operations: `console.log` (1), the promise body (4), and another `console.log` (10). So, 1, 4, and 10 are synchronous. Next, for promises and `nextTick`, timers will be last. I think `process.nextTick` (9) comes before promises. Then 5 (the first promise's `console.log`), then 8. Wait, promise is before `nextTick` in this case. We need to complete the promise microtask queue first: 5, 8, 7, then 6. What's left? 8, 5, 3, and 2. I think `setTimeout` and `setImmediate` are tricky; their order can vary depending on the...",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "How do I understand CORS? Why sometimes we see this problem in the browser but don't see this problem in Postman, for example?",
+      "answer": "Yes, CORS is Cross-Origin Sharing or Cross-Origin Resource Sharing, I guess. It is something like a policy that exists only in browsers, as you said, and we don't have it in other tools. What does it do? When you request an endpoint from a backend application, usually, mostly if CORS is enabled on the backend side, the browser makes a pre-flight request. It is sent to the backend firstly before the main request to check if the requesting site can access the data. For example, the backend might accept only certain domains or certain HTTP methods, and so on. So, for example, if the backend configured CORS to accept only domain.com, and if you are requesting the backend from domain2.com, you will not get the data because you are not in the list of the backend's CORS configuration. But why don't we get it in Postman? Because this check, when we send that option, that pre-flight request, it is done by the browser itself. So, it is the browser's responsibility to control this process. That's why we don't have that kind of errors in Postman.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Talking from your experience, do you consider it best practice to allow it for everyone, or to fine-tune it and only allow it to only domains that are needed?",
+      "answer": "The best practice is to set the domains that should get the data because when we write backend, we usually know who will be requesting the endpoints and the server, and we can specify those domains. But maybe I have not seen those cases, but maybe there are cases when we don't know the domains beforehand, and maybe they can change from time to time. In those cases, maybe the star is more efficient.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "With that, I just want to check whether you use it already in your day-to-day work, and if yes, in what ways do you use AI tools to boost your productivity?",
+      "answer": "Yes, AI is everywhere nowadays, and I also use it. I usually use AI, and yes, I guess I use it every day because maybe I got that lazy to Google something. Even if I have any problem, anything that I don't know, I usually use AI. It is something like a new Google for me. Also, it gives some code snippets, sometimes the useful ones. And of course, you cannot just copy and paste them; you need to change them to comply with your project, but they are really useful nowadays.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "By the way, what specific services do you use? I mean, even with Pal Z, you can choose what tool you can use, like GPT, or whatever, Llama.",
+      "answer": "I usually use conversational ChatGPT, and that's it, nothing more yet.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "And do you use some techniques when you form your prompts? Like, did you hear about zero-shot prompting or few-shot prompting? Maybe you know about them and can talk from your experience about them.",
+      "answer": "Not really, I haven't heard of them. I usually use my own techniques.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "And the last question here, do you know about the temperature parameter that can also affect the outcome of your prompts?",
+      "answer": "Yes, but I haven't changed it ever when I use AI. But I used it to work with it in my recent project when we integrated AI with our own project. And at that time, I used it to play with that, setting it higher or lower. And yes, the temperature simply is how creative the answer of AI will be, I guess.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "I see you named the resource here 'user'. Most often, I see that it's called 'users' in plural. What do you think about this idea? What approach do you follow in your practice?",
+      "answer": "I guess usually in REST APIs, we use singular words, not plural ones. So, if you go by the principles of REST, we need to name them singularly.",
+      "follow_up": "By the way, what principles of REST? Did you hear about Richardson's Maturity Model about REST, or are you following specific best practices that you know, or the principles of REST that you just read from the definition of this pattern?"
+    },
+    {
+      "question": "Did you hear about Richardson's Maturity Model about REST, or are you following specific best practices that you know, or the principles of REST that you just read from the definition of this pattern?",
+      "answer": "I haven't heard about Richardson's principles, never. I know some principles of RESTful APIs for them to be fully RESTful. For that, they need to be cacheable, they need to be a layered system, which means that when you add some layers between your server and front, nothing gets broken. And there was something like a uniform interface. There are overall five or six principles of REST to be a RESTful API.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "What practices do you use if you write this for production for specific routes? You did the error handling in one place and also sent a 500 status. Would you send this 500 status all the time, or would you consider some other statuses upon different conditions to be sent?",
+      "answer": "I would probably be looking for the type of the error. I would have different errors, for example, 'not found error' or 'bad request error', and I would check it here in my error handler. Depending on the type of the error, I would return the particular status.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "How would you, as a backend developer, make it so for me, a front-end developer, to have more context-specific messages when a bad request occurs, especially for specific routes like user creation?",
+      "answer": "When incoming data is incorrect or invalid, we check it in our endpoint handler. If we find an invalid parameter or field, we throw an error and pass a specific message, like 'Name should be a text,' in the response body.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Did you use methods like schema validation for input? How can you explain what it is and why it is needed?",
+      "answer": "In Fastify, which I've worked with, it has its own validation. We set rules for each field coming from the front-end, like a user's name must be text, no more than 100 symbols, and mandatory for POST requests, but optional for PUT. For each endpoint, we write our own validation.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Can you describe different alternatives to HTTP, such as WebSockets, GraphQL, long polling, and short polling? Explain why they make sense in certain conditions, when you would use them, and also provide some criticism.",
+      "answer": "I haven't worked with WebSockets or polling, but I know WebSockets are used in messaging apps to create a connection between two sides for data sharing. I have worked with GraphQL, which is similar to REST but with big differences. Its main advantage is making one request to get data by describing what you want, unlike REST where you need multiple endpoints for different data.",
+      "follow_up": "What is the disadvantage of GraphQL? I've seen services with GraphQL APIs that impose usage limits because queries can be constructed to reach everything, potentially leading to circular dependencies, like requesting a user, then another user through that user. Have you encountered such edge cases, or have you mostly used GraphQL rather than implementing it yourself?"
+    },
+    {
+      "question": "What is the disadvantage of GraphQL? I've seen services with GraphQL APIs that impose usage limits because queries can be constructed to reach everything, potentially leading to circular dependencies, like requesting a user, then another user through that user. Have you encountered such edge cases, or have you mostly used GraphQL rather than implementing it yourself?",
+      "answer": "I haven't implemented it, but I know what you're talking about. It's probably the most popular problem about GraphQL, called the N+1 problem. I have faced it before, but I don't remember what it was about or how to solve it now.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "I would like to ask you to provide some feedback to each other.",
+      "answer": "I think the interview went well. Of course, I asked some deep questions to understand the limits of Shakat. I think you now understand some areas that you can improve based on this interview. But I think for a middle position, you did a great job. And most importantly, as usual, you already have this production experience. We can talk about theory for days, but what is usually important for me is that you already write some production code for real projects. So you have such experience, and of course, you have it. But yeah, just for this interview, we discussed general topics about some quality, about testing, and Shakat managed to answer them great. Also, an important topic right now, even for EPAM as well, I mean, as well as for other industries like clouds. And Shakat also has experience with clouds, with AWS specifically, which is the most popular cloud right now. And yeah, we did not touch a lot about frameworks, not just frameworks, but Shakat wrote some sample application for Express, and we discussed some potential areas that can be improved for production to be considered production-ready. And of course, we discussed the heart of the Node.js event loop, and Shakat was capable of managing it perfectly. So overall, I think Shakat did a great job. That's all that I can say.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Now, I think that Shakat, you could also share a couple of thoughts about the interview process.",
+      "answer": "It was a pleasure to participate in this interview, you know, because it was more like just a conversation with a person about some experience of mine. And also, during the interview, I got some details that will be really useful and helpful in my further career and experience. Thank you very much for your feedback.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "So Victor, what's the verdict?",
+      "answer": "Like I said, I think it went well, so I would hire Shakat. But all the compensation stuff is not on me.",
+      "follow_up": "NONE"
+    }
+  ]
+}

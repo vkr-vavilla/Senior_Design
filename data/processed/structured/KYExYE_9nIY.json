@@ -1,0 +1,339 @@
+{
+  "video_id": "KYExYE_9nIY",
+  "summary": "This mock interview focuses on designing Reddit's homepage feed. The employee, Kevin, starts by clarifying requirements like daily active users (50 million), number of posts per page (25), post types (text and image), and focusing on logged-in users and top posts from subscribed subreddits within 24 hours. He then moves to calculations, estimating data size per post and proposing optimizations like using thumbnails to reduce bandwidth. The high-level design involves a microservice architecture with web, app, ranking, feed, user, and post services, along with databases and an object store. Key design considerations include horizontal scalability with NoSQL, sharding strategies (initially by post ID, then refined to subreddit ID), and avoiding stale data through on-demand generation, caching, and a crawler for active subreddits.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Hi everybody and welcome to another mock interview with Exponent. Today we're here with Kevin Jenn. Kevin, would you like to introduce yourself?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Hi, nice to meet you guys. Yeah, my name is Kevin. I am a senior at Vanderbilt studying computer science, and I have interned at a number of different companies, both large and small, such as Google, Tesla, and a couple of other small startups. I'm excited for today."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "That's fantastic. We're excited to have you, Kevin. So today we're going to be doing a system design question, and my question to you is: How would you design Reddit's homepage feed?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Gotcha, gotcha. Reddit's homepage feed, like just kind of like the first page that you see when you visit Reddit?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yes, exactly. Take a second to think about it."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "That's okay, sure. Okay, can you tell me first of all, how many daily users are on Reddit?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Let's say 50 million."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay. All right, so that's quite a sizable number. From what I know about Reddit's homepage, there are a certain number of posts, I'm guessing from various subreddits, right?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, that's correct. Homepage. I can't remember how many posts are on the homepage. Let's go with 25 for now."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Gotcha, gotcha. So 25 posts on the homepage, and each post is comprised of some kind of content, as well as several links to the full post page. It also has a title, it also shows a number of comments, I think, on the post, just a variety of different metadata. The post content can be one of several types, I think it could be a text post, or it could be a video post, or it could be an image post. Should we design for all these different post types?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "I think let's focus on text and images for now."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Gotcha, sounds good. Cool. Actually, let me mark this down. That's fine. You sent me a whimsical link earlier, right?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, I just write my notes on that. Share that. There we go, that's good."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so 50 million users, 25 posts on the homepage, just think per page. And you said we only have to care about image and text posts right now?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yes. All right. And from what I remember, on Reddit, there are several tabs at the very top where you can sort by different settings, like hot, top, controversial. Should we care about all these different post or feed sorting methods?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Let's not worry too much about the ranking for now. Let's just pretend that whatever posts you see are the top posts of the subreddits that the logged-in users subscribed to in the past 24 hours."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, okay. Top post, 24 hours. All right. Let's see. Oh yeah, so I guess the Reddit homepage, I think, looks different for whether you're a logged-in user or not. If Reddit posts come from various subreddits, if you're logged in, you're probably subscribed to different subreddits compared to another user or compared to a not logged-in user. Only posts from your subscribed subreddits should appear on your homepage. I think that was the behavior. Should we care about building this kind of homepage feed for logged-in users, or is it fine to just do anonymous users?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Let's go with logged-in users."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, okay, yeah, sounds good, sounds good. So we have to think about that as well during the system design. Consider logged-in users. Okay, cool. I think that's all my questions for right now, and I think I can move on to calculations. That sounds good."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, I think that sounds good."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Oh, cool. So let's make another text box right here. So if there's 50 million daily active users that visit Reddit's homepage, and I guess if each of them visits the homepage maybe five times, if that's a reasonable number, is this per user? That would be around 250 million page hits on the homepage, so that's pretty large. And each page hit would require noting 25 different posts. So that means, just in a single day, we would have to load 250 million times 25. I already wrote that earlier, let me just calculate that number real quick. I guess like 6.2 billion posts. Let's see. And then for every single post, we should also calculate how much data or how much memory it would take to load it. Yeah, so every single post has a title, it has the number of comments, the number of awards or gold, I guess. Let's see. And I guess if it's a text post, oh right, it also has the timestamp too. If it's a text post, I think text posts probably usually have around a couple hundred characters, so maybe just like 300 characters."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "That sounds good for text posts. And or if it's an image post, it might have an image attached to it. So, or image..."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "How are you assuming the 300 characters value?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I'm just thinking from my experience visiting Reddit and clicking on text posts, 300 characters is kind of enough for one or two small paragraphs. Yeah, that's kind of been my experience looking at Reddit text posts, but correct me if that's wrong."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "No, that's fine. I just wanted to know how you were approaching that. And is this like an excerpt that you would see of a post, or is it the entire contents?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "It would be the entire content. I see. Okay, yeah."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "And then there's also the hyperlink to the full post if you click on this post on the homepage. All right, so I guess we can start calculating how much each piece of metadata would require in terms of memory. So the title would be, I'd say, around maybe 50 characters. Okay. And then if we consider each character to be around two bytes of storage for a char, that would be around 100 bytes for the title. Okay. And then the number of comments, that would just be an integer value, I'm thinking, which would just be four bytes. And then, let's see, the number of golds, that would also be an int, so that'd be four bytes too. The timestamp, that would be a float or maybe a big int, eight bytes for that. And then 300 characters for the text content, 300 times two would be 600 bytes. Image is, I think, usually around 100 or 200 kilobytes. So yeah, like 100 KB. Okay. And the hyperlink to the full post, I think that is also around maybe 50 characters, or maybe on the high end, like 100. So just set it as 100 characters times two bytes is equal to 200 bytes. Okay, cool, cool. So when I visit Reddit, most of the posts I see are image posts. Would you like the actual distribution of image and text posts?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Not really, I don't think I have a number off the top of my head. But let's assume in our world, we're going to go 50/50. Let's assume at least half of your posts have an image in them."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "All right, sounds good. Yeah, so half of the posts have an image, half don't. And for a single post, or I guess for 25 posts, let's do a single post. The average amount of data for a single post that would be 0.5 times 100 plus 4 plus 4 plus 8 plus 100 KB, which is like 100,000. So it's 0.5 times 100 plus 4 plus 4 plus 8 plus 600. Let me think about it for a second. Would you like to plug this into my calculator real quick?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Sure."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so honestly, I think the size of the image takes up most of the data required to store a post. It's like 50.4 KB, which we can just round down to 50, maybe. So for 6.2 billion posts per day times 50 KB, that's a pretty large number. At least, yeah, let me see how bad that is. 6.2..."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Is there anything that you can do to reduce this number off the bat?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, yeah, yeah. I was first thinking about how big this would be. It's probably bigger than a gigabyte, right? Gigabyte, terabyte, I don't know what's next. But yeah, I think first we should think about how to reduce this value for a single post. If we have to load six billion posts a day, and each post is 50 kilobytes on average, that would be pretty significant and probably would not be good for bandwidth, outgoing bandwidth. Yeah. So I'm thinking, I think when I visit Reddit, usually I don't see a full-size image next to the image post. Instead, I see a tiny thumbnail. And then I can click on this plus button below it to expand the image if I want to. I'd say usually when I visit Reddit, I don't click on every single image post; I just click on a few that I'm interested in. I'm guessing that's probably the same for most other users as well. So perhaps what we can do is instead of sending a full-size image for every single post on the homepage initially, we can send that big image on demand once the user decides to enlarge it. But by default, we can just send a smaller thumbnail."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Great. Okay, how's that going to affect your calculation?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, so I think if we change it to a thumbnail, maybe like 10 kilobytes, just a low-resolution image, that would probably reduce it by 10x as well. So that each image post, or each post on average, would be five kilobytes instead of 50 kilobytes. Okay. Although, another additional metadata we would need to have would be a link to that full-size image in our object store."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Cool, cool. And I assume that the size for that would be similar to the other hyperlink, right?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Right, yeah, it would be some hundred bytes or so."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, yeah. I think, is there anything else I should do for the calculations, do you think?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "I think this sounds reasonable. So you have a sense for how big each post would be and just how much bandwidth you're going to need if you're loading 25 posts every time someone visits the homepage, right? So this sounds good. Let's move on to the high-level design."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I'm thinking that there will probably be quite a few services involved in loading the homepage, and it might be good to split our system design up into a microservice architecture, where we have multiple different services, different servers talking to one another. Okay. And that would just be better in general for scalability, fault tolerance, and also separation of concerns between these different services, like building them. Okay, let's go with that. So as for the different services we would need for this homepage, I'm thinking just the default web server, a basic web server that talks to the client, some application servers that handle the different backend logic, maybe a ranking service that would be in charge of ranking the different posts, I guess in our situation, according to the top most post. And let's see what else. Maybe a feed service that would be in charge of creating the Reddit feed for a user, a user service that would be in charge of keeping track of updating and getting data from the user database, as well as a, let's see, a post service as well. Right, keep track of new posts and keep track of fetching posts to display on the homepage. And also, I'm thinking about, yeah, as for databases, we would need a database for this one. Let's do for this one. And we would also need an object store to store all the different images as well. Yeah, I think that's pretty much it for the higher-level design. I have some thoughts about the post database as well."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, sure. What are your thoughts on that?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I think, given the number of posts Reddit has, I'm guessing there's a lot. We would have to be careful how we create this post database. I'm thinking we would probably need some horizontal scalability, or else it might not be possible to fit, I'm guessing, hundreds of millions of posts on Reddit into this database. In that case, I'm also thinking of something like a NoSQL server, because when displaying your Reddit feed on the homepage, it's probably not as important that everything you see is the freshest or most up-to-date or most consistent. So, a NoSQL server, and we should have some horizontal scalability, and I think we should scale it in terms of sharding. So we can probably shard or distribute the posts across multiple database shards based on their post ID. So, shard by post ID. And that would allow us to kind of have an equal amount of data across all of our shards."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "What's the criteria for sharding here? What's the criteria?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I was just thinking of a simple formula. If the post ID is just an integer value, and the post ID is an auto-generated number, we could just use something like modulo to distribute this post to that shard, or to this other shard. If you have 100 shards, then it would be something like the post ID mod 100. Okay, we belong to that shard. However, usually, modulo sharding, using something simple like modulo, is not a good solution if you ever need to repartition your database, if you need to add a new shard to this database, like if each of your shards are getting too big or something. In that case, it would kind of shift all the modular values, like modding by 100, modding by 101, that results in totally different values. So, I know there's something called consistent hashing we can do to avoid having to do that, so we can increase the number of shards without having to repartition a lot of our data. Yeah, yeah. Okay, cut that. Are you probably out there? Just pause for a little bit."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, yeah, sure. Yeah, okay. And okay, so I think that strategy makes sense just to account for when your shards get too big, and you have a strategy to deal with that if that happens. Okay, all right, yeah. All right, sounds good."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "And then the feed service... Actually, before that, I kind of want to draw out this system."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "That sounds good. Yep, that sounds good. Yeah, that would help me visualize too, a little bit."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So we have our web servers right here, we would have our app servers over here. And then we would have, let's see, I'm thinking, so the client talks to the web servers, which talks to the application servers. And the application server should pull the homepage feed from the feed service, I'm thinking. And then the feed service would talk to a couple different services. The ranking service would be one of them, to rank the different posts. To get the posts themselves, it would have to talk to the post service. And right, the app server should also talk to the user service. Something like that. Something like this, I'm thinking of. And then let me just connect the lines. Okay, I'm going to switch this arrow, but I can't. Which arrow? I got it. Okay, yeah, I feel like the arrows just represent making requests, basically. Okay, yeah. And then we also have a database right here, and also a post database right here. And then our object store, that would be right here, and you can just talk to it directly. Image. Okay. And then let me move this all a little bit. And then this would be the client who talks to the web servers and who also talks to the post image store. Okay. All right, let's see. Oh yeah, I'm also missing load balancers, but I definitely want them to be in here. So let me just, I can just make this triangle. And right, we want to have load balancers in front of the web server and in front of the app server as well. And let's see. Yeah, I feel like a service would probably consist of multiple servers. Honestly, I think there should be load balancers in front of most of these lines, most of these arrows also, just because we don't want the system to have a single source of failure, where one server goes down, the entire Reddit homepage can be loaded. Yeah. This is kind of the overall design."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, so how are you going to be calculating the top posts with this system?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, so what I'm thinking of is, the app servers, when the client makes the request to the Reddit homepage, it will go to web servers, and then the app servers will kind of pull the data from the various other services. It would talk to the user service, determining what subreddits this user is subscribed to, and it would talk to the feed service, passing in those subreddits. And the feed service should generate, should pull posts appropriately for those subreddits back, and the feed service should rank them appropriately, and then give them back to the client, basically. Okay, yeah. I'm thinking with this flow, in order to pull the posts across different subreddits, because we are sharding the post database by post ID, we would basically have to query every single shard to get the different posts across all the subreddits. Yeah, which might be slightly taxing, and maybe there's a better way to do it. Perhaps, instead of sharding by post ID, we can shard by what subreddit that particular post belongs to."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, that sounds reasonable."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, so if two posts are created in, I guess, the funny subreddit, they would both belong on the same post database shard. And that way, say a user is only subscribed to a few subreddits, like one of them being funny, or let's say he's only subscribed to funny, then we would just have to only query that post database from the feed service instead of querying all the different shards. Yeah. Okay, so let me just update that: shard by subreddit ID. A problem with sharding by subreddit is that some subreddits have a lot more posts than other subreddits, and that can result in some shards being much larger than other shards. Yeah. So, I think in that case, maybe we can just have some functionality where if a shard gets too big, we can expand it to two different shards, we can break it up. And then with our consistent hashing that we talked about earlier, it wouldn't be too difficult to move some of that data from that shard onto the new shard."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, that sounds good. How would you be avoiding stale data?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I think for avoiding stale data, can you clarify a little bit?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So we're saying that we want the top posts in the past 24 hours, right? First of all, what's your, let's go back to the strategy that you're using to collect those 25 posts? And then how would you make sure that you are constantly giving back, if the user is visiting Reddit five times a day, each time I'm assuming that those 25 posts are going to have to be fresh, right? You mean fresh as in they should be different from one another, or if there are changes to what the top 25 posts are for this user, then yes, they should be different."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, gotcha, I got you, I see what you mean. Yeah, so I think the easy solution for this would just be to generate the feed on demand. Basically, when the user visits Reddit, we would, at that point in time, have the feed service call the post service, get the latest 24-hour posts, and then rank them accordingly, send them back to the user. Yeah, by doing that generation on demand, it will ensure that the user will have no stale data, but it would also mean that that might be kind of taxing for our backend to do that, given all the number of pages that we have. Yeah, so I'm thinking that we could possibly implement it in a better way. Let's see, we could have, just off the top of my head, I'm thinking of having a cache. So maybe when a user visits Reddit for the first time that day, if the user visits Reddit for the first time that day, then we would do this online generation of their feed and then cache that result. If the user visits in the next minute or two, we can just serve that feed from the cache."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, so do you have any strategies to not tax the backend so much?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Right, so I'm thinking the first thing is that we probably don't have to look at all the posts in the post database. Maybe we can cache the top posts per subreddit, and that would allow us to, on a daily basis or every couple hours, when a user makes a request to Reddit's homepage, we can just fetch those top posts from all the subreddits that they're subscribed to, instead of looking at the entire post database across all the hundreds of millions of posts, and just rank those top posts accordingly. Okay. And we could have a crawler that would do this kind of caching, and this crawler could crawl every couple hours or so per subreddit. Actually, just a quick question, do you know how many subreddits there are on Reddit?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Let's assume for our purposes around two million, but I also would say not all of them are active at the same time, so I'll assume like 130,000 or so are active."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, okay, gotcha. Right, so that's really important to know that only a small portion of all subreddits are active subreddits. So maybe we can just do crawling on these active subreddits, crawl the top posts in the last 24 hours of these active subreddits, and keep track of those. And then for non-active subreddits, we can maybe just, if not active subreddits wouldn't have any new posts, we can just exclude them from being fetched for our homepage purposes."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And how are you differentiating between whether a subreddit is active or not?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I'm thinking we could have another layer of crawling, I guess. For this one, maybe once every day, at a much slower cadence, that checks, 'Does this subreddit have any new posts?' If it does have a new post, then we can check this subreddit as active, we can move it to the active subreddit category. Otherwise, it would just be considered non-active. Yeah, so having that cache, we can add that in right here, then remove these two top posts cache, and we would have a crawler that populates this cache from the post service. Okay, okay. Yeah, I think this is pretty much it for the design then. Do you have any other questions?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "I think this is a good place to stop. I want to ask you, Kevin, what do you think is the most challenging part about approaching questions like this?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I think just keeping track of all the different components of the system, keeping track of all the different requirements, that is pretty challenging. But I think the more system design you do, the more experience you have, the better over time."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And the devil is in the details for system design. So, I think you did a good job in kind of highlighting the little things that you wanted to add to this system, starting from the load balancers that you addressed right from the beginning, the sharding strategy that you wanted to use, and then caching at the end. So it's these little things that you kind of add to a system that convey to an interviewer that you've thought about this, and you know what you're talking about, and you have ideas for how to design a really robust system. Thank you. Yeah, thanks so much for being with us today, Kevin. This was great, and I hope you build the next Reddit, and good luck with your upcoming interviews. Thanks so much for watching. Don't forget to hit the like and subscribe buttons below to let us know that this video is valuable for you, and of course, check out hundreds more videos just like this at tryexponent.com. Thanks for watching and good luck on your upcoming interview."
+    }
+  ],
+  "training_pairs": [
+    {
+      "question": "How would you design Reddit's homepage feed?",
+      "answer": "Gotcha, gotcha. Reddit's homepage feed, like just kind of like the first page that you see when you visit Reddit?",
+      "follow_up": "Yes, exactly. Take a second to think about it."
+    },
+    {
+      "question": "Can you tell me first of all, how many daily users are on Reddit?",
+      "answer": "Let's say 50 million.",
+      "follow_up": "From what I know about Reddit's homepage, there are a certain number of posts, I'm guessing from various subreddits, right?"
+    },
+    {
+      "question": "Should we design for all these different post types?",
+      "answer": "I think let's focus on text and images for now.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Should we care about all these different post or feed sorting methods?",
+      "answer": "Let's not worry too much about the ranking for now. Let's just pretend that whatever posts you see are the top posts of the subreddits that the logged-in users subscribed to in the past 24 hours.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Should we care about building this kind of homepage feed for logged-in users, or is it fine to just do anonymous users?",
+      "answer": "Let's go with logged-in users.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "How are you assuming the 300 characters value?",
+      "answer": "I'm just thinking from my experience visiting Reddit and clicking on text posts, 300 characters is kind of enough for one or two small paragraphs.",
+      "follow_up": "And is this like an excerpt that you would see of a post, or is it the entire contents?"
+    },
+    {
+      "question": "Is there anything that you can do to reduce this number off the bat?",
+      "answer": "I think first we should think about how to reduce this value for a single post. If we have to load six billion posts a day, and each post is 50 kilobytes on average, that would be pretty significant and probably would not be good for bandwidth, outgoing bandwidth. So perhaps what we can do is instead of sending a full-size image for every single post on the homepage initially, we can send that big image on demand once the user decides to enlarge it. But by default, we can just send a smaller thumbnail.",
+      "follow_up": "How's that going to affect your calculation?"
+    },
+    {
+      "question": "How's that going to affect your calculation?",
+      "answer": "If we change it to a thumbnail, maybe like 10 kilobytes, just a low-resolution image, that would probably reduce it by 10x as well. So that each image post, or each post on average, would be five kilobytes instead of 50 kilobytes. Although, another additional metadata we would need to have would be a link to that full-size image in our object store.",
+      "follow_up": "Cool, cool. And I assume that the size for that would be similar to the other hyperlink, right?"
+    },
+    {
+      "question": "I think this sounds reasonable. So you have a sense for how big each post would be and just how much bandwidth you're going to need if you're loading 25 posts every time someone visits the homepage, right? So this sounds good. Let's move on to the high-level design.",
+      "answer": "I'm thinking that there will probably be quite a few services involved in loading the homepage, and it might be good to split our system design up into a microservice architecture, where we have multiple different services, different servers talking to one another. And that would just be better in general for scalability, fault tolerance, and also separation of concerns between these different services, like building them. So as for the different services we would need for this homepage, I'm thinking just the default web server, a basic web server that talks to the client, some application servers that handle the different backend logic, maybe a ranking service that would be in charge of ranking the different posts, a feed service that would be in charge of creating the Reddit feed for a user, a user service that would be in charge of keeping track of updating and getting data from the user database, as well as a post service. As for databases, we would need a database and an object store to store all the different images as well. I have some thoughts about the post database as well.",
+      "follow_up": "What are your thoughts on that?"
+    },
+    {
+      "question": "What's the criteria for sharding here? What's the criteria?",
+      "answer": "I was just thinking of a simple formula. If the post ID is just an integer value, and the post ID is an auto-generated number, we could just use something like modulo to distribute this post to that shard, or to this other shard. If you have 100 shards, then it would be something like the post ID mod 100. However, usually, modulo sharding is not a good solution if you ever need to repartition your database, if you need to add a new shard to this database, like if each of your shards are getting too big or something. In that case, it would kind of shift all the modular values. So, I know there's something called consistent hashing we can do to avoid having to do that, so we can increase the number of shards without having to repartition a lot of our data.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Okay, so how are you going to be calculating the top posts with this system?",
+      "answer": "The app servers, when the client makes the request to the Reddit homepage, it will go to web servers, and then the app servers will pull the data from the various other services. It would talk to the user service, determining what subreddits this user is subscribed to, and it would talk to the feed service, passing in those subreddits. And the feed service should generate, should pull posts appropriately for those subreddits back, and the feed service should rank them appropriately, and then give them back to the client, basically. I'm thinking with this flow, in order to pull the posts across different subreddits, because we are sharding the post database by post ID, we would basically have to query every single shard to get the different posts across all the subreddits. Which might be slightly taxing, and maybe there's a better way to do it. Perhaps, instead of sharding by post ID, we can shard by what subreddit that particular post belongs to.",
+      "follow_up": "Okay, that sounds reasonable."
+    },
+    {
+      "question": "How would you be avoiding stale data?",
+      "answer": "I think the easy solution for this would just be to generate the feed on demand. Basically, when the user visits Reddit, we would, at that point in time, have the feed service call the post service, get the latest 24-hour posts, and then rank them accordingly, send them back to the user. By doing that generation on demand, it will ensure that the user will have no stale data, but it would also mean that that might be kind of taxing for our backend to do that, given all the number of pages that we have. So I'm thinking that we could possibly implement it in a better way. We could have, just off the top of my head, I'm thinking of having a cache. So maybe when a user visits Reddit for the first time that day, then we would do this online generation of their feed and then cache that result. If the user visits in the next minute or two, we can just serve that feed from the cache.",
+      "follow_up": "Okay, so do you have any strategies to not tax the backend so much?"
+    },
+    {
+      "question": "And how are you differentiating between whether a subreddit is active or not?",
+      "answer": "I'm thinking we could have another layer of crawling. For this one, maybe once every day, at a much slower cadence, that checks, 'Does this subreddit have any new posts?' If it does have a new post, then we can check this subreddit as active, we can move it to the active subreddit category. Otherwise, it would just be considered non-active. So having that cache, we can add that in right here, then remove these two top posts cache, and we would have a crawler that populates this cache from the post service.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "What do you think is the most challenging part about approaching questions like this?",
+      "answer": "I think just keeping track of all the different components of the system, keeping track of all the different requirements, that is pretty challenging. But I think the more system design you do, the more experience you have, the better over time.",
+      "follow_up": "NONE"
+    }
+  ]
+}

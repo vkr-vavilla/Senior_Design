@@ -1,0 +1,372 @@
+{
+  "video_id": "GxCD7Q_qDpU",
+  "summary": "This chunk features the interviewer (Clem) introducing a mock Google behavioral interview with fellow tech YouTuber Nick White. After a brief setup, the interview begins with Nick discussing his diverse work experience, his transition to full-time YouTube content creation, and how his YouTube experience, particularly in communication and leadership, could translate to a software engineering role at Google. The employee discusses how they handle criticism on YouTube (deleting comments) versus how they would approach it in a professional software engineering team (constructive feedback, one-on-one discussions). They elaborate on the best ways to give and receive criticism. The conversation then shifts to the challenges of running a YouTube channel, specifically the consistent quality required for filming. Finally, the employee explains their reasons for seeking a software engineering job now, citing a desire to stay current with new technologies and the need for a more stable career path. The employee discusses their preference for working with new technologies and how they acquire new skills, particularly in mobile development, through video tutorials and building projects. They also explain their strategy for overcoming technical blockers by Googling, consulting Stack Overflow, and asking teammates. The conversation then shifts to a self-reflection question, where the employee identifies their tendency to joke around and the challenge of adapting to more serious team members, outlining their approach to improving this aspect of their professional interactions.",
+  "quality_flags": [
+    "employee_utterance_cut_off_at_end",
+    "No direct interview Q&A for training_pairs; content is post-interview analysis and outro."
+  ],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Hey everyone, I've done many mock Google interviews on this channel, but one type I haven't done is a mock Google behavioral interview. In this video, I'm doing a mock Google behavioral interview with Nick White, another tech YouTuber. This is a standard behavioral interview you might get at a big tech company. I asked him various questions, most of them picked from AlgoExpert, my company, where we have behavioral interview content. Behavioral interviews are tricky because there's no real right or wrong answer; it's very conversational. Hopefully, you'll find this video insightful. We also did a debrief session after the interview, so stick around for that."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Nick has his button-down shirt, he's ready to put his serious hat on. Nick, are you ready for the behavioral interview?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I am. I was born ready."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "You're born ready. All right, let's do this. This is probably going to be about 20 to 30 minutes. Let's begin. Hey Nick, how's it going? I hope you've had a good couple of interviews so far today. The way we're going to do this interview is probably 20 to 30 minutes, just getting to know you a little bit better, having you tell me about your experience, and then we might jump into a short coding problem if that's okay with you."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "That sounds great. Cool."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So I'm looking at your resume here, and I see that you've got a few different work positions over the past year or so as a software engineer. It also looks like you have a YouTube channel and you've been a content creator on YouTube doing algorithmic explanations, coding tutorials, and all that. So, why don't you take a minute or two to tell me a little bit about yourself and all this work experience that you have?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Oh, yeah, sure. So I went to college for computer science. I did some internships during college where I did full-stack web development and a couple of internships with mobile development. Afterwards, I got some part-time and full-time positions at consultant agencies where I did mobile development, web development, more mobile development, more web development, and other things like WordPress, CMS kind of stuff. Then I had a contract position for an actual software engineering role in San Francisco. My YouTube started picking up at the time, so I decided not to return for a full-time position and do YouTube full-time. I do YouTube full-time at the moment."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, so it sounds like you've had a lot of experience with different parts of the stack, like web development and mobile. On YouTube, it sounds like you're focusing more on algorithms, like coding interviews. What kind of coding tutorials do you do?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I do coding interview tutorials, technical interview prep stuff, and I've done a little bit of web stuff, some project building stuff like that."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, and so I'm curious, how would you compare your experience on YouTube as a content creator in tech to your job or your various jobs as a full-time engineer? Have you found some similarities there, or what?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "There are some similarities as far as project building. When I build projects, that's somewhat similar to software engineering, just like it would be in industry. However, I'm not sitting here for eight hours a day coding. I have nobody telling me what to code, so I'm kind of making stuff up on my own that I think people would find interesting, and I'm not given tasks to do each day by some kind of engineering manager."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Right, right. Sorry, excuse me one second, my cat. This is what happens when you're doing remote work; my cat is bothering me. I apologize for that, Nick. So, I guess one question that I'm very curious about, because these days you see a lot of people doing content creation on YouTube in the tech community and all that: if you were to join Google now and have a full-time software engineering position at Google, do you feel like your YouTube experience would bring something unique to the table? If yes, what is that? How do you feel like your experience from YouTube translates into a job at Google?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I think that content creation and being a content creator helps you grow socially. I think I've grown a lot socially and as a leader in the past two years that I've run my channel. From sitting in my bedroom all by myself, now I'm talking to a lot of people every day, and I feel like I have much better communication skills, which some people might lack."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "I see. Do you mind expanding a little bit on that? What do you mean by a leader? How has YouTube helped you become more of a leader?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I'd like to think that what I do is kind of direct people's way of thinking, or the people that watch me, a little bit in the right direction. I want to be doing that in the right direction, which is what leaders do; they direct who they're leading in the right direction, I guess. Does that kind of make sense?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Sure, but I guess, do you have a particular example of how you've seen that enacted? Obviously, if you're doing videos and if they're well received, I'm sure you're seeing that kind of impact. But do you have examples maybe that you could share of exact times when you've seen your viewers tell you something or you've helped them?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Oh, yeah. So, I teach my audience how to get into companies, how to study for the interview, how to prepare. People that follow the things I say, I kind of tell them how I would study to become proficient in this stuff, and they will follow along. I've gotten many messages from people who get into these companies, and they thank me because I was a big part in them getting into them."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Right, okay, that's really cool. I'm sure that must feel like pretty meaningful work."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "You're helping these people that you don't necessarily know firsthand, right? I guess one question that I'm curious about is, have you ever had criticism on YouTube? Like people who criticize either your work or your approach to your work, or things like that? And how have you handled it?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I rarely, very rarely, get criticism. I have a couple of solution videos that people don't like, and maybe I should take those down. I just never did. But most of the time, I very rarely get criticism. When someone's being negative, for example, I post songs, maybe joking around songs once in a while about coding on my YouTube, or I try and do fun things once in a while. The people that are here for pure educational content might get mad and they say stuff like, 'This channel used to be useful.' And you know, I don't need that negative energy, so there's a very simple solution: there's this little three dots, and you click delete on the comment, and that's about the end of it."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So, tying this back to a full-time job as part of a software engineering team, how do you think you would react or handle if you had criticism from a teammate, maybe even like a close teammate, and you can't just delete them or hide them or anything?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Well, if I actually get criticism that I think is accurate, for example, like those solution videos, there's like two out of hundreds that maybe I didn't do the best job. I probably should have gone back and privated those because maybe they're just wasting people's time, and I probably will after this; I just forgot about it until now. I think if someone's giving me criticism and I feel like it's true, which I feel like I'm a pretty good judge of what would be true as far as criticism, then I'll take that into consideration. If I agree with it, then I'll try and work on changing something about myself, whatever that might be."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "I see. And so, how do you think of the best way to give and receive criticism? Are you the kind of person who thinks that criticism should be given frequently? In what way? Should it be given directly? Should it be given through a manager or something?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "It's kind of difficult because I feel like some people's tolerance for criticism is a lot different. Some people would like more of an approach of you being really kind, and they would be able to take that. And some people need it to be a little bit more serious. Some people would be fine with it being very direct. You know, 'I just want to know what's going wrong, tell me straight up.' That's the kind of person I am; I would be glad to just take direct criticism. I won't be affected or have my feelings hurt. But for the general population of people, if I were to give criticism, I would probably have to start off being a little bit more kind, bringing up some concern, whether it be in a joking kind of way just to let them know that you think that, or some kind of way like that. And then if they don't take that into consideration or something gets worse, then you would have to maybe be more serious about it."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And define 'be more serious about it.' Like, imagine you had this on the job."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, if it was something that's really affecting productivity of a product team, development, whatever it is, you could bring up that they didn't—at first, you could be nice and bring up that they didn't meet expectations a certain time. And maybe just hope that it doesn't happen again, say it in a way that makes it seem like, 'Oh yeah, hopefully this doesn't happen again.' And then, if it proceeds, maybe you have to sit down one-on-one and be like, 'Hey, we're having a tough time here for these reasons. What do you think is going on here, and how do you think we can make this not happen in the future or improve what's going on here?'"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Gotcha. And I guess, maybe going back to the thing about YouTube and all your experience there, I'm curious, what's been the most challenging thing about YouTube? What's been the most challenging thing about running this channel and growing it?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "The most challenging thing for me is probably filming, probably the filming aspect of it. It seems like you really need to be in the right mind state to film. You need to have things like, I think background matters, I think filming, the camera quality, the audio—everything kind of comes together into this one thing to be as good as it could possibly be. So, there's a lot of factors. Some ideas are bad. Just a lot of things go into filming that have to all come together and be in place for a video to be good, so it's hard to make videos."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Right, so it's like that consistent quality aspect of it. Gotcha. Okay, so I guess maybe let's change gears a little bit. Why don't you tell me why you are interested in getting a software engineering job now? Because from what I understand, you said that you were potentially offered a position, or you could have pursued another company, but you decided to pursue YouTube full-time. And it seems like your YouTube gig is growing really well. So, why are you now looking to get a software engineering job? What are you looking to learn from it? What are your reasons?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I think there's nothing like being in the industry and working a software engineering job where you're coding all day, every day. It's a lot different than YouTube. For example, at one point in time, I was up with the latest technologies, and I knew what the new things coming out were because you're paying attention. Everything's going fast. When you're doing YouTube, you don't necessarily have to be paying attention to all these new technologies. You're not coding all day, so you don't know the brand new library that came out because you're not doing anything related to that library. So, I want to get back to where all the new stuff is because I like the feeling of knowing all the newest stuff and being at the head of all the new technologies. I just like that kind of stuff. But at the same time, YouTube isn't the most stable job, so a software engineering position—I like coding, and a software engineering position is more stable, I guess."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, that makes sense. And I guess, how do you think about staying in the loop with all these new technologies? Like, say you joined Google and you have a full-time software engineering job, are you the kind of person who then tries to stay up to date with all the new technologies, or do you try to stay up to date with just the ones that you work at or that you use at work? How do you think about that?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "When I'm coding a lot and doing..."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "First of all, I would probably want to be assigned to a project or some kind of team that's working on something with the newest technologies, like the latest and greatest stuff. I would not really be interested in working in a position where I'm doing like PHP, MySQL, some old legacy software. Once you start out there, usually the team, if you're all doing the latest stuff, your teammates are going to be finding new stuff and talking about it. Then, however you communicate about it, you learn stuff from them and they learn stuff from you. Usually, stuff just pops up, like new libraries, and since you're coding all day, you'll just see new things being used all the time. I like it because I get really interested in the newest stuff. A lot of the time, why are they making it? Because it's probably the best. When they release the new thing, it's usually going to be the best, otherwise, they're making it for no reason, right?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And so, on that note, when you started your positions where, for example, you worked in mobile development, from what I understood, you didn't have mobile development experience at that time, did you?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "No, I made an iOS app in college, but that was about it."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So then, how did you kind of ramp up? How did you get up to speed in mobile development, coming from maybe only iOS, or only one iOS, given that on that job you did also Android development, right?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, so some people read books and articles and stuff like that. I watch videos. I used to read books a lot, and reading's fine, but the best way for me to retain information is I watch videos. I watch project-building videos for iOS and Android. 'Let's Build That App' is like some dude that is really good at building apps, and I'll just follow along with his little tutorials. I'll build some apps and just pick it up. You kind of just pick it up. It's really similar to web; it's just you're using different environments and it's a little bit different, like constraints of the phones and stuff like that. But besides that, just project building, watch videos, and then build projects. Building projects is a good way to learn stuff too."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Gosh, so if you're assigned something that you don't know, you're going to get deep into it using tutorials and video tutorials, trying to build your own projects. Yeah. And what do you do if you're stuck? Let's say you're at work and you've got this new thing that you're trying to pick up, and you're completely stuck?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Usually, with enough Googling, you can find it. I'll only get stuck on a three-line thing or a very specific detail that I need to figure out, like, 'Why is this data not here?' or 'How do I get this here?' Something like that. So, usually, with enough Googling, you'll find the right way to do it, like Stack Overflow or wherever you look. Sometimes you can't; sometimes it'll just be people complaining, and then you can't find answers to it. In that case, if you spend enough time and you really work hard, you can kind of, I guess, come up with your own thing once in a while if you piece enough things together. It could take a really long time, and you might have to struggle through it. One thing you can do to maybe avoid that time gap is ask some of your teammates first, like, 'Hey, do you know anything about this?' And if they don't, then I guess you are going to have to struggle through it. But you could ask people or just look around, right? And then the way you can maybe find the person who does, if they don't know, they can point you to someone or something."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah. Okay, well, listen, just in the last couple of minutes, I want to ask you a question that I like to ask people just because I always think that it can be interesting introspection. If you had to say one thing about yourself that you think you're not particularly good at and that you want to get better at—something that you've either always been not particularly good at or maybe lately you're not particularly good at it—what is it, and how do you intend on becoming better at it?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Let me think if one thing I'm bad at. All right, sorry, I failed the interview. Take your time. Yeah, I just need to think about it for a second. I guess one thing that has been a little bit tough for me is I like to joke around, and I assume that everyone else does. Maybe not everyone else does; maybe some people are more serious and they don't understand jokes. So, I think what I need to better do is identify whether someone is interested in joking around or just wants to have a strictly professional relationship. And I guess that would be one of the main things. Is that a good answer?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "There are no good or bad answers, but I'm curious, how do you plan on getting better at that?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I don't know. See, the thing is, I wouldn't want to really work in a position where everyone is dead serious all the time. I would want to probably meet my team and think there's a good fit before I decided to work with them permanently. I would not really have a good time working with all serious people. So, that's one of the things I've noticed recently, whereas before, when I was first getting my first things, it was like, 'Oh, it's a job, I get the job.' But there's more to consider, like, 'Do you get along with the people?' But then you want to make some—not everyone can be exactly like you, so I need to work on, I guess, accepting that more and figuring out the balance between all that. Life's all about balance. I don't know what I can do to really improve my balance with everything, but I'm trying. Whatever that may be, I'm trying. So, I don't know what the exact steps are, but I am trying to do that."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Sure. Have you had a time when you, like, was there a specific instance where that happened, and you felt like you said something that someone didn't really get, or something, and it just didn't work out?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "No, I think it's just about relationships with people. I just like positive energy; I like joking around. When someone doesn't reciprocate when I'm doing that, then it can be awkward, I guess. So, it's like you're trying to be all funny or whatever, and then the person is just like, 'Leave me alone,' or whatever, and then it could just be awkward after that. Not like anything was said, but passive aggression or something like that. I want to avoid passive aggression at all costs; that's one of my least favorite things."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Right. And so, just out of curiosity, in a case like that, how would you handle it? Let's say that happens. How would you get over that passive aggressiveness or the weird awkwardness?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So, one thing I've learned is you could address it, I guess, which you could say, 'Hey, I was joking. I know maybe you don't want to joke.' I think..."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "That would just make it worse, though, so I would not even want to address it. If it's something as small as, like, I'm trying to joke around and they just want to be serious, and maybe it's awkward for a second, I think the best way that I think of now is just let it go. Just don't joke around. Identify it early on and just don't do it again, and just forget about it, and everything will be fine. Now, if you just keep doing it or if you bring it up, it might just make it more awkward. Yeah, I think that's probably the best way: just get it out of your mind as fast as possible."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, cool. Well, Nick, listen. Now, you know, it's been about 25 minutes. We've got about 15 more minutes to do a coding interview problem. So, let's reverse a linked list. I'm joking, but oh, dude, I could write that off the top of my head in like three seconds. But no, okay, all right, I think we're done. If you want, we can do a quick debriefing session now. You're actually reversing a linked list in Hangouts chat. All right, so, super quick debriefing session. First of all, behavioral interviews are always tricky. They're also not the easiest thing to do as the interviewer because, as the interviewer, I'm not really looking for a right or wrong answer. I'm not necessarily looking for an answer that pleases me, or like, I'm not trying to be like, 'Is Nick like me? Does he think like me?' Right? I'm just trying to see, 'Am I getting bad signal from you, or are you unable to give me any signal? Are you unable to give me any good information?' Sure. And also, you have an interesting background, especially since we focused a lot on your YouTube. It's kind of unique, and I think that you talked pretty well about your YouTube, and you tied it into software engineering pretty well. A couple of things that I'll say, a couple of points of improvement off the top of my head. So, number one, this is kind of an implementation detail, so to speak. Obviously, I don't know that in a real interview you would have said, 'I failed the interview.' I doubt you would have said that near the end. But just in general, you can take your time, especially if someone asks you a question like I did at the end, where I'm like, 'How, or what's something that you're bad at?' Right? Or a weakness of yours or something like that that might take you off guard. If it does, it's like, 'Okay, let me think. Let me take 10-20 seconds to think about that.' It's better that you think about it and come up with something really good than not. So, that's one thing. And by the way, here, just as a side note, these are the types of questions that ideally you even just have prepared ahead of time. You know, the classic, 'What are your strengths? What are your weaknesses?' All those, ideally, you have them off the top of your head. So, that was one little thing. Then the second thing is, there's one point—I forget the context again—it was near the middle when we were talking about YouTube and criticism. And this is a nitpick. This is not something that I personally would flag as bad, but you said, 'I've almost never gotten criticism.' And some people might interpret that as, 'Oh, this guy's a little bit arrogant,' or, 'This guy's a little bit like, lacks self-awareness,' or something. Not a big deal, right? I'm just saying things that might catch the eye. So, I would perhaps..."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I mean, I did. I said I gave a couple examples of criticism, though."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "You did, you did, and that was great. I'm just saying, here I'm being really nitpicky, right? Yeah, a lot of it is, it's not, you know, they might just hear that and then just take that. I guess some people might interpret that and just be like, 'Okay, person reacted that they don't get criticism,' even though, yeah, you did say that you got criticism. And then, the last thing I'll say is about the weakness, what you said about the weakness. It sounded, that was badly, though. Again, there are no right or bad answers, right? You just kind of entered one of those weird gray areas where it's just, I would avoid that. Ideally, you might be able to come up with just a better weakness, so to speak, right? Yeah, I understand that you were caught off guard because you didn't expect that question, and you were truthful. And personally, I think that was a valid weakness, right? That's something that people need to think about in a professional setting. But it's just, I personally would probably just say, maybe try to stay away from that. Try to stay into something more technical, or it could be non-technical, but maybe more like your communication skills. Although, obviously, don't make up, do use something."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, I like my communication skills, because I would have said that, so I can't think of anything else."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Exactly. You don't want to lie. You don't want to be like, 'Yeah, my communication skills are bad,' if you're actually a good communicator, which you are, by the way. You're a good communicator, a really good communicator. But yeah, just something to keep in mind. And this is where, you know, on AlgoExpert, when we cover the behavioral interviews, I always say that it's not that you can give a right or bad answer for behavioral interviews, but it's just sometimes you can find examples that give a tiny bit better signal, or scenarios that give a tiny bit better signal than other scenarios or other answers that you can give. So, all that to say, I would just, probably, given all the questions that I asked you here, try to re-watch this video and think, 'How could I have answered this just a little bit better to give a little bit more information?' And that's what you can do in your interviews."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "That makes sense. I totally agree that that's probably a bad topic to bring up in the workplace: communication, joking around, and stuff like that. I'm going to think of something else."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "You can just come up with something that will give better information and will leave no room for misunderstanding, or that kind of..."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, I don't want people to think, 'Oh, this guy's going to come into the office and just be saying ridiculous stuff,' because that's obviously not what I meant."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, exactly. And that's the thing, oftentimes it's like that's not really what you meant or whatever. And so, quick pause, I just want to add two points to this debriefing session. The first one has to do with leadership. We kind of addressed leadership earlier on in the..."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Nick mentioned that he served as a leader on YouTube to his viewers, and I asked him about that. What I want to say is that his answer, while decent, not bad, wasn't super detailed. You might have noticed that I didn't press on that; I didn't ask him more about leadership. I didn't really challenge him on that. The reason I didn't do that is because I would expect that Nick, if he were applying to Google or Facebook, would be applying for either an L3 or L4 position, maybe L5. The point is, he wouldn't be applying for a super senior position; he wouldn't be applying for a management position. For an L3 or L4 software engineer at Google, you're not really focusing on leadership or looking for leadership traits. Of course, it matters a little bit, but it's not the main thing. If you are an engineering manager or a very senior candidate, then be aware that you will be asked much more about leadership if it pops up in the interview. Your interviewer will press on it more. So, that's point number one. Point number two has to do with something that Nick mentioned when he was talking about working in a legacy codebase or with older technologies. He said something along the lines of, 'I would never want to work in a legacy codebase, a codebase that uses PHP or MySQL.' Here, you usually want to stay away from saying absolutes, right? Saying, 'I would never want to do that,' because, first of all, it can come across as a little bit entitled, depending on how you say it. Here, I don't think that Nick meant it in a bad way, but it can come across as that. Also, you never know if maybe your interviewer actually likes working in those codebases or types of technologies. Maybe they currently do work with PHP, and they really like PHP. They don't trust me, but in all seriousness, you never know; that could be a thing. Also, you don't know if you might end up working in such a codebase or with such a technology once you do get the job, unless you're applying to a company where it's a thing with them to advertise that they work with the hottest tech and not in legacy codebases. I would recommend staying away from that. At the end of the day, even at Google, there are a lot of legacy codebases. On this topic of staying away from absolutes, in that final answer that Nick gave, the one that entered the gray area with the jokes, I think he said something along the lines of, 'I would never want to work on a team that doesn't joke around a little bit or doesn't have a positive attitude.' Even there, just in general, I would recommend staying away from absolutes. Nothing super bad or super striking, just probably better to have a more balanced approach to your answers. So, those were the couple of points that I wanted to add, and let's go back to the actual video. Otherwise, good insight, no bad signal. It's always the thing with behavioral interviews: I got good signal. It's not like I was like, 'Oh my God, this is amazing.' That's not really what you get in a behavioral interview. It's more just like, 'Okay, this person looks like a good software engineer whom I would like as a co-worker. I would not dislike them as a co-worker. They would not be causing all sorts of weird issues or whatever."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Heck yeah, sounds like I aced it! No."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Alright, well, thank you so much for doing this, Nick."
+    }
+  ],
+  "training_pairs": [
+    {
+      "question": "So, why don't you take a minute or two to tell me a little bit about yourself and all this work experience that you have?",
+      "answer": "Oh, yeah, sure. So I went to college for computer science. I did some internships during college where I did full-stack web development and a couple of internships with mobile development. Afterwards, I got some part-time and full-time positions at consultant agencies where I did mobile development, web development, more mobile development, more web development, and other things like WordPress, CMS kind of stuff. Then I had a contract position for an actual software engineering role in San Francisco. My YouTube started picking up at the time, so I decided not to return for a full-time position and do YouTube full-time. I do YouTube full-time at the moment.",
+      "follow_up": "Okay, so it sounds like you've had a lot of experience with different parts of the stack, like web development and mobile. On YouTube, it sounds like you're focusing more on algorithms, like coding interviews. What kind of coding tutorials do you do?"
+    },
+    {
+      "question": "What kind of coding tutorials do you do?",
+      "answer": "I do coding interview tutorials, technical interview prep stuff, and I've done a little bit of web stuff, some project building stuff like that.",
+      "follow_up": "Okay, and so I'm curious, how would you compare your experience on YouTube as a content creator in tech to your job or your various jobs as a full-time engineer? Have you found some similarities there, or what?"
+    },
+    {
+      "question": "How would you compare your experience on YouTube as a content creator in tech to your job or your various jobs as a full-time engineer? Have you found some similarities there, or what?",
+      "answer": "There are some similarities as far as project building. When I build projects, that's somewhat similar to software engineering, just like it would be in industry. However, I'm not sitting here for eight hours a day coding. I have nobody telling me what to code, so I'm kind of making stuff up on my own that I think people would find interesting, and I'm not given tasks to do each day by some kind of engineering manager.",
+      "follow_up": "If you were to join Google now and have a full-time software engineering position at Google, do you feel like your YouTube experience would bring something unique to the table? If yes, what is that? How do you feel like your experience from YouTube translates into a job at Google?"
+    },
+    {
+      "question": "If you were to join Google now and have a full-time software engineering position at Google, do you feel like your YouTube experience would bring something unique to the table? If yes, what is that? How do you feel like your experience from YouTube translates into a job at Google?",
+      "answer": "I think that content creation and being a content creator helps you grow socially. I think I've grown a lot socially and as a leader in the past two years that I've run my channel. From sitting in my bedroom all by myself, now I'm talking to a lot of people every day, and I feel like I have much better communication skills, which some people might lack.",
+      "follow_up": "I see. Do you mind expanding a little bit on that? What do you mean by a leader? How has YouTube helped you become more of a leader?"
+    },
+    {
+      "question": "What do you mean by a leader? How has YouTube helped you become more of a leader?",
+      "answer": "I'd like to think that what I do is kind of direct people's way of thinking, or the people that watch me, a little bit in the right direction. I want to be doing that in the right direction, which is what leaders do; they direct who they're leading in the right direction, I guess. Does that kind of make sense?",
+      "follow_up": "Sure, but I guess, do you have a particular example of how you've seen that enacted? Obviously, if you're doing videos and if they're well received, I'm sure you're seeing that kind of impact. But do you have examples maybe that you could share of exact times when you've seen your viewers tell you something or you've helped them?"
+    },
+    {
+      "question": "Do you have examples maybe that you could share of exact times when you've seen your viewers tell you something or you've helped them?",
+      "answer": "Oh, yeah. So, I teach my audience how to get into companies, how to study for the interview, how to prepare. People that follow the things I say, I kind of tell them how I would study to become proficient in this stuff, and they will follow along. I've gotten many messages from people who get into these companies, and they thank me because I was a big part in them getting into them.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Have you ever had criticism on YouTube? Like people who criticize either your work or your approach to your work, or things like that? And how have you handled it?",
+      "answer": "I rarely, very rarely, get criticism. I have a couple of solution videos that people don't like, and maybe I should take those down. I just never did. But most of the time, I very rarely get criticism. When someone's being negative, for example, I post songs, maybe joking around songs once in a while about coding on my YouTube, or I try and do fun things once in a while. The people that are here for pure educational content might get mad and they say stuff like, 'This channel used to be useful.' And you know, I don't need that negative energy, so there's a very simple solution: there's this little three dots, and you click delete on the comment, and that's about the end of it.",
+      "follow_up": "So, tying this back to a full-time job as part of a software engineering team, how do you think you would react or handle if you had criticism from a teammate, maybe even like a close teammate, and you can't just delete them or hide them or anything?"
+    },
+    {
+      "question": "So, tying this back to a full-time job as part of a software engineering team, how do you think you would react or handle if you had criticism from a teammate, maybe even like a close teammate, and you can't just delete them or hide them or anything?",
+      "answer": "Well, if I actually get criticism that I think is accurate, for example, like those solution videos, there's like two out of hundreds that maybe I didn't do the best job. I probably should have gone back and privated those because maybe they're just wasting people's time, and I probably will after this; I just forgot about it until now. I think if someone's giving me criticism and I feel like it's true, which I feel like I'm a pretty good judge of what would be true as far as criticism, then I'll take that into consideration. If I agree with it, then I'll try and work on changing something about myself, whatever that might be.",
+      "follow_up": "I see. And so, how do you think of the best way to give and receive criticism? Are you the kind of person who thinks that criticism should be given frequently? In what way? Should it be given directly? Should it be given through a manager or something?"
+    },
+    {
+      "question": "How do you think of the best way to give and receive criticism? Are you the kind of person who thinks that criticism should be given frequently? In what way? Should it be given directly? Should it be given through a manager or something?",
+      "answer": "It's kind of difficult because I feel like some people's tolerance for criticism is a lot different. Some people would like more of an approach of you being really kind, and they would be able to take that. And some people need it to be a little bit more serious. Some people would be fine with it being very direct. You know, 'I just want to know what's going wrong, tell me straight up.' That's the kind of person I am; I would be glad to just take direct criticism. I won't be affected or have my feelings hurt. But for the general population of people, if I were to give criticism, I would probably have to start off being a little bit more kind, bringing up some concern, whether it be in a joking kind of way just to let them know that you think that, or some kind of way like that. And then if they don't take that into consideration or something gets worse, then you would have to maybe be more serious about it.",
+      "follow_up": "And define 'be more serious about it.' Like, imagine you had this on the job."
+    },
+    {
+      "question": "And define 'be more serious about it.' Like, imagine you had this on the job.",
+      "answer": "Yeah, if it was something that's really affecting productivity of a product team, development, whatever it is, you could bring up that they didn't—at first, you could be nice and bring up that they didn't meet expectations a certain time. And maybe just hope that it doesn't happen again, say it in a way that makes it seem like, 'Oh yeah, hopefully this doesn't happen again.' And then, if it proceeds, maybe you have to sit down one-on-one and be like, 'Hey, we're having a tough time here for these reasons. What do you think is going on here, and how do you think we can make this not happen in the future or improve what's going on here?'",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "What's been the most challenging thing about YouTube? What's been the most challenging thing about running this channel and growing it?",
+      "answer": "The most challenging thing for me is probably filming, probably the filming aspect of it. It seems like you really need to be in the right mind state to film. You need to have things like, I think background matters, I think filming, the camera quality, the audio—everything kind of comes together into this one thing to be as good as it could possibly be. So, there's a lot of factors. Some ideas are bad. Just a lot of things go into filming that have to all come together and be in place for a video to be good, so it's hard to make videos.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Why are you interested in getting a software engineering job now? Because from what I understand, you said that you were potentially offered a position, or you could have pursued another company, but you decided to pursue YouTube full-time. And it seems like your YouTube gig is growing really well. So, why are you now looking to get a software engineering job? What are you looking to learn from it? What are your reasons?",
+      "answer": "I think there's nothing like being in the industry and working a software engineering job where you're coding all day, every day. It's a lot different than YouTube. For example, at one point in time, I was up with the latest technologies, and I knew what the new things coming out were because you're paying attention. Everything's going fast. When you're doing YouTube, you don't necessarily have to be paying attention to all these new technologies. You're not coding all day, so you don't know the brand new library that came out because you're not doing anything related to that library. So, I want to get back to where all the new stuff is because I like the feeling of knowing all the newest stuff and being at the head of all the new technologies. I just like that kind of stuff. But at the same time, YouTube isn't the most stable job, so a software engineering position—I like coding, and a software engineering position is more stable, I guess.",
+      "follow_up": "Yeah, that makes sense. And I guess, how do you think about staying in the loop with all these new technologies? Like, say you joined Google and you have a full-time software engineering job, are you the kind of person who then tries to stay up to date with all the new technologies, or do you try to stay up to date with just the ones that you work at or that you use at work? How do you think about that?"
+    },
+    {
+      "question": "How do you think about staying in the loop with all these new technologies? Like, say you joined Google and you have a full-time software engineering job, are you the kind of person who then tries to stay up to date with all the new technologies, or do you try to stay up to date with just the ones that you work at or that you use at work? How do you think about that?",
+      "answer": "When I'm coding a lot and doing...",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "And so, on that note, when you started your positions where, for example, you worked in mobile development, from what I understood, you didn't have mobile development experience at that time, did you?",
+      "answer": "No, I made an iOS app in college, but that was about it.",
+      "follow_up": "So then, how did you kind of ramp up? How did you get up to speed in mobile development, coming from maybe only iOS, or only one iOS, given that on that job you did also Android development, right?"
+    },
+    {
+      "question": "So then, how did you kind of ramp up? How did you get up to speed in mobile development, coming from maybe only iOS, or only one iOS, given that on that job you did also Android development, right?",
+      "answer": "Yeah, so some people read books and articles and stuff like that. I watch videos. I used to read books a lot, and reading's fine, but the best way for me to retain information is I watch videos. I watch project-building videos for iOS and Android. 'Let's Build That App' is like some dude that is really good at building apps, and I'll just follow along with his little tutorials. I'll build some apps and just pick it up. You kind of just pick it up. It's really similar to web; it's just you're using different environments and it's a little bit different, like constraints of the phones and stuff like that. But besides that, just project building, watch videos, and then build projects. Building projects is a good way to learn stuff too.",
+      "follow_up": "Gosh, so if you're assigned something that you don't know, you're going to get deep into it using tutorials and video tutorials, trying to build your own projects. Yeah. And what do you do if you're stuck? Let's say you're at work and you've got this new thing that you're trying to pick up, and you're completely stuck?"
+    },
+    {
+      "question": "And what do you do if you're stuck? Let's say you're at work and you've got this new thing that you're trying to pick up, and you're completely stuck?",
+      "answer": "Usually, with enough Googling, you can find it. I'll only get stuck on a three-line thing or a very specific detail that I need to figure out, like, 'Why is this data not here?' or 'How do I get this here?' Something like that. So, usually, with enough Googling, you'll find the right way to do it, like Stack Overflow or wherever you look. Sometimes you can't; sometimes it'll just be people complaining, and then you can't find answers to it. In that case, if you spend enough time and you really work hard, you can kind of, I guess, come up with your own thing once in a while if you piece enough things together. It could take a really long time, and you might have to struggle through it. One thing you can do to maybe avoid that time gap is ask some of your teammates first, like, 'Hey, do you know anything about this?' And if they don't, then I guess you are going to have to struggle through it. But you could ask people or just look around, right? And then the way you can maybe find the person who does, if they don't know, they can point you to someone or something.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "If you had to say one thing about yourself that you think you're not particularly good at and that you want to get better at—something that you've either always been not particularly good at or maybe lately you're not particularly good at it—what is it, and how do you intend on becoming better at it?",
+      "answer": "Let me think if one thing I'm bad at. All right, sorry, I failed the interview. Take your time. Yeah, I just need to think about it for a second. I guess one thing that has been a little bit tough for me is I like to joke around, and I assume that everyone else does. Maybe not everyone else does; maybe some people are more serious and they don't understand jokes. So, I think what I need to better do is identify whether someone is interested in joking around or just wants to have a strictly professional relationship. And I guess that would be one of the main things. Is that a good answer?",
+      "follow_up": "There are no good or bad answers, but I'm curious, how do you plan on getting better at that?"
+    },
+    {
+      "question": "There are no good or bad answers, but I'm curious, how do you plan on getting better at that?",
+      "answer": "I don't know. See, the thing is, I wouldn't want to really work in a position where everyone is dead serious all the time. I would want to probably meet my team and think there's a good fit before I decided to work with them permanently. I would not really have a good time working with all serious people. So, that's one of the things I've noticed recently, whereas before, when I was first getting my first things, it was like, 'Oh, it's a job, I get the job.' But there's more to consider, like, 'Do you get along with the people?' But then you want to make some—not everyone can be exactly like you, so I need to work on, I guess, accepting that more and figuring out the balance between all that. Life's all about balance. I don't know what I can do to really improve my balance with everything, but I'm trying. Whatever that may be, I'm trying. So, I don't know what the exact steps are, but I am trying to do that.",
+      "follow_up": "Sure. Have you had a time when you, like, was there a specific instance where that happened, and you felt like you said something that someone didn't really get, or something, and it just didn't work out?"
+    },
+    {
+      "question": "Sure. Have you had a time when you, like, was there a specific instance where that happened, and you felt like you said something that someone didn't really get, or something, and it just didn't work out?",
+      "answer": "No, I think it's just about relationships with people. I just like positive energy; I like joking around. When someone doesn't reciprocate when I'm doing that, then it can be awkward, I guess. So, it's like you're trying to be all funny or whatever, and then the person is just like, 'Leave me alone,' or whatever, and then it could just be awkward after that. Not like anything was said, but passive aggression or something like that. I want to avoid passive aggression at all costs; that's one of my least favorite things.",
+      "follow_up": "Right. And so, just out of curiosity, in a case like that, how would you handle it? Let's say that happens. How would you get over that passive aggressiveness or the weird awkwardness?"
+    },
+    {
+      "question": "Right. And so, just out of curiosity, in a case like that, how would you handle it? Let's say that happens. How would you get over that passive aggressiveness or the weird awkwardness?",
+      "answer": "So, one thing I've learned is you could address it, I guess, which you could say, 'Hey, I was joking. I know maybe you don't want to joke.' I think...",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "How do you handle awkward situations or miscommunications in a professional setting?",
+      "answer": "That would just make it worse, though, so I would not even want to address it. If it's something as small as, like, I'm trying to joke around and they just want to be serious, and maybe it's awkward for a second, I think the best way that I think of now is just let it go. Just don't joke around. Identify it early on and just don't do it again, and just forget about it, and everything will be fine. Now, if you just keep doing it or if you bring it up, it might just make it more awkward. Yeah, I think that's probably the best way: just get it out of your mind as fast as possible.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "You mentioned you've almost never gotten criticism, but you did provide examples. How do you reconcile that statement with the examples?",
+      "answer": "I mean, I did. I said I gave a couple examples of criticism, though.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Regarding your weakness, you entered a 'weird gray area.' How do you feel about that answer now, and what are your thoughts on improving it?",
+      "answer": "That makes sense. I totally agree that that's probably a bad topic to bring up in the workplace: communication, joking around, and stuff like that. I'm going to think of something else.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "What are your concerns about how your previous answer regarding weakness might be perceived?",
+      "answer": "Yeah, I don't want people to think, 'Oh, this guy's going to come into the office and just be saying ridiculous stuff,' because that's obviously not what I meant.",
+      "follow_up": "NONE"
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "video_id": "R_KXuSVE3U4",
+  "summary": "The employee designs an online multiplayer chess game. They explain the matchmaking service, which queues players by skill and allows matching with nearest queues if waiting too long. They then detail the game service, which uses an application load balancer for sticky connections and websockets for player movements, with game state saved to a ranking database.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "For today's software engineering interview, we'd like you to design an online multiplayer chess game."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, we'll start off with the design for the matchmaking service. When a player wants to join a game, they'll send a request to our matchmaking service. Assuming each player has a unique rating, we'll place their request to join a game into a queue based on their rank. In this example, we have one for low-skilled players, one for average players, and one for high-skilled players. We'll attempt to match that player with the first person in the queue that they are also in."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "What if one player gets stuck waiting too long because nobody's in the same queue as them?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "If a player is waiting too long for a match, like in this example, where they're the only person in the queue, after a certain amount of time, let's say 30 seconds, we can allow them to match with somebody from the nearest queue."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "After a match is made, how do the players actually play?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Once the matchmaking service has two players that want to play, it'll make a request to our game service to actually open up a game for them. Firstly, that request will go to an application load balancer to determine which container will actually be running the game. The application load balancer allows us to configure sticky connections, so both users will always be connected to the same container. Users will be connected and send their movements over websockets. Once the game is complete, the state will be written to the ranking database. Rankings will be updated, and they can play another game."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Can you explain why you chose websockets here?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Websockets run over TCP, where every message is delivered exactly once and in order. For a slower-paced game like chess, this is more important than getting super low latency with something like a UDP implementation."
+    }
+  ],
+  "training_pairs": [
+    {
+      "question": "For today's software engineering interview, we'd like you to design an online multiplayer chess game.",
+      "answer": "Okay, we'll start off with the design for the matchmaking service. When a player wants to join a game, they'll send a request to our matchmaking service. Assuming each player has a unique rating, we'll place their request to join a game into a queue based on their rank. In this example, we have one for low-skilled players, one for average players, and one for high-skilled players. We'll attempt to match that player with the first person in the queue that they are also in.",
+      "follow_up": "What if one player gets stuck waiting too long because nobody's in the same queue as them?"
+    },
+    {
+      "question": "What if one player gets stuck waiting too long because nobody's in the same queue as them?",
+      "answer": "If a player is waiting too long for a match, like in this example, where they're the only person in the queue, after a certain amount of time, let's say 30 seconds, we can allow them to match with somebody from the nearest queue.",
+      "follow_up": "After a match is made, how do the players actually play?"
+    },
+    {
+      "question": "After a match is made, how do the players actually play?",
+      "answer": "Once the matchmaking service has two players that want to play, it'll make a request to our game service to actually open up a game for them. Firstly, that request will go to an application load balancer to determine which container will actually be running the game. The application load balancer allows us to configure sticky connections, so both users will always be connected to the same container. Users will be connected and send their movements over websockets. Once the game is complete, the state will be written to the ranking database. Rankings will be updated, and they can play another game.",
+      "follow_up": "Can you explain why you chose websockets here?"
+    },
+    {
+      "question": "Can you explain why you chose websockets here?",
+      "answer": "Websockets run over TCP, where every message is delivered exactly once and in order. For a slower-paced game like chess, this is more important than getting super low latency with something like a UDP implementation.",
+      "follow_up": "NONE"
+    }
+  ]
+}

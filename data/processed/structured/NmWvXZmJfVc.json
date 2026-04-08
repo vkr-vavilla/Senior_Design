@@ -1,0 +1,584 @@
+{
+  "video_id": "NmWvXZmJfVc",
+  "summary": "This transcript captures a technical interview for a .NET Fullstack Angular Developer position. The interviewer, Mahesh, questions the candidate, Ruchi, across various topics including ASP.NET Web API (REST principles, content negotiation, security, error handling), C# (generics, polymorphism, unmanaged resources, TPL, custom middleware, model validation, environment variables), Entity Framework (ORM, DB first, entity data model, states, tracking, performance bottlenecks), SQL Server (indexes, stored procedures, execution plan, isolation levels), Unit Testing (frameworks, CI/CD role, AAA principles, test pyramid), SOLID principles (DIP), Code Smells, Design Patterns (Singleton, Repository, CQRS, Factory), and Architecture (monolithic vs. microservices). The interview concludes with hands-on coding questions in C# and SQL, followed by a brief feedback session from both the candidate and interviewer.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Thank you. Hi, Ruchi, how are you doing today?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Hi, Mahesh, I'm doing good. How are you?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, good, thank you. As you know, Ruchi, this position is mainly for a .NET fullstack Angular developer position, and we are looking for someone who can design, develop, and maintain web applications using technologies like .NET, C#, and Angular. With that, let's go ahead and we'll be covering different .NET technologies first, then we'll move to Angular. As part of .NET, let's discuss ASP.NET Web API, different topics in that section. Can you explain what are the different REST principles we have?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "If I talk about REST principles, it's a set of principles which we use to design capable and effective web services. Key principles for REST are cacheability, so responses can be cached to enhance the response. We have a client-server architecture, so client and servers operate independently. We have a uniform interface, which is the way of interacting via HTTP methods: GET, PUT, POST, PATCH, and DELETE. Also, we have versioning, so we can maintain the versioning of the API. We also give user control for filtering and sorting, so filtering and sorting is one of the REST principles. Also, we have something like code on demand, where we can return executable code instead of our responses in JSON or XML. I think these are some of the key principles."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, good. Can you explain this concept of content negotiation that we can achieve using Web API?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Content negotiation, I would say, it's a process where API determines which is the best format for a response based on the client which they wanted to accept. So, API and client can communicate and decide whatever the response they want to accept. For example, we can have a response in JSON, XML, or any other formats. We can set it up in content type as a header so that then we get the response."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And coming to the security part, can you explain how you are securing your API endpoints?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "In my application, for API endpoints, we have used authentication and authorization. We have used JWT tokens. For internally communicating the APIs, we didn't opt for JWT tokens; we went for API key authentications. We also have CORS (Cross-Origin Resource Sharing) that restricts access to the API, which prevents unauthorized access. In our project, we have also done rate limiting and throttling so that we can limit and prevent the abuse of requests per user or API."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, so talking about CORS that you mentioned, can you elaborate more on that?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "As I mentioned, it restricts domain access to the API to prevent unauthorized access. We can enable it using the `AddCors` method in .NET Core. There, we can add a policy with origin, so that way we can implement it."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And can you explain the error handling mechanism that you implemented for your API?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "For error handling, there is `try-catch` which we use for critical sections. We also have global exception handling; we have used custom middleware for it. We have problem details which are used for consistent responses in .NET Core. That way, I think we have handled it. Also, for monitoring those errors, we have gone with logging, and in our applications, we have used Serilog."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, fine. Moving on to C#, can you explain about generics and why we use generics with an example?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Generics allow us to create reusable code without specifying a data type at compile time. It also helps us in avoiding unnecessary boxing and unboxing. Why do we generally go for generics? It's for type safety prevention during runtime, and it helps us with performance issues; it improves performance. If you ask me for an example, let's say I have a method `Print` that accepts multiple data types. I can create a generic method for it using angle brackets and type `T`. So, if I have a method `Print` and I pass some value as `T value`, now if I call `Print(100)`, it will print an output as an integer `100`. If I pass `Print(\"hello\")`, that is a string type, so it will give me the output \"hello\". So, we can use multiple data types."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And can you elaborate on what is runtime polymorphism and its applications?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "For runtime polymorphism, I would say it is also known as method overriding. It's a fundamental concept used in object-oriented programming. Here, it allows a class to provide a specific implementation of a method that is already defined in the base class. Let's say we have a base class as `Animal`, and there we have a virtual method as `Speak`. Now, if I have a child class, let's say `Dog`, and it inherits the base class `Animal`, we can override the method using the `override` keyword, which is `Speak`, and `Dog` barks. So, we can just write the implementation of that method."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And how can we clean unmanaged resources in C#?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "If I speak about unmanaged resources, those are resources which are not managed by .NET itself. These are something like if we are handling things related to files or database connections, those occupy unmanaged memory. To clean up those memory, we have to implement the `IDisposable` interface because the GC does not automatically clean up those resources. So, we implement those interfaces and use the `Dispose` method to release the resources explicitly. Also, sometimes what happens is a developer forgets to call the `Dispose` method, so we go for the destructor, which acts as a safety net to clean up those unmanaged resources before the object is garbage collected."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Did you use TPL (Task Parallel Library) in your project?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, in several places I've used it."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, so can you explain what are the different methods you have used in TPL and their uses?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Mainly in TPL, what I've used is `Task.Run`, which runs the code on a separate thread. I have used `Task.WhenAll`, which is generally used to run multiple tasks concurrently. We have also used `Task.WhenAny`, which waits for the first task to complete and then resumes the next task. Other than that, I think we have also used `ContinueWith`, but I'm not too familiar with it, but yeah, it is basically used for chaining tasks."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "All right, and how about `TaskCompletionSource`? Any idea on that?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, I've heard about `TaskCompletionSource`. I've seen those methods like `SetResult`, `SetException`, and `SetCanceled` methods which are used in our code to manually manage task completion. Other than that, I think I've not worked on it explicitly that much."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "All right, okay. And I hope you're using .NET Core framework. Okay, can you explain where we can use custom middleware and how we can build a custom middleware?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Custom middleware comes into the picture if we want to customize any logic. Let's say I want to customize the logic for authentication and authorization pipeline, so I can go ahead with custom middleware. Or, if I want to change something in the request, modify the request and response data, there I can go ahead. Or, like I mentioned earlier, if we want to handle exceptions centrally, there we can create custom middleware."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So how do we create it? How to build a new custom middleware?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "If I want to create the custom middleware, I can add the `RequestDelegate` parameter in the constructor. I can register that custom middleware in the `Program.cs` class, or maybe if we are using .NET Core 3.1, there we can go for the `Startup.cs` class. Here, we have an `InvokeAsync` method where we can write the logic for the custom middleware."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, fine. And how to implement model validation?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Model validations I have implemented using data annotations, like `Required` and those data annotations I've used in the model."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay. And what are the different options we have to store environment-specific information in your .NET application, and which one have you used?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "For environment-specific information, in our project, we are using Azure Key Vault, which is a highly secure way. We have also used `appsettings.json` to store connection strings sometimes, or some key-value pairs which we wanted to store. In one of our projects, we have also used environment variables; it was a Windows application, so there we used environment variables, but we kept in mind that we are not going to commit it in our source control."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, so you're using it in Azure and securing it, is it?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Mainly we have used Key Vault."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, so which ORMs have you worked on? Object-relational mappers?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I worked on Entity Framework. We already had an existing database schema, so we opted for a database-first approach."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So can you explain more on how to implement this DB-first approach?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "For implementation of the DB-first approach, we need to install EF Core packages. After installing those packages, we need to generate the models from the database which is already there. We configure the DB context class and then we register those DB contexts in our dependency injection and use those contexts to perform CRUD operations."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And what is this Entity Data Model and what does it contain?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "If I speak about Entity Data Model, it's a conceptual model. It's a kind of an abstraction layer between the database and the application code, where a developer can interact with the data using those objects. Because earlier we used to use raw SQL queries, now with the help of EDM, we use objects."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, and what are the different entity states we have?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I'll just recall it, but we have `Detached`, which is the state where EF is not tracking the entity. We have `Unchanged`, `Added`, `Modified`, and `Deleted`, I think."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, so where do we use these states? Where are these useful?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "These states are basically used when we are adding some data, or when we are modifying the entities. So, there we go for these states, like whether the object is created manually, or they are being added in the DB context, or the data has been fetched from the database or not. These are some use cases."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And you mentioned something about tracking, right? So, what are these tracking and no-tracking mechanisms we have, and where to use them?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Tracking and no-tracking are approaches where we track the changes for the entities which are managed by DB context. Tracking is monitoring the entities which are tracked by Entity Framework; it keeps the original values and the current values of the entities. Whereas, we have no-tracking, which does not track the entities that are retrieved. Mainly, we go for no-tracking where we have performance, specifically for read values, not for write values. So, we go for no-tracking. No-tracking highly improves performance and reduces memory consumption."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "All right. And talking about performance, can you explain how to identify performance bottlenecks in an application which is using EF and how to fix them?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "If we want to identify performance, we have Entity Framework Profiler, where we can detect slow queries. Those are highlighted, like if there is any query which is slow, those are highlighted in red. It also detects the N+1 query problems where multiple queries are being fetched related to the data instead of a single optimized query. It also identifies redundant queries, like the same queries being executed multiple times, so instead, we can consider caching techniques there. Also, I think it detects missing indexes if there are any indexes which are being missed there, so those are also being detected by EF Profiler."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, got you. And going to SQL Server, you just mentioned about indexes. So, can you explain what are the pros and cons of using indexes?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Pros and cons of using indexes: if you are using indexes, queries become very fast in terms of fetching the data. If you want to sort or filter, it gives us effective sorting and filtering of data. Cons, I would say, it is a very high storage cost in terms of whenever we are storing the data; there are multiple indexes, so it would be high storage cost. And slower insert, update, and delete, whereas select queries are very fast if you're using indexes. Too many indexes can hurt the performance, so that is one."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Any reason why DML operations get slower with indexes?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Whenever we are inserting any index in our table, what happens is data is being stored in a sorted format if there is any index added in a column. So, those are being stored in a sorted format, that is why they are slow."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Got you. Did you work on creating stored procedures?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, so can you explain some best practices that you followed for writing efficient stored procedures?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Whenever I used to write stored procedures, I make sure that I am not using `SELECT *`. I avoid using `SELECT *` and I go for specifying the columns which are being used in the stored procedures. As we spoke about indexes, I opt for proper indexes in the tables. We have `IN` and we have `EXISTS`, so I go for `EXISTS` instead of `IN` in the `WHERE` condition for better performance. Also, I have mostly avoided cursors because those are very slow. At the start of the stored procedure, we use `SET NOCOUNT ON`. For temporary tables, instead of creating temporary tables, I generally go for temporary variables."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So what does `SET NOCOUNT ON` do?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "If I'm executing the stored procedure, there are multiple insert statements or select statements, so we generally used to get how many rows are being affected in the output window. If we use `SET NOCOUNT ON`, we don't get those values, those number of counts."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Can you explain about execution plan and where we can use it?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Execution plan we generally go for if our queries or, let's say, our stored procedures are very slow, and we wanted to see why these stored procedures are slow, or we want to check how the joins and indexes are being used in our table, and what is the actual cost of operations and what are the bottlenecks. There we go for the execution plan. With the help of the execution plan, we can opt for the optimization of the SQL queries."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And what are the different isolation levels in SQL?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I do not have much information on it, but I've seen we have `READ UNCOMMITTED`, and we have `READ COMMITTED`, and I think `REPEATABLE READ`, `SNAPSHOT` or something, but I do not have much information on this."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And how about unit testing? Have you implemented unit tests for your applications?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, so I have implemented unit testing in my previous project, but here I've not implemented, but yeah, I have an idea about it."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, so which libraries or frameworks have you used?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I have used NUnit in my previous project."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, so can you explain the role of unit tests in the CI/CD pipeline, how effective are they, and what is their importance?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Whenever we are writing unit test cases and we have a CI/CD pipeline, those unit test cases are automatically added and they run automatically. If we have existing unit test cases and if they fail, let's say I committed my changes and my build is run, now my build is failing because I have broken down some unit test cases. That helps us in initially checking up on the code which we have broken, rather than it went to the server or maybe sometimes I have seen the code has gone to production but the existing functionality has been broken. So that way it helps."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, so you'll stop the build there and there itself?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, we can fix those changes."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, and when we write these unit tests, we follow these principles, right? We call them as AAA principles. Any idea what they are?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "AAA principle is like we have Arrange, Act, and Assert. So, we follow those principles to create a clear structure in our unit test cases. Arrange sets up the initial condition for the test. Act executes the method which we are testing. And Assert, those assertion methods, verifies that the behavior is as per the expectation or not. So, there we go for the AAA pattern."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Can you explain about the test pyramid?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "We have a test pyramid where we have unit testing at the bottom, then we have integration testing as a middle layer, and we have end-to-end testing as a top layer. So that makes a pyramid."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Right, so what is the importance of unit testing here? Why is it placed at the base? Any reason?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "As I mentioned, if we are implementing unit testing in the CI/CD pipeline as well, early detection of issues is important. That is why we kept it at the bottom layer, so that if there are any changes we broke, existing changes, those are detected early."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, can you explain Dependency Inversion Principle?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Dependency Inversion Principle, I would say, it is DIP. It's one of the principles used in SOLID principles. It states that high-level modules should not depend on low-level modules, but they should depend on abstraction, and abstraction should not depend on details, but details should depend on abstraction. What it says is like we should not depend directly on the creation of objects of classes, but instead we should go for maybe interfaces or abstract classes. Like we used to create a class, we used to create objects, and then we used to call those methods. So instead, we can go for the interfaces and then call those methods and do the needful. We have dependency injection also, which helps in achieving DIP."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And we have these code smells, right? What is a code smell and give an example?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "A code smell is, if I say, it's a kind of bad practices or poor coding practices which we follow in our project. It generally does not cause any bugs in a project, but I feel over time it leads to some issues or maybe technical debt. For example, I have seen people create methods that are very long, which are very hard to read and understand, and it's difficult to debug them as well. I've seen long classes which violate the Single Responsibility Principle because they're not following the rule, and those become very difficult to understand. There is duplicated code which causes code smells. Also, I've seen whenever some new developer, maybe a junior developer, comes into a project, they use hardcoded values, they use hardcoded numbers which doesn't make any sense if another person is reading that. So, we should avoid those hardcoded values; instead, we can go for constants and we can have a meaningful name for them. That way, I think we can help."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Got you. And also, you said you have been doing code reviews, right? So, how do you find out different code smells that are present in the source code given to you?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "We have static analysis tools like SonarQube and ReSharper, where we can find out about the code smells. Also, sometimes when we are reviewing, like I mentioned, if there are hardcoded numbers, if let's say the tool has not fetched those details, but if we are looking and we are comparing that old code, previous code, to the committed code which the developer wants to commit, comparing those codes we can find out these are hardcoded values and we can tell them about it. Also, to avoid long methods, we have something like in Visual Studio, we can have code metrics where we can fetch cyclomatic complexity. If cyclomatic complexity is too high for a method, that means it's a very long method, it contains a lot of `if`s, a lot of loops, and that is why the complexity is high, and it would be very difficult for us to maintain in the future. Yeah, I think that is the way we do it."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And can you explain what are design patterns?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "It is a kind of a reusable solution for any software design problems. It does not provide us ready-to-use code, but it gives us the framework which helps in solving any type of problem. We have multiple design patterns which are segregated as creational, structural, and behavioral design patterns. I think these are design patterns."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, so can you mention any specific patterns which you have used?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "In my project, I have used Singleton design pattern, and I have used Repository design pattern, and I have also used CQRS and Factory design pattern."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Can you explain any of these, like a scenario you have used, how they are useful?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "If I mention, as I spoke, I've used Repository design pattern. It's a structural pattern which provides an abstraction layer over the data access layer. It aims to separate the logic that retrieves data from the business layer. So, we create repository interfaces which basically have the CRUD methods to perform create, read, update, and delete operations. And we have repository implementations where we implement those repository interfaces and perform the data operations."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, so talking about the architectural part, can you explain your current project architecture, Ruchi?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Currently, I'm working with Agile Room, and there, as I mentioned, I'm working on the modernization part. Earlier, the project was related to a document management system, so there we were following the legacy architecture, which is SOA (Service-Oriented Architecture). For communication, we were using WCF and SOAP services. Because of the WCF and SOAP services, we were having large payloads in the response, which led to performance issues, and our services were very highly tightly coupled, so we were not able to scale our application. That is why we opted for a modernization approach. In modernization, what we are doing is we are creating a microservice-based architecture where we are breaking down those WCF services into lightweight RESTful services. Earlier, we had a single service which was handling the entire project; now we have created multiple microservices which handle specific work. For the communication part, we are using REST APIs. For the database, we are using SQL Server database, and for authentication and authorization, we are using OAuth and JWT."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, so you said you have used microservices, right? Can you explain the differences between monolithic application and microservices, where we use each of them, like pros and cons?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "If you want to make our application highly scalable, because in microservices we have independent services, we go for microservices. If there are independent services, we can go for a different tech stack as well, so it makes our application more flexible. Also, if you want to go for phased deployment, we go for microservices because if, let's say, I have Service 1 and Service 2, and I want to deploy some updates in Service 1, I need not stop the entire system; Service 2 will remain unaffected, and Service 1 can be deployed easily. So there we go for microservices. For the failure thing also, I would say the entire application is not affected, so there also we go for microservices. In terms of monolithic, scalability is an issue, that is one of the cons for a monolithic. Code is very tightly coupled, that is another con for monolithic, and slower deployment, so there we don't go for monolithic. But if our application is not too big and we want just a single codebase, for easier development and deployment, we go for monolithic. If I speak about debugging and monitoring, if there are any logs being added, monolithic is more preferred because in microservices it becomes very difficult to look for the entire services where the issue has happened. So that way, we choose between monolithic and microservices."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "What is the software development process you have been following?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "We are following Agile."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, so can you explain what is the difference between Definition of Ready and Definition of Done?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Definition of Ready, we generally use DoR. It's a set of criteria that must be met before the work item is considered ready to be worked on. Like if somebody is assigned a task, those set of criteria should be well written, like we have acceptance criteria, so those should be there. We have gone through the grooming of the user stories; we have already groomed that user story. People understand the user story well and they do not have any questions related to that user story, and we have estimated that user story. So, that time we say that this user story is Definition of Ready. And we have Definition of Done, so it is a set of criteria that defines that the work has been done and it is ready for maybe release. All the necessary standards have been fulfilled, all acceptance criteria have been done, testing from the QA is done, and it is ready for production. If you want to give some demo for the user story, that is also done. So, that time we say that user story is done, and that is considered as Definition of Done."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And what are the different estimation techniques you used?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Currently in my project, we are using sometimes story points and sometimes planning poker. So, we have Fibonacci series where we opt for the numbers based on the complexity of the user stories. In my past project, I have seen people use ideal days and hours, like they are going to complete the story in five days or maybe they use hours, like, 'Okay, let's give 40 hours to complete the user story.' That is also what I've seen. And I have seen in my past project we have T-shirt sizing, so we give estimation as extra small, small, medium, large, and extra large. So that way we use."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Fine. Let's go through some hands-on questions, Ruchi, on .NET. Can you share back your screen?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, can you see my C# compiler?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yes, you need to write one C# function that will be accepting one string as a parameter and it will print the number of occurrences of each character in a string."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so let me just reiterate the question first and then I can code it. Let's say we have a string equals to maybe \"hello world\", and so the output would be H is 1, E is 1, again L is 3, and so on, right?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yes, that's right."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so what I'm thinking is I can go ahead with, let's say, I'm just using a hardcoded string value which is \"hello world\" only. What I'm thinking is I can use a dictionary which keeps the character as key and an integer as value. I have `Dictionary<char, int>`. I'll iterate through each character in the string. If the output contains the key, then what I'll do is I'll increase the value, otherwise, I'll add `key, 1`. For each key in `output.Keys`, I'll print `key: value`. I think I'm done. So what I did is I've created a dictionary and have just iterated through the characters in the dictionary and printed the values."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, fine. So it will take care of spaces as well, white spaces?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, it should. Yeah."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, fine. Moving from C#, let's go to some SQL hands-on questions. Run the scripts and create two tables: one table is called `Room` which is having `RoomID` and `RoomName`, and we have another table called `Employee` which has `EmployeeID`, `Name`, `RoomID`, and the `RoomID` is a foreign key. You need to write a SQL query to print a single employee who sits in the most overcrowded room."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "What I can do is I can count the number of employees in each room, like we have `EmployeeID`, `Name`, and `RoomID`. So I can fetch the employee count in the room, and then maybe I can go ahead with identifying which is the room that has the highest number of employees, and then I can print a single employee in that room. Okay, let me just write it down, otherwise I can also forget. Okay, so, let's say, how many employees are there in a room? It's kind of a room occupancy maybe. And then what I can do is I can go for identifying the highest number of employees in a room, and then we can retrieve that single employee. I mainly work with C#, so I'm just taking a little time for this one. No problem, no worries. Okay, so maybe, okay, this is some query. This is some query. Maybe I can go for a CTE with this one, okay, so that I can just occupy because this is kind of maybe a temporary table. So I'm thinking like if we have to write a query, so I can go for CTE where I can fetch the room occupancy and then identify the number of employees based on this Common Table, and then I can retrieve the single employee. Okay, if I type room occupancy, I have room occupancy which is added. Now here I have room occupancy. Here what I wanted to do is I want to select the employees who are there in the room. So what I can do is I can select `RoomID` and count, maybe one, as `EmployeeCount` from the `Employee` table, and then I have `RoomID`. I have count of number. I will `GROUP BY RoomID`. So this will give me the number of employees in the room. And secondly, now based on this, I want to identify the highest number of employees in a room. So maybe I can identify `MoreCrowdedRoom` as you have this `MostCrowdedRoom` will give me `RoomID` and from this is my room occupancy. So here I have the more crowded room. Now what I wanted to use is I just wanted to print `SELECT EmployeeID` with their `Name` and that `RoomID`, and I will join it with `MoreCrowdedRoom`. If we have `TOP 1` and we have this. Okay, I need to just join on `RoomID`. I will add join on `Employee`. No, join will be based on `RoomID`. I have. Okay, so now I am getting an error on line number 32. Yes, so what I did. We don't. Do you have the insert statement as well, or shall I insert? Oh, you can insert some data if you want. So we have Alice Smith. Okay, so in room number one, we have more number of employees. In one and two, we have, right? I think it picked up one. Yes. Okay, okay. Can you add one more row, maybe? Can you add one more row with room number two? Okay, so now we wanted to check for two, six. Okay, okay, I think there was some issue with the caching maybe. Okay, sure, got it."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "You can stop sharing now, Ruchi. We'll go to Angular now. How many years of experience do you have in Angular, Ruchi?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "In Angular, I have around two years of experience, but primarily I work with .NET only."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, got you. So in Angular, we have these different compilation techniques, right? So can you explain what they are and what are the differences between those two?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Compilation, we have JIT and AOT. We have Just-in-Time compilation approach and we have Ahead-of-Time compilation approach. Generally, whenever compilation happens in development mode, we opt for JIT because it is very fast. It allows fast changing and it allows hot reloading. But it gives us slower initial load, and it gives us full debugging support, so we debug the entire code and fix those changes in our code. However, if we go for the Ahead-of-Time approach, we generally go for AOT approach in production. It compiles the code at build time and then sends it to the browser. It is more secure because it compiles the code into JavaScript and it reduces runtime injection attacks there. Initial loads are faster when we use AOT. Earlier in JIT, it is very slow because in AOT, the templates are pre-compiled and the browser loads the app very quickly. Also, if we are using AOT, the bundle size is very small, so it removes unused Angular features and it optimizes our code to JavaScript files."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And can you explain how change detection works in Angular?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "In Angular, change detection is a mechanism which ensures that the UI stays in sync with the application data model. If there are any application state changes, let's say somebody, a user, has given some input, or there is some HTTP request, or some event triggers, that time Angular reflects the updates on the DOM. Those changes are being detected. We have two flows: there is one change detection strategy which is the default strategy, which runs for every event that happens and it detects the changes there for each and every event. For default, Angular traverses the entire component tree to check for changes. However, for another approach, which is `OnPush`, if we enable `OnPush` approach, it runs the change detection only when input properties are changed or if an observable emits new data. So that time only it runs the change detection. So we need not check the entire components, and it helps in improving the performance."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And suppose you have been tasked with optimizing the performance of an existing Angular application, Ruchi. What steps would you take to identify and address performance issues?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "The performance-related issues, like I said, I've not worked much with Angular. So I think I might give you the wrong answer for it."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, fine. And can you explain the purpose and use cases of using RxJS?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "We generally go for RxJS when we have any asynchronous data streams. To handle those asynchronous data streams, we go for reactive programming. We go for RxJS, like if there is any HTTP request, to handle those HTTP requests, we use observables whenever we call for an API. There we go for RxJS. We have state management also; for state management, I think NgRx is used for state management, so we go for that. Maybe I think for tracking real-time data also, we have `Subject` and `BehaviorSubject`, so we go for that."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "What are the different tools or frameworks used for unit testing in Angular?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "In Angular, we have used Jasmine for unit testing, and mainly Jasmine is being used in our project."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, fine, got it. Okay, Ruchi, I think that's it from my side. I pretty much covered all the topics required. Thank you for your answers."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Thank you so much, Mahesh."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "So there we have it. Thank you very much to both Mahesh and Ruchi for what was an incredibly engaging interview. I hope you found this interesting and useful as I did. Listen in there, now we have an exciting part: the feedback session. Usually, the candidate doesn't get direct feedback right after an interview, but since this is on a show, we have a great opportunity to share it right away. First, let's speak to our interviewee, Ruchi, and get a little bit more detail on that session. So, Ruchi, what's your general feeling of the overall process?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I feel the entire process was very streamlined. There were topics which were as per my experience, and all the topics were covered really well because we just had around one hour to 90 minutes. In that time slot, we needed to cover the coding task and we had to cover the technical interviews. So, I think the questions which were asked to me were very refined and that was really helpful. Wherever I needed some time to breathe or think, Mahesh was really helpful there; he didn't just jump to the next question. So, I had a great experience."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "Amazing. I can tell, certainly having listened in, that it was perfectly streamlined, good responses to all the questions. Was there any challenging part in the interview that really made you think?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I would say one is the SQL query. I don't write frequent SQL queries, so I took a little time to analyze what all things needed to be done in that SQL query. So, that was the challenging part. And the second challenging part which I felt was Angular, because I don't work much with Angular. So, that is something that was challenging, but I just prepared a little bit in Angular, so that was, like, I can work on it more and then prepare well for Angular also."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "Fantastic. Thank you so much, Ruchi, for being a part of this and a little bit of insider information for our listener. It was really appreciated. And now we move over to our interviewer, Mahesh, to tell us a little bit more. So, Mahesh, can you shed some light on the overall impression of the interview?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yes, it was great. I think she performed very well during the interview. She was able to answer most of the questions with confidence and accuracy. I think she also demonstrated a very good understanding in .NET and has a fair knowledge in Angular as well. When it comes to hands-on tasks, interviewers typically don't expect candidates to provide a full-fledged solution within the short period of time that we have, but I think she went above and beyond, and she was able to deliver a complete and well-thought-out solution. So, I think she did well."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "At last, what's your verdict? Does Ruchi seem like a good fit for a .NET with Angular Dev role?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yes, Ruchi did well. I think she is very much suitable for this position, which requires good knowledge on .NET technology, Angular, and anything which she already has."
+    }
+  ],
+  "training_pairs": [
+    {
+      "question": "Can you explain what are the different REST principles we have?",
+      "answer": "If I talk about REST principles, it's a set of principles which we use to design capable and effective web services. Key principles for REST are cacheability, client-server architecture, uniform interface (interacting via HTTP methods like GET, PUT, POST, PATCH, DELETE), versioning, user control for filtering and sorting, and code on demand where we can return executable code instead of responses in JSON or XML. I think these are some of the key principles.",
+      "follow_up": "Can you explain the concept of content negotiation that we can achieve using Web API?"
+    },
+    {
+      "question": "Coming to the security part, can you explain how you are securing your API endpoints?",
+      "answer": "In my application, for API endpoints, we have used authentication and authorization with JWT tokens. For internal API communication, we opted for API key authentications. We also use CORS (Cross-Origin Resource Sharing) to restrict access to the API, preventing unauthorized access. In our project, we also implemented rate limiting and throttling to prevent abuse of requests per user or API.",
+      "follow_up": "Talking about CORS that you mentioned, can you elaborate more on that?"
+    },
+    {
+      "question": "Moving on to C#, can you explain about generics and why we use generics with an example?",
+      "answer": "Generics allow us to create reusable code without specifying a data type at compile time. It helps in avoiding unnecessary boxing and unboxing, ensures type safety during runtime, and improves performance. For example, if I have a method `Print<T>` that accepts a value of type `T`, I can call `Print(100)` to print an integer or `Print(\"hello\")` to print a string. We can use multiple data types with a single generic method.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "How can we clean unmanaged resources in C#?",
+      "answer": "Unmanaged resources are those not managed by .NET itself, like file handles or database connections, which occupy unmanaged memory. To clean them up, we implement the `IDisposable` interface and use the `Dispose` method to explicitly release resources. If a developer forgets to call `Dispose`, we use destructors as a safety net to clean up unmanaged resources before the object is garbage collected.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Can you explain where we can use custom middleware and how we can build a custom middleware?",
+      "answer": "Custom middleware is useful when we want to customize logic, such as for authentication and authorization pipelines, or to modify request and response data. We can also use it for central exception handling. To build one, I add a `RequestDelegate` parameter in the constructor, register the middleware in `Program.cs` (or `Startup.cs` for .NET Core 3.1), and write the logic in the `InvokeAsync` method.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Can you explain how to identify performance bottlenecks in an application which is using EF and how to fix them?",
+      "answer": "To identify performance bottlenecks, we can use an Entity Framework profiler. It detects slow queries, highlighting them in red, and identifies N+1 query problems where multiple queries fetch related data instead of a single optimized one. It also detects redundant queries and missing indexes. For redundant queries, we can consider caching techniques.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Can you explain some best practices that you followed for writing efficient stored procedures?",
+      "answer": "When writing stored procedures, I avoid `SELECT *` and specify only the necessary columns. I ensure proper indexes are in place on tables and prefer `EXISTS` over `IN` for better performance in `WHERE` conditions. I mostly avoid cursors as they are very slow. At the start of the stored procedure, I use `SET NOCOUNT ON`, and for temporary data, I generally go for temporary variables instead of temporary tables.",
+      "follow_up": "What does `SET NOCOUNT ON` do?"
+    },
+    {
+      "question": "Can you explain the role of unit tests in the CI/CD pipeline, how effective are they, and what is their importance?",
+      "answer": "When we write unit test cases and we have a CI/CD pipeline, those unit test cases are automatically added and they run automatically. If we have existing unit test cases and if they fail, let's say I committed my changes and my build is run, now my build is failing because I have broken down some unit test cases. That helps us in initially checking up on the code which we have broken, rather than it went to the server or maybe sometimes I have seen the code has gone to production but the existing functionality has been broken. So that way it helps.",
+      "follow_up": "So you'll stop the build there and there itself?"
+    },
+    {
+      "question": "What is a code smell and give an example?",
+      "answer": "A code smell refers to bad or poor coding practices in a project. It doesn't usually cause bugs immediately but can lead to issues or technical debt over time. Examples include very long methods that are hard to read, understand, or debug, and long classes that violate the Single Responsibility Principle. Duplicated code and hardcoded values, especially by junior developers, are also common code smells. We should use constants with meaningful names instead of hardcoded numbers.",
+      "follow_up": "You said you have been doing code reviews, right? So how do you find out different code smells that are present in the source code given to you?"
+    },
+    {
+      "question": "You said you have used microservices, right? So can you explain the differences between monolithic application and microservices, where we use each of them, like pros and cons?",
+      "answer": "We use microservices for highly scalable applications because they have independent services, allowing for different tech stacks and more flexibility. They enable faster deployment, as updating one service doesn't affect the entire system. Failure in one service also doesn't affect the whole application. Monolithic applications have scalability issues, tightly coupled code, and slower deployments. However, for smaller applications with a single codebase, monolithic is preferred for easier development and deployment. Debugging and monitoring logs are also easier in monolithic applications compared to microservices, where issues can be spread across many services.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "In Angular, we have these different compilation techniques, right? So can you explain what they are and what are the differences between those two?",
+      "answer": "We have Just-in-Time (JIT) and Ahead-of-Time (AOT) compilation. JIT is used in development mode because it allows fast changes and hot reloading, offering full debugging support, though it results in slower initial loads. AOT is preferred for production as it compiles code at build time, making it more secure by reducing runtime injection attacks. AOT also leads to faster initial loads because templates are pre-compiled, and the bundle size is smaller as unused Angular features are removed, optimizing code to JavaScript files.",
+      "follow_up": "NONE"
+    }
+  ]
+}

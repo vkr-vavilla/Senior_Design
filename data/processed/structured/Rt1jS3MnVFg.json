@@ -1,0 +1,61 @@
+{
+  "video_id": "Rt1jS3MnVFg",
+  "summary": "The employee explains three methods for handling large API data returns: pagination, data compression, and using a third-party service like S3 for direct downloads.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "For today's software engineering interview, explain how you'd handle an API that needs to return large amounts of data at once."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "First thing I'd do is implement pagination so we don't have to send all the data back at once."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Can you explain exactly how it works?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Pagination is just breaking up the data into multiple chunks and only giving chunks back to the client one at a time as they request them. Google search does this. When you search something, it can't possibly return all the results on the internet, so it only returns one page. If you click the second page, it gets the second page of results."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay. But what if I want the users to get all the data at once?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "The second thing we could try is compressing the data. This is like when a file is too large to send over email and you make a zip file instead, then send that over. We're doing the same thing but within our server."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Makes sense. What if the compressed file is too big?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "We could use a third-party service to deal with it. When somebody makes a request for the data, we'll fetch the data from our database, then send it over to some service like S3, which is made for sharing large files. Once we're done processing, we can send them a URL where they can directly download the file from S3 instead of us having to manage."
+    }
+  ],
+  "training_pairs": [
+    {
+      "question": "For today's software engineering interview, explain how you'd handle an API that needs to return large amounts of data at once.",
+      "answer": "First thing I'd do is implement pagination so we don't have to send all the data back at once.",
+      "follow_up": "Can you explain exactly how it works?"
+    },
+    {
+      "question": "Can you explain exactly how it works?",
+      "answer": "Pagination is just breaking up the data into multiple chunks and only giving chunks back to the client one at a time as they request them. Google search does this. When you search something, it can't possibly return all the results on the internet, so it only returns one page. If you click the second page, it gets the second page of results.",
+      "follow_up": "Okay. But what if I want the users to get all the data at once?"
+    },
+    {
+      "question": "What if I want the users to get all the data at once?",
+      "answer": "The second thing we could try is compressing the data. This is like when a file is too large to send over email and you make a zip file instead, then send that over. We're doing the same thing but within our server.",
+      "follow_up": "What if the compressed file is too big?"
+    },
+    {
+      "question": "What if the compressed file is too big?",
+      "answer": "We could use a third-party service to deal with it. When somebody makes a request for the data, we'll fetch the data from our database, then send it over to some service like S3, which is made for sharing large files. Once we're done processing, we can send them a URL where they can directly download the file from S3 instead of us having to manage.",
+      "follow_up": "NONE"
+    }
+  ]
+}

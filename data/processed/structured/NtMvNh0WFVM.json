@@ -1,0 +1,301 @@
+{
+  "video_id": "NtMvNh0WFVM",
+  "summary": "The employee designs a reservation and payment system for a parking garage, covering requirements clarification, API design (public and internal), scale considerations, database schema (reservations, garages, spots, users, vehicles), and high-level architecture (UI, backend, DB with read replicas, load balancing, consistency trade-offs, third-party payment). The interviewer provides feedback and asks for advice.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "I would like you to design a reservation and payment system for a parking garage."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Welcome everyone to another mock interview at Exponent. Today, we're going to be doing a systems design interview question with Tim. Before we dive in, Tim, would you like to introduce yourself?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, for sure. Hey, my name is Tim. I'm a software engineer. I've been doing engineering for a couple years now. I previously worked at some large tech companies like Amazon Lab126 or Airbnb. I'm currently working on some startup stuff on my own."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Nice, thanks for being with us today, Tim. So, the question today: I would like you to design a reservation and payment system for a parking garage."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "All right, awesome. Yeah, we can just dive right into it if you'd like. The first thing I like to do generally is clarify the requirements a little bit, just to make sure I'm not making any incorrect assumptions. So to start off, I'll write some of them down just to make sure I've got them off the bat."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Sure."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Let's see. For this type of reservation system, presumably, we need a way to be able to reserve a parking spot and maybe receive some kind of ticket or receipt."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yes, that's correct."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Make this a little wider here. You obviously need to be able to pay for the parking spot."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yep."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "And then, I guess this might be more of a scale requirement, but at a higher level, if we think about this type of product, we'd probably prefer to err on the side of higher consistency. Yes, because if I'm thinking about it, we probably don't want two people to be able to reserve the same parking spot, obviously."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yep, absolutely."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Cool. And then, I'm curious, are there different types of parking? Because if I think about a normal parking garage, you know, there are various types: maybe a handicap spot, maybe some larger spots, maybe some smaller spots."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So, for this question, let's restrict it to three types of spots depending on the size of the vehicle: compact, regular, and large vehicles."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Large. Awesome. And then, for the prices for the garages, would they be flat rate?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, let's say flat rate, but different rates for the three different types of parking, and flat rate based on time."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Cool. All right, awesome. Yeah, that makes a lot of sense to me. And then, obviously, I believe this should be some form of web app or mobile app interfacing with a back-end server. So, with these product requirements and requirements in mind, I guess we can dive right into defining the sort of interface or the API we're going to be working with. I think this type of thing is going to have some public endpoints and then some internal endpoints. So, I'll start us off with some of the more public endpoints. Off the bat, we need, as we mentioned in the product requirements, a way to reserve. So, let's call this one `/reserve`. I'm just calling it this; in reality, it doesn't have to be immediately RESTful, it could be GraphQL or anything. This is just so we have a general understanding of what this should look like."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "I think that sounds good."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "And so, what should this type of thing take? We obviously want to know which garage we're referring to. We want to know when, the time duration during which this should be reserved as well. So, that seems pretty reasonable. Let's go with something along those lines. And then, as we mentioned in the product requirements, we should return some type of receipt or ticket. So, let's say it returns a tuple. Obviously, we want the specific spot, as well as potentially a way to identify which specific reservation we're referring to, so we just call that a reservation ID. So, yeah, that seems reasonable for that. Then, obviously, there should be some form of payment endpoint. This is probably beyond the scope of the specific problem per se, but the actual implementation could probably just be handled by a third party. So, yeah, we want to pay by reservation ID. And then, I want to say, you probably end up using something like Stripe or Square, or alternatively, you can implement your own, which is a little more complex."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, I think we can assume that a third party will be taking care of that."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Cool. Yeah, awesome. And then, you also have to be able to cancel your reservation. That seems pretty reasonable, just because things come up in general. So, we should have a cancel endpoint as well. Let's call that here. Similarly, you should be able to just pass the reservation ID, and I think it should handle the rest. So, that seems pretty reasonable for our public endpoints, at least for the functionality that we're describing here. We're probably going to have a few more endpoints on the internal app, so let's get started on those. Taking a look at the public endpoints that we've created here, there are a few internal things we might need. One thing we need is a way to calculate the actual individual payments on the internal side. Debatably, that could just be part of the initial endpoint, but personally, I prefer to separate them out. So, let's see here. Similarly, it should just take the reservation ID because, presumably – and we can delve into this more later when we define our actual data schema – but presumably, the reservation ID tells us which specific garage we're referring to and then what the actual times are. That way, we can get the individual rates based on what garage it is, what time. Yeah, so that should be fine."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "And then, on the reserve side, we probably need a way to check what spots are currently available. That seems pretty reasonable from a UI perspective. So, let's say we have a `free_spots` endpoint. One thing, I guess, when we're considering the parameters of what this specific endpoint might require, obviously we need the garage. But some other things that might be prudent are the type of vehicle or the time. The reason I say that is, if we think about it, the larger spots – like you mentioned, we defined compact, regular, and large – the larger spots actually end up being able to be used for the smaller vehicles. Obviously, we would prefer not to have to do that down the line; we would prefer to use up all the smaller spots. But reasonably, if all of those spots are full and someone wants to reserve a spot, they should be able to reserve a large spot, at least in my opinion. So, there are just some things to note. And then, some of the more complex logic that's going to be held should be in the actual allocation of the spot. We don't have to dive into the minutia of the actual algorithm of that right now, but for now, let's just define that as `allocate_spot`, and that should similarly take a garage ID, vehicle type, and a time."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, cool."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "And yeah, that seems pretty reasonable for the three we have here. Some of the more optional things we could be adding, if I'm thinking more about the actual product, obviously the ability to create an account seems pretty reasonable. If it's a garage you're going to be using over and over, we may want to incorporate that. So, let's say we have a `create_account` endpoint. Some things that we might need there are an email and a password, which seem pretty reasonable for the initial things. Obviously, we'd do some hashing for that; we don't want to store that in plain text. And then, some more optional things like first name or last name. Just as another thing to note, optionally, you can also just implement third-party single sign-on options like Google or Facebook login."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, and their payment details, I'm assuming, are going to be taken care of by whatever third parties are handling that?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Exactly. Yeah."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Cool. And then, let's say we just have a `login` endpoint, just because you need that once you've created an account."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Cool. So, I think that seems pretty reasonable, at least on the first pass, for the specific system interface we're working with. So, let's consider the actual scale or scope of the problem. We kind of tackled that briefly when we discussed how we want high consistency given the nature of this problem. But let's look at the actual size or far-reaching extent. Honestly, my initial impression is that we're not likely to deal with many at-scale issues with this type of problem. On a per-garage basis, even if we optimistically upper-bound a garage at 10 floors – I don't think the average parking garage is going to have 10 floors, but let's upper-bound it just for the sake of this problem – and let's say there are maybe 200 spots per floor, that's 2,000 relevant spots per garage. And the system, I guess, what, 2,000 relevant spots per garage? I don't think there are that many parking garages in the world. So, I'm not particularly concerned about designing this as a more distributed system. I think even if there are a million parking garages, that's still not within the realm of big data, in my opinion. So, I don't think that really factors into the considerations here. That being said, as we mentioned before, we care most about the system being up-to-date. We don't really want to run into a race condition where we happen to allocate to the same spots at the same time. So, those are just something to keep in mind. And then, given that we're probably not going to run into that many at-scale issues, we can jump over to the data schema side of things: how we're going to design the database."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Sounds good."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So, let me shift over here on Whimsical. Cool. So, I guess what are some of the first things we probably want to tackle here? Reservations are obviously the point of this entire product, so we can start with that. Let's go with reservations. Create a table here. Cool. To start us off, as most tables will, we have an ID, and this is our primary key. We can define it as a serial within most relational databases. I apologize, I tend to lean towards relational databases for most of this type of problem. Reasonably speaking, you could probably go into more of a NoSQL type solution, but more of my expertise lies in the relational database side. So, presumably, some type of PostgreSQL or MySQL is what we'll be working with here. I'll be designing the data schema with that sort of perspective in mind."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, that's totally fine."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Awesome. So, back to the reservations. Initial field: ID, the serial, that way it increments as you add more and more. It seems totally reasonable. What else would we want? The other information we'd want in this table: we need which specific garage it's referring to, which spot we actually ended up allocating to it, and then the start and end time seem like pretty reasonable things. As well as, whether or not this has been paid. Depending on how you want to format the product, you might be able to pay on-site as opposed to in the app per se. So, that sort of status might be reasonable."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, I think that's this garage ID. And I think we can, presumably, we're going to be making a table down the line with this, so we'll call this a foreign key as well. Then, let's see, we have the spot ID. Another thing about it, it's probably not unreasonable to make a spot table as well. That way, it could have the potential vehicle types and whether or not it's reserved at a specific time. Yeah, so let's go with that also. And then, we want `start_time`, we want the `end_time`, and I guess it's just paid or not paid, so we just call that `paid`. Cool. That seems pretty reasonable for a reservation table. Obviously, we can add a user ID or such if we end up having those, but for now, this is the important part."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, I think this is good to start with."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Perfect. Yeah, so let's move over to creating a garage table. There's this whole debate over whether or not you should be using singular or plural in table names. Honestly, I'm probably in the singular camp, even though I just wrote 'reservations', but I don't think it matters either way for the sake of this problem. That's fine."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, yeah."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So, this will also obviously have an ID, similarly, primary key and serial. So, what are some of the things we want for the garage? Where it is, is something that's generally pretty important, and that can also help down the line when it comes to actually starting specific replicas of the database or load balancing things like that. An easy way off the bat to handle that is a zip code."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yep, that's pretty universal."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So, let's go with that. To be able to incorporate the extensions of zip codes that requires a hyphen, so maybe let's go with `VARCHAR` instead of an `INT`. And then, what else do we want? Oh, we want the individual rates. We mentioned that this is flat rate based on size. Yes. So, for now, it seems relatively reasonable to have a size, and then obviously these are nullable columns in the case that they don't have that specific type of spot in the specific garage."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yep."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "And one thing to note here is I'm using `DECIMAL`. I know there are obviously some issues down the line regarding floating-point errors and calculations and payments. I think `DECIMAL` is the PostgreSQL type that should be able to handle that. I'm not confident that there's an equivalent MySQL type, but I'm sure there is. So, I think that seems like a pretty reasonable approach."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "I think that's fine."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "And then, let's go with `spots`. Like we mentioned, we have a spot table here. Similar to the other ones, we want an ID with a primary key, a serial. Now, what do we want for the spot? We want the relevant garage, obviously. We want the type of vehicle, and then we want the specific status. Like, what is it? Maybe it's being reserved, maybe it's unavailable right now, maybe they're paving over the spot, or maybe it's just totally empty. So, I think those are pretty reasonable things to have there."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So, the `garage_id`, obviously, it's a foreign key, and I guess it's a secondary key. And then, we want the `vehicle_type`. For now, I'm going to call this an `ENUM`. I'll get into this a little later when we actually define... oh, actually, I can get into this now, I guess. There's a trade-off when you add enums, particularly in a relational database, simply because you gain performance benefits by being an `INT` as opposed to a character string or whatever. But the trade-off is some flexibility issues down the line. I know in PostgreSQL specifically, when you add an enum, you can never remove it; you can never remove the type afterwards. So, that's something to consider when you choose them. I think for this specific case, like compact, regular, and large, I don't think those are things that are ever going to be totally out of phase in a parking garage type system, so I think it's totally reasonable."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, I mean, I'm here. But like I mentioned before, I don't think we're going to run into these issues at scale here. It would be totally reasonable to just use a `VARCHAR` as well for flexibility, and then have that vetting on the application layer side."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, I think that's fine. You can make a call over here on the trade-off that you're willing to go for, for sure."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Cool. And then, what else? Oh, we had the, I guess, supposedly optional table. Given that we optionally want to be able to create an account, let's say we have a `users` table. That should just have all the familiar things: an ID with a primary key, a serial. And then, as we mentioned in the previous endpoints that were optional, maybe an email, or I guess `VARCHAR` because we're in PostgreSQL, and then a password as well. Note that this is probably something conventional, like SHA-256 hashing. And then, first name, obviously nullable, as well as last name. Cool. And then, arguably, if I'm thinking about the nature of this type of application, the whole reason we wanted optional users in the first place is just so they could recurringly reserve a spot. If we want to be able to recurringly reserve a spot, we probably also want the type of vehicle. Actually, we might want the type of vehicle in general. So, I think a `vehicle` table is a totally reasonable thing to have in this scenario."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yep, I think that's fine."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "And then, let's go with ID as usual. And then, optionally, a user ID that can be a foreign key. And then, let's say we want their license, which seems reasonable. And then, probably the vehicle type again, similar to the one that was in the `spots` table. So, yeah, I think that probably covers our requirements here. I mean, obviously, I can add more as we go through the problem, but for now, does that seem like a good starting point?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "I think this seems good. Yeah, this looks reasonable. Maybe we can dive into what the high-level architecture would look like."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, for sure. So, we can get into that here. We start us off with the very basics: we want an application UI, it can be either web or mobile, and then we want some sort of back-end server. So, let's say here we have a web app or mobile UI, depending on the sort of... or maybe even both. And then, over here, let's go with a back-end server. This will talk to this, and vice versa. Cool. Now, some of the deeper considerations to have here are, obviously, we're going to have a database. As we mentioned before, the one that I lean towards is a PostgreSQL DB. So, let's just call this DB. And so, that's just off the bat. In reality, we can end up doing a number of different adjustments here. One thing that we can consider is splitting the back-end server into a reservation server and a slot server, given the complexity of allocating slots. That seems probably a little unnecessary here. A bigger thing that might be more reasonable is, given that we described up here that the system needs to have high consistency, we notice that in this type of problem, we probably want to be able to read way more than write. So, if we're going to be reading a lot more than writing, we probably want a number of different read replicas for the DB. So, we can separate this out here, move it up this way. Yes, I can. Awesome. So, let's call this a read replica. So, the server would kind of work like this. Essentially, go here. One thing that would be prudent to have in this scenario, given that we're probably hosting a number of read replicas, we probably want some form of load balancer in between, just to allocate where the individual calls are going. It would probably be prudent for this type of problem to shard that based on location. I know that we mentioned earlier that the garage might have a zip code; that seems like a pretty reasonable way to approach that. So, let's maybe this here. And then, from here, we can go up here, call this read, call this read. Then, this one will be write. And then, what else? We mentioned... oh, go for it."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "I was going to ask, do you anticipate any trade-offs based on this decision?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, well, not specifically the read replica portion. One thing that is likely going to end up being a specific trade-off, as I was sort of pathing towards, we mentioned that this type of thing wants high consistency. So, I think it's pretty reasonable to take a strong consistency approach versus an eventual consistency approach. Simply because, if we think about the nature of someone using this application from a customer perspective, it's likely not the case that they're going to be super frequently reserving things, probably not more than even twice a day at most, and that already seems a little excessive. So, in reality, they're probably very willing to wait or deal with a higher latency, which is the trade-off you make when you have strong consistency versus eventual consistency, where you increase the performance, the execution on the customer side, in the customer's view. But the trade-off you make there is you might not have the exact data. We want exact data because we want them to be able to know that the spot they're reserving is specifically the spot they'll get. The way that's tackled in this setup is you basically read lock. That's an initial approach that a lot of people use. It seems pretty reasonable as well, especially for something that's not necessarily at an aggressive scale. In the sense that when someone's writing to the PostgreSQL DB, you read lock the replicas. That way, they wait for the result to finish, so you know the data is as up-to-date as possible. One potential consideration in the future might be, depending on how you want to split up and shard your database, you might want to consider the logic of read locking based on location. Because if we think about it, why would we read lock something in Wisconsin if someone's reserving something in California? But that's a little more of a complex decision down the line."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, yeah, I think that's a good, that would be a good next step. Cool."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "And then, yeah, I think that's... oh, one other thing. We mentioned up here that we have a payment, since we're likely to be using an existing third-party payment. So, we just draw that in here. Let's say it's like... place that here, have that here both ways. Don't really know how to do this. Oh, there we go. Cool. Nice."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, I think this is pretty good and a good place to stop. What did you think about that, Tim?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Ah, it's an interesting, weird problem, I guess. I think a lot of these types of problems end up actually having issues at scale. So, I think I was lucky in the sense that I think it's reasonable to say, with some back-of-the-envelope estimation, that this problem doesn't tackle that. And that made it a lot more of, I guess, how do we design the data problem."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, now I think some things that you did really well: clarification questions at the beginning were very well drawn out by you, and that made the scope of the question a lot more manageable for you to tackle and to just understand exactly what the requirements were. And I think one thing that I saw you do consistently, and that was really good, was providing your opinions. So, explaining what the problem was, why you were doing something, what your opinion on it was. One example was just separating the payment calculation from the public endpoint. That was a small example where you suggested that you were going to separate it, and you provided a reason for that. And I think that you did that consistently throughout, which just shows that you would be someone who people would enjoy working with as an engineer because you have opinions on things. And it's conversational too; it adds flavor to the question that you're doing. It doesn't sound very robotic and rehearsed, and adds some commentary for the interviewer to be able to interact with as well. Yeah, and I like that towards the end you called out that you weren't super confident on the use of `DECIMAL` as the type. Things like that, I think, are good for interviewees to do. If there is something that people aren't super confident about, call it out. It's better to just throw it out there than kind of go into it blind, because then at least the interviewer knows exactly where you stand and what you might need help with or hints with at some point in the question. What advice do you think you'd give someone if they were to receive this question?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, I mean, I think a lot of people approach these types of problems very, I guess, almost too strictly formulaically. And I think that that's good to an extent. I mean, I think a lot of the reason for that is algo problems are another metric that people are generally evaluated on, and that honestly probably doesn't have too much bearing on the actual job. But system design questions, I feel like, are a lot more relevant and applicable to actual work contexts. So, thinking about the problem from a more flexible standpoint there, and treating it like you're working with a co-worker and you're actually going over an estimation of what the entire system is like, is a pretty reasonable approach to tackle these types of problems."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, absolutely. Well, thank you so much, Tim. This was really great, and good luck with your interviews!"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Thank you so much, it was fun."
+    }
+  ],
+  "training_pairs": [
+    {
+      "question": "Welcome everyone to another mock interview at Exponent. Today, we're going to be doing a systems design interview question with Tim. Before we dive in, Tim, would you like to introduce yourself? Nice, thanks for being with us today, Tim. So, the question today: I would like you to design a reservation and payment system for a parking garage.",
+      "answer": "Yeah, for sure. Hey, my name is Tim. I'm a software engineer. I've been doing engineering for a couple years now. I previously worked at some large tech companies like Amazon Lab126 or Airbnb. I'm currently working on some startup stuff on my own. All right, awesome. Yeah, we can just dive right into it if you'd like. The first thing I like to do generally is clarify the requirements a little bit, just to make sure I'm not making any incorrect assumptions. So to start off, I'll write some of them down just to make sure I've got them off the bat.",
+      "follow_up": "Sure."
+    },
+    {
+      "question": "Let's see. For this type of reservation system, presumably, we need a way to be able to reserve a parking spot and maybe receive some kind of ticket or receipt. You obviously need to be able to pay for the parking spot. And then, I guess this might be more of a scale requirement, but at a higher level, if we think about this type of product, we'd probably prefer to err on the side of higher consistency. Yes, because if I'm thinking about it, we probably don't want two people to be able to reserve the same parking spot, obviously. Cool. And then, I'm curious, are there different types of parking? Because if I think about a normal parking garage, you know, there are various types: maybe a handicap spot, maybe some larger spots, maybe some smaller spots.",
+      "answer": "Yes, that's correct. Yep. Yep, absolutely. Large. Awesome. And then, for the prices for the garages, would they be flat rate?",
+      "follow_up": "Yeah, let's say flat rate, but different rates for the three different types of parking, and flat rate based on time."
+    },
+    {
+      "question": "So, with these product requirements and requirements in mind, I guess we can dive right into defining the sort of interface or the API we're going to be working with. I think this type of thing is going to have some public endpoints and then some internal endpoints. So, I'll start us off with some of the more public endpoints. Off the bat, we need, as we mentioned in the product requirements, a way to reserve. So, let's call this one `/reserve`. I'm just calling it this; in reality, it doesn't have to be immediately RESTful, it could be GraphQL or anything. This is just so we have a general understanding of what this should look like.",
+      "answer": "I think that sounds good. And so, what should this type of thing take? We obviously want to know which garage we're referring to. We want to know when, the time duration during which this should be reserved as well. So, that seems pretty reasonable. Let's go with something along those lines. And then, as we mentioned in the product requirements, we should return some type of receipt or ticket. So, let's say it returns a tuple. Obviously, we want the specific spot, as well as potentially a way to identify which specific reservation we're referring to, so we just call that a reservation ID. So, yeah, that seems reasonable for that. Then, obviously, there should be some form of payment endpoint. This is probably beyond the scope of the specific problem per se, but the actual implementation could probably just be handled by a third party. So, yeah, we want to pay by reservation ID. And then, I want to say, you probably end up using something like Stripe or Square, or alternatively, you can implement your own, which is a little more complex.",
+      "follow_up": "Yeah, I think we can assume that a third party will be taking care of that."
+    },
+    {
+      "question": "Yeah, I think we can assume that a third party will be taking care of that. Okay. Okay, cool. Yeah, and their payment details, I'm assuming, are going to be taken care of by whatever third parties are handling that?",
+      "answer": "Cool. Yeah, awesome. And then, you also have to be able to cancel your reservation. That seems pretty reasonable, just because things come up in general. So, we should have a cancel endpoint as well. Let's call that here. Similarly, you should be able to just pass the reservation ID, and I think it should handle the rest. So, that seems pretty reasonable for our public endpoints, at least for the functionality that we're describing here. We're probably going to have a few more endpoints on the internal app, so let's get started on those. Taking a look at the public endpoints that we've created here, there are a few internal things we might need. One thing we need is a way to calculate the actual individual payments on the internal side. Debatably, that could just be part of the initial endpoint, but personally, I prefer to separate them out. So, let's see here. Similarly, it should just take the reservation ID because, presumably – and we can delve into this more later when we define our actual data schema – but presumably, the reservation ID tells us which specific garage we're referring to and then what the actual times are. That way, we can get the individual rates based on what garage it is, what time. Yeah, so that should be fine. And then, on the reserve side, we probably need a way to check what spots are currently available. That seems pretty reasonable from a UI perspective. So, let's say we have a `free_spots` endpoint. One thing, I guess, when we're considering the parameters of what this specific endpoint might require, obviously we need the garage. But some other things that might be prudent are the type of vehicle or the time. The reason I say that is, if we think about it, the larger spots – like you mentioned, we defined compact, regular, and large – the larger spots actually end up being able to be used for the smaller vehicles. Obviously, we would prefer not to have to do that down the line; we would prefer to use up all the smaller spots. But reasonably, if all of those spots are full and someone wants to reserve a spot, they should be able to reserve a large spot, at least in my opinion. So, there are just some things to note. And then, some of the more complex logic that's going to be held should be in the actual allocation of the spot. We don't have to dive into the minutia of the actual algorithm of that right now, but for now, let's just define that as `allocate_spot`, and that should similarly take a garage ID, vehicle type, and a time. And yeah, that seems pretty reasonable for the three we have here. Some of the more optional things we could be adding, if I'm thinking more about the actual product, obviously the ability to create an account seems pretty reasonable. If it's a garage you're going to be using over and over, we may want to incorporate that. So, let's say we have a `create_account` endpoint. Some things that we might need there are an email and a password, which seem pretty reasonable for the initial things. Obviously, we'd do some hashing for that; we don't want to store that in plain text. And then, some more optional things like first name or last name. Just as another thing to note, optionally, you can also just implement third-party single sign-on options like Google or Facebook login. Exactly. Yeah. Cool. And then, let's say we just have a `login` endpoint, just because you need that once you've created an account.",
+      "follow_up": "Cool. So, I think that seems pretty reasonable, at least on the first pass, for the specific system interface we're working with. So, let's consider the actual scale or scope of the problem. We kind of tackled that briefly when we discussed how we want high consistency given the nature of this problem. But let's look at the actual size or far-reaching extent. Honestly, my initial impression is that we're not likely to deal with many at-scale issues with this type of problem. On a per-garage basis, even if we optimistically upper-bound a garage at 10 floors – I don't think the average parking garage is going to have 10 floors, but let's upper-bound it just for the sake of this problem – and let's say there are maybe 200 spots per floor, that's 2,000 relevant spots per garage. And the system, I guess, what, 2,000 relevant spots per garage? I don't think there are that many parking garages in the world. So, I'm not particularly concerned about designing this as a more distributed system. I think even if there are a million parking garages, that's still not within the realm of big data, in my opinion. So, I don't think that really factors into the considerations here. That being said, as we mentioned before, we care most about the system being up-to-date. We don't really want to run into a race condition where we happen to allocate to the same spots at the same time. So, those are just something to keep in mind. And then, given that we're probably not going to run into that many at-scale issues, we can jump over to the data schema side of things: how we're going to design the database."
+    },
+    {
+      "question": "Sounds good. Okay, that's totally fine. Yeah, I think this is good to start with.",
+      "answer": "So, let me shift over here on Whimsical. Cool. So, I guess what are some of the first things we probably want to tackle here? Reservations are obviously the point of this entire product, so we can start with that. Let's go with reservations. Create a table here. Cool. To start us off, as most tables will, we have an ID, and this is our primary key. We can define it as a serial within most relational databases. I apologize, I tend to lean towards relational databases for most of this type of problem. Reasonably speaking, you could probably go into more of a NoSQL type solution, but more of my expertise lies in the relational database side. So, presumably, some type of PostgreSQL or MySQL is what we'll be working with here. I'll be designing the data schema with that sort of perspective in mind. Awesome. So, back to the reservations. Initial field: ID, the serial, that way it increments as you add more and more. It seems totally reasonable. What else would we want? The other information we'd want in this table: we need which specific garage it's referring to, which spot we actually ended up allocating to it, and then the start and end time seem like pretty reasonable things. As well as, whether or not this has been paid. Depending on how you want to format the product, you might be able to pay on-site as opposed to in the app per se. So, that sort of status might be reasonable. Yeah, I think that's this garage ID. And I think we can, presumably, we're going to be making a table down the line with this, so we'll call this a foreign key as well. Then, let's see, we have the spot ID. Another thing about it, it's probably not unreasonable to make a spot table as well. That way, it could have the potential vehicle types and whether or not it's reserved at a specific time. Yeah, so let's go with that also. And then, we want `start_time`, we want the `end_time`, and I guess it's just paid or not paid, so we just call that `paid`. Cool. That seems pretty reasonable for a reservation table. Obviously, we can add a user ID or such if we end up having those, but for now, this is the important part. Perfect. Yeah, so let's move over to creating a garage table. There's this whole debate over whether or not you should be using singular or plural in table names. Honestly, I'm probably in the singular camp, even though I just wrote 'reservations', but I don't think it matters either way for the sake of this problem. That's fine. So, this will also obviously have an ID, similarly, primary key and serial. So, what are some of the things we want for the garage? Where it is, is something that's generally pretty important, and that can also help down the line when it comes to actually starting specific replicas of the database or load balancing things like that. An easy way off the bat to handle that is a zip code. So, let's go with that. To be able to incorporate the extensions of zip codes that requires a hyphen, so maybe let's go with `VARCHAR` instead of an `INT`. And then, what else do we want? Oh, we want the individual rates. We mentioned that this is flat rate based on size. Yes. So, for now, it seems relatively reasonable to have a size, and then obviously these are nullable columns in the case that they don't have that specific type of spot in the specific garage. And one thing to note here is I'm using `DECIMAL`. I know there are obviously some issues down the line regarding floating-point errors and calculations and payments. I think `DECIMAL` is the PostgreSQL type that should be able to handle that. I'm not confident that there's an equivalent MySQL type, but I'm sure there is. So, I think that seems like a pretty reasonable approach.",
+      "follow_up": "I think that's fine."
+    },
+    {
+      "question": "I think that's fine. Yeah, I think that's fine. You can make a call over here on the trade-off that you're willing to go for, for sure. Yep, I think that's fine.",
+      "answer": "And then, let's go with `spots`. Like we mentioned, we have a spot table here. Similar to the other ones, we want an ID with a primary key, a serial. Now, what do we want for the spot? We want the relevant garage, obviously. We want the type of vehicle, and then we want the specific status. Like, what is it? Maybe it's being reserved, maybe it's unavailable right now, maybe they're paving over the spot, or maybe it's just totally empty. So, I think those are pretty reasonable things to have there. So, the `garage_id`, obviously, it's a foreign key, and I guess it's a secondary key. And then, we want the `vehicle_type`. For now, I'm going to call this an `ENUM`. I'll get into this a little later when we actually define... oh, actually, I can get into this now, I guess. There's a trade-off when you add enums, particularly in a relational database, simply because you gain performance benefits by being an `INT` as opposed to a character string or whatever. But the trade-off is some flexibility issues down the line. I know in PostgreSQL specifically, when you add an enum, you can never remove it; you can never remove the type afterwards. So, that's something to consider when you choose them. I think for this specific case, like compact, regular, and large, I don't think those are things that are ever going to be totally out of phase in a parking garage type system, so I think it's totally reasonable. Yeah, I mean, I'm here. But like I mentioned before, I don't think we're going to run into these issues at scale here. It would be totally reasonable to just use a `VARCHAR` as well for flexibility, and then have that vetting on the application layer side. Cool. And then, what else? Oh, we had the, I guess, supposedly optional table. Given that we optionally want to be able to create an account, let's say we have a `users` table. That should just have all the familiar things: an ID with a primary key, a serial. And then, as we mentioned in the previous endpoints that were optional, maybe an email, or I guess `VARCHAR` because we're in PostgreSQL, and then a password as well. Note that this is probably something conventional, like SHA-256 hashing. And then, first name, obviously nullable, as well as last name. Cool. And then, arguably, if I'm thinking about the nature of this type of application, the whole reason we wanted optional users in the first place is just so they could recurringly reserve a spot. If we want to be able to recurringly reserve a spot, we probably also want the type of vehicle. Actually, we might want the type of vehicle in general. So, I think a `vehicle` table is a totally reasonable thing to have in this scenario. And then, let's go with ID as usual. And then, optionally, a user ID that can be a foreign key. And then, let's say we want their license, which seems reasonable. And then, probably the vehicle type again, similar to the one that was in the `spots` table. So, yeah, I think that probably covers our requirements here. I mean, obviously, I can add more as we go through the problem, but for now, does that seem like a good starting point?",
+      "follow_up": "I think this seems good. Yeah, this looks reasonable. Maybe we can dive into what the high-level architecture would look like."
+    },
+    {
+      "question": "I think this seems good. Yeah, this looks reasonable. Maybe we can dive into what the high-level architecture would look like. I was going to ask, do you anticipate any trade-offs based on this decision?",
+      "answer": "Yeah, for sure. So, we can get into that here. We start us off with the very basics: we want an application UI, it can be either web or mobile, and then we want some sort of back-end server. So, let's say here we have a web app or mobile UI, depending on the sort of... or maybe even both. And then, over here, let's go with a back-end server. This will talk to this, and vice versa. Cool. Now, some of the deeper considerations to have here are, obviously, we're going to have a database. As we mentioned before, the one that I lean towards is a PostgreSQL DB. So, let's just call this DB. And so, that's just off the bat. In reality, we can end up doing a number of different adjustments here. One thing that we can consider is splitting the back-end server into a reservation server and a slot server, given the complexity of allocating slots. That seems probably a little unnecessary here. A bigger thing that might be more reasonable is, given that we described up here that the system needs to have high consistency, we notice that in this type of problem, we probably want to be able to read way more than write. So, if we're going to be reading a lot more than writing, we probably want a number of different read replicas for the DB. So, we can separate this out here, move it up this way. Yes, I can. Awesome. So, let's call this a read replica. So, the server would kind of work like this. Essentially, go here. One thing that would be prudent to have in this scenario, given that we're probably hosting a number of read replicas, we probably want some form of load balancer in between, just to allocate where the individual calls are going. It would probably be prudent for this type of problem to shard that based on location. I know that we mentioned earlier that the garage might have a zip code; that seems like a pretty reasonable way to approach that. So, let's maybe this here. And then, from here, we can go up here, call this read, call this read. Then, this one will be write. And then, what else? We mentioned... oh, go for it. Yeah, well, not specifically the read replica portion. One thing that is likely going to end up being a specific trade-off, as I was sort of pathing towards, we mentioned that this type of thing wants high consistency. So, I think it's pretty reasonable to take a strong consistency approach versus an eventual consistency approach. Simply because, if we think about the nature of someone using this application from a customer perspective, it's likely not the case that they're going to be super frequently reserving things, probably not more than even twice a day at most, and that already seems a little excessive. So, in reality, they're probably very willing to wait or deal with a higher latency, which is the trade-off you make when you have strong consistency versus eventual consistency, where you increase the performance, the execution on the customer side, in the customer's view. But the trade-off you make there is you might not have the exact data. We want exact data because we want them to be able to know that the spot they're reserving is specifically the spot they'll get. The way that's tackled in this setup is you basically read lock. That's an initial approach that a lot of people use. It seems pretty reasonable as well, especially for something that's not necessarily at an aggressive scale. In the sense that when someone's writing to the PostgreSQL DB, you read lock the replicas. That way, they wait for the result to finish, so you know the data is as up-to-date as possible. One potential consideration in the future might be, depending on how you want to split up and shard your database, you might want to consider the logic of read locking based on location. Because if we think about it, why would we read lock something in Wisconsin if someone's reserving something in California? But that's a little more of a complex decision down the line. And then, yeah, I think that's... oh, one other thing. We mentioned up here that we have a payment, since we're likely to be using an existing third-party payment. So, we just draw that in here. Let's say it's like... place that here, have that here both ways. Don't really know how to do this. Oh, there we go. Cool. Nice.",
+      "follow_up": "Okay, I think this is pretty good and a good place to stop. What did you think about that, Tim?"
+    },
+    {
+      "question": "Okay, I think this is pretty good and a good place to stop. What did you think about that, Tim? Yeah, now I think some things that you did really well: clarification questions at the beginning were very well drawn out by you, and that made the scope of the question a lot more manageable for you to tackle and to just understand exactly what the requirements were. And I think one thing that I saw you do consistently, and that was really good, was providing your opinions. So, explaining what the problem was, why you were doing something, what your opinion on it was. One example was just separating the payment calculation from the public endpoint. That was a small example where you suggested that you were going to separate it, and you provided a reason for that. And I think that you did that consistently throughout, which just shows that you would be someone who people would enjoy working with as an engineer because you have opinions on things. And it's conversational too; it adds flavor to the question that you're doing. It doesn't sound very robotic and rehearsed, and adds some commentary for the interviewer to be able to interact with as well. Yeah, and I like that towards the end you called out that you weren't super confident on the use of `DECIMAL` as the type. Things like that, I think, are good for interviewees to do. If there is something that people aren't super confident about, call it out. It's better to just throw it out there than kind of go into it blind, because then at least the interviewer knows exactly where you stand and what you might need help with or hints with at some point in the question. What advice do you think you'd give someone if they were to receive this question?",
+      "answer": "Ah, it's an interesting, weird problem, I guess. I think a lot of these types of problems end up actually having issues at scale. So, I think I was lucky in the sense that I think it's reasonable to say, with some back-of-the-envelope estimation, that this problem doesn't tackle that. And that made it a lot more of, I guess, how do we design the data problem. Yeah, I mean, I think a lot of people approach these types of problems very, I guess, almost too strictly formulaically. And I think that that's good to an extent. I mean, I think a lot of the reason for that is algo problems are another metric that people are generally evaluated on, and that honestly probably doesn't have too much bearing on the actual job. But system design questions, I feel like, are a lot more relevant and applicable to actual work contexts. So, thinking about the problem from a more flexible standpoint there, and treating it like you're working with a co-worker and you're actually going over an estimation of what the entire system is like, is a pretty reasonable approach to tackle these types of problems.",
+      "follow_up": "Yeah, absolutely. Well, thank you so much, Tim. This was really great, and good luck with your interviews!"
+    }
+  ]
+}

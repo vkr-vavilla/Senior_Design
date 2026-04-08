@@ -1,0 +1,87 @@
+{
+  "video_id": "kLBrHG4HIA0",
+  "summary": "This conversation explains caching as a method to speed up website loading. It covers what caching is, where it can be implemented (browser, database/server, server/client), how to decide where to cache based on performance bottlenecks, what data to cache (frequently accessed), and common tools like Redis and CDNs.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "EMPLOYEE",
+      "text": "My website is taking forever to load. How can I speed it up?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "All right. Are you doing any caching?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "No. What's that?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "The concept of caching is simple. You basically store information closer to the user so they can get it faster. Your browser does this all the time. For example, the first time you visit a website, it probably takes a long time, but the second time you visit it, it usually loads a lot faster because your browser is saving things like the images and the static files from that site locally."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Cool. If the browser is doing it for me, then what do I need to do?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "The browser is just one of many places where caching can happen. You could add a cache between your database and your server or even between your server and your clients."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, then where should I cache?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Well, that depends on a lot of factors, but a good place to start is looking at what part of the request process is taking up a lot of time. In this simple example, if your entire request is taking 10 seconds and 8 seconds of that is the database, then a good place to start the caching would be between the database and the server."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So, I just cache everything in there?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "You only want to cache your most frequently accessed data. For example, a popular YouTube video. When Mr. Beast drops a video, do you want every single request to watch it going all the way to your database? No, you just want to bring it into your cache once and then every single request can hit this much faster."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, it makes sense. What tools do you use to actually implement this?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Redis is the most popular choice for application level caching, and you can also cache using a CDN, using something like CloudFront or Cloudflare, which I'll talk about."
+    }
+  ],
+  "training_pairs": [
+    {
+      "question": "My website is taking forever to load. How can I speed it up?",
+      "answer": "Are you doing any caching?",
+      "follow_up": "No. What's that?"
+    },
+    {
+      "question": "What's that?",
+      "answer": "The concept of caching is simple. You basically store information closer to the user so they can get it faster. Your browser does this all the time. For example, the first time you visit a website, it probably takes a long time, but the second time you visit it, it usually loads a lot faster because your browser is saving things like the images and the static files from that site locally.",
+      "follow_up": "If the browser is doing it for me, then what do I need to do?"
+    },
+    {
+      "question": "If the browser is doing it for me, then what do I need to do?",
+      "answer": "The browser is just one of many places where caching can happen. You could add a cache between your database and your server or even between your server and your clients.",
+      "follow_up": "Where should I cache?"
+    },
+    {
+      "question": "Where should I cache?",
+      "answer": "That depends on a lot of factors, but a good place to start is looking at what part of the request process is taking up a lot of time. In this simple example, if your entire request is taking 10 seconds and 8 seconds of that is the database, then a good place to start the caching would be between the database and the server.",
+      "follow_up": "So, I just cache everything in there?"
+    },
+    {
+      "question": "So, I just cache everything in there?",
+      "answer": "You only want to cache your most frequently accessed data. For example, a popular YouTube video. When Mr. Beast drops a video, do you want every single request to watch it going all the way to your database? No, you just want to bring it into your cache once and then every single request can hit this much faster.",
+      "follow_up": "What tools do you use to actually implement this?"
+    },
+    {
+      "question": "What tools do you use to actually implement this?",
+      "answer": "Redis is the most popular choice for application level caching, and you can also cache using a CDN, using something like CloudFront or Cloudflare, which I'll talk about.",
+      "follow_up": "NONE"
+    }
+  ]
+}

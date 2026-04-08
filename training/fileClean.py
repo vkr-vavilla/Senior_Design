@@ -6,7 +6,12 @@ import os
 import time
 from pathlib import Path
 from typing import Any
-from groq import Groq, RateLimitError, APIStatusError
+# Attempt to import google-genai; if unavailable, fail clearly at runtime.
+try:
+    from google import genai  # type: ignore
+except Exception:
+    genai = None  # type: ignore
+
 from dotenv import load_dotenv
 
 ENV_PATH = Path(__file__).resolve().parent.parent / "backend" / ".env"
@@ -155,37 +160,23 @@ def merge_chunk_results(video_id: str, chunk_results: list[dict[str, Any]]) -> d
     }
 
 
-def groq_generate_json(
-    client: Groq,
+def gemini_generate_json(
+    client: Any,
     model: str,
     prompt: str,
-    max_retries: int = 3,
-    base_backoff_sec: float = 5.0,
 ) -> dict[str, Any]:
-    attempt = 0
-    while True:
-        try:
-            response = client.chat.completions.create(
-                model=model,
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.2,
-                max_tokens=4096,
-            )
-            text = response.choices[0].message.content
-            if not text:
-                raise RuntimeError("Empty response from Groq")
-            return extract_json(text)
-
-        except RateLimitError as exc:
-            if attempt >= max_retries:
-                raise RuntimeError(f"Groq rate-limited after {max_retries} retries: {exc}") from exc
-            wait_sec = base_backoff_sec * (2 ** attempt)
-            print(f"[rate-limit] Groq 429; retrying in {wait_sec:.1f}s (attempt {attempt + 1}/{max_retries})")
-            time.sleep(wait_sec)
-            attempt += 1
-
-        except APIStatusError as exc:
-            raise RuntimeError(f"Groq API error {exc.status_code}: {exc.message}") from exc
+    try:
+        response = client.models.generate_content(
+            model=model,
+            contents=prompt,
+            config={"temperature": 0.2},
+        )
+        text = getattr(response, "text", None)
+        if not text:
+            raise RuntimeError("Empty response from Gemini")
+        return extract_json(text)
+    except Exception as exc:
+        raise RuntimeError(f"Gemini API error: {exc}") from exc
 
 
 def write_json(path: Path, obj: dict[str, Any]) -> None:
@@ -211,12 +202,10 @@ def process_file(
     txt_path: Path,
     output_structured_dir: Path,
     output_jsonl_path: Path,
-    client: Groq,
+    client: Any,
     model: str,
     overwrite: bool,
     delay_sec: float,
-    max_retries: int,
-    base_backoff_sec: float,
     max_chars_per_chunk: int,
 ) -> tuple[bool, int]:
     video_id = txt_path.stem
@@ -236,12 +225,10 @@ def process_file(
 
     for i, chunk_text in enumerate(chunks, start=1):
         prompt = build_prompt(video_id=video_id, transcript_text=chunk_text, chunk_index=i, total_chunks=len(chunks))
-        result = groq_generate_json(
+        result = gemini_generate_json(
             client=client,
             model=model,
             prompt=prompt,
-            max_retries=max_retries,
-            base_backoff_sec=base_backoff_sec,
         )
         chunk_results.append(result)
         if delay_sec > 0:
@@ -264,28 +251,32 @@ def parse_args() -> argparse.Namespace:
     default_out = Path(__file__).resolve().parent.parent / "data" / "processed"
 
     parser = argparse.ArgumentParser(
-        description="Clean raw transcript txt files with Groq and export training-grade structured data."
+        description="Clean raw transcript txt files with Gemini and export training-grade structured data."
     )
     parser.add_argument("--input-dir", type=Path, default=default_in)
     parser.add_argument("--output-dir", type=Path, default=default_out)
-    parser.add_argument("--model", default="llama-3.3-70b-versatile", help="Groq model name")
+    parser.add_argument("--model", default="gemini-2.5-flash", help="Gemini model name")
     parser.add_argument("--limit", type=int, default=0, help="Process only first N files (0 = all)")
     parser.add_argument("--overwrite", action="store_true", help="Reprocess files even if output already exists")
     parser.add_argument("--delay-sec", type=float, default=0.5, help="Delay between API calls")
-    parser.add_argument("--max-retries", type=int, default=3, help="Retries on rate limits")
-    parser.add_argument("--base-backoff-sec", type=float, default=5.0, help="Base backoff seconds for retries")
-    parser.add_argument("--max-chars-per-chunk", type=int, default=8000, help="Max transcript chars per request")
+    parser.add_argument("--max-chars-per-chunk", type=int, default=16000, help="Max transcript chars per request")
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
 
-    api_key = os.getenv("GROQ_API_KEY", "").strip()
+    api_key = os.getenv("GEMINI_API_KEY", "").strip() or os.getenv("GOOGLE_API_KEY", "").strip()
     if not api_key:
-        raise RuntimeError("Missing GROQ_API_KEY in environment. Add it to backend/.env")
+        raise RuntimeError("Missing GEMINI_API_KEY (or GOOGLE_API_KEY) in environment. Add it to backend/.env")
 
-    client = Groq(api_key=api_key)
+    if genai is None:
+        raise RuntimeError(
+            "The 'google-genai' package is not installed or could not be imported. "
+            "Install it with 'pip install google-genai' and ensure it's available in your environment."
+        )
+
+    client = genai.Client(api_key=api_key)
 
     input_dir: Path = args.input_dir
     output_dir: Path = args.output_dir
@@ -314,8 +305,6 @@ def main() -> None:
                 model=args.model,
                 overwrite=args.overwrite,
                 delay_sec=args.delay_sec,
-                max_retries=args.max_retries,
-                base_backoff_sec=args.base_backoff_sec,
                 max_chars_per_chunk=args.max_chars_per_chunk,
             )
             if ok:

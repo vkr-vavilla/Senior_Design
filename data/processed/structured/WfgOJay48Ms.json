@@ -1,0 +1,86 @@
+{
+  "video_id": "WfgOJay48Ms",
+  "summary": "The conversation covers the definitions of a program, process, and thread, their differences, and provides an example using Google Chrome. It also touches upon the advantages of using threads.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "What's your major?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Computer science."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "What is the difference between a process and a thread?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, I forgot all of this."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "We first have to understand what a program is. A program is just some code sitting on your disk. When the CPU wants to run that program, it loads it into memory and assigns resources like a processor which executes the program. So once executed, that program becomes a process."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay. Tell me a little bit more about what's going on inside the process."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Each process has its own code, stack, data, and heap. But most importantly, it has its own address space. This means that one process cannot affect other processes. So even if one of these crashes, it will not affect the other processes running on your computer."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay. Can you give me an example of this?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "A common example of a program with multiple processes is Google Chrome. Each tab is its own process. If one tab crashes, it's not going to affect the other tabs that are running in Chrome."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, great. Now, where do threads come into play?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Threads live within a process, and each process has one or more threads. These threads get their own register and their own stack, but they share the same address space. This implies that if one thread goes down, it could affect the other threads and crash your entire process."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So, what's the advantage of using threads?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Because your computer doesn't have to go to a different address space when it wants to switch between threads."
+    }
+  ],
+  "training_pairs": [
+    {
+      "question": "What is the difference between a process and a thread?",
+      "answer": "Okay, I forgot all of this. We first have to understand what a program is. A program is just some code sitting on your disk. When the CPU wants to run that program, it loads it into memory and assigns resources like a processor which executes the program. So once executed, that program becomes a process.",
+      "follow_up": "Tell me a little bit more about what's going on inside the process."
+    },
+    {
+      "question": "Tell me a little bit more about what's going on inside the process.",
+      "answer": "Each process has its own code, stack, data, and heap. But most importantly, it has its own address space. This means that one process cannot affect other processes. So even if one of these crashes, it will not affect the other processes running on your computer.",
+      "follow_up": "Can you give me an example of this?"
+    },
+    {
+      "question": "Can you give me an example of this?",
+      "answer": "A common example of a program with multiple processes is Google Chrome. Each tab is its own process. If one tab crashes, it's not going to affect the other tabs that are running in Chrome.",
+      "follow_up": "Now, where do threads come into play?"
+    },
+    {
+      "question": "Now, where do threads come into play?",
+      "answer": "Threads live within a process, and each process has one or more threads. These threads get their own register and their own stack, but they share the same address space. This implies that if one thread goes down, it could affect the other threads and crash your entire process.",
+      "follow_up": "So, what's the advantage of using threads?"
+    },
+    {
+      "question": "So, what's the advantage of using threads?",
+      "answer": "Because your computer doesn't have to go to a different address space when it wants to switch between threads.",
+      "follow_up": "NONE"
+    }
+  ]
+}

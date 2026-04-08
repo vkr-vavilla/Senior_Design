@@ -1,0 +1,233 @@
+{
+  "video_id": "Z-0g_aJL5Fw",
+  "summary": "A mock system design interview for TikTok, covering functional and non-functional requirements, API design for video upload and feed viewing, database choices, caching strategies, and scaling considerations.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Hey everyone, I'm here today with Adam, and today we'll be doing a mock system design interview. I'm really excited to have Adam in this video. Adam, do you mind just introducing yourself and telling us a little bit about what you work on?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Sure. Hi, my name is Adam. I work on cloud engineering and back-end systems, currently at Oracle, but I'll be moving over to Google soon."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Awesome. Yeah, we're really excited to jump into a practice system design interview today. The question that we'll be doing is 'Design TikTok'."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, cool. Design TikTok. Well, this is a phone app. I actually have never used TikTok. So maybe we can start by just quickly, if you could give me, I have an idea, obviously I know what it is, but if you could just kind of give me a quick overview of what we're looking for and maybe be a little bit specific on the portion of TikTok we're wanting to focus on."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Awesome, yeah. So, a high-level overview of TikTok is it's a mobile app for video sharing between users. The basic idea is you're able to upload a video to TikTok, and then you're able to view a feed of videos. You see one video at a time, you scroll up, you see the next video. You can follow users, so you see their videos that they post, and then you can also perform actions on those videos, like favoriting them or commenting on them, I think. So, those are the basic things we'll want to support."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Cool, all right, that makes sense. I'm just going to take a minute and jot down some notes real quick."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Sounds great. In the meantime, I'll switch over and just screen share here into our whiteboard."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Cool. So, it looks like TikTok is a mobile app. If it's okay with you, I think I'm just going to focus on the back-end infrastructure and not so much go into the mobile app portion, just because I think there's a little bit more feature-rich detail there in the back-end system. From what I can see, the first thing I want to dive into are these functional requirements. When I say functional requirements, I just kind of mean the top-level buckets of work that we're wanting to look into. So, the first thing from what you explained to me was 'upload videos', right? So, a user from their mobile device, or really, in theory, since we're just dividing the device and the back end, if it's okay, I'm going to assume that we're just going to create an API that is client-agnostic, that's going to accept user data to upload videos. So, we're going to kind of think, section one here, if I was going to write this up, these functional, I'm just going to say number one here is 'upload videos'. And so, when we upload videos, these videos are time-boxed, right? It's sort of the same way as Instagram; they're only about 15 seconds each, is that right?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, we can assume they're 30 seconds to maybe a maximum of like a minute long."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so max one minute. Cool. And I'm also assuming that if I'm uploading videos, would there also be text associated with that? Like with Instagram or Facebook, where you can upload a photo but you can also tag and add text and things like that?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, that's a good question. Let's assume you can add a comment or caption to it. We don't need to get into the details of tagging and how that would work, but yeah, some text data associated with it."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, cool. Upload. Let's say video plus text. Cool. And then, number two here, what I'm thinking is you said 'view feed'. When I think about viewing the feed, what we're doing is aggregating, and correct me if I'm wrong, are we talking about aggregating videos from only people I follow? Or is it people I follow plus, like, I know that TikTok has this special algorithm that they use to grab recommended videos. Can I assume there's a mixture of those two things?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, I think that's a good question. For simplicity, we could focus maybe on videos of people you follow, but I would be interested in hearing about how you would create a trending or video recommendation as well. For the purposes of this, do you want me to include an ability for me to comment on videos as part of that functionality?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, let's try to build out how we would favorite videos and maybe follow particular creators."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, cool. So, yeah, that's actually my next functional requirement here, which is 'follow users'. So, favoriting, following, commenting, forwarding—I don't know if they allow that—but I'll just kind of bucket that as a 'video interaction' endpoint."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Sure, cool. All right, so that kind of covers these as the general functional requirements. So, really quickly, I just want to talk about these non-functional requirements. What I mean by that is, let's start with availability, latency, and scale. So, it sounds to me like I'm going to make an assumption here that this needs to be a highly available system, simply because of the scale of the users that are going to be using it. It sounds like it's going to be a lot, and because it is serving videos, it does need to be highly available. So, I'm just going to say roughly, highly available, around 99.999%. Does that sound about right for you?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, that sounds great, because there are always these trade-offs, right? When I'm thinking about how I'm going to design a system, I'm just trying to understand if it's not super high, if it maybe doesn't need to be as highly available, maybe there are certain things we can do to balance our budget and how we're going to budget for our compute resources and that sort of thing. So, cool. Also, thinking about latency, the one good thing is, from the sound of it, since it is a mobile device, it sounds like we can cache a lot of the content on the device itself. So, when we initially pull stuff, we'll be able to obviously get the top-level stuff really quickly, but after that, we can kind of be pulling stuff in the background. So, it sounds like we have a little bit of leeway there. Does that sound about right to you?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, that sounds good. I think maybe later on we can talk a little bit about the latency, or how this would differ across different features, like upload versus download, and how to think about that."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, okay, I'll just put TBD for that. Cool. And then, scale. Can you just give me a rough estimate on, if we're talking about users, do you have any idea how many users we're talking about here, like in a day?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, in a day, let's say we want to support a million active users in a day."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, so a million daily active users. Cool. So, I'm just going to do a couple of estimates here now that we're talking about this. This gives me an idea of how I'm going to store everything. We said max here for the videos was about one minute. I'm just going to make a quick assumption and say that a minute of compressed H.264 video is about five megabytes. Does that sound about right to you?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I think it sounds like, and then maybe we can say each user is uploading two per day, which equals 10 megabytes per day per user. I'm not going to get too much into this yet; I just want to get a rough idea for the big chunk here, which is videos. The rest of it, user metadata, is going to be minimal. I think it's going to be 1K per user per day. I think that's a pretty good estimate, roughly. Okay, cool. So, I think with all that, is there anything else you can see that I'm missing here? Does that seem like a rough, good overview of the system that we're trying to tackle here?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, this seems like a good overview. I think we can dive in now."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, cool. So, I think I'm going to start with a couple of API endpoints just to get my head around it. I think what I'd like to start with is 'upload video'. If I talk about the database schema that backs that, our user object is going to be something along the lines of: we're going to have some sort of user ID, and that's going to be like a UUID. We're going to have a video link—I'll get to that later—but I think that's going to be once we upload the video, we're going to want to store it in some sort of blob storage like S3. So, this will be a fully qualified link to that object, so this would be like a URL. And then maybe metadata, this would just be string data. So, that's kind of the first endpoint I'm thinking. Let me just go into that real quick. I'm not going to get into much of the user detail stuff here, just because I think that's sort of a solved problem. I think we can get to that if we have time, but for the scope of this, I'm not really going to talk too much about it. So, I'm just going to take a minute and think this through."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, cool. So, I think obviously we're going to want some sort of database to back this, and this is going to be where we store this table. So, I'm assuming for right now, I'm just going to make an assumption this is going to be a relational database, PostgreSQL, whatever flavor of relational database you so choose. So, 'upload video' is going to send this object to the relational database. Could you just briefly talk about maybe the differences between a relational database versus another type of database and why we might want to use this?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, so, like a relational database versus a NoSQL database, for example. A relational database is going to be a little bit more structured. Typically, you'll use relational databases for things like user data objects, linking different tables together. For example, you can have a single user that has many videos, so you would have many video objects, and those can be stored in two different tables, and you can do SQL queries against those. NoSQL databases are really good for unstructured data, like log data, things like that. So, a little bit more free-form in nature, not as structured in the sense that you're going to be querying that data and doing a lot of joins to it. You're kind of just going to be more like free-form searching for key-values inside that data. So, yeah, in this case, a relational database can be a lot more strict, but it can also be more space and speed efficient for specific queries. So, yeah, I think that makes sense here. So, I think what we do is upload the video object to this database. Oh, sorry, rather, this would actually just be the video data, right? It would be the best way to describe this, the video table. So, this is going to send to the video table. The idea here is that this is just the data, because what we're then going to want to do is send the actual video object to some sort of cloud bucket, like I mentioned before, like S3. This would be like a blob store. The idea here is that the video itself actually lives here, and then in this table, we have a link to that. So, we're going to be running a POST to this API endpoint, this 'upload video' endpoint. This would be my video plus my user information. So, the 'upload video' accepts the video and the user information. We save it in the table, we upload it to blob storage, and then we're going to return some sort of 200 response, which is what the API would respond with to the app itself, saying that the video went through correctly. So, that kind of handles our upload section. It's pretty straightforward for the upload section. Are there any questions about that, or did you have anything I think I missed there?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "No, I think that makes a lot of sense. We have the overview of where the video goes, where the metadata goes, and how the app would make that request. So, I think that makes sense. Cool, awesome."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So, let's talk really quick about the 'view feed'. This will be a similar endpoint, 'view feed', and what this is actually going to be is a GET request. So, when you open up the app, I think would we want to load this content right when the application opens? I'm guessing we want to start pre-loading as much as we can ahead of time so that the user isn't waiting too much for videos to load, right?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, I think we'd want to do that, insofar as it would let us view videos faster, but maybe not so much that it would use up user bandwidth and things like that."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, I think maybe the top, whatever, the first three videos, for example, we'd want to just grab those as quick as possible. The reason I asked that is I think it would make sense to have some sort of Redis cache over here, some sort of cache, whatever it is. The idea here would be that we actually preload a list of, like, the top 10 videos that we're going to load for the user before they even get to the 'view feed' page. So, if a user with a specific user UUID hits this 'view feed', we're going to go to this cache that's already pre-built, and we're going to grab those top videos that are already pre-selected. So, for example, this UUID would respond with 10 video links that are associated with that user ID and the links for the blob storage, so that the app would then be grabbing them from the blob stores right away. Does that make sense?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, that makes sense. Yeah, that's super interesting. Can you tell me a little bit more about how the cache would work?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, so I'm actually thinking about a service here in the background that would run. This would be a 'pre-cache service', and this would just kind of run on a schedule, but also maybe on demand, something like that. What it would do is it would compile playlists for users and pre-cache them. So, it could potentially be that we could base it on when the user actually goes and does the GET request, that we sort of preload it for the next one, or we just do it in the background. There are a couple of strategies we could use there. What I'm trying to get away from is relying too much, because from what I can tell, this system seems very read-heavy, right? There's going to be a lot of reading going on. So, in addition to having this main database, which I'll get to scaling, I think, in a bit, but for this main database, we're also going to want to have some sort of read worker, which would be like a read-only database. The reason being, we don't want to create too much load on this single database that's accepting these uploads. We want to have something that's managing the reads. In fact, I would actually do something like this where the secondary is pulling from the primary, and this is used for read-only, which builds the pre-cache, which loads the cache, which then when the 'view feed' gets hit, it loads it instantly, right? At least the query, right? So, does that make sense?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, that makes a lot of sense. I think getting back to one of the first questions about latency, can you talk a little bit about how introducing this cache would affect latency in the system and seeing updates and things like that?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, for sure. So, one thing we would need to consider is how quickly we want, like, I don't know if the video that I upload would show up in my feed. I don't think so. This feed is basically a curated list of videos. So, I think the point here is that because I know that TikTok has a special algorithm they use to populate your feed, I'm trying to get rid of all that happening at the moment of GET, at the moment of loading the app. I'm trying to have it pre-built, right? So that right away we're getting what we need from the back end and not having to wait for some sort of service to compile that on the fly. Plus, this also solves a little bit of our scaling issue, because if you can imagine TikTok has a million users, what if one million users all get on at the same time and run the same exact query? We could really kill our databases because we're running all these queries at the same time. We can also increase that latency. You can solve that with auto-scaling groups, but even auto-scaling groups take time to spin up. So, that's kind of the thing I'm thinking about here. But the real key here is I just noticed that this seems very read-heavy, so I was trying to get to the point where those reads were managed on their own."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, I think that's a great insight."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Cool, I think that kind of handles the 'view feed' for the most part. Yeah, I feel pretty good about that. The last piece here would be favoriting videos. I think we would have just another endpoint here, and this would just be, I'm going to call this 'user activity' maybe, or something like that. That's a little bit generic, but I'm going to speed through this. I'd try and name it something better in the real world, something more descriptive of what it actually did. But the idea here is that when I hit the 'user activity' endpoint, this is for 'follow', this is for 'liking videos', that sort of thing. I apologize, I'm actually going to just move this around a little bit so that I can get to my database cleaner. Yeah, just move this down a bit. So, the idea behind 'user activity' is it's literally just going to hit this RDB, the database. And so, for my, I'd actually have a different table here. I'd have some sort of, let me just put this over here, put it right here for now. So, this table would look something along the lines: still have a user ID and a UUID. I think we would have, so, yeah, I think this would be a 'followers' or a 'user activity' table. And the idea here would be, we're going to need a couple of keys here. So, 'following' is actually going to have to be a foreign key to another table, because for any one user, we're obviously going to be following multiple other accounts, right? So, we're going to need another table in there that's got a list of user IDs that I'm following, user accounts. In addition to that, we're going to want 'likes'. So, we're going to want to store another, I think, another foreign key to a 'videos' table. So, assuming if each account has a table of videos, like we're seeing up here, we would basically have, sorry, I think I missed something here. We're probably going to want to have a video UUID, like a video ID, and this would be a UUID field here, so that I can key to this video ID and say that that's a list of the likes that I'm liking. And then this all feeds later into the pre-cache service algorithm, which I'm not going to get into, but I think that's important to store. So, basically, whatever activity I have, all this user activity is going to hit the database, and add that to this table, right? So, I'm now following this user, I'm liking this video, etc. So that if I ever needed to run a GET request, which sounds like the pre-cache service will actually need to run some sort of request against user activity, or some sort of, maybe we have an internal service that manages that, I'm not sure. But yeah, I'd have an API that would return all the user's likes and followers, essentially, is what I'm getting at. And maybe that's a GET request here from the user activity. But that's sort of the rough idea of what I'm thinking for that. Does that make sense from a flow perspective?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, that makes sense. Awesome. Okay, well, yeah, I think we've got, we jumped into some details there. I think overall, we've got all the pieces in place, and I think this is a pretty good stopping point. Do you have any last things you would add to this before we sort of wrap up?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "No, I think if I had a little more time, I'd maybe get a little bit more into the pre-cache service, because I think it might need its own almost separate database structure and things like that. But I think, like I said, I don't want to get too much into the weeds with the TikTok-specific algorithmic kind of stuff. I think just kind of keeping it saying that this exists somewhere and we would just use it is good enough for the purposes of this interview. So, no, I feel pretty good about it."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Awesome. All right, well, yeah, let's call it here. So, just recapping what we went over: we talked about designing the API, we talked about database structure, we talked about different microservices and load balancing and things like that. I thought overall you did a really awesome job of really clearly communicating all these ideas and also jumping in and providing extra knowledge about the specific things. Even when I asked a follow-up question, or even without asking, I feel like you really jumped in and showed you had mastery over all of these topics, which was really awesome. And even though this is a condensed version of this, I feel like you could have gone multiple layers deeper on any of these topics, so it really shows me that you know what you're talking about. But yeah, what did you think overall?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, I think it's always interesting trying to design something that you've never used. So, we're sort of having to make a couple of assumptions, knowing I know Facebook, I know Instagram, so I kind of understand those. Making some assumptions on how it's used by people really kind of helped. But yeah, I thought it went well."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Well, thank you so much, Adam, and good luck to everyone on your system design interview."
+    }
+  ],
+  "training_pairs": [
+    {
+      "question": "The question that we'll be doing is 'Design TikTok'.",
+      "answer": "Okay, cool. Design TikTok. Well, this is a phone app. I actually have never used TikTok. So maybe we can start by just quickly, if you could give me, I have an idea, obviously I know what it is, but if you could just kind of give me a quick overview of what we're looking for and maybe be a little bit specific on the portion of TikTok we're wanting to focus on.",
+      "follow_up": "Awesome, yeah. So, a high-level overview of TikTok is it's a mobile app for video sharing between users. The basic idea is you're able to upload a video to TikTok, and then you're able to view a feed of videos. You see one video at a time, you scroll up, you see the next video. You can follow users, so you see their videos that they post, and then you can also perform actions on those videos, like favoriting them or commenting on them, I think. So, those are the basic things we'll want to support."
+    },
+    {
+      "question": "And so, when we upload videos, these videos are time-boxed, right? It's sort of the same way as Instagram; they're only about 15 seconds each, is that right?",
+      "answer": "Yeah, we can assume they're 30 seconds to maybe a maximum of like a minute long.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "And I'm also assuming that if I'm uploading videos, would there also be text associated with that? Like with Instagram or Facebook, where you can upload a photo but you can also tag and add text and things like that?",
+      "answer": "Yeah, that's a good question. Let's assume you can add a comment or caption to it. We don't need to get into the details of tagging and how that would work, but yeah, some text data associated with it.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "When I think about viewing the feed, what we're doing is aggregating, and correct me if I'm wrong, are we talking about aggregating videos from only people I follow? Or is it people I follow plus, like, I know that TikTok has this special algorithm that they use to grab recommended videos. Can I assume there's a mixture of those two things?",
+      "answer": "Yeah, I think that's a good question. For simplicity, we could focus maybe on videos of people you follow, but I would be interested in hearing about how you would create a trending or video recommendation as well. For the purposes of this, do you want me to include an ability for me to comment on videos as part of that functionality?",
+      "follow_up": "Yeah, let's try to build out how we would favorite videos and maybe follow particular creators."
+    },
+    {
+      "question": "So, it sounds to me like I'm going to make an assumption here that this needs to be a highly available system, simply because of the scale of the users that are going to be using it. It sounds like it's going to be a lot, and because it is serving videos, it does need to be highly available. So, I'm just going to say roughly, highly available, around 99.999%. Does that sound about right for you?",
+      "answer": "Yeah, that sounds great, because there are always these trade-offs, right? When I'm thinking about how I'm going to design a system, I'm just trying to understand if it's not super high, if it maybe doesn't need to be as highly available, maybe there are certain things we can do to balance our budget and how we're going to budget for our compute resources and that sort of thing.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Also, thinking about latency, the one good thing is, from the sound of it, since it is a mobile device, it sounds like we can cache a lot of the content on the device itself. So, when we initially pull stuff, we'll be able to obviously get the top-level stuff really quickly, but after that, we can kind of be pulling stuff in the background. So, it sounds like we have a little bit of leeway there. Does that sound about right to you?",
+      "answer": "Yeah, that sounds good. I think maybe later on we can talk a little bit about the latency, or how this would differ across different features, like upload versus download, and how to think about that.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Can you just give me a rough estimate on, if we're talking about users, do you have any idea how many users we're talking about here, like in a day?",
+      "answer": "Yeah, in a day, let's say we want to support a million active users in a day.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "I'm just going to make a quick assumption and say that a minute of compressed H.264 video is about five megabytes. Does that sound about right to you?",
+      "answer": "I think it sounds like, and then maybe we can say each user is uploading two per day, which equals 10 megabytes per day per user. I'm not going to get too much into this yet; I just want to get a rough idea for the big chunk here, which is videos. The rest of it, user metadata, is going to be minimal. I think it's going to be 1K per user per day. I think that's a pretty good estimate, roughly. Okay, cool. So, I think with all that, is there anything else you can see that I'm missing here? Does that seem like a rough, good overview of the system that we're trying to tackle here?",
+      "follow_up": "Yeah, this seems like a good overview. I think we can dive in now."
+    },
+    {
+      "question": "Could you just briefly talk about maybe the differences between a relational database versus another type of database and why we might want to use this?",
+      "answer": "Yeah, so, like a relational database versus a NoSQL database, for example. A relational database is going to be a little bit more structured. Typically, you'll use relational databases for things like user data objects, linking different tables together. For example, you can have a single user that has many videos, so you would have many video objects, and those can be stored in two different tables, and you can do SQL queries against those. NoSQL databases are really good for unstructured data, like log data, things like that. So, a little bit more free-form in nature, not as structured in the sense that you're going to be querying that data and doing a lot of joins to it. You're kind of just going to be more like free-form searching for key-values inside that data. So, yeah, in this case, a relational database can be a lot more strict, but it can also be more space and speed efficient for specific queries. So, yeah, I think that makes sense here. So, I think what we do is upload the video object to this database. Oh, sorry, rather, this would actually just be the video data, right? It would be the best way to describe this, the video table. So, this is going to send to the video table. The idea here is that this is just the data, because what we're then going to want to do is send the actual video object to some sort of cloud bucket, like I mentioned before, like S3. This would be like a blob store. The idea here is that the video itself actually lives here, and then in this table, we have a link to that. So, we're going to be running a POST to this API endpoint, this 'upload video' endpoint. This would be my video plus my user information. So, the 'upload video' accepts the video and the user information. We save it in the table, we upload it to blob storage, and then we're going to return some sort of 200 response, which is what the API would respond with to the app itself, saying that the video went through correctly. So, that kind of handles our upload section. It's pretty straightforward for the upload section. Are there any questions about that, or did you have anything I think I missed there?",
+      "follow_up": "No, I think that makes a lot of sense. We have the overview of where the video goes, where the metadata goes, and how the app would make that request. So, I think that makes sense. Cool, awesome."
+    },
+    {
+      "question": "So, when you open up the app, I think would we want to load this content right when the application opens? I'm guessing we want to start pre-loading as much as we can ahead of time so that the user isn't waiting too much for videos to load, right?",
+      "answer": "Yeah, I think we'd want to do that, insofar as it would let us view videos faster, but maybe not so much that it would use up user bandwidth and things like that.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Can you tell me a little bit more about how the cache would work?",
+      "answer": "Yeah, so I'm actually thinking about a service here in the background that would run. This would be a 'pre-cache service', and this would just kind of run on a schedule, but also maybe on demand, something like that. What it would do is it would compile playlists for users and pre-cache them. So, it could potentially be that we could base it on when the user actually goes and does the GET request, that we sort of preload it for the next one, or we just do it in the background. There are a couple of strategies we could use there. What I'm trying to get away from is relying too much, because from what I can tell, this system seems very read-heavy, right? There's going to be a lot of reading going on. So, in addition to having this main database, which I'll get to scaling, I think, in a bit, but for this main database, we're also going to want to have some sort of read worker, which would be like a read-only database. The reason being, we don't want to create too much load on this single database that's accepting these uploads. We want to have something that's managing the reads. In fact, I would actually do something like this where the secondary is pulling from the primary, and this is used for read-only, which builds the pre-cache, which loads the cache, which then when the 'view feed' gets hit, it loads it instantly, right? At least the query, right? So, does that make sense?",
+      "follow_up": "Yeah, that makes a lot of sense. I think getting back to one of the first questions about latency, can you talk a little bit about how introducing this cache would affect latency in the system and seeing updates and things like that?"
+    },
+    {
+      "question": "Yeah, that makes a lot of sense. I think getting back to one of the first questions about latency, can you talk a little bit about how introducing this cache would affect latency in the system and seeing updates and things like that?",
+      "answer": "Yeah, for sure. So, one thing we would need to consider is how quickly we want, like, I don't know if the video that I upload would show up in my feed. I don't think so. This feed is basically a curated list of videos. So, I think the point here is that because I know that TikTok has a special algorithm they use to populate your feed, I'm trying to get rid of all that happening at the moment of GET, at the moment of loading the app. I'm trying to have it pre-built, right? So that right away we're getting what we need from the back end and not having to wait for some sort of service to compile that on the fly. Plus, this also solves a little bit of our scaling issue, because if you can imagine TikTok has a million users, what if one million users all get on at the same time and run the same exact query? We could really kill our databases because we're running all these queries at the same time. We can also increase that latency. You can solve that with auto-scaling groups, but even auto-scaling groups take time to spin up. So, that's kind of the thing I'm thinking about here. But the real key here is I just noticed that this seems very read-heavy, so I was trying to get to the point where those reads were managed on their own.",
+      "follow_up": "NONE"
+    }
+  ]
+}

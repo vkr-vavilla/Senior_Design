@@ -1,0 +1,478 @@
+{
+  "video_id": "KM4J5XuXUzE",
+  "summary": "This transcript captures a technical interview for a mid-level frontend developer role with a focus on React and JavaScript. The interview covers a wide range of topics including JavaScript Event Loop, React concepts (Virtual DOM, Hooks, state management), comparison with Angular, TypeScript, clean code principles, design patterns, server-side rendering, performance optimization, code review processes, linting, testing, and SonarQube. It also includes soft skill questions on task delegation, onboarding, and team motivation. The session concludes with a practical coding task (pangram check) and a post-interview feedback discussion with the host, interviewer, and interviewee.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "UNKNOWN",
+      "text": "Hi everyone, my name is Chris Howard and I'm one of the Anywhere Club hosts here on the English-speaking channel. It's a real privilege to have you joining us for another interview series. Today, we're going to be talking all things JavaScript front end. For those of you that are new to the Anywhere Club, we're a global online community for IT professionals, helping with your career development, relocation, and even learning new languages. Today, we've got an amazing session lined up with both our interviewer and our interviewee on the topic of JavaScript front end. This is a mid-level role with five plus years experience, talking all things React and JavaScript. I'm really excited for what we've got lined up, and I think it's going to be an incredible session to get some hands-on insight into what a real-life interview scenario looks like. We'll be joined today by two speakers, Victor Soroka and Alexi Deis, and we'll be talking all things JS. So, without further ado, let's meet our candidates and our interviewer and find out more. Over to you."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Hi guys, happy to be here. I'm a frontend developer with over 9 years of experience. I started small as a junior software engineer here in EPAM during our pre-production program, so happy to be at EPAM, really. My primary focus is on frontend applications with React specifically, and I also act as a manager, as a resource manager, talent manager, and skill advisor, as you see. So, I think I will be capable of asking both technical and non-technical questions. Ready to start."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "Amazing, and it's great to have you join us, Victor. And of course, now over to our candidate, Alexi, to introduce himself."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Hello Anywhere Club, my name is Alexi, and I am a frontend engineer. I have experience for about 4 years, and I started my career here at EPAM as a junior software engineer. I'm very glad to be here as well. My primary stack of technology is JavaScript, React JS. Also, I worked a bit with cloud like AWS, and I know Java just a little bit."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "Thank you. So there we have it, we've met both our interviewer and our interviewee, and all we have to do now is kick off that interview. So I'm going to disappear from the background and hand over for an amazing interview session on our JavaScript front end as part of the Anywhere Interview Series. Over to you."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "How are you doing? How are you feeling?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I'm feeling great, thank you. Just a little bit nervous, you know, this common interview, it can be nervous actually."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, it's fine, but we're going to have just a discussion, so I think you're going to do great. I just want to introduce you to the position. It's going to be for a frontend developer role, for a JavaScript engineer, with a focus on React. What do you think about that?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, that sounds really great. Just before we start, can you tell us a bit about your experience overall?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, sure. So I started my career at EPAM as a junior software engineer. My primary stack was Angular in the very beginning. I used Angular JS on my first project, and then we did a kind of migration from Angular JS to a React application. After that, I primarily use React in my applications. Right now, I'm working on the project as a key developer. I'm working with React, I'm working with Azure cloud, and also we have just a little bit of Node."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, sounds great. And just a common question, but I really like to ask this one: What do you consider your most challenging task overall of your career?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "It depends. If we're talking about a technical challenge and task, for me that was the migration task from my first project when I worked as a junior software engineer. It was really complicated for me, and I struggled maybe several weeks doing that. Of course, I used some help from my team lead and from senior developers as well, and together we did it. I was performing a complex migration from the old version of Node to the new one, but it involved actually a lot of breaking changes, and a lot of application code was rewritten. But if we are talking about my challenging soft skills problem, that was my estimation mistake. It happened maybe four months ago. I was given a task, and the customer asked how many weeks or months I would do this task. I said, 'I'll do that in two weeks. Yeah, two weeks will be enough.' And the customer said, 'Yeah, that's great, so let's get started.' After one week had passed, I saw that there was a lot of work, and I wouldn't do that in one week, maybe three, four, five weeks. That was a really complex challenge for me to do everything right, and of course, I did that in more than two weeks. So that was one of my mistakes and one of my challenges. Right now, if I'm talking about estimations, I'm trying to overestimate something. So if a customer asks me how many days I will do this task, I will say five, but I know that I'm doing four, three."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, I got it. It's a really great lesson you learned. I mean, in terms of that, we shouldn't underestimate because customers can stick to that value and then use it against us, so we must be prepared. Overall, estimation is, of course, a really big topic. Okay, thank you for this answer. Let's start with our main questions. The first one is a technical one, but still very important: Can you tell us about the Event Loop in JavaScript? How it works, and what data structures are present there?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, sure. When we're talking about the Event Loop, it's actually just an endless loop where JavaScript waits for tasks, executes them, and then sleeps, waiting for more tasks. As we know, JavaScript is a single-threaded programming language, and it can be a problem to work with asynchronous code, so that's why the Event Loop concept was introduced. The general algorithm of the engine is very simple: while there's a task, we will execute it, and then the Event Loop will just sleep until a task appears. But one more thing is that there are several queues. The Event Loop has a microtask queue and a macrotask queue. The macrotask queue is actually like some tasks, some things that we do from the code, and microtasks queue consists of some promises, some `setTimeout` operations. One major moment here: the queue of the microtasks must be finished before we will do the next macrotasks."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, thank you for the answer. And with regard to this microtask queue, you mentioned promises are there. But what if we have an example where there is a promise, and there is a `then` callback there, and it creates a new promise? What will be executed first: the next promise or the first thing in the microtask queue?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So if I understand you correctly, we have a promise with `then`, right? And after that, we have another promise, right? Like I said, the entire microtask queue must be finished before we will go to the next macrotask. So this `then` will be executed only after completing the previous one."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, that's good with Event Loop. Let's proceed to our next question. Let's talk about React. Can you tell us about React and why it's really popular nowadays? Assuming your experience with Angular, maybe you can compare those two and explain why React is better, and in what aspects you think Angular is better."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, thank you for the question. React is just a library. It extends JavaScript functionality by introducing JSX syntax, so we can write JavaScript code, and inside the JavaScript code, we can write almost HTML code right in our components. That's an elegant and easy solution. React is a lightweight library, and it is easy to use. Angular is a more complex solution. Angular is a framework, and it introduces a Model-View-Controller model. That's why Angular can be a bit more complex than React. I think React is so popular nowadays because, like I said, it is a very easy solution that can be scalable and reusable, while Angular can have some learning curve problems."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And with regard to Angular, you know, in Angular we use TypeScript, and it's built-in. Can we do the same with React applications?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, we can work with TypeScript in React applications as well. It is not built-in like in Angular. In Angular, we can just write with TypeScript, but in React, we need to turn on this functionality to work with the TypeScript language. The default option will be JavaScript. And while we're on this TypeScript topic, can you just highlight the benefits of using it? Maybe we don't even need TypeScript. Do you know what was the solution to type React applications before TypeScript?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "I meant Prop Types in React. Using it, we were able to add typings to the props. But do you think it's not enough for React applications, and we still need TypeScript?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "That actually depends. Prop Types can help us to work with types, definitely, but there's a lot more functionality. For example, we can use intersections and union types, and as far as I know, in Prop Types, we cannot do that. Also, there's static typing, we can use classic classes, we can use classic inheritance. I think it has just more advantages than just Prop Types in JavaScript. Of course, it depends, maybe someone will choose Prop Types instead of TypeScript, but my solution will be using TypeScript."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, sounds good, I agree with you on that. Okay, with regard to React questions, let's proceed with the next topic. Do you know the concept of the Virtual DOM, and what benefit it gives for React apps?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, so as far as we know, the common web application uses just a DOM. DOM is like a Document Object Model that consists of several elements on the page, and it can be hard to update this DOM. When we're working on a website, it can slow the performance; it can be a really complex operation. That's why React introduces Virtual DOM. So it's just a lightweight copy of the real DOM, and when React wants to update something, it just monitors what was changed. It changes them like batches in the Virtual DOM and then creates an operation to update the real DOM. But that's how it was before. Right now, React uses Fiber, so it just works with a diff algorithm. It always monitors what was changed and creates a queue of operations, and after that, it runs this queue to update what was changed."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, good. Nice that you mentioned Fiber. It's the current mechanism of doing so; not many candidates know that. Okay, let's proceed with the next question, still about React. Can you tell us what Hooks you use, or do you know, do you use the most?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, so a Hook is like a function that can be used when we want to create a side effect or we want to memoize something. There are a lot of hooks that we can use: `useCallback`, `useMemo`, `useEffect`, of course, `useLayoutEffect`. Most of the time, I use `useEffect` or `useCallback` hooks. `useEffect` is a hook that can perform some side effects, for example, when something was changed or when the component was rendered. I can use the `useEffect` hook to do something like from the side. And `useCallback` can memoize the function for me, so if the function wasn't changed, React will not recalculate it. I will be able to use it, and it will decrease the performance of the application."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Got it. You know, it's a typical task in a frontend application to add some event listeners and then remove them. How would you do this with the help of the `useEffect` hook?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So, for example, when we want to use this event listener, we can use the `useEffect` hook to create it, right? And when something was changed, when we know that we don't need this event listener, we can use `useEffect` to unsubscribe from the event listener. So we will not have any performance issues, and we will be sure that we unsubscribed from the event listener exactly at the time when we need it."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "You mentioned that you used `useCallback`. Why do we even need this hook? For what needs do you use it?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So actually, React can memoize something, and it's important when we're working on complex solutions, like complex web applications, because memory is not unlimited, and we need to work with it somehow. When we have some complex operations, we should think about memoizing the result because when we, for example, update the page, if the component would be re-rendered, if something was changed, then this complex operation can be recalculated. It's not the best way to work with web applications because it can lead to a performance bottleneck. So for that, we can memoize some results of complex operations. We can ensure that if none of the parameters were changed, for example, then we can just reuse the previous result. For that, we can use `useMemo` hook or `useCallback` hook. The difference is that `useMemo` can memoize the value, for example, and `useCallback` can memoize the whole function when we want to use it."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Got it. Definitely. Can you tell us about ways to manage state in React applications? How can you do it? Maybe you have multiple approaches of doing it."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, sure. When we want to manage state in a React application, we can start using the `useState` hook. It actually creates an object with two parameters: the first one is just the state, and the second one is the function to set the state. We can use this state anywhere in the component, and when we change the state, then the component can be re-rendered. Also, it can be a problem because sometimes we need to have a lot of information in the state. So for that, we can use either objects, we can just use, for example, an object for the state, or we can use some state management solutions like Redux or MobX. React can also offer a built-in solution for that: Context, so we can store information using Context."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, definitely. Okay, let's proceed with our next topics outside React, and let's talk about the general concept of clean code. What is, in your opinion, clean code? You know, high-quality code, you name it."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "For me, clean code is code that is easy to maintain, easy to read, easy to understand, and of course, it is easy to change and easy to expand if we need it. For example, if we don't even need to write a comment for this code, and the code is great and clean, of course, it was just an example. But when we see the code and we can clearly understand it, clearly read it, and if you already know how to change it, that's clean code."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And what principles do you know that can help us with this?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So in my mind, I remember several of them. For example, DRY, it means 'Don't Repeat Yourself' principle. It says what it says, right? You just don't have to repeat yourself, you don't have to recreate something; if you create it once, you can reuse it. The second one is KISS. It was created in the US Army like 15 years ago or something, and it stands for 'Keep It Simple, Stupid.' So we don't have to over-engineer something. It is enough just to create something and to expand it; we don't need to over-engineer or complicate something. Also, I remember SOLID principles, I'm not sure whether I will..."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, let's not delve into it. It's great that you know it. So, great answer. Just to finish here, I wanted to ask you about different categories of software design patterns and overall, why do we need these patterns? What can they help us with?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So there are several types of patterns. We have creational patterns, structural patterns, and behavioral patterns. For example, creational patterns are designed to provide various object creation mechanisms where we can increase the reuse of existing code, for example, a Builder, Factory, or Singleton. Structural design patterns explain how to assemble objects into larger structures, for example, Adapter or Composite. And behavioral patterns are concerned with algorithms, and it assigns responsibilities between objects, for example, Iterator or State. Those are examples of behavioral design patterns."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Got it. But can you tell us why do we need these patterns? We can write code on our own, you know. Maybe you can explain."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, so design patterns are typical solutions to commonly occurring problems. For example, when we encounter a problem, I think that 99% of the time, we are not the first who encountered the problem, and before that, someone created the best solution for that, and we can just reuse it. It's like an analogy to a cooking recipe. For example, if you want to create a pie, I think you wouldn't create a pie just from the things that you had. I think you would just look on the internet to find the recipe of the pie and recreate it. So the same here, if you encounter a problem, you can just use a pattern to have the best solution for that."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Nice analogy, this recipe. We will use it in future interviews. Okay, let's proceed with the next question. It's going to be a question about Server-Side Rendering. As you see right now with React, there are popular frameworks like Next.js, like Gatsby. I just wanted to ask you why internet web development is moving towards these frameworks more, rather than using traditional single-page applications."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so let me explain what Server-Side Rendering is first of all. That's a mechanism that allows us to get the site content that was rendered on the web server rather than a browser. So the server will prepare an HTML document and will just send me the file, and that's all. Why is that important? First of all, that's important because a lot of people are now using mobile phones, maybe everyone is using mobile phones and mobile applications, and the performance of these mobile applications is, of course, less than the performance of a regular web browser. So it can be great if our mobile phones will not render everything complex that the computer must do, and it will just get the whole information from the web server. And of course, it would be faster. It would be ideal for some static websites, for example, because if you render the page, it won't be re-rendered again and again; it will just get the whole HTML from the server, and that's all, that would be enough. So that's why I think that's a great solution. Also, if we're talking about SEO optimizations, it will be more SEO optimized because it is already on the web server."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, definitely. Okay, let's go with our next question. It's going to be about performance. So imagine you have an application that runs slowly for whatever reason. What would be your steps to identify what can be wrong?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So first of all, I will try to see some metrics to see what exactly can be wrong. For example, maybe it's response time, maybe it's just slow, or maybe it will use a lot of system resources. So I will see some metrics. There are a lot of metrics that can be used here, like error rates, for example. Then I will perform load testing. There are lots of applications that can help me, for example, Lighthouse or, I don't remember how it's called, like something with Google, the Google instrument as well, we can use it. So we can test our application according to Lighthouse, for example, to see what can be wrong. Maybe there is a function that recalculates every time, and that's why my application is slow. Or I remember from my practice, I encountered a situation when my really complex function was re-rendered each time; I just forgot to use `useCallback`. I just forgot to use it, and it was re-rendered like one time per second, and my application was really slow. So it can be a problem as well. So I will conduct some stress testing, scalability testing; I will see what exactly can be wrong."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, definitely, and a nice example of `useCallback` because sometimes we see that React even recommends us to omit using these callbacks if the application works okay, like don't prematurely optimize things. And in your case, it's definitely the case that you needed it. Okay, let's proceed with the next question. With regard to performance, by the way, what ways overall do you know, just from the top of your head, for optimizations of React applications? The common practices that we can use both on the frontend and on the backend that you can name to optimize a React application, right?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "First of all, we should avoid re-renders, as many as we can, because re-renders without reason are bad re-renders. So we need to see that we memoize complex functions. We need to make sure that everything works purely, without unexpected side effects. That's the thing that comes to mind from the top of my head."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, good. Let's proceed with the next question. About the code review process: How would you organize it?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so the code review process is a process where someone reviews the code of another. It's actually a risky thing because there can be conflicts. For example, someone can say, 'My code is right, and your code is not.' We need to make sure that the whole process is ready and healthy. So, for doing that, I will introduce some discussions. For example, if someone creates a pull request, we can discuss what was changed, and I can even introduce pair checking of this pull request because when just one person reads this code, and if one person is responsible for merging, I think that can lead to conflicts. So, for that purpose, for example, I can introduce these discussions so a whole team can check this pull request, write some comments, and then, according to the comments, the person that created the pull request will either fix them or merge it."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, got it. Nice technique. And overall, during the code review, what systems do you usually check? What is the best practice for you? Because you can see a lot of lines of code, and we still need to understand how to make it better. What would you check?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "It depends from time to time, but I think it would be great if you have a checklist of what must be checked. First of all, you check whether the code works, then you check some edge cases, then you check some syntax, linter features, then you check the optimization, the performance. And if something works properly, then it's right. So if the code is clean for you, then that's great, and you can approve it. But like I said, that works for most cases because there are examples, for example, when a customer really needs the functionality, and it must be just delivered right away. For that purpose, I can approve a pull request even if it's not the best code, but then I will create some technical debt items, and I will turn to them as fast as possible."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, definitely, we don't need to forget about these additional follow-up tech debt stories. And this is a nice technique. In this case, you mentioned linting. How can it help us in our day-to-day life? And also, do you think it's similar to testing, the concept of lint versus test?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So that's actually different things. A linter is a thing that can check just your syntax rules. For example, you can set your linter for you, and for example, your code for you will be right, but for another person, this linter will give an error. So the linter just follows some code standards, and that's all. It will show you some potential problems, of course, but it cannot replace testing. Of course, if we're talking about testing, you must write unit tests for your functions. For example, if you created a function, first of all, you should check your function using a linter just to see that it was written properly according to the code standard that you use on a project. And after that, if you make sure that everything is fine by the syntax, you must check this logic of the function because the code might be fine, but the function can return you a wrong value just because the logic is incorrect. And after that, you can use unit tests to make sure that everything works properly."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Mm, yeah, definitely. By the way, do you have experience writing unit tests for React applications?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, for most of the time, I used Jest for writing unit tests. And what code coverage do you have on your project?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So on my project, we have more than 70% of coverage. I think it is good. It is not the best coverage that we can have, but we don't need to have 100% coverage. But I think that's a good number for us. Usually, I think if you have more than 70% of coverage, then that is already good."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "I just want to understand if the customer has a notion about this code coverage, and pays attention to it."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, the customer knows about this number, and we're going to increase the coverage after we write more functionality, of course."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, I just wanted to understand if you know about SonarQube and what benefits it may also bring to us during the CI/CD process."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, so SonarQube is like a platform that can analyze the quality of the code. It's not like testing. You can just use SonarQube to see where you have potential code smells or potential performance problems that can be fixed in the moment. So that's why it's a great way to use SonarQube. It can be integrated with the CI/CD process, like you said. When we push the code to GitHub, for example, Sonar can just monitor this code to see its performance or code smells, and then it will tell you what can be fixed."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, I think we are done with technical questions. Now I just have a couple of soft skill questions, but still important questions, and I just want to discuss them with you as well. So, imagine you're acting as a frontend lead or team lead in your team, and you now have responsibilities to delegate tasks. How would you choose the person for the task and the task that you want to delegate to this person?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "We are talking about delegation, right, not assignment? Because delegation is the process when we also delegate the responsibility for this task. So, for example, if I need to pick a good person for the task, like the right person, because the main difference between delegation and assignment is about responsibility. An assignment is like, 'Here is the task, here are the conditions, so you must do this task in two days.' So that's an assignment. But delegation is, 'I want to have this and this, and you will have unlimited time. I trust you, so please help me do that. You can do this part of my tasks; I can delegate it to you.' So that's a delegation. And if we're talking about, for example, React applications, if we're talking about programming here, we can delegate some big sphere of something. For example, the person can work with their own tasks, the person can work with their own functionality, and we don't even need to track them or assign them. I think that's delegation."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay. And what would be your steps in order to introduce the task to the person and overall just to track the progress to make sure that the task you delegated is done correctly?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I can have some meetings with this person. I can just talk with this person to see that everything goes fine, but it won't be like boss and employee relationships. It would be like just employee with employee relationships. So we will have common rights, and we can just talk about the tasks to see that they work properly."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And what would you not delegate? What tasks would you leave for yourself?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "That actually depends on the project, right? Because I think that most of the tasks can be delegated. I think I won't delegate some tasks that are connected exactly with my part of the work, exactly with something that the customer asked me to do or was delegated to me. Then I will do that by myself."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, let's proceed with the next question about onboarding. Imagine you again act as a frontend lead, and you have a new member in your team. How would you organize the onboarding for this person?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So first of all, I will introduce the team, and I will make sure that this person feels comfortable because it is always not just about technical things. We must remember that it is always uncomfortable to meet a lot of new people and a lot of new solutions that can be hard. First of all, I will make sure that this person feels properly. So I will introduce the team, I will introduce some ceremonies, I will introduce the process like how we work. And after that, I will introduce what we do, I will introduce the solutions that we use, I will introduce the things that we do. And it can be not just a one-to-one meeting; it can be meetings with a whole team just to make sure that the person understands that everything that goes here is well-designed and mentally safe."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Definitely. And what would you choose as a first task for this person?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So as a first task for this person, I will choose something easy, not just because I don't trust this person or I don't know their skills. I will choose something easy just to warm up this person. So this person will see how everything works, and just inside their head, this person will know how they can work here. So it would be an easy task, for example, fix some styles or fix any bug or something. But like I said, it will be only the first task or maybe the second one, because after that, of course, we need to enroll this person into the core functionality."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Let's proceed with the next question about motivation. What approaches would you use in order to motivate your team, just to track that they still have motivation to work on this project? Because we know the common problem of developers in IT is that developers tend to burn out, and it's also one of the responsibilities of frontend leads and team leads to make sure their team is not in that state."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, that actually can be a real problem because I have encountered a burnout condition myself. Now everything is fine. As a team leader, of course, I will try to do everything I can to prevent this burnout for my employees. So the first one is to work properly according to the Sprints and according to the Scrum metrics. I mean that means that we don't have to do more than we expect. If we talk with a customer that this amount of the task will be enough, then it would be enough. Of course, there are some exceptions, for example, the release is burning or something was broken, of course, that happens. But for the most part of our work, I will do my best so my employees will work only the time they need to work, and that's all. So after 6 o'clock, it's their time, they must rest, and that's all. After that, I will introduce team buildings. There are a lot of places where we can go as a team. We can grab some pizza, we can drink something, and it would be a great solution for everyone just to know each other more closely and to trust each other more closely. I think it is very important as a part of the job as well. And the third thing, I will not limit my employees to work on something. For example, if the person wants to work with AWS Cloud, I will say, 'Yeah, that's great, so let's see what you know about AWS, and we can select an appropriate task for you.' Because if a person wants to work with clouds and it is not allowed to work with clouds in a project, that can decrease the motivation of this person. So I won't limit my employees on that."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Definitely, and a really nice idea with team buildings. We work not only with development; we want to know not only how good our team is in terms of development, but we want to know the people. So it's important."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, Alexi, thank you for your questions with regard to technical and soft skills. I think I'm done with the questions, and now we have the last piece, the practical task. Let's proceed with this. For this task, we need an online editor, CodeSandbox. Can you please open it?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, it is right here."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, great. And the task, I'm just going to read it to you. Your task is to figure out if a sentence is a pangram. A pangram, you can understand, is that it's going to use every letter of the alphabet at least once. It should be case-insensitive. And for this particular task, you need to use the sentence that contains all 26 letters of the English alphabet once. So..."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so as far as I understood, I will write a function that will check whether a sentence is a pangram. A sentence is a pangram if it consists of every single letter of the English alphabet, right? So it must consist of each letter in the alphabet at least once, right?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, and just an additional ask for you: during the implementation, please explain us step by step what you are doing, what are your thoughts, you know, so it will be..."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, sure. So I will create a function here that will check whether a sentence is a pangram. I will create a string with the alphabet, and then I will create a Set collection. I will check whether a letter is included in the string of the alphabet, and if it does, then I will add this to the Set. If I use this way, I will not count special characters, numbers, all of that. I will count only letters in lowercase. And Set is a collection that consists of unique elements. That's why in the end, the size of the Set must be equal to 26, and if it does, then it is a pangram, and if it's not, then it is not a pangram."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Sounds good. Just make sure to use the string that I sent you in the chat as input to your function."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, let me get started here. So here is a test string, I will name it like 'input' or just 'input'. All right. So for now, I will create a string that consists of the alphabet. So I will create the string `alphabet` equals, and it will be just 'abcdefghijklmnopqrstuvwxyz'. Yeah, seems to be right. And now I will create the function that will check whether the sentence is a pangram. So `isPangram`, I will receive an input as a string, and here I will check whether it's a pangram. So first of all, I will create a Set. So `const uniqueLetters = new Set()`. So I created a Set here. And now, I will have a loop that will go through the whole input. For example, I can use a `forEach` loop, for example, but no, that's a string. I will use just a usual `for` loop here. So `for (let i = 0; i < this.string.length; i++)`. I will check whether a letter is inside the alphabet. So `alphabet.includes(input[i])`. No, vice versa. `alphabet.includes(input[i].toLowerCase())` of course, because we must think about case insensitivity. So `toLowerCase()`. If it includes, then we can add it to the Set. So it would be `letters.add(input[i].toLowerCase())`. As I used `toLowerCase()` twice, I can create just a new variable here, for example, `const letter = input[i].toLowerCase()`. So I will save it in a separate variable, and then I will check it here on line 13 and here on line 14 as well. So before I will return something, I will just write the Set to the console to see what is inside. So I will write `console.log(uniqueLetters)`. And now let me call this function `isPangram`, and input would be as here. So we can see that we have 25 letters here, not 20... oh, 26, yes, because we will start from zero, obviously. So it seems to be that it works. So let me do, instead of `console.log`, I will return `uniqueLetters.size === 26` because 26, that's the length of the whole alphabet. And here I will try it with my input string. So if `isPangram`, I will provide this input as a test. So it must give me `true`, and it does, we have `true`. And now let me recheck it with a wrong input. For example, `isPangram`, and I will provide something like this, for example, 'this is not a pangram', and it must give me `false`, and it does. Good."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So, how is it? Yeah, it's good. I just want to say that, Alexi, I see that the argument name is the same as your input variable on line three, which might lead to potential errors. How can you solve this, and what type of error do you think it might be?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Oh, I see, I see. I'm using the parameter name the same as a test name here, and that's why even if I rename it to just 'sentence', for example, it still will work because now I'm using the outer input from here. That's the issue I see now. So for that, I can use a `var` variable, for example, or I can just rename my parameter to 'sentence' like I put here. I think the best approach will be just to use another name so we can avoid these shadowing namings. The fix will be here, and now we have the same functionality, but we won't have any problems with it here."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, Alexi, imagine that your solution works okay. I see that you already provided us the proof. But imagine that your input contains like a million characters, but the first 26 of these characters are at the beginning. Can you improve the algorithm so we won't process the whole string, but we only process these first 26 or whatever characters in order to understand that we already have the solution?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, I think I got you. So you're talking about the case when we have more than 1,000 letters in the test string, but the first 26 will be the alphabet, or the first 100, and we just don't need to proceed with others. So for that case, I can just test it inside a loop. I can write a condition that, for example, if `uniqueLetters.size` would be already 26, then I can just return `true`, and that's all."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, something like this. That's right. But do you think it's better to do it at the end of the current iteration or at the beginning?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I think that would be... actually, yeah, let me copy that. I think that we should do this check after the end of the thing because obviously, in the beginning of this `for` loop, we will definitely need to first of all add it and then check, because it would be one more operation that is not necessary."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, great. So I think we are done with the coding task and with the whole interview. Thank you, Alexi, for your answers. Thank you, Victor, for your questions. That was great."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "So there we have it, thanks very much to both Victor and Alexi for what was an incredibly engaging interview. I hope you found it as interesting and useful as I did listening in there. What's great now is we're going to take about two to three minutes with both our interviewer and our interviewee to get a little bit of feedback on how that process went, understand perhaps some of the areas that were challenging, and also get a general feel for how the flow of the interview went. So first, let's speak to our interviewee, Alexi, and get a little bit more detail on that session. Alexi, how did you think that went? What was your general feeling of the overall process?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Thank you, Chris, for the question. So the whole interview was very light and easy to follow. I wasn't even nervous; I was nervous just a little bit in the beginning, you know. But after the first question was asked, I was like, 'Oh yeah, everything is fine, everything is great, do not be nervous.' So everything was really, really, really great. I liked it a lot, and thank you so much for this interview. Thank you."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "Amazing. Yeah, and I think it's normal for most people to get nervous during an interview. But I can tell, certainly having listened in, that it was perfectly streamlined, good responses to all the questions. Was there anything at all that maybe caught you off guard or a challenge, or you were genuinely kind of on point with how you were responding?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Actually, I wasn't expecting some unexpected questions here. Everything was even not very easy, but everything was easy to answer. I was prepared for that, and that's why the whole flow was great for me as well."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "Well, thank you so much for being a part of this. And a little insider information for our listeners: although I mentioned at the beginning this was a five-plus years experience role, Alexi is just coming up to that five years, so about four years. And I know that all of us listening, and myself included, are very impressed with your responses. So if that isn't motivating for perhaps some of our Anywhere Club listeners, I'm not too sure what is. But thank you so much for your kind of elegant, succinct responses to those questions. It was really appreciated. Thank you."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "And now we move over to Victor, our interviewer, to tell us a little bit more. So, Victor, it would be great to get your overall impressions of the interview, and then I'll ask you a few more kind of deep-dive questions."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, definitely. I think the interview went very smoothly. It's really obvious that Alexi was greatly prepared, and each question that I asked, he answered really sharp. So it's really nice to conduct sessions for such prepared candidates because, you know, it can be otherwise. And yeah, usually, like Alexi mentioned, I try to start with some warm-up questions just to make sure the candidate is feeling comfortable, and then proceed straight to the agenda with all the questions that I prepared. So overall, I think everything went really great."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "Amazing, and I think I agree with you. Was there anything in there that really impressed you throughout the whole interview? Something that really jumped out, and you thought, 'Wow, that was a great response'?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, about React, as I said, it was that Alexi mentioned Fiber architecture. It's a really advanced topic, and I think it's great that Alexi knows about it. Also, his knowledge about Hooks and clean code, and his vision about how to organize the code review process, it's a really important topic. I really liked his questions about soft skills topics, specifically about motivation. It's a really important point, and I really liked that Alexi talked from his experience during the questions. So I value this during the interview that I conduct myself, and I, as an interviewer, also like to talk from my experience. I think this is the most valuable thing in any interview."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "Definitely. And it wouldn't be an interview without me asking for perhaps one development point or something that perhaps you'd like to have heard a little bit more about. Was there anything at all in the interview that you thought Alexi could perhaps angle a little bit differently or perhaps give a little bit more detail on, perhaps as a development area?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, maybe it would be great to hear more about server-side techniques, about these frameworks like Next.js. It's not only about server-side rendering, but actually, these frameworks contain a lot of solutions. Like Alexi mentioned about Angular, it's a really complex solution that already has a lot of built-in features that a project can benefit from. And yeah, it's currently a really important vector for frontend applications. But overall, you know, the answer was good enough, but this is just a recommendation which I would recommend Alexi to delve into."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "Absolutely. Well, thank you also to yourself, Victor, for your expert interviewing skills there. It's been a real privilege to have you join us as part of this interview series."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Happy to be here. Thank you for the invitation, and it was really great."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "No problem. So there we have it, another Anywhere Club series completed. It's been a real privilege to have you join us. Now, what would be my top tip to take away from this? I think we heard from our interviewee around unexpected questions, and I'm sure you realized as well that Alexi wasn't tripped up on that. But I think always going to an interview expecting the worst necessarily is not my advice, but expecting the unexpected. And I think sometimes some questions can trip you up. Our interviewee demonstrated perfectly this is not about perhaps trying to bend the truth or try and get away with something that you don't necessarily know. Instead, just give an honest response to those questions. If something isn't for you, or perhaps you have an area that you're challenged upon, then just call that out. And I think between the two of you, you can have a conversation and really get to the crux of what you're trying to discuss. So that's my tip for today. In my final few words, I would say, of course, if you haven't engaged with the Anywhere Club online, then please do check us out on our social media platforms and engage with us on Discord, a very active online community. As a reminder, the Anywhere Club is a global community for IT professionals to learn new languages, help with relocation, and of course, develop their IT skills, programming languages, and other competencies with like-minded individuals from all over the world. If you've liked what you've watched today, then be sure to like, comment, and subscribe, and I will see you very, very soon for the next video in our Anywhere Club interview series. I've been Chris Howard, it's been a real privilege to have you join us, and I will see you very, very soon."
+    }
+  ],
+  "training_pairs": [
+    {
+      "question": "What do you consider your most challenging task overall of your career?",
+      "answer": "It depends. If we're talking about a technical challenge and task, for me that was the migration task from my first project when I worked as a junior software engineer. It was really complicated for me, and I struggled maybe several weeks doing that. Of course, I used some help from my team lead and from senior developers as well, and together we did it. I was performing a complex migration from the old version of Node to the new one, but it involved actually a lot of breaking changes, and a lot of application code was rewritten. But if we are talking about my challenging soft skills problem, that was my estimation mistake. It happened maybe four months ago. I was given a task, and the customer asked how many weeks or months I would do this task. I said, 'I'll do that in two weeks. Yeah, two weeks will be enough.' And the customer said, 'Yeah, that's great, so let's get started.' After one week had passed, I saw that there was a lot of work, and I wouldn't do that in one week, maybe three, four, five weeks. That was a really complex challenge for me to do everything right, and of course, I did that in more than two weeks. So that was one of my mistakes and one of my challenges. Right now, if I'm talking about estimations, I'm trying to overestimate something. So if a customer asks me how many days I will do this task, I will say five, but I know that I'm doing four, three.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Can you tell us about the Event Loop in JavaScript? How it works, and what data structures are present there?",
+      "answer": "Yes, sure. When we're talking about the Event Loop, it's actually just an endless loop where JavaScript waits for tasks, executes them, and then sleeps, waiting for more tasks. As we know, JavaScript is a single-threaded programming language, and it can be a problem to work with asynchronous code, so that's why the Event Loop concept was introduced. The general algorithm of the engine is very simple: while there's a task, we will execute it, and then the Event Loop will just sleep until a task appears. But one more thing is that there are several queues. The Event Loop has a microtask queue and a macrotask queue. The macrotask queue is actually like some tasks, some things that we do from the code, and microtasks queue consists of some promises, some `setTimeout` operations. One major moment here: the queue of the microtasks must be finished before we will do the next macrotasks.",
+      "follow_up": "What if we have an example where there is a promise, and there is a `then` callback there, and it creates a new promise? What will be executed first: the next promise or the first thing in the microtask queue?"
+    },
+    {
+      "question": "Can you tell us about React and why it's really popular nowadays? Assuming your experience with Angular, maybe you can compare those two and explain why React is better, and in what aspects you think Angular is better. Also, in Angular we use TypeScript, and it's built-in. Can we do the same with React applications, and do you think Prop Types are enough for React applications, or do we still need TypeScript?",
+      "answer": "Okay, thank you for the question. React is just a library. It extends JavaScript functionality by introducing JSX syntax, so we can write JavaScript code, and inside the JavaScript code, we can write almost HTML code right in our components. That's an elegant and easy solution. React is a lightweight library, and it is easy to use. Angular is a more complex solution. Angular is a framework, and it introduces a Model-View-Controller model. That's why Angular can be a bit more complex than React. I think React is so popular nowadays because, like I said, it is a very easy solution that can be scalable and reusable, while Angular can have some learning curve problems. Yes, we can work with TypeScript in React applications as well. It is not built-in like in Angular. In Angular, we can just write with TypeScript, but in React, we need to turn on this functionality to work with the TypeScript language. The default option will be JavaScript. That actually depends. Prop Types can help us to work with types, definitely, but there's a lot more functionality. For example, we can use intersections and union types, and as far as I know, in Prop Types, we cannot do that. Also, there's static typing, we can use classic classes, we can use classic inheritance. I think it has just more advantages than just Prop Types in JavaScript. Of course, it depends, maybe someone will choose Prop Types instead of TypeScript, but my solution will be using TypeScript.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Do you know the concept of the Virtual DOM, and what benefit it gives for React apps?",
+      "answer": "Yes, so as far as we know, the common web application uses just a DOM. DOM is like a Document Object Model that consists of several elements on the page, and it can be hard to update this DOM. When we're working on a website, it can slow the performance; it can be a really complex operation. That's why React introduces Virtual DOM. So it's just a lightweight copy of the real DOM, and when React wants to update something, it just monitors what was changed. It changes them like batches in the Virtual DOM and then creates an operation to update the real DOM. But that's how it was before. Right now, React uses Fiber, so it just works with a diff algorithm. It always monitors what was changed and creates a queue of operations, and after that, it runs this queue to update what was changed.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Can you tell us what Hooks you use, or do you know, do you use the most? How would you use `useEffect` to add and remove event listeners? And why do we need `useCallback`?",
+      "answer": "Yes, so a Hook is like a function that can be used when we want to create a side effect or we want to memoize something. There are a lot of hooks that we can use: `useCallback`, `useMemo`, `useEffect`, of course, `useLayoutEffect`. Most of the time, I use `useEffect` or `useCallback` hooks. `useEffect` is a hook that can perform some side effects, for example, when something was changed or when the component was rendered. I can use the `useEffect` hook to do something like from the side. So, for example, when we want to use this event listener, we can use the `useEffect` hook to create it, right? And when something was changed, when we know that we don't need this event listener, we can use `useEffect` to unsubscribe from the event listener. So we will not have any performance issues, and we will be sure that we unsubscribed from the event listener exactly at the time when we need it. And `useCallback` can memoize the function for me, so if the function wasn't changed, React will not recalculate it. I will be able to use it, and it will decrease the performance of the application. React can memoize something, and it's important when we're working on complex solutions, like complex web applications, because memory is not unlimited, and we need to work with it somehow. When we have some complex operations, we should think about memoizing the result because when we, for example, update the page, if the component would be re-rendered, if something was changed, then this complex operation can be recalculated. It's not the best way to work with web applications because it can lead to a performance bottleneck. So for that, we can memoize some results of complex operations. We can ensure that if none of the parameters were changed, for example, then we can just reuse the previous result. For that, we can use `useMemo` hook or `useCallback` hook. The difference is that `useMemo` can memoize the value, for example, and `useCallback` can memoize the whole function when we want to use it.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Can you tell us about ways to manage state in React applications? How can you do it? Maybe you have multiple approaches of doing it.",
+      "answer": "Yes, sure. When we want to manage state in a React application, we can start using the `useState` hook. It actually creates an object with two parameters: the first one is just the state, and the second one is the function to set the state. We can use this state anywhere in the component, and when we change the state, then the component can be re-rendered. Also, it can be a problem because sometimes we need to have a lot of information in the state. So for that, we can use either objects, we can just use, for example, an object for the state, or we can use some state management solutions like Redux or MobX. React can also offer a built-in solution for that: Context, so we can store information using Context.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "What is, in your opinion, clean code? What principles do you know that can help us with this? And what are the different categories of software design patterns, and overall, why do we need these patterns?",
+      "answer": "For me, clean code is code that is easy to maintain, easy to read, easy to understand, and of course, it is easy to change and easy to expand if we need it. For example, if we don't even need to write a comment for this code, and the code is great and clean, of course, it was just an example. But when we see the code and we can clearly understand it, clearly read it, and if you already know how to change it, that's clean code. So in my mind, I remember several of them. For example, DRY, it means 'Don't Repeat Yourself' principle. It says what it says, right? You just don't have to repeat yourself, you don't have to recreate something; if you create it once, you can reuse it. The second one is KISS. It was created in the US Army like 15 years ago or something, and it stands for 'Keep It Simple, Stupid.' So we don't have to over-engineer something. It is enough just to create something and to expand it; we don't need to over-engineer or complicate something. Also, I remember SOLID principles. So there are several types of patterns. We have creational patterns, structural patterns, and behavioral patterns. For example, creational patterns are designed to provide various object creation mechanisms where we can increase the reuse of existing code, for example, a Builder, Factory, or Singleton. Structural design patterns explain how to assemble objects into larger structures, for example, Adapter or Composite. And behavioral patterns are concerned with algorithms, and it assigns responsibilities between objects, for example, Iterator or State. Those are examples of behavioral design patterns. Design patterns are typical solutions to commonly occurring problems. For example, when we encounter a problem, I think that 99% of the time, we are not the first who encountered the problem, and before that, someone created the best solution for that, and we can just reuse it. It's like an analogy to a cooking recipe. For example, if you want to create a pie, I think you wouldn't create a pie just from the things that you had. I think you would just look on the internet to find the recipe of the pie and recreate it. So the same here, if you encounter a problem, you can just use a pattern to have the best solution for that.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Why is internet web development moving towards frameworks like Next.js and Gatsby, rather than using traditional single-page applications?",
+      "answer": "Okay, so let me explain what Server-Side Rendering is first of all. That's a mechanism that allows us to get the site content that was rendered on the web server rather than a browser. So the server will prepare an HTML document and will just send me the file, and that's all. Why is that important? First of all, that's important because a lot of people are now using mobile phones, maybe everyone is using mobile phones and mobile applications, and the performance of these mobile applications is, of course, less than the performance of a regular web browser. So it can be great if our mobile phones will not render everything complex that the computer must do, and it will just get the whole information from the web server. And of course, it would be faster. It would be ideal for some static websites, for example, because if you render the page, it won't be re-rendered again and again; it will just get the whole HTML from the server, and that's all, that would be enough. So that's why I think that's a great solution. Also, if we're talking about SEO optimizations, it will be more SEO optimized because it is already on the web server.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Imagine you have an application that runs slowly for whatever reason. What would be your steps to identify what can be wrong? And what ways overall do you know for optimizations of React applications?",
+      "answer": "So first of all, I will try to see some metrics to see what exactly can be wrong. For example, maybe it's response time, maybe it's just slow, or maybe it will use a lot of system resources. So I will see some metrics. There are a lot of metrics that can be used here, like error rates, for example. Then I will perform load testing. There are lots of applications that can help me, for example, Lighthouse or, I don't remember how it's called, like something with Google, the Google instrument as well, we can use it. So we can test our application according to Lighthouse, for example, to see what can be wrong. Maybe there is a function that recalculates every time, and that's why my application is slow. Or I remember from my practice, I encountered a situation when my really complex function was re-rendered each time; I just forgot to use `useCallback`. I just forgot to use it, and it was re-rendered like one time per second, and my application was really slow. So it can be a problem as well. So I will conduct some stress testing, scalability testing; I will see what exactly can be wrong. First of all, we should avoid re-renders, as many as we can, because re-renders without reason are bad re-renders. So we need to see that we memoize complex functions. We need to make sure that everything works purely, without unexpected side effects. That's the thing that comes to mind from the top of my head.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "How would you organize the code review process? What systems do you usually check, and what is the best practice for you? Also, how can linting help us in our day-to-day life, and do you think it's similar to testing? Do you have experience writing unit tests for React applications, what code coverage do you have on your project, and does the customer pay attention to it? Do you know about SonarQube and what benefits it may also bring to us during the CI/CD process?",
+      "answer": "Okay, so the code review process is a process where someone reviews the code of another. It's actually a risky thing because there can be conflicts. For example, someone can say, 'My code is right, and your code is not.' We need to make sure that the whole process is ready and healthy. So, for doing that, I will introduce some discussions. For example, if someone creates a pull request, we can discuss what was changed, and I can even introduce pair checking of this pull request because when just one person reads this code, and if one person is responsible for merging, I think that can lead to conflicts. So, for that purpose, for example, I can introduce these discussions so a whole team can check this pull request, write some comments, and then, according to the comments, the person that created the pull request will either fix them or merge it. It depends from time to time, but I think it would be great if you have a checklist of what must be checked. First of all, you check whether the code works, then you check some edge cases, then you check some syntax, linter features, then you check the optimization, the performance. And if something works properly, then it's right. So if the code is clean for you, then that's great, and you can approve it. But like I said, that works for most cases because there are examples, for example, when a customer really needs the functionality, and it must be just delivered right away. For that purpose, I can approve a pull request even if it's not the best code, but then I will create some technical debt items, and I will turn to them as fast as possible. So that's actually different things. A linter is a thing that can check just your syntax rules. For example, you can set your linter for you, and for example, your code for you will be right, but for another person, this linter will give an error. So the linter just follows some code standards, and that's all. It will show you some potential problems, of course, but it cannot replace testing. Of course, if we're talking about testing, you must write unit tests for your functions. For example, if you created a function, first of all, you should check your function using a linter just to see that it was written properly according to the code standard that you use on a project. And after that, if you make sure that everything is fine by the syntax, you must check this logic of the function because the code might be fine, but the function can return you a wrong value just because the logic is incorrect. And after that, you can use unit tests to make sure that everything works properly. Yes, for most of the time, I used Jest for writing unit tests. So on my project, we have more than 70% of coverage. I think it is good. It is not the best coverage that we can have, but we don't need to have 100% coverage. But I think that's a good number for us. Usually, I think if you have more than 70% of coverage, then that is already good. Yes, the customer knows about this number, and we're going to increase the coverage after we write more functionality, of course. Yes, so SonarQube is like a platform that can analyze the quality of the code. It's not like testing. You can just use SonarQube to see where you have potential code smells or potential performance problems that can be fixed in the moment. So that's why it's a great way to use SonarQube. It can be integrated with the CI/CD process, like you said. When we push the code to GitHub, for example, Sonar can just monitor this code to see its performance or code smells, and then it will tell you what can be fixed.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "Imagine you're acting as a frontend lead or team lead in your team, and you now have responsibilities to delegate tasks. How would you choose the person for the task and the task that you want to delegate to this person? What would be your steps to introduce and track the task, and what tasks would you not delegate? Also, how would you organize the onboarding for a new team member, and what would you choose as a first task for this person?",
+      "answer": "We are talking about delegation, right, not assignment? Because delegation is the process when we also delegate the responsibility for this task. So, for example, if I need to pick a good person for the task, like the right person, because the main difference between delegation and assignment is about responsibility. An assignment is like, 'Here is the task, here are the conditions, so you must do this task in two days.' So that's an assignment. But delegation is, 'I want to have this and this, and you will have unlimited time. I trust you, so please help me do that. You can do this part of my tasks; I can delegate it to you.' So that's a delegation. And if we're talking about, for example, React applications, if we're talking about programming here, we can delegate some big sphere of something. For example, the person can work with their own tasks, the person can work with their own functionality, and we don't even need to track them or assign them. I think that's delegation. I can have some meetings with this person. I can just talk with this person to see that everything goes fine, but it won't be like boss and employee relationships. It would be like just employee with employee relationships. So we will have common rights, and we can just talk about the tasks to see that they work properly. That actually depends on the project, right? Because I think that most of the tasks can be delegated. I think I won't delegate some tasks that are connected exactly with my part of the work, exactly with something that the customer asked me to do or was delegated to me. Then I will do that by myself. So first of all, I will introduce the team, and I will make sure that this person feels comfortable because it is always not just about technical things. We must remember that it is always uncomfortable to meet a lot of new people and a lot of new solutions that can be hard. First of all, I will make sure that this person feels properly. So I will introduce the team, I will introduce some ceremonies, I will introduce the process like how we work. And after that, I will introduce what we do, I will introduce the solutions that we use, I will introduce the things that we do. And it can be not just a one-to-one meeting; it can be meetings with a whole team just to make sure that the person understands that everything that goes here is well-designed and mentally safe. So as a first task for this person, I will choose something easy, not just because I don't trust this person or I don't know their skills. I will choose something easy just to warm up this person. So this person will see how everything works, and just inside their head, this person will know how they can work here. So it would be an easy task, for example, fix some styles or fix any bug or something. But like I said, it will be only the first task or maybe the second one, because after that, of course, we need to enroll this person into the core functionality.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "What approaches would you use in order to motivate your team, just to track that they still have motivation to work on this project? Because we know the common problem of developers in IT is that developers tend to burn out, and it's also one of the responsibilities of frontend leads and team leads to make sure their team is not in that state.",
+      "answer": "Yeah, that actually can be a real problem because I have encountered a burnout condition myself. Now everything is fine. As a team leader, of course, I will try to do everything I can to prevent this burnout for my employees. So the first one is to work properly according to the Sprints and according to the Scrum metrics. I mean that means that we don't have to do more than we expect. If we talk with a customer that this amount of the task will be enough, then it would be enough. Of course, there are some exceptions, for example, the release is burning or something was broken, of course, that happens. But for the most part of our work, I will do my best so my employees will work only the time they need to work, and that's all. So after 6 o'clock, it's their time, they must rest, and that's all. After that, I will introduce team buildings. There are a lot of places where we can go as a team. We can grab some pizza, we can drink something, and it would be a great solution for everyone just to know each other more closely and to trust each other more closely. I think it is very important as a part of the job as well. And the third thing, I will not limit my employees to work on something. For example, if the person wants to work with AWS Cloud, I will say, 'Yeah, that's great, so let's see what you know about AWS, and we can select an appropriate task for you.' Because if a person wants to work with clouds and it is not allowed to work with clouds in a project, that can decrease the motivation of this person. So I won't limit my employees on that.",
+      "follow_up": "NONE"
+    },
+    {
+      "question": "During the pangram coding task, you implemented a solution. Imagine your input contains a million characters, but the first 26 are at the beginning. Can you improve the algorithm so we won't process the whole string? And do you think it's better to do this check at the end of the current iteration or at the beginning?",
+      "answer": "Yeah, I think I got you. So you're talking about the case when we have more than 1,000 letters in the test string, but the first 26 will be the alphabet, or the first 100, and we just don't need to proceed with others. So for that case, I can just test it inside a loop. I can write a condition that, for example, if `uniqueLetters.size` would be already 26, then I can just return `true`, and that's all. I think that we should do this check after the end of the thing because obviously, in the beginning of this `for` loop, we will definitely need to first of all add it and then check, because it would be one more operation that is not necessary.",
+      "follow_up": "NONE"
+    }
+  ]
+}
