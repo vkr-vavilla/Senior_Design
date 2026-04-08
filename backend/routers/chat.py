@@ -26,7 +26,7 @@ def verify_token(token: str) -> str:
 
 
 @router.websocket("/ws")
-async def chat_ws(websocket: WebSocket, token: str, interview_id: str = ""):
+async def chat_ws(websocket: WebSocket, token: str, interview_id: str = "", client_session_id: str = ""):
     # Validate JWT before accepting connection
     try:
         user_id = verify_token(token)
@@ -40,7 +40,6 @@ async def chat_ws(websocket: WebSocket, token: str, interview_id: str = ""):
     history = []
     db = get_db()
     interview_context = ""
-    saved_session_id = None
 
     # If an interview_id was provided, fetch the resume + job description
     if interview_id:
@@ -74,7 +73,6 @@ INSTRUCTIONS:
 - Be conversational but professional, like a real senior engineer interviewer.
 - Push back on vague answers and ask for specifics.
 """
-                saved_session_id = interview_id
                 print(f"DEBUG: Loaded interview context for {interview_id}")
         except Exception as e:
             print(f"DEBUG: Could not load interview context: {e}")
@@ -129,6 +127,7 @@ INSTRUCTIONS:
                     break
                 if isinstance(item, str) and item.startswith("__ERROR__:"):
                     print(f"Gemini error: {item}")
+                    await websocket.send_text(json.dumps({"chunk": f"AI Error: {item}", "done": False}))
                     break
                 full_reply += item
                 await websocket.send_text(json.dumps({"chunk": item, "done": False}))
@@ -145,30 +144,39 @@ INSTRUCTIONS:
                     {"_id": ObjectId(interview_id)},
                     {"$set": {"messages": history}}
                 )
-                saved_session_id = interview_id
             else:
-                # Fallback: save as a standalone chat session
-                result = await db.chat_sessions.insert_one({
+                # Fallback: save as a standalone chat session using client_session_id
+                _id = client_session_id if client_session_id else str(ObjectId())
+                await db.chat_sessions.insert_one({
+                    "_id": _id,
                     "user_id": user_id,
                     "messages": history,
                     "created_at": datetime.now(timezone.utc),
                 })
-                saved_session_id = str(result.inserted_id)
 
 
 @router.post("/{session_id}/feedback", response_model=FeedbackResponse)
 async def get_feedback(session_id: str):
     db = get_db()
+    session = None
 
     # Try the interviews collection first (new flow)
-    session = await db.interviews.find_one(
-        {"_id": ObjectId(session_id)},
-        {"resume_pdf": 0}  # exclude binary
-    )
+    try:
+        session = await db.interviews.find_one(
+            {"_id": ObjectId(session_id)},
+            {"resume_pdf": 0}  # exclude binary
+        )
+    except Exception:
+        pass
 
-    # Fallback to legacy chat_sessions collection
+    # Fallback to legacy chat_sessions collection using string id or object id
     if not session:
-        session = await db.chat_sessions.find_one({"_id": ObjectId(session_id)})
+        session = await db.chat_sessions.find_one({"_id": session_id})
+        if not session:
+            try:
+                session = await db.chat_sessions.find_one({"_id": ObjectId(session_id)})
+            except Exception:
+                pass
 
     if not session or not session.get("messages"):
         raise HTTPException(status_code=404, detail="Session not found or has no messages")

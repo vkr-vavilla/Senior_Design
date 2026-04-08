@@ -23,6 +23,22 @@ const DIFFICULTY_LEVELS = [
   { value: 'hard', label: 'Hard' },
 ];
 
+const TARGET_COMPANIES = [
+  'General',
+  'Google',
+  'Meta',
+  'Amazon',
+  'Apple',
+  'Microsoft',
+  'Netflix',
+  'Tesla',
+  'NVIDIA',
+  'Stripe',
+  'Uber',
+  'Airbnb',
+  'LinkedIn',
+];
+
 const POPULAR_ROLES = [
   'Software Engineer',
   'Product Manager',
@@ -63,6 +79,7 @@ export default function DashboardPage() {
   const { user, token, isLoading } = useAuthContext();
 
   const [role, setRole] = useState('Software Engineer');
+  const [targetCompany, setTargetCompany] = useState('General');
   const [interviewType, setInterviewType] = useState('technical');
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
   const [resumeFile, setResumeFile] = useState<File | null>(null);
@@ -70,6 +87,8 @@ export default function DashboardPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
   const [isDragging, setIsDragging] = useState(false);
+  const [sessions, setSessions] = useState<any[]>([]);
+  const [isFetchingSessions, setIsFetchingSessions] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -77,6 +96,21 @@ export default function DashboardPage() {
       router.push('/login');
     }
   }, [user, isLoading, router]);
+
+  useEffect(() => {
+    async function fetchRecent() {
+      if (!token) return;
+      try {
+        const data = await interviewApi.getSessions(token);
+        setSessions((data as any[]).slice(0, 3));
+      } catch (err) {
+        console.error('Failed to fetch sessions', err);
+      } finally {
+        setIsFetchingSessions(false);
+      }
+    }
+    fetchRecent();
+  }, [token]);
 
   if (isLoading) return <LoadingPage />;
   if (!user) return null;
@@ -123,6 +157,7 @@ export default function DashboardPage() {
         const params = new URLSearchParams({
           role: role.trim(),
           type: interviewType,
+          company: targetCompany,
           difficulty,
           interviewId: result.interview_id,
         });
@@ -214,6 +249,21 @@ export default function DashboardPage() {
                         {r}
                       </button>
                     ))}
+                  </div>
+                </div>
+
+                {/* Target Company */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Select
+                    label="Target Company"
+                    options={TARGET_COMPANIES.map(c => ({ value: c, label: c }))}
+                    value={targetCompany}
+                    onChange={(e) => setTargetCompany(e.target.value)}
+                  />
+                  <div className="flex items-end mb-1">
+                    <p className="text-xs text-slate-500 italic pb-2">
+                       {"AI will tailor questions to this company's specific interview style."}
+                    </p>
                   </div>
                 </div>
 
