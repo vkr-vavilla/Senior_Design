@@ -13,7 +13,7 @@ interface UseInterviewChatReturn {
   sessionEnded: boolean;
   elapsedTime: number;
   sessionId: string | null;
-  startInterview: (config: InterviewConfig, token: string) => void;
+  startInterview: (config: InterviewConfig, token: string, onChunk?: (chunk: string) => void, onDone?: () => void) => void;
   sendMessage: (text: string) => void;
   endInterview: () => void;
   messagesEndRef: React.RefObject<HTMLDivElement>;
@@ -58,7 +58,7 @@ export function useInterviewChat(): UseInterviewChatReturn {
   }, []);
 
   const startInterview = useCallback(
-    (config: InterviewConfig, token: string) => {
+    (config: InterviewConfig, token: string, onChunk?: (chunk: string) => void, onDone?: () => void) => {
       if (wsRef.current) {
         wsRef.current.close();
       }
@@ -119,6 +119,11 @@ export function useInterviewChat(): UseInterviewChatReturn {
                 )
               );
             }
+            
+            // Call the callback for Speech-to-Speech
+            if (onChunk) {
+              onChunk(data.chunk);
+            }
           } else {
             // Stream complete
             const doneId = streamingIdRef.current;
@@ -132,6 +137,8 @@ export function useInterviewChat(): UseInterviewChatReturn {
                 )
               );
             }
+            
+            if (onDone) onDone();
           }
         } catch (err) {
           console.error('Failed to parse WS message:', err);
