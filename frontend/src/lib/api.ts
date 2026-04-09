@@ -81,6 +81,34 @@ export const chatApi = {
     );
     return response.feedback;
   },
+  async transcribe(audioBlob: Blob): Promise<{ text: string }> {
+    const formData = new FormData();
+    formData.append('file', audioBlob, 'recording.webm');
+
+    const response = await fetch(`${API_URL}/chat/transcribe`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Transcription failed');
+    }
+
+    return response.json();
+  },
+  async synthesize(text: string): Promise<Blob> {
+    const response = await fetch(`${API_URL}/chat/synthesize`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Synthesis failed');
+    }
+
+    return response.blob();
+  },
 };
 
 export const interviewApi = {
