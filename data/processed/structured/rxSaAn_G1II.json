@@ -1,0 +1,61 @@
+{
+  "video_id": "rxSaAn_G1II",
+  "summary": "An employee explains their process for selecting a database, covering data type/access, the CAP theorem (consistency, availability, partition tolerance) with examples, and team familiarity with technologies.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "For today's software engineering interview, explain how you'd select a database."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "The first two things I consider are the type of data that we have and how we want to access it. For example, do we have a bunch of text documents and the only operation we want to do is search, or do we just have user data and are fine with doing a standard relational database setup?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, what would you consider next?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "All distributed systems are subject to the CAP theorem, and databases are no exception. So of these three, consistency, availability, and partition tolerance, our database will only be able to prioritize two."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Can you give an example?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Something like a bank would prioritize strong consistency. If they didn't, then somebody might be able to withdraw more than the allowed amount in their account using multiple transactions. Now, something like a social media app might prioritize availability. It doesn't really matter if somebody sees exactly how many likes are on their post in real time, as long as it's eventually correct."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Is there anything else you would take into account?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "The last thing I always consider is what your engineers are familiar with. If everyone at the company is a wizard with PostgreSQL and MongoDB, you should probably just try to make that work. It can be a lot more headache to learn and use a new technology when the rest of your team is using something."
+    }
+  ],
+  "training_pairs": [
+    {
+      "question": "For today's software engineering interview, explain how you'd select a database.",
+      "answer": "The first two things I consider are the type of data that we have and how we want to access it. For example, do we have a bunch of text documents and the only operation we want to do is search, or do we just have user data and are fine with doing a standard relational database setup?",
+      "follow_up": "Okay, what would you consider next?"
+    },
+    {
+      "question": "Okay, what would you consider next?",
+      "answer": "All distributed systems are subject to the CAP theorem, and databases are no exception. So of these three, consistency, availability, and partition tolerance, our database will only be able to prioritize two.",
+      "follow_up": "Can you give an example?"
+    },
+    {
+      "question": "Can you give an example?",
+      "answer": "Something like a bank would prioritize strong consistency. If they didn't, then somebody might be able to withdraw more than the allowed amount in their account using multiple transactions. Now, something like a social media app might prioritize availability. It doesn't really matter if somebody sees exactly how many likes are on their post in real time, as long as it's eventually correct.",
+      "follow_up": "Is there anything else you would take into account?"
+    },
+    {
+      "question": "Is there anything else you would take into account?",
+      "answer": "The last thing I always consider is what your engineers are familiar with. If everyone at the company is a wizard with PostgreSQL and MongoDB, you should probably just try to make that work. It can be a lot more headache to learn and use a new technology when the rest of your team is using something.",
+      "follow_up": "NONE"
+    }
+  ]
+}

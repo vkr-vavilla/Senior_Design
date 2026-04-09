@@ -1,0 +1,48 @@
+{
+  "video_id": "lyGosx9OuJQ",
+  "summary": "The employee explains webhooks, defining them as a way for applications to notify each other of events. They use the example of Stripe payments to illustrate the inefficiency of constant API polling versus the real-time, resource-saving benefits of webhooks, where Stripe sends a POST request to a specified URL upon an event.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "For today's software engineering interview, please explain webhooks."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "A webhook provides a way for other applications to let your application know when an event happens. Let me explain this through a simple example. Let's say I'm using Stripe to process payments, and I have some application which does other application logic. Whenever I want to know if there's a new payment, I have to make an API call to Stripe to get the payments, and Stripe can return me a list of all the new payments."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Making constant API requests to look for new data does seem like a pain in this case."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Exactly. It's slow because I might not make an API call right when a payment happens, and it wastes a lot of resources because I'm constantly making API calls to check for new payments, whether or not somebody actually made one. So, here's where webhooks come in. I just send Stripe a URL of where my webhook is on the server side, and from then on out, anytime any event happens, in this case a payment, Stripe can send a post request with the information that I need."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, and then based on that notification, you can do something in real time."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Exactly. Now, I'm not wasting resources making API requests to look for events that may or may not have happened, and as soon as an event happens, I'm able to do something like send my users an email thanking them for buying."
+    }
+  ],
+  "training_pairs": [
+    {
+      "question": "For today's software engineering interview, please explain webhooks.",
+      "answer": "A webhook provides a way for other applications to let your application know when an event happens. Let me explain this through a simple example. Let's say I'm using Stripe to process payments, and I have some application which does other application logic. Whenever I want to know if there's a new payment, I have to make an API call to Stripe to get the payments, and Stripe can return me a list of all the new payments.",
+      "follow_up": "Making constant API requests to look for new data does seem like a pain in this case."
+    },
+    {
+      "question": "Making constant API requests to look for new data does seem like a pain in this case.",
+      "answer": "Exactly. It's slow because I might not make an API call right when a payment happens, and it wastes a lot of resources because I'm constantly making API calls to check for new payments, whether or not somebody actually made one. So, here's where webhooks come in. I just send Stripe a URL of where my webhook is on the server side, and from then on out, anytime any event happens, in this case a payment, Stripe can send a post request with the information that I need.",
+      "follow_up": "Okay, and then based on that notification, you can do something in real time."
+    },
+    {
+      "question": "Okay, and then based on that notification, you can do something in real time.",
+      "answer": "Exactly. Now, I'm not wasting resources making API requests to look for events that may or may not have happened, and as soon as an event happens, I'm able to do something like send my users an email thanking them for buying.",
+      "follow_up": "NONE"
+    }
+  ]
+}

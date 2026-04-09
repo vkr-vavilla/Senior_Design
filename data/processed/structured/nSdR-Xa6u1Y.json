@@ -1,0 +1,78 @@
+{
+  "video_id": "nSdR-Xa6u1Y",
+  "summary": "An employee explains a step-by-step process for debugging a slow database, covering initial data collection, query optimization, database setup, caching, and considering alternative database technologies.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "For today's software engineering interview, explain how you debug a slow database."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "The first thing I do is collect data. I look at what queries are taking long, how long they're taking, and if this only happens while under load or all the time."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, makes sense. Then what would you do next?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I'd look at specific requests to make sure they're doing exactly what I think they're doing, and they're doing it the best way possible. It's very easy to write a query that gets data, but does it very inefficiently."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "All right. And what if the queries look fine?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "If the queries look good, I'd make sure that our database is set up to handle the most common access patterns as efficiently as possible. We can do things like adding indexes or even adjusting the entire structure of the tables if necessary."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, let's say your database is set up well and you already have the indexes in place."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "If that doesn't help and queries are repeated and computation-heavy, we can introduce a cache between the database and the server to store the results of common requests so we can instantly return those."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "What if requests aren't repeated or caching doesn't help?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "If none of that works, we might be using the wrong database altogether. For example, trying to use PostgreSQL when the only operation we want is a fuzzy search. It works, but there are better options out there like Elasticsearch."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "All right, I'll follow for more real-world system design advice."
+    }
+  ],
+  "training_pairs": [
+    {
+      "question": "For today's software engineering interview, explain how you debug a slow database.",
+      "answer": "The first thing I do is collect data. I look at what queries are taking long, how long they're taking, and if this only happens while under load or all the time.",
+      "follow_up": "Okay, makes sense. Then what would you do next?"
+    },
+    {
+      "question": "Okay, makes sense. Then what would you do next?",
+      "answer": "I'd look at specific requests to make sure they're doing exactly what I think they're doing, and they're doing it the best way possible. It's very easy to write a query that gets data, but does it very inefficiently.",
+      "follow_up": "All right. And what if the queries look fine?"
+    },
+    {
+      "question": "All right. And what if the queries look fine?",
+      "answer": "If the queries look good, I'd make sure that our database is set up to handle the most common access patterns as efficiently as possible. We can do things like adding indexes or even adjusting the entire structure of the tables if necessary.",
+      "follow_up": "Okay, let's say your database is set up well and you already have the indexes in place."
+    },
+    {
+      "question": "Okay, let's say your database is set up well and you already have the indexes in place.",
+      "answer": "If that doesn't help and queries are repeated and computation-heavy, we can introduce a cache between the database and the server to store the results of common requests so we can instantly return those.",
+      "follow_up": "What if requests aren't repeated or caching doesn't help?"
+    },
+    {
+      "question": "What if requests aren't repeated or caching doesn't help?",
+      "answer": "If none of that works, we might be using the wrong database altogether. For example, trying to use PostgreSQL when the only operation we want is a fuzzy search. It works, but there are better options out there like Elasticsearch.",
+      "follow_up": "NONE"
+    }
+  ]
+}

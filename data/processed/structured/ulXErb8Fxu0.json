@@ -1,0 +1,61 @@
+{
+  "video_id": "ulXErb8Fxu0",
+  "summary": "The employee explains different authentication methods for a website, starting with basic auth, then moving to session auth, and finally JWT auth, addressing interviewer challenges regarding security and scalability for each method.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "For today's software engineering interview, explain how you'd handle authentication for a website."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I will just use basic auth. On every single request from the client to the server, we'll include this header with a B64 encoded version of their username and password, which the server can validate against our username and password in the database."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, so we have to share unencrypted credentials on every single request with this method. Can you do it another way?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "That's a good point. Instead, let's use session auth. A user will make one request with their username and password. We can validate it on the server side and issue them a session key via cookie, which is stored in memory on the server side. Any subsequent request from the client will include that session ID, which we can validate against what we have in server memory. So they don't have to send their username and password every time."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Better, but this won't work in a distributed environment unless we're using a shared state with something like Redis."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, in that case, we can use JWT auth. The user will make a login request, and the server will use a secret key to generate a JWT that they can pass back to validate themselves on every single request."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And why is this better than session auth?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "This is better because we're not depending on server memory to store a session ID. Any server on the backend which has access to this secret key and the JWT passed from the client can validate that user. So no matter how many servers we have on the backend, if they have this secret key, they can validate that request."
+    }
+  ],
+  "training_pairs": [
+    {
+      "question": "For today's software engineering interview, explain how you'd handle authentication for a website.",
+      "answer": "I will just use basic auth. On every single request from the client to the server, we'll include this header with a B64 encoded version of their username and password, which the server can validate against our username and password in the database.",
+      "follow_up": "Okay, so we have to share unencrypted credentials on every single request with this method. Can you do it another way?"
+    },
+    {
+      "question": "Okay, so we have to share unencrypted credentials on every single request with this method. Can you do it another way?",
+      "answer": "That's a good point. Instead, let's use session auth. A user will make one request with their username and password. We can validate it on the server side and issue them a session key via cookie, which is stored in memory on the server side. Any subsequent request from the client will include that session ID, which we can validate against what we have in server memory. So they don't have to send their username and password every time.",
+      "follow_up": "Better, but this won't work in a distributed environment unless we're using a shared state with something like Redis."
+    },
+    {
+      "question": "Better, but this won't work in a distributed environment unless we're using a shared state with something like Redis.",
+      "answer": "Okay, in that case, we can use JWT auth. The user will make a login request, and the server will use a secret key to generate a JWT that they can pass back to validate themselves on every single request.",
+      "follow_up": "And why is this better than session auth?"
+    },
+    {
+      "question": "And why is this better than session auth?",
+      "answer": "This is better because we're not depending on server memory to store a session ID. Any server on the backend which has access to this secret key and the JWT passed from the client can validate that user. So no matter how many servers we have on the backend, if they have this secret key, they can validate that request.",
+      "follow_up": "NONE"
+    }
+  ]
+}

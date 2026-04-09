@@ -1,0 +1,74 @@
+{
+  "video_id": "ts0KUrz5it8",
+  "summary": "An explanation of the differences between URLs and domain names, including what a domain name is, its utility, where its information lives (DNS zone, name server), and finally, what a URL encompasses.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "What's the difference between a URL and a domain name?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, let's start with a domain name. This is what you actually own, and it's just the root identity of your online presence. This is not a website or anything; it's just a name."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, that doesn't sound very useful."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Well, it's useful because you can use that name to point to other things. For example, a website, an API, or an email server. Now, instead of someone having to memorize the IP of your website, they can just memorize your domain name."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And where does all that information actually live?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "When you buy a domain name, you usually get access to a DNS zone. In practice, this is basically a text file where you can configure different things about your domain."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, but then where is that DNS zone? How does the internet find it?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "This information is kept in a name server, usually something like Cloudflare or Route 53. When somebody wants to get information about your domain, essentially the content of this text file, they need to go to this name server first, which has that content."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay. Then what is a URL?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "A URL is everything something needs to get to a specific page or resource on your site. It includes the protocol, the fully qualified domain name, and the path to get a specific resource."
+    }
+  ],
+  "training_pairs": [
+    {
+      "question": "What's the difference between a URL and a domain name?",
+      "answer": "Let's start with a domain name. This is what you actually own, and it's just the root identity of your online presence. This is not a website or anything; it's just a name.",
+      "follow_up": "That doesn't sound very useful."
+    },
+    {
+      "question": "Why is a domain name useful if it's just a name?",
+      "answer": "It's useful because you can use that name to point to other things. For example, a website, an API, or an email server. Now, instead of someone having to memorize the IP of your website, they can just memorize your domain name.",
+      "follow_up": "And where does all that information actually live?"
+    },
+    {
+      "question": "Where does the information for a domain name actually live?",
+      "answer": "When you buy a domain name, you usually get access to a DNS zone. In practice, this is basically a text file where you can configure different things about your domain.",
+      "follow_up": "But then where is that DNS zone? How does the internet find it?"
+    },
+    {
+      "question": "Where is the DNS zone kept, and how does the internet find it?",
+      "answer": "This information is kept in a name server, usually something like Cloudflare or Route 53. When somebody wants to get information about your domain, essentially the content of this text file, they need to go to this name server first, which has that content.",
+      "follow_up": "Then what is a URL?"
+    },
+    {
+      "question": "What is a URL?",
+      "answer": "A URL is everything something needs to get to a specific page or resource on your site. It includes the protocol, the fully qualified domain name, and the path to get a specific resource.",
+      "follow_up": "NONE"
+    }
+  ]
+}

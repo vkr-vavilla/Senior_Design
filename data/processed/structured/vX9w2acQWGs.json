@@ -1,0 +1,91 @@
+{
+  "video_id": "vX9w2acQWGs",
+  "summary": "The conversation discusses methods to deter AI crawlers from websites, starting with robots.txt, then proposing a more elaborate 'dungeon' strategy to trap and identify bots for training a bot profiler.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "How can I stop AI crawlers from coming to my website?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Just add something like this to your robots.txt with all the user agents that you don't want to be able to access your site."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Do you think people actually care about the robots.txt file?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Instead of just using a robots.txt, why don't you build a dungeon to get them stuck and waste their time?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, but how do we decide if somebody gets the dungeon or not?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Start by identifying if a user is a bot or not. You can use things like their user agent, their IP address, and their traffic pattern. This is difficult at first, but it will get easier over time."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Makes sense. What's in the dungeon, and how do we build it?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Hundreds or thousands of pages of real-looking static HTML content about real stuff, just generic useless information."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "How does someone go from our regular content to the dungeon, though?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "When a suspicious user requests a page, we add invisible anchor links that no human would ever click or see to the web page. Those anchor tags lead to our pre-generated content dungeon."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, but beyond wasting their time, money, and compute, what's the point of this?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Remember the first step, deciding if someone's a bot or not? This is difficult if you don't have data, but the dungeon makes this easy. Anybody that gets stuck in the dungeon is probably a bot, so we can use that to train our profiler to catch bots more quickly in the future."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "That's pretty sick. Does anybody do this already?"
+    }
+  ],
+  "training_pairs": [
+    {
+      "question": "How can I stop AI crawlers from coming to my website?",
+      "answer": "Just add something like this to your robots.txt with all the user agents that you don't want to be able to access your site.",
+      "follow_up": "Do you think people actually care about the robots.txt file?"
+    },
+    {
+      "question": "Do you think people actually care about the robots.txt file?",
+      "answer": "Instead of just using a robots.txt, why don't you build a dungeon to get them stuck and waste their time?",
+      "follow_up": "Okay, but how do we decide if somebody gets the dungeon or not?"
+    },
+    {
+      "question": "Okay, but how do we decide if somebody gets the dungeon or not?",
+      "answer": "Start by identifying if a user is a bot or not. You can use things like their user agent, their IP address, and their traffic pattern. This is difficult at first, but it will get easier over time.",
+      "follow_up": "Makes sense. What's in the dungeon, and how do we build it?"
+    },
+    {
+      "question": "What's in the dungeon, and how do we build it?",
+      "answer": "Hundreds or thousands of pages of real-looking static HTML content about real stuff, just generic useless information.",
+      "follow_up": "How does someone go from our regular content to the dungeon, though?"
+    },
+    {
+      "question": "How does someone go from our regular content to the dungeon, though?",
+      "answer": "When a suspicious user requests a page, we add invisible anchor links that no human would ever click or see to the web page. Those anchor tags lead to our pre-generated content dungeon.",
+      "follow_up": "Okay, but beyond wasting their time, money, and compute, what's the point of this?"
+    },
+    {
+      "question": "Okay, but beyond wasting their time, money, and compute, what's the point of this?",
+      "answer": "Remember the first step, deciding if someone's a bot or not? This is difficult if you don't have data, but the dungeon makes this easy. Anybody that gets stuck in the dungeon is probably a bot, so we can use that to train our profiler to catch bots more quickly in the future.",
+      "follow_up": "That's pretty sick. Does anybody do this already?"
+    }
+  ]
+}
