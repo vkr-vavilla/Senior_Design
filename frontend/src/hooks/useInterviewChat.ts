@@ -13,7 +13,7 @@ interface UseInterviewChatReturn {
   sessionEnded: boolean;
   elapsedTime: number;
   sessionId: string | null;
-  startInterview: (config: InterviewConfig, token: string) => void;
+  startInterview: (config: InterviewConfig, token: string, onChunk?: (chunk: string) => void, onDone?: () => void) => void;
   sendMessage: (text: string) => void;
   endInterview: () => void;
   messagesEndRef: React.RefObject<HTMLDivElement>;
@@ -58,23 +58,18 @@ export function useInterviewChat(): UseInterviewChatReturn {
   }, []);
 
   const startInterview = useCallback(
-    (config: InterviewConfig, token: string) => {
+    (config: InterviewConfig, token: string, onChunk?: (chunk: string) => void, onDone?: () => void) => {
       if (wsRef.current) {
         wsRef.current.close();
       }
 
-      // Try to use existing interviewId or generate a fresh one for standalone session
-      const idToUse = config.interviewId || generateId();
-      setSessionId(idToUse);
-
-      const params = new URLSearchParams({ token });
+      // If we have an interviewId from the resume flow, use it as the session ID immediately
       if (config.interviewId) {
-        params.append('interview_id', config.interviewId);
-      } else {
-        params.append('client_session_id', idToUse);
+        setSessionId(config.interviewId);
       }
 
-      const ws = new WebSocket(`${WS_URL}/chat/ws?${params.toString()}`);
+      const interviewIdParam = config.interviewId ? `&interview_id=${config.interviewId}` : '';
+      const ws = new WebSocket(`${WS_URL}/chat/ws?token=${token}${interviewIdParam}`);
       wsRef.current = ws;
 
       ws.onopen = () => {
@@ -124,6 +119,11 @@ export function useInterviewChat(): UseInterviewChatReturn {
                 )
               );
             }
+            
+            // Call the callback for Speech-to-Speech
+            if (onChunk) {
+              onChunk(data.chunk);
+            }
           } else {
             // Stream complete
             const doneId = streamingIdRef.current;
@@ -137,24 +137,19 @@ export function useInterviewChat(): UseInterviewChatReturn {
                 )
               );
             }
+            
+            if (onDone) onDone();
           }
         } catch (err) {
           console.error('Failed to parse WS message:', err);
         }
       };
 
-      ws.onclose = (event) => {
+      ws.onclose = () => {
         setIsConnected(false);
         setIsStreaming(false);
         stopTimer();
-
-        // Try to extract session ID from close event or generate one
-        // The backend saves the session on close
-        setSessionId((prev) => prev || generateId());
-
-        if (!sessionEnded) {
-          setSessionEnded(true);
-        }
+        setSessionEnded(true);
       };
 
       ws.onerror = (error) => {
@@ -164,7 +159,7 @@ export function useInterviewChat(): UseInterviewChatReturn {
         stopTimer();
       };
     },
-    [startTimer, stopTimer, sessionId, sessionEnded]
+    [startTimer, stopTimer]
   );
 
   const sendMessage = useCallback((text: string) => {

@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import { Bot } from 'lucide-react';
 import { RegisterForm } from '@/components/auth/RegisterForm';
 import { NeuralNetworkBackground } from '@/components/ui/NeuralNetworkBackground';
+import { Logo } from '@/components/ui/Logo';
 
 export default function RegisterPage() {
   return (
@@ -19,11 +19,8 @@ export default function RegisterPage() {
       <div className="relative z-10 w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2.5 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-              <Bot className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-2xl font-bold text-white tracking-tight">Final Round</span>
+          <Link href="/" className="inline-flex">
+            <Logo size="lg" />
           </Link>
           <h1 className="mt-6 text-2xl font-bold text-white">Create your account</h1>
           <p className="mt-2 text-slate-400 text-sm">

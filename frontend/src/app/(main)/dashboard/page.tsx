@@ -6,8 +6,8 @@ import { Input, Select } from '@/components/ui/Input';
 import { LoadingPage } from '@/components/ui/LoadingSpinner';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { interviewApi } from '@/lib/api';
-import { Brain, Briefcase, ChevronRight, Clock, FileText, Layers, Play, Shuffle, Upload, X } from 'lucide-react';
-import Link from 'next/link';
+import { RecentSessions } from '@/components/dashboard/RecentSessions';
+import { Brain, Briefcase, ChevronRight, FileText, Play, Shuffle, Upload, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
@@ -167,14 +167,24 @@ export default function DashboardPage() {
         setIsUploading(false);
       }
     } else {
-      // No resume — go directly (basic flow without context)
-      const params = new URLSearchParams({
-        role: role.trim(),
-        type: interviewType,
-        company: targetCompany,
-        difficulty,
-      });
-      router.push(`/interview?${params.toString()}`);
+      // No resume — create a lightweight session so it appears in history
+      setIsUploading(true);
+      try {
+        const result = await interviewApi.startInterview(
+          { role: role.trim(), interviewType, difficulty },
+          token
+        );
+        const params = new URLSearchParams({
+          role: role.trim(),
+          type: interviewType,
+          difficulty,
+          interviewId: result.interview_id,
+        });
+        router.push(`/interview?${params.toString()}`);
+      } catch (err) {
+        setUploadError(err instanceof Error ? err.message : 'Failed to start session');
+        setIsUploading(false);
+      }
     }
   };
 
@@ -346,7 +356,7 @@ export default function DashboardPage() {
                 {/* Resume Upload */}
                 <div>
                   <label className="text-sm font-medium text-slate-300 block mb-2">
-                    Resume (PDF) <span className="text-slate-500 font-normal">— optional</span>
+                    Resume (PDF) <span className="text-slate-500 font-normal"></span>
                   </label>
                   <input
                     ref={fileInputRef}
@@ -396,7 +406,7 @@ export default function DashboardPage() {
                 {/* Job Description */}
                 <div>
                   <label className="text-sm font-medium text-slate-300 block mb-2">
-                    Job Description <span className="text-slate-500 font-normal">— optional</span>
+                    Job Description <span className="text-slate-500 font-normal"></span>
                   </label>
                   <textarea
                     value={jobDescription}
@@ -437,15 +447,15 @@ export default function DashboardPage() {
               <div className="space-y-3">
                 {[
                   {
-                    icon: '💡',
+                    icon: '•',
                     text: 'Answer questions with structured responses (STAR method for behavioral)',
                   },
                   {
-                    icon: '🎯',
+                    icon: '•',
                     text: 'Be specific — use real examples and concrete numbers when possible',
                   },
                   {
-                    icon: '⏱️',
+                    icon: '•',
                     text: 'Aim for 2-4 minute answers — not too brief, not too long',
                   },
                 ].map((tip, i) => (
@@ -457,60 +467,7 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Recent Sessions List */}
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-              <div className="flex items-center justify-between gap-2 mb-4">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-slate-400" />
-                  <h3 className="font-semibold text-white text-sm">Recent Sessions</h3>
-                </div>
-                <Link href="/history" className="text-xs text-indigo-400 hover:text-indigo-300 font-medium">
-                  View All
-                </Link>
-              </div>
-              
-              {isFetchingSessions ? (
-                <div className="py-8 text-center text-slate-500 text-xs animate-pulse">
-                  Loading history...
-                </div>
-              ) : sessions.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-8 gap-3 text-center">
-                  <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center">
-                    <Layers className="w-5 h-5 text-slate-600" />
-                  </div>
-                  <div>
-                    <p className="text-slate-400 text-sm font-medium">No sessions yet</p>
-                    <p className="text-slate-600 text-xs mt-1">
-                      Practice to see your logs here
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {sessions.map((s) => (
-                    <Link
-                      key={s._id}
-                      href={`/history/${s._id}`}
-                      className="block p-3 rounded-xl bg-slate-800/30 border border-slate-700/50 hover:border-indigo-500/50 hover:bg-slate-800/50 transition-all group"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold text-white group-hover:text-indigo-300 truncate pr-2">
-                          {s.role || 'General Mock'}
-                        </span>
-                        <ChevronRight className="w-3 h-3 text-slate-600 group-hover:text-indigo-400" />
-                      </div>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[10px] text-slate-500 capitalize">{s.interview_type || 'technical'}</span>
-                        <span className="text-slate-700 text-[10px]">•</span>
-                        <span className="text-[10px] text-slate-500">
-                          {new Date(s.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                        </span>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
+            {token && <RecentSessions token={token} />}
           </div>
         </div>
       </main>

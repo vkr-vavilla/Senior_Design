@@ -1,19 +1,32 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException, File, UploadFile
 from jose import JWTError, jwt
 from google import genai
+<<<<<<< HEAD
 from openai import OpenAI
 from datetime import datetime, timezone
 from database import get_db
 from config import GEMINI_API_KEY, VLLM_BASE_URL, VLLM_MODEL, AI_BACKEND, JWT_SECRET, JWT_ALGORITHM
+=======
+from groq import Groq
+from datetime import datetime, timezone
+from database import get_db
+from config import GEMINI_API_KEY, JWT_SECRET, JWT_ALGORITHM, GROQ_API_KEY
+>>>>>>> main
 from models.chat import ChatMessage, FeedbackResponse
 from bson import ObjectId
 import json
 import asyncio
+import tempfile
+import os
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
 gemini_client = genai.Client(api_key=GEMINI_API_KEY)
+<<<<<<< HEAD
 qwen_client = OpenAI(base_url=VLLM_BASE_URL, api_key="token-abc123")
+=======
+groq_client = Groq(api_key=GROQ_API_KEY)
+>>>>>>> main
 
 
 def verify_token(token: str) -> str:
@@ -25,6 +38,63 @@ def verify_token(token: str) -> str:
         return user_id
     except JWTError:
         raise ValueError("Invalid token")
+
+
+@router.post("/transcribe")
+async def transcribe_audio(file: UploadFile = File(...)):
+    try:
+        # Save the uploaded file to a temporary file
+        with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1]) as tmp:
+            content = await file.read()
+            tmp.write(content)
+            tmp_path = tmp.name
+
+        try:
+            # Call Groq API for transcription
+            with open(tmp_path, "rb") as audio_file:
+                transcription = groq_client.audio.transcriptions.create(
+                    file=(file.filename, audio_file.read()),
+                    model="whisper-large-v3",
+                    response_format="json",
+                    language="en",
+                    temperature=0.0
+                )
+            return {"text": transcription.text}
+        finally:
+            # Clean up the temporary file
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)
+
+    except Exception as e:
+        print(f"Transcription error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/synthesize")
+async def synthesize_speech(request: dict):
+    try:
+        text = request.get("text")
+        if not text:
+            return Response(content="Empty text", status_code=400)
+
+        print(f"DEBUG: Synthesizing text: {text[:50]}...")
+        
+        # Call Groq API for speech synthesis (Orpheus)
+        response = groq_client.audio.speech.create(
+            model="canopylabs/orpheus-v1-english",
+            voice="troy",  # Common Orpheus voice
+            input=text,
+            response_format="wav"
+        )
+        print("DEBUG: Groq synthesis successful, returning audio content")
+
+        # Return the audio as a streaming response
+        from fastapi.responses import Response
+        return Response(content=response.read(), media_type="audio/wav")
+
+    except Exception as e:
+        print(f"Synthesis error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.websocket("/ws")
@@ -66,6 +136,7 @@ JOB DESCRIPTION:
 {job_desc}
 
 INSTRUCTIONS:
+- Ask questions like a real interviewer, make them concise instead of giving out paragraphs. It should be conversational.
 - Ask questions that are relevant to BOTH the candidate's resume AND the job description.
 - For technical interviews: ask about technologies and projects mentioned in the resume, system design, and coding concepts relevant to the job.
 - For behavioral interviews: ask about specific experiences from their resume using the STAR method.

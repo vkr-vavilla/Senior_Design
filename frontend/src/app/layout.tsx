@@ -17,9 +17,9 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: 'Final Round — AI-Powered Mock Interviews',
+  title: 'FinalRound — Your AI Interview Coach',
   description:
-    'Ace your next interview with Final Round. Practice with our AI interviewer, get real-time feedback, and land your dream job.',
+    'Ace your next interview with FinalRound. Practice with our AI interviewer, get real-time feedback, and land your dream job.',
   keywords: ['mock interview', 'AI interview', 'interview prep', 'job preparation'],
 };
 

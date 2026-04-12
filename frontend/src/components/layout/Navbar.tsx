@@ -1,8 +1,9 @@
 'use client';
 
+import { Logo } from '@/components/ui/Logo';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
-import { Bot, LayoutDashboard, LogOut, Plus } from 'lucide-react';
+import { LayoutDashboard, LogOut, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -29,11 +30,8 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/dashboard" className="flex items-center gap-2 shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
-              <Bot className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-lg font-bold text-white tracking-tight">Final Round</span>
+          <Link href="/dashboard">
+            <Logo size="md" />
           </Link>
 
           {/* Nav Links */}
@@ -64,7 +62,7 @@ export function Navbar() {
             {user && (
               <Link
                 href="/history"
-                className="hidden sm:flex items-center gap-3 hover:bg-slate-800/50 p-1.5 rounded-xl transition-colors group"
+                className="hidden sm:flex items-center gap-3 p-1 rounded-xl transition-all duration-300 group hover:bg-white/5 active:scale-95"
               >
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">

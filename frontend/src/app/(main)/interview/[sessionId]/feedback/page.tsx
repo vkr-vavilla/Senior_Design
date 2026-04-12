@@ -71,7 +71,7 @@ export default function FeedbackPage() {
     <div className="min-h-screen bg-slate-950">
       <Navbar />
 
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
         {/* Header */}
         <div className="mb-8">
           <button
