@@ -125,6 +125,7 @@ JOB DESCRIPTION:
 {job_desc}
 
 INSTRUCTIONS:
+- Ask questions like a real interviewer, make them concise instead of giving out paragraphs. It should be conversational.
 - Ask questions that are relevant to BOTH the candidate's resume AND the job description.
 - For technical interviews: ask about technologies and projects mentioned in the resume, system design, and coding concepts relevant to the job.
 - For behavioral interviews: ask about specific experiences from their resume using the STAR method.
