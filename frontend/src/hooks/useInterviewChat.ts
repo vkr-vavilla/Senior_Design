@@ -79,13 +79,11 @@ export function useInterviewChat(): UseInterviewChatReturn {
         setSessionEnded(false);
         startTimer();
 
-        // Send initial message to kick off the interview
-        const initialMessage = `I want to practice a ${config.difficulty} ${config.type} interview for a ${config.role} position. Please start the interview by greeting me and asking your first question.`;
-
-        ws.send(JSON.stringify({ message: initialMessage }));
-
-        // Add initial message to chat (as a hidden/system trigger — show it as user context)
-        // We actually just show the AI response; skip showing the system prompt
+        // The backend handles the initial greeting now to avoid double-priming
+        // if (config.interviewId) {
+        //   const initialMessage = `I want to practice a ${config.difficulty} ${config.type} interview for a ${config.role} position. Please start the interview by greeting me and asking your first question.`;
+        //   ws.send(JSON.stringify({ message: initialMessage }));
+        // }
       };
 
       ws.onmessage = (event) => {

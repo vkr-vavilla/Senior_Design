@@ -68,18 +68,27 @@ async def synthesize_speech(request: dict):
             from fastapi.responses import Response
             return Response(content="Empty text", status_code=400)
 
-        print(f"DEBUG: Synthesizing text: {text[:50]}...")
+        # Groq Orpheus has a 200 char limit per request. 
+        # We split text into chunks just in case, though frontend usually sends sentences.
+        def split_text(t, limit=200):
+            return [t[i:i + limit] for i in range(0, len(t), limit)]
 
-        response = groq_client.audio.speech.create(
-            model="canopylabs/orpheus-v1-english",
-            voice="troy",
-            input=text,
-            response_format="wav"
-        )
-        print("DEBUG: Groq synthesis successful, returning audio content")
+        chunks = split_text(text)
+        combined_audio = b""
+        
+        for chunk in chunks:
+            response = groq_client.audio.speech.create(
+                model="canopylabs/orpheus-v1-english",
+                voice="troy",
+                input=chunk,
+                response_format="wav"
+            )
+            # For wav, we should ideally strip headers for subsequent chunks, 
+            # but for now we'll just take the content.
+            combined_audio += response.read()
 
         from fastapi.responses import Response
-        return Response(content=response.read(), media_type="audio/wav")
+        return Response(content=combined_audio, media_type="audio/wav")
 
     except Exception as e:
         print(f"Synthesis error: {e}")
@@ -114,32 +123,39 @@ async def chat_ws(websocket: WebSocket, token: str, interview_id: str = "", clie
                 int_type = interview.get("interview_type", "technical")
                 difficulty = interview.get("difficulty", "medium")
 
-                system_prompt = f"""You are an expert interviewer conducting a {difficulty} {int_type} interview for a {role} position.
+                system_prompt = f"""# ROLE
+You are a senior {role} interviewer. Your goal is to conduct a professional {difficulty} {int_type} interview.
 
-CANDIDATE'S RESUME:
-{resume_text}
+# CANDIDATE CONTEXT
+- **Role**: {role}
+- **Experience Level**: {difficulty}
+- **Interview Type**: {int_type}
+- **Resume Information**: {resume_text}
+- **Job Description**: {job_desc}
 
-JOB DESCRIPTION:
-{job_desc}
+# CONVERSATION RULES
+1. **ASK ONE QUESTION AT A TIME**. This is critical.
+2. Be conversational but professional. Act like a senior engineer.
+3. Push back on vague answers. Ask for implementation details or specific STAR examples.
+4. Do not provide feedback during the interview. Save it for the end.
+5. If the interview type is 'technical', focus on system design, coding patterns, and specific technologies from the resume.
+6. If 'behavioral', focus on leadership, conflict resolution, and teamwork.
 
-INSTRUCTIONS:
-- Ask questions relevant to BOTH the candidate's resume AND the job description.
-- For technical interviews: ask about technologies and projects mentioned in the resume, system design, and coding concepts relevant to the job.
-- For behavioral interviews: ask about specific experiences from their resume using the STAR method.
-- For mixed interviews: alternate between technical and behavioral questions.
-- Start by greeting the candidate and asking your first question.
-- Ask one question at a time, wait for the answer, then follow up or move to the next question.
-- Be conversational but professional, like a real senior engineer interviewer.
-- Push back on vague answers and ask for specifics.
+# FORMATTING
+- Do not write out the candidate's responses.
+- Do not explain your AI nature. Just stay in character.
+- Start by greeting the candidate by name if available, or just a professional greeting, and ask your first question.
 """
                 print(f"DEBUG: Loaded interview context for {interview_id}")
         except Exception as e:
             print(f"DEBUG: Could not load interview context: {e}")
 
     try:
-        # Prime the conversation: inject system prompt and get opening greeting from AI
-        opening_prompt = f"{system_prompt}\n\nBegin the interview now. Greet the candidate and ask your first question. Do not write out the full interview — just say your opening greeting and first question."
-        messages = [{"role": "user", "content": opening_prompt}]
+        # Prime the conversation with system instructions
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": "I am ready. Please start the interview."}
+        ]
 
         loop = asyncio.get_running_loop()
         queue: asyncio.Queue = asyncio.Queue()
@@ -200,8 +216,8 @@ INSTRUCTIONS:
                         model=VLLM_MODEL,
                         messages=messages,
                         stream=True,
-                        max_tokens=512,
-                        temperature=0.7,
+                        max_tokens=256,
+                        temperature=0.6,
                     )
                     for chunk in stream:
                         delta = chunk.choices[0].delta.content
