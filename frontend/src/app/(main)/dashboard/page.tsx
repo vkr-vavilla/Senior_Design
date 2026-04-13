@@ -356,7 +356,7 @@ export default function DashboardPage() {
                 {/* Resume Upload */}
                 <div>
                   <label className="text-sm font-medium text-slate-300 block mb-2">
-                    Resume (PDF) <span className="text-slate-500 font-normal">— optional</span>
+                    Resume (PDF) <span className="text-slate-500 font-normal"></span>
                   </label>
                   <input
                     ref={fileInputRef}
@@ -406,7 +406,7 @@ export default function DashboardPage() {
                 {/* Job Description */}
                 <div>
                   <label className="text-sm font-medium text-slate-300 block mb-2">
-                    Job Description <span className="text-slate-500 font-normal">— optional</span>
+                    Job Description <span className="text-slate-500 font-normal"></span>
                   </label>
                   <textarea
                     value={jobDescription}

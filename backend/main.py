@@ -58,7 +58,7 @@ async def lifespan(app: FastAPI):
     stop_vllm()
 
 
-app = FastAPI(title="PrepAI API", lifespan=lifespan)
+app = FastAPI(title="FinalRound", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

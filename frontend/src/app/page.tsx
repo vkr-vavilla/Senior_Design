@@ -1,22 +1,22 @@
-import Link from 'next/link';
+import { AnimateIn } from '@/components/ui/AnimateIn';
+import CelestialSphere from '@/components/ui/celestial-sphere';
+import { ContainerScroll } from '@/components/ui/container-scroll-animation';
+import { FeatureCards } from '@/components/ui/FeatureCards';
+import { InteractiveRobotSpline } from '@/components/ui/interactive-3d-robot';
+import { Logo } from '@/components/ui/Logo';
+import { AISessionCard } from '@/components/ui/RobotHUD';
+import { RotatingText } from '@/components/ui/RotatingText';
 import {
   ArrowRight,
   Bot,
-  Users,
-  TrendingUp,
   MessageSquare,
-  Target,
-  Zap,
   Star,
+  Target,
+  TrendingUp,
+  Users,
+  Zap,
 } from 'lucide-react';
-import { AnimateIn } from '@/components/ui/AnimateIn';
-import { InteractiveRobotSpline } from '@/components/ui/interactive-3d-robot';
-import { ContainerScroll } from '@/components/ui/container-scroll-animation';
-import CelestialSphere from '@/components/ui/celestial-sphere';
-import { FeatureCards } from '@/components/ui/FeatureCards';
-import { AISessionCard } from '@/components/ui/RobotHUD';
-import { Logo } from '@/components/ui/Logo';
-import { RotatingText } from '@/components/ui/RotatingText';
+import Link from 'next/link';
 
 const ROBOT_SCENE = 'https://prod.spline.design/PyzDhpQ9E5f1E3MT/scene.splinecode';
 
@@ -35,7 +35,7 @@ export default function LandingPage() {
       <div className="fixed inset-0 bg-slate-950/55 pointer-events-none -z-[5]" />
 
       {/* ── Navbar ────────────────────────────────────────────── */}
-      <nav className="fixed top-4 inset-x-4 z-50 max-w-6xl mx-auto">
+      <nav className="absolute top-4 inset-x-4 z-50 max-w-6xl mx-auto">
         {/* Outer glow halo */}
         <div className="absolute -inset-px rounded-[18px] bg-gradient-to-r from-indigo-500/15 via-violet-500/10 to-indigo-500/15 blur-sm pointer-events-none" />
 
@@ -352,16 +352,6 @@ export default function LandingPage() {
               </AnimateIn>
             ))}
           </div>
-
-          <AnimateIn className="text-center mt-16" delay={380}>
-            <Link
-              href="/register"
-              className="group inline-flex items-center gap-2.5 px-8 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-0.5 cursor-pointer text-base"
-            >
-              Get Started Free
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-            </Link>
-          </AnimateIn>
         </div>
       </section>
 
