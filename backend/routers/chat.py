@@ -171,7 +171,6 @@ You are a senior {role} interviewer. Your goal is to conduct a professional {dif
                 if AI_BACKEND == "gemini":
                     for chunk in chat_session.send_message_stream("Please start the interview now with your greeting and first message."):
                         if chunk.text:
-                            loop.call_soon_threadsafe, [queue.put_nowait, chunk.text]
                             loop.call_soon_threadsafe(queue.put_nowait, chunk.text)
                 else:
                     stream = vllm_client.chat.completions.create(
