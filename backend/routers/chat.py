@@ -16,8 +16,8 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 
 groq_client = Groq(api_key=GROQ_API_KEY)
 
-VLLM_BASE_URL = os.getenv("VLLM_BASE_URL", "http://localhost:8000/v1")
-VLLM_MODEL = os.getenv("VLLM_MODEL", "google/gemma-7b-it")
+VLLM_BASE_URL = os.getenv("VLLM_PRIMARY_URL", "http://localhost:8000/v1")
+VLLM_MODEL = os.getenv("VLLM_PRIMARY_MODEL", "Qwen/Qwen2.5-7B-Instruct")
 
 vllm_client = OpenAI(base_url=VLLM_BASE_URL, api_key="not-needed")
 
@@ -68,14 +68,11 @@ async def synthesize_speech(request: dict):
             from fastapi.responses import Response
             return Response(content="Empty text", status_code=400)
 
-        # Groq Orpheus has a 200 char limit per request. 
-        # We split text into chunks just in case, though frontend usually sends sentences.
         def split_text(t, limit=200):
             return [t[i:i + limit] for i in range(0, len(t), limit)]
 
         chunks = split_text(text)
         combined_audio = b""
-        
         for chunk in chunks:
             response = groq_client.audio.speech.create(
                 model="canopylabs/orpheus-v1-english",
@@ -83,8 +80,6 @@ async def synthesize_speech(request: dict):
                 input=chunk,
                 response_format="wav"
             )
-            # For wav, we should ideally strip headers for subsequent chunks, 
-            # but for now we'll just take the content.
             combined_audio += response.read()
 
         from fastapi.responses import Response
@@ -104,7 +99,6 @@ async def chat_ws(websocket: WebSocket, token: str, interview_id: str = "", clie
         return
 
     await websocket.accept()
-    print("DEBUG: WebSocket accepted")
 
     history = []
     db = get_db()
@@ -123,35 +117,24 @@ async def chat_ws(websocket: WebSocket, token: str, interview_id: str = "", clie
                 int_type = interview.get("interview_type", "technical")
                 difficulty = interview.get("difficulty", "medium")
 
-                system_prompt = f"""# ROLE
-You are a senior {role} interviewer. Your goal is to conduct a professional {difficulty} {int_type} interview.
+                system_prompt = f"""You are a senior {role} interviewer conducting a professional {difficulty} {int_type} interview.
 
-# CANDIDATE CONTEXT
-- **Role**: {role}
-- **Experience Level**: {difficulty}
-- **Interview Type**: {int_type}
-- **Resume Information**: {resume_text}
-- **Job Description**: {job_desc}
+CANDIDATE CONTEXT:
+- Resume: {resume_text}
+- Job Description: {job_desc}
 
-# CONVERSATION RULES
-1. **ASK ONE QUESTION AT A TIME**. This is critical.
-2. Be conversational but professional. Act like a senior engineer.
-3. Push back on vague answers. Ask for implementation details or specific STAR examples.
-4. Do not provide feedback during the interview. Save it for the end.
-5. If the interview type is 'technical', focus on system design, coding patterns, and specific technologies from the resume.
-6. If 'behavioral', focus on leadership, conflict resolution, and teamwork.
-
-# FORMATTING
-- Do not write out the candidate's responses.
-- Do not explain your AI nature. Just stay in character.
-- Start by greeting the candidate by name if available, or just a professional greeting, and ask your first question.
-"""
-                print(f"DEBUG: Loaded interview context for {interview_id}")
+RULES:
+- Ask ONE question at a time and wait for the candidate to answer before asking the next.
+- Be conversational but professional.
+- Push back on vague answers and ask for specifics.
+- For technical interviews: focus on system design, coding patterns, and technologies from the resume.
+- For behavioral interviews: use the STAR method.
+- Do not provide feedback during the interview.
+- Greet the candidate and ask your first question to begin."""
         except Exception as e:
-            print(f"DEBUG: Could not load interview context: {e}")
+            print(f"Could not load interview context: {e}")
 
     try:
-        # Prime the conversation with system instructions
         messages = [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": "I am ready. Please start the interview."}
@@ -196,9 +179,7 @@ You are a senior {role} interviewer. Your goal is to conduct a professional {dif
         history.append({"role": "model", "text": opening_reply})
 
         while True:
-            print("DEBUG: Waiting for message...")
             data = await websocket.receive_text()
-            print(f"DEBUG: Received data: {data[:100]}")
             message = json.loads(data).get("message", "")
             if not message:
                 continue
@@ -211,21 +192,19 @@ You are a senior {role} interviewer. Your goal is to conduct a professional {dif
 
             def stream_sync():
                 try:
-                    print("DEBUG: Starting vLLM stream")
                     stream = vllm_client.chat.completions.create(
                         model=VLLM_MODEL,
                         messages=messages,
                         stream=True,
-                        max_tokens=256,
-                        temperature=0.6,
+                        max_tokens=512,
+                        temperature=0.7,
                     )
                     for chunk in stream:
                         delta = chunk.choices[0].delta.content
                         if delta:
                             loop.call_soon_threadsafe(queue.put_nowait, delta)
-                    print("DEBUG: vLLM stream complete")
                 except Exception as e:
-                    print(f"DEBUG: vLLM stream error: {e}")
+                    print(f"vLLM stream error: {e}")
                     loop.call_soon_threadsafe(queue.put_nowait, f"__ERROR__:{e}")
                 finally:
                     loop.call_soon_threadsafe(queue.put_nowait, None)
@@ -238,7 +217,6 @@ You are a senior {role} interviewer. Your goal is to conduct a professional {dif
                 if item is None:
                     break
                 if isinstance(item, str) and item.startswith("__ERROR__:"):
-                    print(f"vLLM error: {item}")
                     await websocket.send_text(json.dumps({"chunk": f"AI Error: {item}", "done": False}))
                     break
                 full_reply += item
