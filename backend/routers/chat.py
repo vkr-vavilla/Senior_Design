@@ -1,10 +1,17 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException, File, UploadFile
 from jose import JWTError, jwt
 from google import genai
+<<<<<<< HEAD
+from openai import OpenAI
+from datetime import datetime, timezone
+from database import get_db
+from config import GEMINI_API_KEY, VLLM_BASE_URL, VLLM_MODEL, AI_BACKEND, JWT_SECRET, JWT_ALGORITHM
+=======
 from groq import Groq
 from datetime import datetime, timezone
 from database import get_db
 from config import GEMINI_API_KEY, JWT_SECRET, JWT_ALGORITHM, GROQ_API_KEY
+>>>>>>> main
 from models.chat import ChatMessage, FeedbackResponse
 from bson import ObjectId
 import json
@@ -15,7 +22,11 @@ import os
 router = APIRouter(prefix="/chat", tags=["chat"])
 
 gemini_client = genai.Client(api_key=GEMINI_API_KEY)
+<<<<<<< HEAD
+qwen_client = OpenAI(base_url=VLLM_BASE_URL, api_key="token-abc123")
+=======
 groq_client = Groq(api_key=GROQ_API_KEY)
+>>>>>>> main
 
 
 def verify_token(token: str) -> str:
@@ -140,18 +151,24 @@ INSTRUCTIONS:
             print(f"DEBUG: Could not load interview context: {e}")
 
     try:
-        print("DEBUG: Creating Gemini chat session")
-
-        # If we have interview context, send it as the first message to set up the AI
+        # --- Gemini setup ---
         gemini_history = []
-        if interview_context:
-            gemini_history = [
-                {"role": "user", "parts": [{"text": interview_context}]},
-                {"role": "model", "parts": [{"text": "Understood. I will conduct this interview based on the candidate's resume and the job description provided. I'm ready to begin when the candidate is."}]},
-            ]
+        if AI_BACKEND == "gemini":
+            print("DEBUG: Creating Gemini chat session")
+            if interview_context:
+                gemini_history = [
+                    {"role": "user", "parts": [{"text": interview_context}]},
+                    {"role": "model", "parts": [{"text": "Understood. I will conduct this interview based on the candidate's resume and the job description provided. I'm ready to begin when the candidate is."}]},
+                ]
+            chat_session = gemini_client.chats.create(model="gemini-2.5-flash", history=gemini_history)
+            print("DEBUG: Chat session created")
 
-        chat_session = gemini_client.chats.create(model="gemini-2.5-flash", history=gemini_history)
-        print("DEBUG: Chat session created")
+        # --- Qwen/vLLM setup ---
+        qwen_messages = []
+        if AI_BACKEND == "qwen":
+            print("DEBUG: Starting Qwen/vLLM chat session")
+            if interview_context:
+                qwen_messages.append({"role": "system", "content": interview_context})
 
         while True:
             print("DEBUG: Waiting for message...")
@@ -163,22 +180,42 @@ INSTRUCTIONS:
 
             history.append({"role": "user", "text": message})
 
-            # Run the sync Gemini streaming in a thread so it doesn't block the event loop
             loop = asyncio.get_running_loop()
             queue: asyncio.Queue = asyncio.Queue()
 
-            def stream_sync():
-                try:
-                    print("DEBUG: Starting Gemini stream")
-                    for chunk in chat_session.send_message_stream(message):
-                        if chunk.text:
-                            loop.call_soon_threadsafe(queue.put_nowait, chunk.text)
-                    print("DEBUG: Gemini stream complete")
-                except Exception as e:
-                    print(f"DEBUG: Gemini stream error: {e}")
-                    loop.call_soon_threadsafe(queue.put_nowait, f"__ERROR__:{e}")
-                finally:
-                    loop.call_soon_threadsafe(queue.put_nowait, None)
+            if AI_BACKEND == "gemini":
+                def stream_sync():
+                    try:
+                        print("DEBUG: Starting Gemini stream")
+                        for chunk in chat_session.send_message_stream(message):
+                            if chunk.text:
+                                loop.call_soon_threadsafe(queue.put_nowait, chunk.text)
+                        print("DEBUG: Gemini stream complete")
+                    except Exception as e:
+                        print(f"DEBUG: Gemini stream error: {e}")
+                        loop.call_soon_threadsafe(queue.put_nowait, f"__ERROR__:{e}")
+                    finally:
+                        loop.call_soon_threadsafe(queue.put_nowait, None)
+            else:
+                qwen_messages.append({"role": "user", "content": message})
+                def stream_sync(msgs=list(qwen_messages)):
+                    try:
+                        print("DEBUG: Starting Qwen stream")
+                        stream = qwen_client.chat.completions.create(
+                            model=VLLM_MODEL,
+                            messages=msgs,
+                            stream=True,
+                        )
+                        for chunk in stream:
+                            text = chunk.choices[0].delta.content
+                            if text:
+                                loop.call_soon_threadsafe(queue.put_nowait, text)
+                        print("DEBUG: Qwen stream complete")
+                    except Exception as e:
+                        print(f"DEBUG: Qwen stream error: {e}")
+                        loop.call_soon_threadsafe(queue.put_nowait, f"__ERROR__:{e}")
+                    finally:
+                        loop.call_soon_threadsafe(queue.put_nowait, None)
 
             loop.run_in_executor(None, stream_sync)
 
@@ -188,13 +225,17 @@ INSTRUCTIONS:
                 if item is None:
                     break
                 if isinstance(item, str) and item.startswith("__ERROR__:"):
+
                     print(f"Gemini error: {item}")
                     await websocket.send_text(json.dumps({"chunk": f"AI Error: {item}", "done": False}))
+
                     break
                 full_reply += item
                 await websocket.send_text(json.dumps({"chunk": item, "done": False}))
 
             history.append({"role": "model", "text": full_reply})
+            if AI_BACKEND == "qwen":
+                qwen_messages.append({"role": "assistant", "content": full_reply})
             await websocket.send_text(json.dumps({"chunk": "", "done": True}))
 
     except WebSocketDisconnect:
@@ -273,16 +314,25 @@ Cover the following in your feedback:
 TRANSCRIPT:
 {transcript}"""
 
-    response = await asyncio.to_thread(
-        gemini_client.models.generate_content,
-        model="gemini-2.5-flash",
-        contents=prompt
-    )
+    if AI_BACKEND == "gemini":
+        response = await asyncio.to_thread(
+            gemini_client.models.generate_content,
+            model="gemini-2.5-flash",
+            contents=prompt
+        )
+        feedback_text = response.text
+    else:
+        response = await asyncio.to_thread(
+            qwen_client.chat.completions.create,
+            model=VLLM_MODEL,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        feedback_text = response.choices[0].message.content
 
     # Save the feedback to the session
     await db.interviews.update_one(
         {"_id": ObjectId(session_id)},
-        {"$set": {"feedback": response.text}}
+        {"$set": {"feedback": feedback_text}}
     )
 
-    return FeedbackResponse(feedback=response.text)
+    return FeedbackResponse(feedback=feedback_text)
