@@ -1,17 +1,11 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException, File, UploadFile
 from jose import JWTError, jwt
 from google import genai
-<<<<<<< HEAD
+from groq import Groq
 from openai import OpenAI
 from datetime import datetime, timezone
 from database import get_db
-from config import GEMINI_API_KEY, VLLM_BASE_URL, VLLM_MODEL, AI_BACKEND, JWT_SECRET, JWT_ALGORITHM
-=======
-from groq import Groq
-from datetime import datetime, timezone
-from database import get_db
-from config import GEMINI_API_KEY, JWT_SECRET, JWT_ALGORITHM, GROQ_API_KEY
->>>>>>> main
+from config import GEMINI_API_KEY, VLLM_BASE_URL, VLLM_MODEL, AI_BACKEND, JWT_SECRET, JWT_ALGORITHM, GROQ_API_KEY
 from models.chat import ChatMessage, FeedbackResponse
 from bson import ObjectId
 import json
@@ -21,12 +15,9 @@ import os
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
-gemini_client = genai.Client(api_key=GEMINI_API_KEY)
-<<<<<<< HEAD
-qwen_client = OpenAI(base_url=VLLM_BASE_URL, api_key="token-abc123")
-=======
 groq_client = Groq(api_key=GROQ_API_KEY)
->>>>>>> main
+gemini_client = genai.Client(api_key=GEMINI_API_KEY)
+vllm_client = OpenAI(base_url=VLLM_BASE_URL, api_key="not-needed")
 
 
 def verify_token(token: str) -> str:
@@ -43,14 +34,12 @@ def verify_token(token: str) -> str:
 @router.post("/transcribe")
 async def transcribe_audio(file: UploadFile = File(...)):
     try:
-        # Save the uploaded file to a temporary file
         with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1]) as tmp:
             content = await file.read()
             tmp.write(content)
             tmp_path = tmp.name
 
         try:
-            # Call Groq API for transcription
             with open(tmp_path, "rb") as audio_file:
                 transcription = groq_client.audio.transcriptions.create(
                     file=(file.filename, audio_file.read()),
@@ -61,7 +50,6 @@ async def transcribe_audio(file: UploadFile = File(...)):
                 )
             return {"text": transcription.text}
         finally:
-            # Clean up the temporary file
             if os.path.exists(tmp_path):
                 os.remove(tmp_path)
 
@@ -75,22 +63,27 @@ async def synthesize_speech(request: dict):
     try:
         text = request.get("text")
         if not text:
+            from fastapi.responses import Response
             return Response(content="Empty text", status_code=400)
 
-        print(f"DEBUG: Synthesizing text: {text[:50]}...")
-        
-        # Call Groq API for speech synthesis (Orpheus)
-        response = groq_client.audio.speech.create(
-            model="canopylabs/orpheus-v1-english",
-            voice="troy",  # Common Orpheus voice
-            input=text,
-            response_format="wav"
-        )
-        print("DEBUG: Groq synthesis successful, returning audio content")
+        # Groq Orpheus has a 200 char limit per request. 
+        def split_text(t, limit=200):
+            return [t[i:i + limit] for i in range(0, len(t), limit)]
 
-        # Return the audio as a streaming response
+        chunks = split_text(text)
+        combined_audio = b""
+        
+        for chunk in chunks:
+            response = groq_client.audio.speech.create(
+                model="canopylabs/orpheus-v1-english",
+                voice="troy",
+                input=chunk,
+                response_format="wav"
+            )
+            combined_audio += response.read()
+
         from fastapi.responses import Response
-        return Response(content=response.read(), media_type="audio/wav")
+        return Response(content=combined_audio, media_type="audio/wav")
 
     except Exception as e:
         print(f"Synthesis error: {e}")
@@ -99,7 +92,6 @@ async def synthesize_speech(request: dict):
 
 @router.websocket("/ws")
 async def chat_ws(websocket: WebSocket, token: str, interview_id: str = "", client_session_id: str = ""):
-    # Validate JWT before accepting connection
     try:
         user_id = verify_token(token)
     except ValueError:
@@ -107,13 +99,14 @@ async def chat_ws(websocket: WebSocket, token: str, interview_id: str = "", clie
         return
 
     await websocket.accept()
-    print("DEBUG: WebSocket accepted")
+    print(f"DEBUG: WebSocket accepted. Using backend: {AI_BACKEND}")
 
-    history = []
+    history = [] # For DB storage
     db = get_db()
-    interview_context = ""
+    
+    # Base instructions
+    system_prompt = "You are a professional interviewer. Be conversational, professional, ask one question at a time, and push back on vague answers."
 
-    # If an interview_id was provided, fetch the resume + job description
     if interview_id:
         try:
             interview = await db.interviews.find_one(
@@ -127,97 +120,133 @@ async def chat_ws(websocket: WebSocket, token: str, interview_id: str = "", clie
                 int_type = interview.get("interview_type", "technical")
                 difficulty = interview.get("difficulty", "medium")
 
-                interview_context = f"""You are an expert interviewer conducting a {difficulty} {int_type} interview for a {role} position.
+                system_prompt = f"""# ROLE
+You are a senior {role} interviewer. Your goal is to conduct a professional {difficulty} {int_type} interview.
 
-CANDIDATE'S RESUME:
-{resume_text}
+# CANDIDATE CONTEXT
+- **Role**: {role}
+- **Experience Level**: {difficulty}
+- **Interview Type**: {int_type}
+- **Resume Information**: {resume_text}
+- **Job Description**: {job_desc}
 
-JOB DESCRIPTION:
-{job_desc}
+# CONVERSATION RULES
+1. **ASK ONE QUESTION AT A TIME**. This is critical.
+2. Be conversational but professional. Act like a senior engineer.
+3. Push back on vague answers. Ask for implementation details or specific STAR examples.
+4. Do not provide feedback during the interview. Save it for the end.
+5. If the interview type is 'technical', focus on system design, coding patterns, and specific technologies from the resume.
+6. If 'behavioral', focus on leadership, conflict resolution, and teamwork.
 
-INSTRUCTIONS:
-- Ask questions like a real interviewer, make them concise instead of giving out paragraphs. It should be conversational.
-- Ask questions that are relevant to BOTH the candidate's resume AND the job description.
-- For technical interviews: ask about technologies and projects mentioned in the resume, system design, and coding concepts relevant to the job.
-- For behavioral interviews: ask about specific experiences from their resume using the STAR method.
-- For mixed interviews: alternate between technical and behavioral questions.
-- Start by greeting the candidate and asking your first question.
-- Ask one question at a time, wait for the answer, then follow up or move to the next question.
-- Be conversational but professional, like a real senior engineer interviewer.
-- Push back on vague answers and ask for specifics.
+# FORMATTING
+- Do not write out the candidate's responses.
+- Do not explain your AI nature. Just stay in character.
+- Start by greeting the candidate by name if available, or just a professional greeting, and ask your first question.
 """
-                print(f"DEBUG: Loaded interview context for {interview_id}")
         except Exception as e:
             print(f"DEBUG: Could not load interview context: {e}")
 
     try:
-        # --- Gemini setup ---
-        gemini_history = []
+        # --- Provider-specific initialization ---
         if AI_BACKEND == "gemini":
-            print("DEBUG: Creating Gemini chat session")
-            if interview_context:
-                gemini_history = [
-                    {"role": "user", "parts": [{"text": interview_context}]},
-                    {"role": "model", "parts": [{"text": "Understood. I will conduct this interview based on the candidate's resume and the job description provided. I'm ready to begin when the candidate is."}]},
-                ]
-            chat_session = gemini_client.chats.create(model="gemini-2.5-flash", history=gemini_history)
-            print("DEBUG: Chat session created")
+            # Gemini uses its own history format
+            gemini_history = [
+                {"role": "user", "parts": [{"text": system_prompt}]},
+                {"role": "model", "parts": [{"text": "Understood. I'm ready to begin the interview."}]}
+            ]
+            chat_session = gemini_client.chats.create(model="gemini-2.0-flash", history=gemini_history)
+        else:
+            # vLLM/OpenAI uses a simple list of messages
+            vllm_messages = [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": "I am ready. Please start the interview."}
+            ]
 
-        # --- Qwen/vLLM setup ---
-        qwen_messages = []
-        if AI_BACKEND == "qwen":
-            print("DEBUG: Starting Qwen/vLLM chat session")
-            if interview_context:
-                qwen_messages.append({"role": "system", "content": interview_context})
+        # --- Opening greeting ---
+        loop = asyncio.get_running_loop()
+        queue: asyncio.Queue = asyncio.Queue()
 
+        def generate_opening():
+            try:
+                if AI_BACKEND == "gemini":
+                    for chunk in chat_session.send_message_stream("Please start the interview now with your greeting and first message."):
+                        if chunk.text:
+                            loop.call_soon_threadsafe(queue.put_nowait, chunk.text)
+                else:
+                    stream = vllm_client.chat.completions.create(
+                        model=VLLM_MODEL,
+                        messages=vllm_messages,
+                        stream=True,
+                        max_tokens=256,
+                        temperature=0.7,
+                    )
+                    for chunk in stream:
+                        delta = chunk.choices[0].delta.content
+                        if delta:
+                            loop.call_soon_threadsafe(queue.put_nowait, delta)
+            except Exception as e:
+                loop.call_soon_threadsafe(queue.put_nowait, f"__ERROR__:{e}")
+            finally:
+                loop.call_soon_threadsafe(queue.put_nowait, None)
+
+        loop.run_in_executor(None, generate_opening)
+
+        opening_reply = ""
         while True:
-            print("DEBUG: Waiting for message...")
+            item = await queue.get()
+            if item is None:
+                break
+            if isinstance(item, str) and item.startswith("__ERROR__:"):
+                await websocket.send_text(json.dumps({"chunk": f"AI Error: {item}", "done": False}))
+                break
+            opening_reply += item
+            await websocket.send_text(json.dumps({"chunk": item, "done": False}))
+
+        await websocket.send_text(json.dumps({"chunk": "", "done": True}))
+        
+        # Sync histories
+        history.append({"role": "model", "text": opening_reply})
+        if AI_BACKEND != "gemini":
+            vllm_messages.append({"role": "assistant", "content": opening_reply})
+
+        # --- Main Message Loop ---
+        while True:
             data = await websocket.receive_text()
-            print(f"DEBUG: Received data: {data[:100]}")
             message = json.loads(data).get("message", "")
             if not message:
                 continue
 
             history.append({"role": "user", "text": message})
+            if AI_BACKEND != "gemini":
+                vllm_messages.append({"role": "user", "content": message})
 
             loop = asyncio.get_running_loop()
             queue: asyncio.Queue = asyncio.Queue()
 
-            if AI_BACKEND == "gemini":
-                def stream_sync():
-                    try:
-                        print("DEBUG: Starting Gemini stream")
+            def stream_response():
+                try:
+                    if AI_BACKEND == "gemini":
                         for chunk in chat_session.send_message_stream(message):
                             if chunk.text:
                                 loop.call_soon_threadsafe(queue.put_nowait, chunk.text)
-                        print("DEBUG: Gemini stream complete")
-                    except Exception as e:
-                        print(f"DEBUG: Gemini stream error: {e}")
-                        loop.call_soon_threadsafe(queue.put_nowait, f"__ERROR__:{e}")
-                    finally:
-                        loop.call_soon_threadsafe(queue.put_nowait, None)
-            else:
-                qwen_messages.append({"role": "user", "content": message})
-                def stream_sync(msgs=list(qwen_messages)):
-                    try:
-                        print("DEBUG: Starting Qwen stream")
-                        stream = qwen_client.chat.completions.create(
+                    else:
+                        stream = vllm_client.chat.completions.create(
                             model=VLLM_MODEL,
-                            messages=msgs,
+                            messages=vllm_messages,
                             stream=True,
+                            max_tokens=512,
+                            temperature=0.7,
                         )
                         for chunk in stream:
-                            text = chunk.choices[0].delta.content
-                            if text:
-                                loop.call_soon_threadsafe(queue.put_nowait, text)
-                        print("DEBUG: Qwen stream complete")
-                    except Exception as e:
-                        print(f"DEBUG: Qwen stream error: {e}")
-                        loop.call_soon_threadsafe(queue.put_nowait, f"__ERROR__:{e}")
-                    finally:
-                        loop.call_soon_threadsafe(queue.put_nowait, None)
+                            delta = chunk.choices[0].delta.content
+                            if delta:
+                                loop.call_soon_threadsafe(queue.put_nowait, delta)
+                except Exception as e:
+                    loop.call_soon_threadsafe(queue.put_nowait, f"__ERROR__:{e}")
+                finally:
+                    loop.call_soon_threadsafe(queue.put_nowait, None)
 
-            loop.run_in_executor(None, stream_sync)
+            loop.run_in_executor(None, stream_response)
 
             full_reply = ""
             while True:
@@ -225,30 +254,25 @@ INSTRUCTIONS:
                 if item is None:
                     break
                 if isinstance(item, str) and item.startswith("__ERROR__:"):
-
-                    print(f"Gemini error: {item}")
                     await websocket.send_text(json.dumps({"chunk": f"AI Error: {item}", "done": False}))
-
                     break
                 full_reply += item
                 await websocket.send_text(json.dumps({"chunk": item, "done": False}))
 
             history.append({"role": "model", "text": full_reply})
-            if AI_BACKEND == "qwen":
-                qwen_messages.append({"role": "assistant", "content": full_reply})
+            if AI_BACKEND != "gemini":
+                vllm_messages.append({"role": "assistant", "content": full_reply})
+            
             await websocket.send_text(json.dumps({"chunk": "", "done": True}))
 
     except WebSocketDisconnect:
-        # Save messages on disconnect
         if history:
             if interview_id:
-                # Update the existing interview document with chat messages
                 await db.interviews.update_one(
                     {"_id": ObjectId(interview_id)},
                     {"$set": {"messages": history}}
                 )
             else:
-                # Fallback: save as a standalone chat session using client_session_id
                 _id = client_session_id if client_session_id else str(ObjectId())
                 await db.chat_sessions.insert_one({
                     "_id": _id,
@@ -263,16 +287,14 @@ async def get_feedback(session_id: str):
     db = get_db()
     session = None
 
-    # Try the interviews collection first (new flow)
     try:
         session = await db.interviews.find_one(
             {"_id": ObjectId(session_id)},
-            {"resume_pdf": 0}  # exclude binary
+            {"resume_pdf": 0}
         )
     except Exception:
         pass
 
-    # Fallback to legacy chat_sessions collection using string id or object id
     if not session:
         session = await db.chat_sessions.find_one({"_id": session_id})
         if not session:
@@ -288,7 +310,6 @@ async def get_feedback(session_id: str):
         f"{msg['role'].upper()}: {msg['text']}" for msg in session["messages"]
     )
 
-    # Build a richer prompt with context if available
     context_info = ""
     if session.get("role"):
         context_info += f"\nRole: {session['role']}"
@@ -314,22 +335,26 @@ Cover the following in your feedback:
 TRANSCRIPT:
 {transcript}"""
 
-    if AI_BACKEND == "gemini":
-        response = await asyncio.to_thread(
-            gemini_client.models.generate_content,
-            model="gemini-2.5-flash",
-            contents=prompt
-        )
-        feedback_text = response.text
-    else:
-        response = await asyncio.to_thread(
-            qwen_client.chat.completions.create,
-            model=VLLM_MODEL,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        feedback_text = response.choices[0].message.content
+    async def generate_feedback():
+        if AI_BACKEND == "gemini":
+            response = await asyncio.to_thread(
+                gemini_client.models.generate_content,
+                model="gemini-2.0-flash",
+                contents=prompt
+            )
+            return response.text
+        else:
+            response = await asyncio.to_thread(
+                vllm_client.chat.completions.create,
+                model=VLLM_MODEL,
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=1024,
+                temperature=0.7,
+            )
+            return response.choices[0].message.content
 
-    # Save the feedback to the session
+    feedback_text = await generate_feedback()
+
     await db.interviews.update_one(
         {"_id": ObjectId(session_id)},
         {"$set": {"feedback": feedback_text}}
