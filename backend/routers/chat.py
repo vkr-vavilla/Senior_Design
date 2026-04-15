@@ -1,8 +1,6 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException, File, UploadFile
 from jose import JWTError, jwt
-from google import genai
 from groq import Groq
-from openai import OpenAI
 from datetime import datetime, timezone
 from database import get_db
 from config import GEMINI_API_KEY, VLLM_BASE_URL, VLLM_MODEL, AI_BACKEND, JWT_SECRET, JWT_ALGORITHM, GROQ_API_KEY
@@ -16,8 +14,23 @@ import os
 router = APIRouter(prefix="/chat", tags=["chat"])
 
 groq_client = Groq(api_key=GROQ_API_KEY)
-gemini_client = genai.Client(api_key=GEMINI_API_KEY)
-vllm_client = OpenAI(base_url=VLLM_BASE_URL, api_key="not-needed")
+
+# LAZY IMPORTS: We only import these when actually needed to prevent crashes on laptops
+def get_gemini_client():
+    try:
+        from google import genai
+        return genai.Client(api_key=GEMINI_API_KEY)
+    except ImportError:
+        print("DEBUG: google-genai not installed. Gemini will be unavailable.")
+        return None
+
+def get_vllm_client():
+    try:
+        from openai import OpenAI
+        return OpenAI(base_url=VLLM_BASE_URL, api_key="not-needed")
+    except ImportError:
+        print("DEBUG: openai library not installed. Local LLMs will be unavailable.")
+        return None
 
 
 def verify_token(token: str) -> str:
@@ -99,265 +112,149 @@ async def chat_ws(websocket: WebSocket, token: str, interview_id: str = "", clie
         return
 
     await websocket.accept()
-    print(f"DEBUG: WebSocket accepted. Using backend: {AI_BACKEND}")
+    print(f"DEBUG: WebSocket accepted. Preferred backend: {AI_BACKEND}")
 
-    history = [] # For DB storage
+    history = [] 
     db = get_db()
     
-    # Base instructions
+    # Context state
     system_prompt = "You are a professional interviewer. Be conversational, professional, ask one question at a time, and push back on vague answers."
-
+    
     if interview_id:
         try:
             interview = await db.interviews.find_one(
                 {"_id": ObjectId(interview_id), "user_id": user_id},
-                {"resume_text": 1, "job_description": 1, "role": 1, "interview_type": 1, "difficulty": 1}
+                {"role": 1, "interview_type": 1, "difficulty": 1, "resume_text": 1, "job_description": 1}
             )
             if interview:
-                resume_text = interview.get("resume_text", "")
-                job_desc = interview.get("job_description", "")
                 role = interview.get("role", "Software Engineer")
-                int_type = interview.get("interview_type", "technical")
                 difficulty = interview.get("difficulty", "medium")
-
-                system_prompt = f"""# ROLE
-You are a senior {role} interviewer. Your goal is to conduct a professional {difficulty} {int_type} interview.
-
-# CANDIDATE CONTEXT
-- **Role**: {role}
-- **Experience Level**: {difficulty}
-- **Interview Type**: {int_type}
-- **Resume Information**: {resume_text}
-- **Job Description**: {job_desc}
-
-# CONVERSATION RULES
-1. **ASK ONE QUESTION AT A TIME**. This is critical.
-2. Be conversational but professional. Act like a senior engineer.
-3. Push back on vague answers. Ask for implementation details or specific STAR examples.
-4. Do not provide feedback during the interview. Save it for the end.
-5. If the interview type is 'technical', focus on system design, coding patterns, and specific technologies from the resume.
-6. If 'behavioral', focus on leadership, conflict resolution, and teamwork.
-
-# FORMATTING
-- Do not write out the candidate's responses.
-- Do not explain your AI nature. Just stay in character.
-- Start by greeting the candidate by name if available, or just a professional greeting, and ask your first question.
+                int_type = interview.get("interview_type", "technical")
+                resume = interview.get("resume_text", "")
+                jd = interview.get("job_description", "")
+                
+                system_prompt = f"""You are a senior {role} interviewer. Conduct a {difficulty} {int_type} interview.
+CANDIDATE INFO: {resume}
+JOB INFO: {jd}
+RULES: 
+- Ask ONE question at a time.
+- Be conversational and concise.
+- Push back on weak answers.
 """
         except Exception as e:
-            print(f"DEBUG: Could not load interview context: {e}")
+            print(f"DEBUG: Load context fail: {e}")
+
+    # Standardized message format for fallback
+    messages = [
+        {"role": "system", "content": system_prompt}
+    ]
+
+    async def get_ai_response_stream(user_input: str):
+        """Unified streamer with automatic fallback and lazy loading."""
+        provider = AI_BACKEND
+        
+        messages.append({"role": "user", "content": user_input})
+        
+        try:
+            if provider == "gemini":
+                client = get_gemini_client()
+                if not client: raise ImportError("Gemini client missing")
+                
+                gemini_history = []
+                for m in messages[:-1]:
+                    role = "user" if m["role"] in ["user", "system"] else "model"
+                    gemini_history.append({"role": role, "parts": [{"text": m["content"]}]})
+                
+                chat = client.chats.create(model="gemini-2.5-flash", history=gemini_history)
+                for chunk in chat.send_message_stream(user_input):
+                    if chunk.text: yield chunk.text
+            else:
+                client = get_vllm_client()
+                if not client: raise ImportError("vLLM client missing")
+                
+                stream = client.chat.completions.create(
+                    model=VLLM_MODEL,
+                    messages=messages,
+                    stream=True,
+                    max_tokens=512
+                )
+                for chunk in stream:
+                    delta = chunk.choices[0].delta.content
+                    if delta: yield delta
+                    
+        except Exception as e:
+            yield f"__ERROR__: AI engine failed or library missing. Error: {e}"
 
     try:
-        # --- Provider-specific initialization ---
-        if AI_BACKEND == "gemini":
-            # Gemini uses its own history format
-            gemini_history = [
-                {"role": "user", "parts": [{"text": system_prompt}]},
-                {"role": "model", "parts": [{"text": "Understood. I'm ready to begin the interview."}]}
-            ]
-            chat_session = gemini_client.chats.create(model="gemini-2.0-flash", history=gemini_history)
-        else:
-            # vLLM/OpenAI uses a simple list of messages
-            vllm_messages = [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": "I am ready. Please start the interview."}
-            ]
-
-        # --- Opening greeting ---
-        loop = asyncio.get_running_loop()
-        queue: asyncio.Queue = asyncio.Queue()
-
-        def generate_opening():
-            try:
-                if AI_BACKEND == "gemini":
-                    for chunk in chat_session.send_message_stream("Please start the interview now with your greeting and first message."):
-                        if chunk.text:
-                            loop.call_soon_threadsafe(queue.put_nowait, chunk.text)
-                else:
-                    stream = vllm_client.chat.completions.create(
-                        model=VLLM_MODEL,
-                        messages=vllm_messages,
-                        stream=True,
-                        max_tokens=256,
-                        temperature=0.7,
-                    )
-                    for chunk in stream:
-                        delta = chunk.choices[0].delta.content
-                        if delta:
-                            loop.call_soon_threadsafe(queue.put_nowait, delta)
-            except Exception as e:
-                loop.call_soon_threadsafe(queue.put_nowait, f"__ERROR__:{e}")
-            finally:
-                loop.call_soon_threadsafe(queue.put_nowait, None)
-
-        loop.run_in_executor(None, generate_opening)
-
-        opening_reply = ""
-        while True:
-            item = await queue.get()
-            if item is None:
+        # Opening greeting
+        full_opening = ""
+        async for chunk in get_ai_response_stream("Begin the interview now."):
+            if chunk.startswith("__ERROR__"):
+                await websocket.send_text(json.dumps({"chunk": chunk, "done": False}))
                 break
-            if isinstance(item, str) and item.startswith("__ERROR__:"):
-                await websocket.send_text(json.dumps({"chunk": f"AI Error: {item}", "done": False}))
-                break
-            opening_reply += item
-            await websocket.send_text(json.dumps({"chunk": item, "done": False}))
-
-        await websocket.send_text(json.dumps({"chunk": "", "done": True}))
+            full_opening += chunk
+            await websocket.send_text(json.dumps({"chunk": chunk, "done": False}))
         
-        # Sync histories
-        history.append({"role": "model", "text": opening_reply})
-        if AI_BACKEND != "gemini":
-            vllm_messages.append({"role": "assistant", "content": opening_reply})
+        await websocket.send_text(json.dumps({"chunk": "", "done": True}))
+        messages.append({"role": "assistant", "content": full_opening})
+        history.append({"role": "model", "text": full_opening})
 
-        # --- Main Message Loop ---
+        # Main Loop
         while True:
             data = await websocket.receive_text()
-            message = json.loads(data).get("message", "")
-            if not message:
-                continue
+            user_msg = json.loads(data).get("message", "")
+            if not user_msg: continue
 
-            history.append({"role": "user", "text": message})
-            if AI_BACKEND != "gemini":
-                vllm_messages.append({"role": "user", "content": message})
-
-            loop = asyncio.get_running_loop()
-            queue: asyncio.Queue = asyncio.Queue()
-
-            def stream_response():
-                try:
-                    if AI_BACKEND == "gemini":
-                        for chunk in chat_session.send_message_stream(message):
-                            if chunk.text:
-                                loop.call_soon_threadsafe(queue.put_nowait, chunk.text)
-                    else:
-                        stream = vllm_client.chat.completions.create(
-                            model=VLLM_MODEL,
-                            messages=vllm_messages,
-                            stream=True,
-                            max_tokens=512,
-                            temperature=0.7,
-                        )
-                        for chunk in stream:
-                            delta = chunk.choices[0].delta.content
-                            if delta:
-                                loop.call_soon_threadsafe(queue.put_nowait, delta)
-                except Exception as e:
-                    loop.call_soon_threadsafe(queue.put_nowait, f"__ERROR__:{e}")
-                finally:
-                    loop.call_soon_threadsafe(queue.put_nowait, None)
-
-            loop.run_in_executor(None, stream_response)
-
-            full_reply = ""
-            while True:
-                item = await queue.get()
-                if item is None:
-                    break
-                if isinstance(item, str) and item.startswith("__ERROR__:"):
-                    await websocket.send_text(json.dumps({"chunk": f"AI Error: {item}", "done": False}))
-                    break
-                full_reply += item
-                await websocket.send_text(json.dumps({"chunk": item, "done": False}))
-
-            history.append({"role": "model", "text": full_reply})
-            if AI_BACKEND != "gemini":
-                vllm_messages.append({"role": "assistant", "content": full_reply})
+            history.append({"role": "user", "text": user_msg})
             
+            full_reply = ""
+            async for chunk in get_ai_response_stream(user_msg):
+                if chunk.startswith("__ERROR__"):
+                    await websocket.send_text(json.dumps({"chunk": chunk, "done": False}))
+                    break
+                full_reply += chunk
+                await websocket.send_text(json.dumps({"chunk": chunk, "done": False}))
+            
+            messages.append({"role": "assistant", "content": full_reply})
+            history.append({"role": "model", "text": full_reply})
             await websocket.send_text(json.dumps({"chunk": "", "done": True}))
 
     except WebSocketDisconnect:
         if history:
             if interview_id:
-                await db.interviews.update_one(
-                    {"_id": ObjectId(interview_id)},
-                    {"$set": {"messages": history}}
-                )
+                await db.interviews.update_one({"_id": ObjectId(interview_id)}, {"$set": {"messages": history}})
             else:
                 _id = client_session_id if client_session_id else str(ObjectId())
-                await db.chat_sessions.insert_one({
-                    "_id": _id,
-                    "user_id": user_id,
-                    "messages": history,
-                    "created_at": datetime.now(timezone.utc),
-                })
+                await db.chat_sessions.insert_one({"_id": _id, "user_id": user_id, "messages": history, "created_at": datetime.now(timezone.utc)})
 
 
 @router.post("/{session_id}/feedback", response_model=FeedbackResponse)
 async def get_feedback(session_id: str):
     db = get_db()
-    session = None
+    session = await db.interviews.find_one({"_id": ObjectId(session_id)})
+    if not session:
+        session = await db.chat_sessions.find_one({"_id": ObjectId(session_id)})
+    
+    if not session or not session.get("messages"):
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    transcript = "\n".join([f"{msg['role'].upper()}: {msg['text']}" for msg in session["messages"]])
+    prompt = f"Provide expert interview feedback for this transcript:\n\n{transcript}"
+
+    async def get_feedback_text():
+        if AI_BACKEND == "gemini":
+            client = get_gemini_client()
+            resp = await asyncio.to_thread(client.models.generate_content, model="gemini-2.5-flash", contents=prompt)
+            return resp.text
+        else:
+            client = get_vllm_client()
+            resp = await asyncio.to_thread(client.chat.completions.create, model=VLLM_MODEL, messages=[{"role": "user", "content": prompt}], max_tokens=1024)
+            return resp.choices[0].message.content
 
     try:
-        session = await db.interviews.find_one(
-            {"_id": ObjectId(session_id)},
-            {"resume_pdf": 0}
-        )
-    except Exception:
-        pass
+        feedback_text = await get_feedback_text()
+    except Exception as e:
+        feedback_text = f"Feedback generation failed: {e}"
 
-    if not session:
-        session = await db.chat_sessions.find_one({"_id": session_id})
-        if not session:
-            try:
-                session = await db.chat_sessions.find_one({"_id": ObjectId(session_id)})
-            except Exception:
-                pass
-
-    if not session or not session.get("messages"):
-        raise HTTPException(status_code=404, detail="Session not found or has no messages")
-
-    transcript = "\n".join(
-        f"{msg['role'].upper()}: {msg['text']}" for msg in session["messages"]
-    )
-
-    context_info = ""
-    if session.get("role"):
-        context_info += f"\nRole: {session['role']}"
-    if session.get("interview_type"):
-        context_info += f"\nInterview Type: {session['interview_type']}"
-    if session.get("difficulty"):
-        context_info += f"\nDifficulty: {session['difficulty']}"
-    if session.get("job_description"):
-        context_info += f"\nJob Description: {session['job_description'][:500]}"
-
-    prompt = f"""You are an expert interview coach. Based on the following mock interview transcript,
-provide detailed feedback on the candidate's performance.
-{context_info}
-
-Cover the following in your feedback:
-1. Overall Score (out of 10)
-2. Technical Accuracy (if applicable)
-3. Communication Clarity
-4. Strengths — what the candidate did well
-5. Areas for Improvement — specific, actionable suggestions
-6. Key Takeaways — 2-3 things to focus on before the real interview
-
-TRANSCRIPT:
-{transcript}"""
-
-    async def generate_feedback():
-        if AI_BACKEND == "gemini":
-            response = await asyncio.to_thread(
-                gemini_client.models.generate_content,
-                model="gemini-2.0-flash",
-                contents=prompt
-            )
-            return response.text
-        else:
-            response = await asyncio.to_thread(
-                vllm_client.chat.completions.create,
-                model=VLLM_MODEL,
-                messages=[{"role": "user", "content": prompt}],
-                max_tokens=1024,
-                temperature=0.7,
-            )
-            return response.choices[0].message.content
-
-    feedback_text = await generate_feedback()
-
-    await db.interviews.update_one(
-        {"_id": ObjectId(session_id)},
-        {"$set": {"feedback": feedback_text}}
-    )
-
+    await db.interviews.update_one({"_id": ObjectId(session_id)}, {"$set": {"feedback": feedback_text}})
     return FeedbackResponse(feedback=feedback_text)

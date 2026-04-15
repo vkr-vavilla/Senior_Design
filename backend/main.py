@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from database import connect_db, close_db
 from routers import auth, chat, interview
+from config import AI_BACKEND
 import asyncio
 import subprocess
 import requests
@@ -52,10 +53,12 @@ def stop_vllm():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await connect_db()
-    await asyncio.to_thread(start_vllm)
+    if AI_BACKEND not in ["gemini"]:
+        await asyncio.to_thread(start_vllm)
     yield
     await close_db()
-    stop_vllm()
+    if vllm_process:
+        stop_vllm()
 
 
 app = FastAPI(title="FinalRound", lifespan=lifespan)
