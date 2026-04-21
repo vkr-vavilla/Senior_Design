@@ -5,23 +5,7 @@
   "turns": [
     {
       "speaker": "INTERVIEWER",
-      "text": "Hello there and welcome to this system design mock interview. Today, we want to show you a really high-quality, best-in-class system design answer so that you can use it to prepare for your interviews and know exactly what standard you should be aiming for. With us, the candidate today, I have a former engineering manager at Google, Mark. Mark, how are you doing?"
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "I'm doing great, Tom. Thanks for having me. I'm looking forward to doing this."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "Oh, thanks for coming on. It's great to have you. Before we get started, I just want to quickly give people an idea of your background as an engineering manager."
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "Yeah, I was an engineering manager at Google for 13 years and worked on several large-scale systems with lots of great engineers. So, I hope I've learned a little bit from them, and it'll be interesting to see me on the other side of the fence, being the interview candidate here. So, I'm looking forward to it."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "I'm sure you'll do a great job. And Mark also is a coach on our platform, so if you need some expert feedback ahead of your interview at Google, Facebook, anywhere, any tech company, then do check him out on our platform. Okay, if you're ready, Mark, let's crack straight into it. The question I want to ask you today is: How would you design Spotify?"
+      "text": "Mark, the question I want to ask you today is: How would you design Spotify?"
     },
     {
       "speaker": "EMPLOYEE",
@@ -45,7 +29,7 @@
     },
     {
       "speaker": "INTERVIEWER",
-      "text": "Big, broad questions like this, you need to constrain the problem, make it solvable in the space of an hour. And Mark did this well, establishing the use cases we wanted to focus on. If you're asked to design an already existing system, in this case Spotify, share what you know about it with the interviewer. They can correct you or fill you in if you have any knowledge gaps. So, if I think about other, if I think about metrics here, let's think about size. Let's do some quick drilling down into some numbers here. And pardon me while I get this going here. So, in numbers, tell me about how many users you're thinking about here for this design?"
+      "text": "Tell me about how many users you're thinking about here for this design?"
     },
     {
       "speaker": "INTERVIEWER",
@@ -76,20 +60,12 @@
       "text": "Yeah, that all makes sense so far."
     },
     {
-      "speaker": "INTERVIEWER",
-      "text": "Before starting your high-level design, as Mark did, get some metrics to help you identify any higher-level decisions that might be influenced by the scale of the system. Mark asked the right questions about the number of users and number of songs. He made some rough calculations without getting bogged down in the numbers. What Mark didn't calculate was the traffic—how many songs are streamed per day or per second. Even that would have helped him figure out the scaling of the web servers, how many he'd need, and how much bandwidth he'd need. However, since this didn't impact his high-level design, it was okay not to go into the details of scaling at this point."
-    },
-    {
       "speaker": "EMPLOYEE",
       "text": "Okay, so let me maybe think about some basic components here, and I'm going to draw them, but I'll get into them maybe a little bit more in detail later. Okay, so some basic components that I would see. Let me start with something that is my best attempt at a mobile phone here. So, you've got your Spotify app, and I'll make this smaller so it fits into the thing. So, you've got your app, which is on your phone typically, and I'm going to assume here that we're talking about the phone app because that's very common. And so, you've got your phone. The phone is going to be talking to an application server, a Spotify application server somewhere, or web server, I guess. And so, let's draw some. Let me just put a like over here, just say there's a Spotify web server. And there's not going to just be one; there's going to be lots of them, and assume that that's a lot. And then, of course, just because this is a standard thing that you do when you have applications in the cloud here—this is, I guess, part of the cloud—you've got a load balancer. And so, let me draw. Let's assume that we've got an arrow here that's talking. So, the Spotify app is talking through the load balancer ultimately to these web servers. And so, those are some key components here. Let me think about this a little bit further. Yeah, I think that's good so far."
     },
     {
       "speaker": "EMPLOYEE",
       "text": "Okay, and then, of course, the most important thing, or one of the most important things here, let me see if I can find a—I know that there's a shape here, here we go, that's a good shape. I'm just going to say, call this the database. And let me make this a little bit more. Let's see, that's what I wanted. Okay, so there's a database. And so, the web servers are going to be talking to the database and basically reading information, writing information to and from the database. So, those are kind of the very high-level components."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "In system design interviews, good dual-bandwidth communication is important. That's to say, you need to communicate well via both drawing and speaking. You should practice this thoroughly before your interview. Mark did this well; he started drawing the components quite early on in his answer, and this allowed the interviewer to follow along easily. It's okay to have simpler and fewer components at this point in the interview; you can then break it out later in your answer, as Mark did when he splits his database in two."
     },
     {
       "speaker": "EMPLOYEE",
@@ -105,7 +81,7 @@
     },
     {
       "speaker": "INTERVIEWER",
-      "text": "Yes, that answers it. Yeah, it does. Thank you. Yeah, I think that makes sense. At this point of your answer, when you've laid out the main components, it's good to start identifying some technologies, as Mark did here, starting with the database. His design made sense, breaking up the databases into audio data and metadata, but he could have explained why he was doing this upfront rather than waiting for the interviewer to ask why. In general, try to be upfront about your decision-making."
+      "text": "Yes, that makes sense."
     },
     {
       "speaker": "EMPLOYEE",
@@ -137,15 +113,11 @@
     },
     {
       "speaker": "INTERVIEWER",
-      "text": "Be ready for the interviewer to ask you about particular components or different aspects of your system and to talk in detail about them. It's also good to talk through the flow of a particular use case. This helps make sure the interviewer is clear on it, but also helps you test your design as you talk through it, as well as helping you identify any potential bottlenecks, as it did with Mark here. Mark explained the purpose of the caching and also where caches might exist in the system. Caching wasn't limited to the CDN and the app, but also the web server. He could have talked about caching the metadata as well as the song data. We've done caching, that's all good. Now, I wanted to ask you about load balancing. How would you think about load balancing for this particular app?"
+      "text": "Now, I wanted to ask you about load balancing. How would you think about load balancing for this particular app?"
     },
     {
       "speaker": "EMPLOYEE",
       "text": "Yeah, magic load balancing. It's, yeah, a little bit hand-wavy here. I think of load balancing—I mean, so load balancing commonly is used to—the load balancer's job here really is to make sure that these web servers are not overloaded so that they're providing good service to the end users and they're not overloaded. And overloaded can mean many things. Often, it's in terms of CPU. So, you're getting lots of requests coming in, and if you're getting lots of requests coming in, then just load balancing these requests across the servers so that there's roughly the same number of requests on each one, assuming they're all equal, would probably also result in the CPU utilization being about equal. I think for this application, I would think about load balancing, I might think about it a little bit differently because we're streaming data. And so, instead of using CPU as my load balancing metric to figure out how to distribute the load, I might be looking at possibly network bandwidth. Because if a particular web server is not doing a lot from a CPU perspective, but if it is I/O bound or network bound, meaning it's hitting its limit of its network connection, then I wouldn't want the load balancer to send it more traffic because it's just going to bog down, and you're going to get skips and things like that. So, I might make this load balancer aware of multiple metrics, one of them being network, maybe memory for caching, although you can kind of limit that possibly, but maybe not CPU for this purpose. It might be requests outstanding or current streams or something like that. There might be some other metrics, but I would want to make this load balancer maybe a little bit smarter than just a typical request round-robin load balancing scheme. So, I'm not sure if that's getting at what you're asking."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "Yeah, I think that answers my question. Load balancing is not a one-size-fits-all. Mark mentioned looking at different metrics as a way to load balance across different servers, which was a clever approach. Mark was very open about the fact that load balancing isn't an area he's an expert on, and this is okay. It's fine to be honest when you're asked about things that are at the limits of your knowledge."
     },
     {
       "speaker": "INTERVIEWER",
@@ -154,22 +126,6 @@
     {
       "speaker": "EMPLOYEE",
       "text": "Yeah, let me think about that and give me just a moment. I mean, again, I've way oversimplified this. But I guess I think if I were to also think about this at a global scale, I mean, Spotify is a global app. And so, it's possible. So, replication—I didn't really talk about replication other than to do the math to say, 'Hey, maybe 3x replication.' And replication, right? Why do we do this? Well, we do it to make sure that we have data available when there's an outage. So, if I were to, you know, indicate three replicas, but that's a little naive. And the same thing for the metadata, of course. But replicating the data is not just for availability and downtime. It's also, you would want to place those replicas closer to where the users are. And so, from a global perspective, you might have music that is more local, like maybe European punk rock is listened to more in Europe. And maybe BTS, because it's Korean pop, is maybe more popular actually in Korea or in Asia. And so, you might want to have the replicas of those songs, and maybe even the metadata, be more locally represented, more locally, so that you can get to it faster. You don't have to cross an ocean to get to the data and to reach it. So, kind of a geo-aware strategy of data placement and possibly replication strategy, that might be a refinement, I think, that I might make to this design to make it just a little bit more performant, effective, etcetera, etcetera. So, yeah, does that make sense?"
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "Yeah, I think that's just an interesting point to add. It's a good idea to wrap up your answer by referring back to the requirements laid out at the beginning of the interview and confirming that your design meets them. If you have time, it's always nice to think big and take a quick look at the problem from a different dimension that could make it more complex. Mark did this with his geolocation idea. He didn't go into detail, but another interviewer might have explored this further, and it could have opened up a whole new aspect of the design. Overall, an excellent answer from Mark."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "Yeah, great job, Mark. I think that was a really good approach. And yeah, how did you feel now, looking back, now the interview is over? Let's say you've walked out the interview room and let out a big sigh of relief. How are you feeling that it's gone?"
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "I feel pretty good about it. It's, yeah, it's definitely different being on the other side of things. And I know that I'm sure I missed things, and I'm, you know, people are watching this and wind up scheduling a session with me. I'm happy to take the feedback on some things that I missed. I'm sure I've missed things, but yeah, it's fun to do this though."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "Cool, good stuff. Well, yeah, thanks very much, and thanks everyone for watching. I really hope you found that useful. If you did, you can like and subscribe, and why not come visit us at igotanoffer.com? There you can find more videos, useful frameworks, and question guides, all completely free. And you can also book expert feedback one-to-one with our coaches from Google, Meta, Amazon, etc. Thank you and good luck with your interview. All right."
     }
   ],
   "training_pairs": [

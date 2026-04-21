@@ -42,10 +42,6 @@
     {
       "speaker": "EMPLOYEE",
       "text": "If none of that works, we might be using the wrong database altogether. For example, trying to use PostgreSQL when the only operation we want is a fuzzy search. It works, but there are better options out there like Elasticsearch."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "All right, I'll follow for more real-world system design advice."
     }
   ],
   "training_pairs": [

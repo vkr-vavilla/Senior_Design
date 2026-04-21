@@ -5,22 +5,6 @@
   "turns": [
     {
       "speaker": "INTERVIEWER",
-      "text": "Hello, welcome to this system design mock interview. Very pleased to say we have a special guest with us today: it's Eugene from one of our favorite channels, Crushing Tech Education. Eugene, thanks for coming on the platform."
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "Thanks for having me, Tom."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "It's great to have you on. Now, you're going to be doing a classic system design mock interview question with us, but before you do, just quickly give people a quick overview of your background."
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "Of course. I'm a senior engineer and manager. I started out my career back in 2010 as a software engineer and over the years had an opportunity to work as a DevOps and network engineer, engineering manager, and VP of Technology. I also have my YouTube channel called Crushing Tech Education where I post a lot of system design content. The idea for the channel was to create content that would cover all those deep-dive concepts because that was my frustration back in the day when I tried to learn more about it. I just wouldn't find any deep-dive content, and the majority of the videos would be very shallow and high-level. So, I guess that's my attempt to fix that."
-    },
-    {
-      "speaker": "INTERVIEWER",
       "text": "Alright, let's stop chattering and get stuck in, shall we? Eugene, today I want to ask you to design Twitter."
     },
     {

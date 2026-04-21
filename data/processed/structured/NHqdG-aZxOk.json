@@ -1,0 +1,210 @@
+{
+  "video_id": "NHqdG-aZxOk",
+  "summary": "System design mock interview with Tom (IGotAnOffer) and Mark (former Google engineering manager). Question: design TikTok. Covers: scope clarification (backend only, skip app and login), scale estimation (1B users, 1B views/day, 10B uploads/year), success metrics (time in app ~1hr/day), detailed assumptions (10s avg, 1MB per video), capacity math (storage: 100 petabytes/year; uploads: 300/s; views: 10K/s), storage design (S3 tiered blob storage, DynamoDB metadata, SQL user data), CDN for regional serving, upload flow, video streaming flow with For You feed generator (ML-based), data schemas (video metadata, user metadata with algo features), For You algorithm design with exclusion guardrails, bottlenecks (for you generator, user data storage), enhancements (move ML to device, pepper feed with variety). Commentary sections provide interview tips.",
+  "quality_flags": ["Commentary sections by narrator marked UNKNOWN; some hand-wavy ML discussion acknowledged by Mark as outside his expertise"],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "How would you design TikTok?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, TikTok. All right. Popular vertical format video sharing application, popular with lots of people around the world I guess. And so it's kind of a social media platform. Pretty interesting and pretty complex I think. So tell me a little bit about maybe use cases here that we should be thinking about."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, sure. Let's not spend time on the mobile app and content creation in the app. I'd like you to focus on a back-end distributed system that supports uploads and downloads."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, that's good. Yeah, because certainly the application is the most central point of the whole thing and you could do lots of cool things in terms of generating your being a Creator so I'm glad we don't have to worry about that — that's also not my forte. So in terms of sign in and sign up and things like that, can we kind of skip that too? That's going to be pretty standard I think."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "I think that's — you're right — that's the less interesting part, so let's skip over that. Yeah. Okay, so you want to focus on sort of the video uploads into the system and then streaming the videos or consuming the videos I guess?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Absolutely. Okay, so tell me a little bit about how many users, how many videos uploaded — what's the scale of this thing, what are we thinking about here?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, yeah. Well we've got let's say one billion users in around 150 countries. And let's assume one billion video views a day. And I think I saw in a recent year there were 10 billion videos uploaded in one year, so let's use that figure as well."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "All right, let me capture some of this stuff — make sure I get this right. We've got a billion users across 150 countries. A billion videos per day viewed. And 10 billion videos uploaded per year. All right, that makes sense. That's big and that's good because we want it to be a big distributed system. So if I think about this app — uploading, downloading, streaming, viewing — even though we're not going to talk about the app too much — we probably should think about some success metrics. Do you have any thoughts on success metrics or would you prefer to hear my thoughts?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, I'd prefer to hear your thoughts on it. Give me some suggestions."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, all right. So I mean I guess in a classic sort of web application kind of thing, daily active users make sense. I think for TikTok the simple metric I guess would probably be something like time in app — so how long are people spending in the app. I'm not a heavy TikTok user at all but I imagine that people use it in different ways — some maybe just scroll through the videos, some watch the entire thing and react and share and do lots more interesting things, and then there's the creators. But time in app is probably the simplest metric to think about, so maximizing time in app. Do you know how long people spend in the app? Do you have a sense of that?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "I think let's say the average is around an hour a day. Does that sound okay?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Sure, so let's assume that. Okay that sounds fine. So time in app, currently about an hour per day. Sounds good. All right, so let me see if I can make some more detailed assumptions here. So this is vertical — it's a vertical form factor video sharing thing as I mentioned — and typically these videos are 1080 pixels by 1920 pixels or something like that. The typical video time range for these clips is like three seconds to a minute. But just for sake of simplification maybe we can assume a 10 second video on average. If that seems okay?"
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, yeah, I think that works."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "And so 1080 times 1920 pixels — which in a video, a 10-second video — I think we can probably assume a megabyte per video. If that seems all right. Okay, so megabyte per video. With those assumptions maybe I can do some really rough calculations. Let me look at uploads first because that translates to storage in addition to some traffic. So if we say 10 billion videos per year, and if we divide by 365 days in a year, that comes out to approximately 30 million videos uploaded per day. And if I say storage — 10 billion a year times a megabyte per video, so 10 billion megabytes — that's 10 petabytes of raw video storage per year. But we have to factor in possibly some replication for redundancy, also possibly different formats for different types of devices. So I might say devices and replication times 10, so let's say 100 petabytes per year of storage requirements. Okay, so that's a lot of storage but these days you can scale. And this naturally makes me think about a blob storage solution — modern solutions scale quite well for this. For video metadata — I mentioned this is a kilobyte of data per video, so instead of 10 petabytes it's a factor of a thousand less — we're talking about 10 terabytes of video metadata. And for traffic — if we say 10 billion videos uploaded per year and divide by 365 days and then by approximately 100,000 seconds in a day, that gets me to 300 videos per second — or at peak maybe around 1,000 per second. At a megabyte each and a megabyte is approximately 10 megabits, that's 10 million megabits — or around 10 gigabits per second ingress. Modern network cards on servers are 10 gigabits per second so this is not a bottleneck. For views — a billion videos viewed per day divided by a hundred thousand seconds gives us 10,000 videos per second. Doing the similar math that's about 100 gigabits egress, which is also not a lot. So I think these are all numbers that can be worked with."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "It can be useful to do some high-level maths to inform your thinking and your solution. So make sure you practice multiplying and dividing big numbers like these as part of your interview preparation — as if you're not used to it, it's very easy to get lost in all the zeros. Mark did some solid calculations to work out the storage for the raw data and metadata. However, he didn't do the maths for the user data storage requirements, instead moving on to make the traffic calculations. It would have been a better idea to finish the storage calculations first as these requirements were more likely to influence the design. As a general rule when you're working on storage calculations, finish them."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, I think we should probably move on. So let me just draw a couple boxes here. I'm going to draw a little TikTok app and then of course we're going to do the typical thing — I don't really want to spend too much time on load balancers here — you've got some sort of a TikTok app service, this is the thing that would run in the cloud, this would be one of my servers and there'd be multiples of these. But I think I take that back — I think I want to separate these two because you asked me to talk about uploads and viewing and streaming. So there's going to be some sort of a TikTok app service. And then let's create another one which is the TikTok upload service because we're going to have we're going to be uploading videos and I think I might keep these separate because they serve slightly different purposes, and in a microservices architecture best practices you would separate these things. The app service when you first open your TikTok app comes through the load balancer and hits one of these app services — the very first thing you might see is all the videos etc and the followers and all these kinds of things. But if I click on upload or create a new video then I might get redirected to the upload service. These are kind of the front ends to the services."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so let's talk a little bit more about the databases. The first thing I talked about was the video blob storage — that's where the actual raw videos would go. And so this has to be sort of like a file system almost, but I probably would use something like Amazon S3 for this because that scales really well and it's purpose-built for this kind of thing. By nature of Amazon Web Services you can nicely replicate the data for better availability, you can have regional replicas so that it's more aware of regions. And the other thing that you can do is you can tier the storage data. We talked about 100 petabytes of raw data for a year and so that can accumulate quickly. With TikTok videos I'm making an assumption that a video's lifespan is not more than maybe a couple of months for most videos — that you don't go back and watch three-year-old videos too much, that it's all about the most recent stuff. Which means that you can tier your data such that older data or data that hasn't been looked at as often can go into Cold Storage. So I'm going to put a keyword in here which is tiered AWS S3. What that means is that if a video is let's say a year old and nobody's really looked at it it could go into really slow offline storage which means it doesn't cost as much and it's more cost effective versus stuff that is most recently uploaded. Then video metadata — I mentioned this is 10 terabytes and I said NoSQL storage. So I probably would use something like DynamoDB as an example. I'm biased for purposes of an initial solution to hosted solutions like Amazon provides because they take a whole bunch of maintenance and operational load off of the engineering team. DynamoDB scales really nicely in terms of the number of rows you can have. So these two things together would make up basically the video storage database."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "So far, yeah. We're good so far. How do you think the different regions and countries could be reflected in your design? Are you taking them into account?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, good question. So I think the nice thing about some of these existing hosted solutions is that they have regional features. But that's not really answering your question I think. If I think about it — I can imagine having different data centers in different locations because you want the responsiveness to be fast. If you're in India you want the responsiveness to be fast, if you're in Europe you want the responsiveness to be fast, if you're in China, US — same kind of thing. And so having the data local near to where you are is what you have to do as a global application. And one of the ways to do that is by partitioning the data possibly based on region or language or things like that, and locating the data in different places. Another thing — when we get to the serving or streaming side — in order to not overload these storage systems you really need to have some sort of a CDN, a Content Delivery Network, like CloudFront or something like this. And what this does is it's basically a set of caches near the closer to the user that cache data that is typically popular. So videos that are popular in a particular region would be in this CDN, stored in the CDN, and thus made to be available faster. The regionality might happen automatically — you'd probably get videos created in India to be more commonly located in the CDNs in India versus Europe, US, China, wherever. So there's definitely some regional aspects to this."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so the piece that we're missing — the piece that I haven't talked about yet — let me draw yet another database because we also mentioned user data. A billion users across 150 countries but they have friends and followers and connections and this is where this whole social graph kind of comes into play. Because of those connections — and those connections may very well span regions and countries — you probably want to have this user data not be explicitly partitioned out into separate databases that can't talk to each other. So I probably would want to put this into some sort of SQL storage solution. I might use Amazon RDS — relational data store — which allows you to use SQL solutions to store your data. I'm hand-waving a little bit about the amount of data here. At a billion users and a kilobyte per user — that's a terabyte of data — which fits, you can do that with modern SQL solutions. But we're starting to get into some bottlenecks there potentially so that might be something we need to look out for. Something like Google Cloud Spanner actually scales much more broadly than that and gives you some relational features. But anyway — user data — that's another big aspect of this."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So if I talk about the upload path — you know the TikTok app would upload a video and send that to the upload service. And then that has to go from there to two places — it really needs to go to the blob storage and it needs to go to the metadata store because you need to be able to add the information about the video so that you can figure out can it be shown, does it make sense to show to people. So that's roughly the flow of an upload. Now let me talk about the video streaming flow. I'm going to just draw a box here and I'm going to call this the 'for you' generator. So when I load my TikTok — when I first go into my TikTok app — I'm already seeing videos. There's no lag, there's no clicking on things, I'm already as soon as a video is in focus it starts playing. And so that means that my app is actually getting multiple videos by the time I start the app. So if I go to the app service, one of the important things the app service has to do is it has to talk to this generator — and by the way this generator is also going to have to be multiple servers because we're scaling. This app service needs to be able to talk to some back-end algorithm that says what should I show the user. And I think that this is actually rather complicated and sophisticated and if I were doing this today I would probably employ some sort of machine learning system to figure out what to show the user because there's just too many variables to try and build a rule-based system. So machine learning solution — that's the overview. So this TikTok app service needs to contact this generator, and ultimately what it's going to do is it's going to return back to this application service a list of video IDs — the for you video IDs — that the application ultimately should show to the user."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So then what happens with that? The application service would get from those video IDs the metadata information about the videos — how long they are, what is the ID, the URL for where to find this video so that I actually can go and fetch it, who created the video, how many likes it has, things like that. So this app service would go straight to the metadata database to get that information so that it could pass that on to the application. And among other things it returns these video URLs. Then the TikTok app for each of those video URLs goes and fetches them by just going to those URLs — and that URL is going to land at a CDN, a Content Delivery Network. Now if that content delivery network has the video because it's popular in its local cache, then it will just go ahead and deliver that — and that's just how CDNs work, nothing special — so if the CDN has it it'll just serve it and it'll be fast and for popular videos that's super fast. If not then it'll wind up going to the back-end storage service like S3 and going and fetching it. So from a video serving perspective, the application has two parts to it: there's the actual video data which goes through the CDN and the blobs, and then there's the metadata which would come through the application service and returns everything you need to show to make your phone application look good."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "Marked drew a good high-level diagram. He did an excellent job talking the interviewer through the upload and download flow and then for the video streaming flow too. You might have noticed that Mark drew lots of arrows to illustrate the flow of data — you don't have to do this, talking it through with the interviewer is sufficient if you prefer. Don't feel that your diagram has to be totally self-explanatory — but it's really important to be comfortable with the diagram drawing tool you're using so that you can use it to help and enhance your explanation rather than having to struggle with it. Mark also covered the For You feed and how it's generated algorithmically, even though he did this in a very simplified way. It was important to touch on because it's key to what makes TikTok unique — this way he prepared the ground to drill down into it later."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "All right, so if that seems good so far — there's two things I'd like to do if we still have time. One of them is I'd like to just talk a little bit more about the data — the schema of the data — what are the elements of the video metadata and the user metadata. And I want to talk about those because I think they're related to the second thing I want to talk about which is a little bit more thinking around how I might do this generator if I were to treat it a little less as a black box. So if that's okay, that's kind of where I'd like to go."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I'd love to see you drill down. So let's talk about the video metadata — what's in this video metadata? So there's going to be a video ID which is just a unique identifier for the video. There's going to be also a video URL — and I'll mention this but I don't want to write it yet — but I mentioned briefly earlier that you might want different encodings depending on the video so during the upload phase, possibly offline asynchronously, if we want to store differently encoded forms of the same video then we probably need to have different URLs or different blobs for those things. So we might have the original raw uploaded video, an iPhone optimized video, a MacBook version, things like that. So you might have video URLs as a list instead of just a single one. But I'll hand-wave over that for now. Okay, so video ID, video URL. What else? Maybe like a creation timestamp — when was this thing created? Probably like a creator ID — who created this video, who uploaded this video? We probably want something like likes or reactions — how many people liked it, how many people didn't like it, etc. And there's something else I want to put in here as a placeholder for now — which is related to the algo features. I'll just call this for now and get back to it. And there might be something like length or duration of the video. So that's what I would think about for the video metadata."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "And let me now talk about what I think would be in the user data. So there's the typical stuff about users — a user ID, some credentials, login credential type of stuff, maybe some things like name, age, other bits of information like that. But then I think the other thing is because this is such a social network graph you probably want to have following user IDs — so who are the people that you're following. There's probably also video history IDs — this is the watch history like what are the things that you've watched in the past, videos you've seen or been shown. And then for if you're a Creator you probably also have uploaded video IDs — what are the videos that you've uploaded. And let's not forget we talked at the very beginning about the success metric — time in app — so I probably need to track per user how long they've been spending in the TikTok app, aggregate that, and be able to look at that offline. So that's probably something I need to store and keep track of."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so let's get back to this thing I mentioned — the for you algo profile. I should probably change the video one here as well — for you algo features. So here's how I'm thinking about this — and again I'm not an ML expert by any means, I have limited background in this kind of stuff — but in order to have a machine learning system be trained and be able to make decisions, one of the things it needs to take in is a set of features. Features could be things like the video ID itself, the number of followers, the entire network graph, content preferences, language — things like this that are specific to this user that help the algorithm figure out what types of videos to show. So that profile is something that I would want to store per user. The for you generator would reference this profile and utilize it along against the algo features that were generated for a particular video — and that could be length of video, content, location, language, a bunch of different features. So this generator can essentially input the features from the user and based on all of the algorithmically feature-identified videos make a determination as to what the best match is for videos to show to the user. So that's a lot of hand-waving but the idea is that this is essentially a neural network or some sort of other system — a machine learning mechanism that has been trained offline with all the videos that have been uploaded, they've all been feature-extracted for each of the videos, and then those features are fed into the system to train it. And then there's a matching step where on the fly we say okay, given this user profile, what are the videos that we should show? That's still kind of black-boxy and hand-wavy. But the key thing is that there's an exclusion profile — exclusion profile might have in it follower IDs or user IDs or something like that for people you don't want to see anymore. Because this ML system is offline and asynchronous and might take a while to catch up if I say I don't want to see any more videos from a particular user — I expect that to take effect immediately. So I'd want a little bit of rule-based guardrails — a combination of some machine learning stuff which is not going to be perfect, and some simple rule-based logic that is unambiguous, to ultimately filter down the set of video URLs that the user would see."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "Mark's explanation for the databases was well structured, first going high level and then drilling down into the schema afterwards. Mark did well talking about the algorithmic generator for the for you feed, even though machine learning is outside his area of expertise. If the system requires including things that you don't know much about, don't just ignore them — you can mention them in a simplified way while being upfront with the interviewer about the limits of your expertise, as Mark was here."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Let me stop here and just ask you — what other things are you thinking about or wondering about here with this design?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, well I'm wondering if there'd be any bottlenecks and yeah I'd also like to hear if you have any enhancements you could make."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, good questions."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so I mean one bottleneck — which is not so much a performance bottleneck but I think I already mentioned there could be possibly a storage bottleneck in terms of keeping all of the user data in one single database just because of size. That could be an issue — I might have to partition the data for the largest regions or something. That might be that. But I think the more interesting performance bottleneck is this generator — that is generating on the fly in near real time when this app service is called every time the app says hey give me what's next. That could be a bottleneck because it has to respond quickly. And so one thing that I wanted to mention here — one of the really cool features of TikTok that I find fascinating is that you're in the app and everything is there immediately. There's no lag, there's no hesitation, there's no spinning wheel — it's all just right there as you're scrolling and your videos are scrolling and they're starting to play as soon as they come into focus. How do you make that happen? The answer is you don't send a request right then. I think the answer is that as The TikTok app is running it's actually constantly talking to the app service and saying what are the 10 next videos or the 20 next videos, and so it's doing what's called a read-ahead. It's pre-computing basically the stuff so that it's ready to go. That's not perfect and there are some issues with that but that's one way to make this seem extremely alive and responsive. But that doesn't solve necessarily the bottleneck of this generation here. So one thing I could think of doing is over time when this app service and the generator start to maybe mature I could imagine moving this logic — some of this logic — into the app, onto the popular platform. So if we've got iOS, Android, Windows, Mac, maybe web — I could imagine that on the most popular platforms — let's say iOS and Android on just mobile devices — that you move this generator code into the actual application onto the phone so that it can take advantage of maybe even the GPU on the phone. Because smartphones are super powerful these days, so you have a lot of compute power to use there, and that could reduce the bottleneck of having these things sort of running out in the cloud. So that that would be a bottleneck that I would be thinking about."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "You asked about enhancements. So I guess maybe moving the generator logic into the phone would be an enhancement too. I think an enhancement that is probably more of a product enhancement is that I could imagine — right now you get a for you feed and it's customized to your likes and preferences — I could imagine having the generator occasionally pepper the list of videos with something that is outside of your domain or your interests, to kind of give you a taste of something. You don't want a lot of that because you don't want people to get a feel like okay I'm getting something that I don't like. But you could imagine peppering the results every now and then with a little bit of something that is new and unusual — sort of a surprise unsolicited idea for a video or something like that. And that would still go through that filter that I was talking about — the exclusion guardrails — so if this is from a follower that I explicitly said don't look at then I wouldn't want to see that. But if it's something that hasn't explicitly been disallowed then maybe it's something that you get to see. An enhancement from a system perspective — one enhancement I could imagine making is that if some of this architecture stabilizes you could pick out certain components or aspects that are costly. So if DynamoDB turns out to be super expensive or RDS — maybe you decide you know what, I'm going to go ahead and pay the engineering costs and get my engineers to do our own hosting of a MySQL solution or do it on a different platform — just to kind of reduce costs because now it's worth it at the scale to build our own solution. But that's always a trade-off between the engineering cost and the sort of service costs that you wind up paying for these kinds of solutions."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "Mark's idea that you could pepper the for you feed with a different type of content is more of a product enhancement than a system enhancement. If you're interviewing for an engineering role, you'd probably want to come up with a system enhancement if possible. Keep in mind the role and level that you're interviewing for — as an individual contributor position more technical depth might be expected, while if you're interviewing for say an engineering manager role you'll want to consider things such as cost trade-offs as Mark did here. Overall a great interview from Mark — he showed some clear thinking and superb communication skills on what was a pretty tricky design."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, let's wrap it up now. Mark, just have a quick look over your design — are you happy with it? Do you feel that you met the objectives that we laid out at the beginning?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, so I think so because I think you asked about sort of the upload and download streaming aspects of it and we did some capacity there. We have the databases, we've got the rough idea of how that's going to flow through the system. I've got a little bit of hand-wavy stuff around the for you feed which is sort of what we show. So I feel like this is a decent start. Again, I imagine the real TikTok architecture is significantly more complex — I mean people have spent engineering decades building this thing and it's an amazing app — so there's no way I'm going to reproduce that in any amount of time. But kudos to those engineers."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "That's very good. Well I think you made a pretty good attempt. Let's finish the interview there. Thanks Mark, you can relax. How was it — was it enjoyable?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "That was fun — hard, difficult, but fun. It's a tricky one, but yeah it was good fun. Watching you watching you do it and yeah I think hopefully people will have learned a lot. I'm sure we'll get lots of comments on it. So yeah, Mark, thanks very much and yeah I hope we'll see you again here sometime soon. Thank you, thanks Tom."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "Hello, I really hope you found that useful. If you did you can like and subscribe and why not come visit us at IGotAnOffer.com. There you can find more videos, useful frameworks and questions guides all completely free. And you can also book expert feedback one-to-one with our coaches from Google, Meta, Amazon, etc. Thank you and good luck with your interview."
+    }
+  ],
+  "training_pairs": [
+    {
+      "question": "How would you design TikTok?",
+      "answer": "Okay, TikTok. All right. Popular vertical format video sharing application, popular with lots of people around the world I guess. And so it's kind of a social media platform. Pretty interesting and pretty complex I think. So tell me a little bit about maybe use cases here that we should be thinking about.",
+      "follow_up": "Let's not spend time on the mobile app and content creation in the app. I'd like you to focus on a back-end distributed system that supports uploads and downloads."
+    },
+    {
+      "question": "How many users, how many videos uploaded — what's the scale of this thing, what are we thinking about?",
+      "answer": "All right. Let me capture some of this stuff — make sure I get this right. We've got a billion users across 150 countries. A billion videos per day viewed. And 10 billion videos uploaded per year. All right, that makes sense. That's big and that's good because we want it to be a big distributed system.",
+      "follow_up": "Do you have any thoughts on success metrics?"
+    },
+    {
+      "question": "What success metrics would you suggest?",
+      "answer": "So I mean I guess in a classic sort of web application, daily active users make sense. I think for TikTok the simple metric I guess would probably be something like time in app — so how long are people spending in the app. I'm not a heavy TikTok user at all but I imagine that people use it in different ways — some maybe just scroll through the videos, some watch the entire thing and react and share and do lots more interesting things, and then there's the creators. But time in app is probably the simplest metric to think about, so maximizing time in app.",
+      "follow_up": "The average is around an hour a day. Let's assume that."
+    },
+    {
+      "question": "Walk me through your capacity estimation — storage and traffic.",
+      "answer": "So this is vertical format video — 1080 times 1920 pixels. Typical clip length three seconds to a minute but let's assume 10 seconds on average, and roughly a megabyte per video. For uploads: 10 billion per year, divide by 365 gives 30 million per day. For storage: 10 billion megabytes = 10 petabytes raw per year. With replication and multiple encodings — multiply by 10 — call it 100 petabytes per year. Video metadata at 1 KB per video is about 10 terabytes. For upload traffic: 30M per day divided by 100K seconds in a day = 300 videos per second, so peak maybe 1,000 per second. At a megabyte each = 10 megabits each = ~10 gigabits per second ingress, which modern network cards handle fine — not a bottleneck. For views: a billion per day divided by 100K seconds = 10,000 videos per second. Similar math gives about 100 gigabits egress, also manageable. This naturally leads me to think about blob storage for the raw videos.",
+      "follow_up": "Walk me through the high-level architecture."
+    },
+    {
+      "question": "Walk me through the high-level architecture.",
+      "answer": "I want to separate two services: a TikTok app service and a TikTok upload service, since they serve slightly different purposes. For storage: raw video goes to video blob storage — I'd use Amazon S3 because it scales really well and is purpose-built for this. I'd use tiered storage so older videos that haven't been accessed much go to Cold Storage, reducing cost. Then video metadata — 10 terabytes of data, NoSQL, so I'd use something like DynamoDB. And for user data — because it's a social graph with connections spanning regions and countries — I'd use a SQL storage solution like Amazon RDS or Google Cloud Spanner. For serving video to users — I'd have a CDN to cache popular videos near users. The regional aspect: data centers in different locations, and the CDN handles the regionality automatically by caching popular videos in local CDN nodes.",
+      "follow_up": "Walk me through the upload flow and the video streaming flow."
+    },
+    {
+      "question": "Walk me through the upload flow and the video streaming flow.",
+      "answer": "Upload flow: the TikTok app uploads a video and sends it to the upload service. From there it goes to two places — blob storage for the raw video and the metadata store with information about the video. Video streaming flow: the App Service needs to talk to a 'For You Generator' — a back-end algorithm that says what should I show this user. And I think if I were doing this today I would employ some sort of machine learning system because there are just too many variables for a rule-based system. The generator returns a list of video IDs for this user. The App Service then fetches metadata for those video IDs from the metadata database — duration, URL, creator ID, likes, etc. Among other things it returns video URLs. The TikTok app fetches each of those video URLs — those URLs land at a CDN. If the CDN has the video because it's popular in its local cache, it delivers it immediately. If not, it fetches from S3 and delivers. So there are two parts to serving: actual video data through the CDN and blobs, and metadata through the application service.",
+      "follow_up": "Let's talk about the data schemas — what's in the video metadata and user metadata?"
+    },
+    {
+      "question": "Let's talk about the data schemas — what's in the video metadata and user metadata?",
+      "answer": "For video metadata: video ID, video URL (or a list of video URLs for different encodings — iPhone optimized, MacBook, etc.), creation timestamp, creator ID, likes or reactions, algo features (I'll get back to this), and duration. For user metadata: user ID, credentials, name and demographic info, following user IDs (who are you following), video history IDs (your watch history — videos you've seen or been shown), uploaded video IDs for creators, and time in app — how long this user has been spending in TikTok, which I need to aggregate and look at offline as our primary success metric.",
+      "follow_up": "Tell me more about the For You algo features and the generator."
+    },
+    {
+      "question": "Tell me more about the For You algo features and the generator. How would you design it?",
+      "answer": "So I'm not an ML expert by any means — I have limited background in this kind of stuff — but in order to have a machine learning system be trained and make decisions, it needs a set of features. Features could be things like the video ID itself, the number of followers, the entire network graph, content preferences, language — things specific to this user that help the algorithm figure out what types of videos to show. That profile is something I'd want to store per user. The For You generator would reference this profile and use it against the algo features generated for each video — length of video, content, location, language, a bunch of different features. The generator — essentially a neural network — has been trained offline with all uploaded videos that have been feature-extracted. Then there's a matching step where on the fly we say, given this user profile, what are the videos that we should show? The tricky part is that this ML system is asynchronous and slow to update. If I say I don't want to see any more videos from a particular user — I expect that to take effect immediately. So I'd want a rule-based exclusion profile alongside the ML — containing follower IDs or user IDs I explicitly don't want to see — that filters the ML output. A combination of ML which isn't perfect plus simple unambiguous rule-based logic would ultimately filter down the set of video URLs that the user would see.",
+      "follow_up": "What bottlenecks do you see and what enhancements would you make?"
+    },
+    {
+      "question": "What bottlenecks do you see and what enhancements would you make?",
+      "answer": "One bottleneck is possibly a storage bottleneck — keeping all the user data in one single database just because of size — might have to partition by region. The more interesting performance bottleneck is the for you generator — it has to respond quickly every time the app asks what's next. One thing about TikTok that I find fascinating is everything is there immediately — there's no spinning wheel — the app is doing what's called a read-ahead, pre-computing the next 10 to 20 videos before you even scroll to them. That's one way to make it seem alive and responsive. But to reduce the generator bottleneck itself, over time I could imagine moving some of the generator code from the cloud into the actual application on the phone. Smartphones are super powerful now — they have GPUs — and you have a lot of compute power there, which could reduce the bottleneck of having things running out in the cloud. For enhancements: moving the generator to the device is one. A product enhancement would be occasionally peppering the for you feed with content outside your typical interests — something new and unusual — still filtered through the exclusion guardrails. From a system perspective — once the architecture stabilizes you could pick out costly components like DynamoDB or RDS and decide to self-host a MySQL solution if the engineering cost is now worth it at scale.",
+      "follow_up": "NONE"
+    }
+  ]
+}

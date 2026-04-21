@@ -8,18 +8,6 @@
       "text": "I would like you to design a reservation and payment system for a parking garage."
     },
     {
-      "speaker": "INTERVIEWER",
-      "text": "Welcome everyone to another mock interview at Exponent. Today, we're going to be doing a systems design interview question with Tim. Before we dive in, Tim, would you like to introduce yourself?"
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "Yeah, for sure. Hey, my name is Tim. I'm a software engineer. I've been doing engineering for a couple years now. I previously worked at some large tech companies like Amazon Lab126 or Airbnb. I'm currently working on some startup stuff on my own."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "Nice, thanks for being with us today, Tim. So, the question today: I would like you to design a reservation and payment system for a parking garage."
-    },
-    {
       "speaker": "EMPLOYEE",
       "text": "All right, awesome. Yeah, we can just dive right into it if you'd like. The first thing I like to do generally is clarify the requirements a little bit, just to make sure I'm not making any incorrect assumptions. So to start off, I'll write some of them down just to make sure I've got them off the bat."
     },

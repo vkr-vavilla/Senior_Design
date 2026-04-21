@@ -5,15 +5,7 @@
   "turns": [
     {
       "speaker": "INTERVIEWER",
-      "text": "Hey everyone, I'm here today with Adam, and today we'll be doing a mock system design interview. I'm really excited to have Adam in this video. Adam, do you mind just introducing yourself and telling us a little bit about what you work on?"
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "Sure. Hi, my name is Adam. I work on cloud engineering and back-end systems, currently at Oracle, but I'll be moving over to Google soon."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "Awesome. Yeah, we're really excited to jump into a practice system design interview today. The question that we'll be doing is 'Design TikTok'."
+      "text": "Design TikTok."
     },
     {
       "speaker": "EMPLOYEE",

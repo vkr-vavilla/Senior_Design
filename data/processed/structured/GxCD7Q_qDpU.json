@@ -8,19 +8,7 @@
   "turns": [
     {
       "speaker": "INTERVIEWER",
-      "text": "Hey everyone, I've done many mock Google interviews on this channel, but one type I haven't done is a mock Google behavioral interview. In this video, I'm doing a mock Google behavioral interview with Nick White, another tech YouTuber. This is a standard behavioral interview you might get at a big tech company. I asked him various questions, most of them picked from AlgoExpert, my company, where we have behavioral interview content. Behavioral interviews are tricky because there's no real right or wrong answer; it's very conversational. Hopefully, you'll find this video insightful. We also did a debrief session after the interview, so stick around for that."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "Nick has his button-down shirt, he's ready to put his serious hat on. Nick, are you ready for the behavioral interview?"
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "I am. I was born ready."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "You're born ready. All right, let's do this. This is probably going to be about 20 to 30 minutes. Let's begin. Hey Nick, how's it going? I hope you've had a good couple of interviews so far today. The way we're going to do this interview is probably 20 to 30 minutes, just getting to know you a little bit better, having you tell me about your experience, and then we might jump into a short coding problem if that's okay with you."
+      "text": "Hey Nick, how's it going? I hope you've had a good couple of interviews so far today. The way we're going to do this interview is probably 20 to 30 minutes, just getting to know you a little bit better, having you tell me about your experience, and then we might jump into a short coding problem if that's okay with you."
     },
     {
       "speaker": "EMPLOYEE",

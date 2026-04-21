@@ -490,38 +490,6 @@
     {
       "speaker": "EMPLOYEE",
       "text": "Thank you so much, Mahesh."
-    },
-    {
-      "speaker": "UNKNOWN",
-      "text": "So there we have it. Thank you very much to both Mahesh and Ruchi for what was an incredibly engaging interview. I hope you found this interesting and useful as I did. Listen in there, now we have an exciting part: the feedback session. Usually, the candidate doesn't get direct feedback right after an interview, but since this is on a show, we have a great opportunity to share it right away. First, let's speak to our interviewee, Ruchi, and get a little bit more detail on that session. So, Ruchi, what's your general feeling of the overall process?"
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "I feel the entire process was very streamlined. There were topics which were as per my experience, and all the topics were covered really well because we just had around one hour to 90 minutes. In that time slot, we needed to cover the coding task and we had to cover the technical interviews. So, I think the questions which were asked to me were very refined and that was really helpful. Wherever I needed some time to breathe or think, Mahesh was really helpful there; he didn't just jump to the next question. So, I had a great experience."
-    },
-    {
-      "speaker": "UNKNOWN",
-      "text": "Amazing. I can tell, certainly having listened in, that it was perfectly streamlined, good responses to all the questions. Was there any challenging part in the interview that really made you think?"
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "I would say one is the SQL query. I don't write frequent SQL queries, so I took a little time to analyze what all things needed to be done in that SQL query. So, that was the challenging part. And the second challenging part which I felt was Angular, because I don't work much with Angular. So, that is something that was challenging, but I just prepared a little bit in Angular, so that was, like, I can work on it more and then prepare well for Angular also."
-    },
-    {
-      "speaker": "UNKNOWN",
-      "text": "Fantastic. Thank you so much, Ruchi, for being a part of this and a little bit of insider information for our listener. It was really appreciated. And now we move over to our interviewer, Mahesh, to tell us a little bit more. So, Mahesh, can you shed some light on the overall impression of the interview?"
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "Yes, it was great. I think she performed very well during the interview. She was able to answer most of the questions with confidence and accuracy. I think she also demonstrated a very good understanding in .NET and has a fair knowledge in Angular as well. When it comes to hands-on tasks, interviewers typically don't expect candidates to provide a full-fledged solution within the short period of time that we have, but I think she went above and beyond, and she was able to deliver a complete and well-thought-out solution. So, I think she did well."
-    },
-    {
-      "speaker": "UNKNOWN",
-      "text": "At last, what's your verdict? Does Ruchi seem like a good fit for a .NET with Angular Dev role?"
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "Yes, Ruchi did well. I think she is very much suitable for this position, which requires good knowledge on .NET technology, Angular, and anything which she already has."
     }
   ],
   "training_pairs": [

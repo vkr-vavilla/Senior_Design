@@ -5,23 +5,7 @@
   "turns": [
     {
       "speaker": "INTERVIEWER",
-      "text": "Hey everyone, welcome to another system design mock interview. Today we're doing a very typical question that lots of you have requested, and to do it, we have a current FAANG engineer, or MAANG engineer as lots of people seem to say now. He's with us now, Ravi, thank you so much for doing this."
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "Thank you so much, Tom. Pleasure. How are you doing?"
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "I'm really good, thanks. Ravi, before we get started, quickly just give people an introduction into who you are as an engineer and a bit about your experience."
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "Sure. So, I currently work as a senior software engineer, as you told, in a MAANG company. I have around 11 years of experience; it's been an 11-year journey. I primarily specialize in distributed systems, backend stuff, primarily Java, JavaScript, a lot of frameworks, MongoDB, and a lot of other databases, and also in cloud tech. Yeah, I've had a really great journey throughout these 11 years, and I'm very, very happy or thankful for this opportunity that you're giving me."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "Great. Well, I think it's going to be a really interesting interview, so let's crack on with it. Ravi, the question I'd like to ask you today is, how would you design a system like YouTube?"
+      "text": "Ravi, the question I'd like to ask you today is: how would you design a system like YouTube?"
     },
     {
       "speaker": "EMPLOYEE",

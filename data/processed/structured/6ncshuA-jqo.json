@@ -4,26 +4,6 @@
   "quality_flags": [],
   "turns": [
     {
-      "speaker": "UNKNOWN",
-      "text": "Hi everyone, my name is Roman Zki and I'm a product manager at EPAM Anx. I'm also the host of today's webinar. Today, we'll be joined by two speakers, Sarf and Pratik, and we'll be talking about all things data structures and algorithms for an interview for a position with four plus years of experience. I believe it's going to be a really incredible session to get some hands-on insights on what a real-life interview looks like."
-    },
-    {
-      "speaker": "UNKNOWN",
-      "text": "This video is brought to you with the support of Anx. Anx is a program developed by EPAM, aimed at enhancing and propagating best software engineering practices and processes across the organization and all team levels. It offers a suite of services, tools, and educational programs to continuously improve software development performance, smoothly integrate GNI tools into everyday work, and foster a culture of excellence and innovation among engineering teams. If you enjoy this video, be sure to check out the links in the description and explore more about what Anx has to offer on engineering excellence for your teams. So now, I'd like to give a couple of words to introduce yourself first. For the interviewer, Sarf, the stage is yours."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "Hi, hello everyone. My name is Sarf. I'm a lead engineer at EPAM Systems. I have about 14 years of experience in the IT industry. Throughout my journey, I was involved in product development and also worked on Java DSA and system design aspects. Today, I'll be playing the role of the interviewer, conducting the interview on Java DSA."
-    },
-    {
-      "speaker": "UNKNOWN",
-      "text": "Wow, thanks. Such a cool experience. You're such a cool guy, and thank you for joining us today. Now, our candidate, Pratik, the word is for you."
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "Hi everyone. I'm Pratik Jaab, and I'm from the EPAM Systems team. I'm playing the role of the candidate. Regarding my background, I have nearly seven years of experience in backend development, specifically with Java, DSA, and system design."
-    },
-    {
       "speaker": "INTERVIEWER",
       "text": "Thank you for the introduction. It seems that we are now all set up, so let's jump into the interview process. There we go. The format of this interview will be like this: I'll be asking some theoretical questions, and then we'll go into problem-solving. The idea is for you to tell me about the requirements, the scope, what kind of data structure you'll be using, then go into the edge cases, and then implement it."
     },

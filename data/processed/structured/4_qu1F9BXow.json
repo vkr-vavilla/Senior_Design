@@ -5,22 +5,6 @@
   "turns": [
     {
       "speaker": "INTERVIEWER",
-      "text": "Hey everyone, welcome to this system design mock interview. Today, I'm really pleased to say we have Alex with us, who was an engineering manager at Shopify for 10 years. Alex, thanks so much for joining us today."
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "Absolutely. My name is Alex Mad. I'm a senior developer and engineering manager, and I worked at Shopify for over 10 years. While there, I've peeked behind the curtain of the hiring process and I've mentored many individuals with this exercise."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "Well, we're really pleased to have you on, and without further ado, let's crack on."
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "Sounds good."
-    },
-    {
-      "speaker": "INTERVIEWER",
       "text": "So, what are we designing today, Alex? I wanted to ask you to design a system like Dropbox, iCloud, or Google Drive."
     },
     {

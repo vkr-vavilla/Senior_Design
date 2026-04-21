@@ -1,0 +1,438 @@
+{
+  "video_id": "rdphm7NB2MY",
+  "summary": "Anywhere Club real-world technical interview for a Java/Azure developer role (5+ years required). Chris hosts; Bartosh (lead software engineer, banking, ~10 years Java/Cloud) interviews Rhodian (software engineer, healthcare, 3+ years Java). Covers: OOP principles, hashCode/equals contract, garbage collector, TreeSet vs HashSet, design patterns, Spring Boot, dependency injection (constructor vs setter), Spring Profiles, types of tests, Docker vs VMs, vertical/horizontal scaling, Azure image-resizing serverless architecture, serverless use cases and risks, Scrum vs Agile, Scrum ceremonies, estimation, production bug handling, Scrum roles. Live coding task: palindrome checker in Java using TDD. Post-interview feedback from both Rhodian (candidate) and Bartosh (interviewer).",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Hello. So let's start our interview. Let's split the interview into three parts. First I would like to talk about your CV — I would like to hear something about your experience, I would like you to tell me about your technical and soft skills. Then we are going to proceed to questions — there will be something from the hard skills, there will be something from the soft skills. Right after the questions we will have some time for the coding task — that would be a super short one, just 15 minutes, that should be enough. You can use your favorite tool for coding and that's completely fine. And yeah, and there will be time for your questions if you have any. Is it clear so far?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, that's clear."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, so I've read through your CV, it's pretty impressive. I like your experience. Nonetheless I would like to hear some facts from your CV, maybe about your last role — what was your main focus, what was the team composition, etc."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so according to my last position I played role of key developer at NFR team. We had quite a big healthcare project with more than 500 people and we were responsible for multi-tenancy implementation, repository migration from mono-repository for microservices to multi-repositories for each microservice as a content. Also I played role of key developer in one of the functional teams in this project — we worked with some third-party content platform for medicine articles and I integrated with this API, synchronized this data between the third-party API and our storage, performed image synchronization for Azure blob storage, such things I think. Okay, also we used TDD on daily basis and we used pair programming. Yeah, that's it."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay. What about team composition?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "We had a Scrum Master, we had Scrum, two-week Sprints, we had the team leader, backend team leader, and I think four developers and a few QAs and automation QA and DevOps."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, sounds pretty complete and pretty exciting. That's great, thanks for that introduction. So I think we can proceed to questions. Yes, I have a bunch of those — some of these will be super open ones, let's say. But yes, let's start from the core, let's start from Java. And yes, hopefully from the warm-up questions. So at first I would like to ask you about OOP. I would like you to name and describe all the principles when you code in Java or in any other language that is object oriented — what principles we should follow?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so OOP is object-oriented programming methodology for programming languages. It includes four principles. First one is abstraction — I'll describe them a little bit. Abstraction is the principle where you focus only on main properties of some objects and don't give any attention to its implementation, so that's it. And second one is encapsulation — it's a property of language which helps us to bundle together methods and data that works with these data inside of a class and it helps us to hide some implementation details via access modifiers. Inheritance is the third one — it allows us to create new classes based on base classes, so we can create derived classes which inherit the properties and methods of the base class. And polymorphism is a feature of language which allows us to manipulate with the derived object class as with the parent object. So that's it."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, that's great. Pretty decent description. Okay, so let's go to the next one. In Java we have two major methods — I mean hashCode and equals. I would like you to mention what is the contract between those two methods and how hashCode is related to equals."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so of course I'd like to mention that equals and hashCode should be overridden for objects that we use in collections which are HashMaps, HashSets and hash-based collections — and that's mostly some model classes, entity classes. And the contract is — for the same objects which are equal to each other, hashCode should be equal. But for the same hashCode, objects can be different. So that's it."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay. And you mentioned about some collections — that in case when we use for example a HashMap we should implement hashCode. But does it pertain only to the situation when we create some collections? Or should we create rather hashCode and equals for every class that we write by our own — if this is not like a service class but it's a model?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "That's required to override these methods because it can be used not only in our code but for example in frameworks — some frameworks can use hashCodes in serialization process or something like that — and it's required."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, I see. Right. So let's proceed to the next question. I would like to ask you about the garbage collector — do you know what that is and what is the purpose of it in Java?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, so basically in Java we don't manage our memory as in C++ for example. We create objects and it automatically manages space in the heap. And when the object is not used we shouldn't clear the space that we used for this object because this is a job of the garbage collector. If no one refers the object anymore, garbage collector will understand that this object can be cleaned up from the heap space. And yeah, that's how it works. There are different algorithms how it works in Java."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah that's right. How about triggering the garbage collector — is it something that we have to take care of or somehow it happens automatically?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "In most cases, as I saw in some graphics, a garbage collection process occurs when some threshold of heap memory is achieved — for example 70 percent of memory is loaded — so then garbage collection occurs. But that depends on the algorithm — some algorithms can do it from time to time, others based on the threshold."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Is there any method to manually trigger the garbage collector if we would like to do so?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I think that there is one but as I didn't work with the memory stuff specifically I don't know, but I'm pretty sure that we can do it."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, thank you. So we touched collections a little bit. I would like to ask you about the difference between TreeSet and HashSet. So we already spoke about hash functions, but what is the difference between those two?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so first of all set is a collection that contains only unique values and we cannot add two same values in the collection — it will just be overridden. In a HashSet, HashSet is based on a hash code — so objects that we add — so basically inside of the HashSet is a HashMap as far as I remember. HashSet uses hash code for the objects that we are adding and the order is kind of random because it's not like totally random but it's based on hash code and the hash code of an object is not quite an ordered thing. But TreeSet is based on a red-black tree, and binary tree, and it keeps order for the values that we add. And if the object that we add implements Comparable it will use the order of the compareTo method, or we can implement Comparator if we would like to add some specific order mechanism — we can send the implementation of Comparator for this class in the Constructor of TreeSet. Okay, main difference is that we can order in a specific way the objects in TreeSet."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, so just to double check — what is the reason of using HashSet? Because it seems that TreeSet is ordered, so it seems that it would be maybe more reasonable to use TreeSet for all of the use cases."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Of course, as we have the hashCode-based algorithm in the HashSet, that's quite efficient. And for example insertion of the object to HashSet is O(1) — constant value — while for the TreeSet it will be some other O, but not constant, because it depends on order. And the HashSet is quite faster."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, completely makes sense. So let's go a little bit higher in terms of abstraction. I would like to ask you about design patterns. Why are these patterns important when we code, and maybe you remember some examples of design patterns that you use in your everyday work?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so design patterns — everyday programmers face problems and a lot of problems are pretty much the same to each other but in some different ways. The only algorithms and business objects differ but the problem keeps the same. And for such problems design patterns were created — that's a common solution for such problems. For example Strategy — a strategy pattern is a pattern that we can use really on a daily basis. But before frameworks were created, for example, we had a Comparator which implements the strategy pattern. When we want to switch the order of the elements that we are using in sort we just change the implementation of this Comparator but the algorithm for merge sort or some other sort that are used in the frameworks keeps the same — but we send our piece of business logic to inside of this algorithm. And it helps us to reduce the amount of code because we don't need to implement all the sort algorithms again. So that's a pretty simple one. We use factories, we use builders on a daily basis, we use proxies etc etc. Yes, and even more to mention — even the naming itself is easier to read when we use these model libraries. We see that there is some sort of factory or something then we understand what should happen — it simplifies. Because we write code not only for us and for machines — mostly we read code — and yeah it helps a lot. Maintaining is even more expensive than writing it for the first time."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay that's cool. So let's proceed to Spring. For Java developers it's one of the most important frameworks. And let's start from Spring Boot — do you have any experience working with Spring Boot?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, I worked with Spring Boot for a few years. On my first project I didn't have it but on my last ones I had it. Spring Boot is a great tool which helps us to put our application together with the Spring framework and different modules of that. For example if we need to add some Azure integration with Spring we just add one of the Azure starters and we remove a big amount of boilerplate code via that. Before Spring Boot was invented we should add the libraries one by one that are needed to our project and configure a lot of beans, a lot of configurations and properties to make these modules work together. But Spring Boot starters help us a lot because we don't need to configure them — they provide some basic configuration for these modules — and if you want you can override them via beans or via some YAML file configurations. That's it."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay yes, makes sense. So there's plenty of advantages basically. So as for the dependency injection — I would like to ask you first what is dependency injection and how can we implement dependency injection, because there is plenty of ways to do so if we use Spring?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So in terms of Spring or dependency injection, let's maybe start from definition and then go deeper into Spring itself. So dependency injection — there is dependency inversion and inversion of control. Inversion of control is where our object is not responsible for creating its dependencies — someone else is creating its dependencies. For example we can implement it via factory method pattern where our derived class will provide us the dependency — that's like a kind of simple example of inversion of control. Dependency injection is one of the implementations where we inject our dependencies via some injector element that injects our dependencies. And in Spring framework we have the dependency injector container, or inversion of control container, which injects all the dependencies between the beans and helps us to decouple the dependencies of our project and decouple the classes — because our classes don't know about implementations. One of the SOLID principles is dependency inversion, where we rely not on implementations but on abstractions. And via inversion of control container and dependency injection we can achieve it."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay it says. And we have basically two places where we can inject our dependencies — there is a constructor and there is a setter. So we can talk about Spring now. I would like to ask you about the difference between these two methods — because we can either use it via constructor and via setter — and what is the difference basically, and maybe some use cases where we should use one way and when the other."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, in Spring we can inject our dependencies via constructor or via setter. Via constructor it's like the best variant because our bean wouldn't be created without dependencies that are needed for that — because if we don't inject one of the dependencies, on a runtime null pointer cannot occur and it's better to inject all the dependencies on an initialization phase when the beans are created. But also we can inject the bean via setter — and it will be set once the bean is created, so we can set it a little bit later. I think it could be done maybe when this bean is quite a loaded one for the memory and it's not needed on initialization phase but it's needed a little bit later — we can initialize it a little bit later to reduce the startup time for the project as an example where we can use it. Yes and sometimes we even could not have the IoC container yet hence we are not able to inject that during startup."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, that's pretty cool. So let me ask you one more question from Spring. There is a concept of Spring Profiles — do you have experience with that, do you recall what that is?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah I had experience with Spring Profiles. So we can define Spring profiles and active profiles for the application and basically based on the active profiles we can activate some beans or deactivate some beans. It helps us for example for testing or for development phase or even at production phase we can swap some storage sources or we can change some implementations — for example on local environment we use local DB which is in-memory but for the production environment we use some remote URL for the DB and some other connections. Just an example. We can use Spring Profiles, we can set Spring profiles via our VM options, and we can also set the profiles in our YAML or property file. YAML itself is a kind of a profile — we can create a separate YAML for separate profiles, for example application-test.yaml will be for test profile configuration."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay great. So let's switch topic a little bit. Let's go to the part that all developers love the most — testing. I would like to ask you what kind of tests you write in your everyday work?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "So on my daily basis I work with unit tests. That's kind of important — and I think that's not just important, it's vital — because if we write tests for our code, not just to cover the X percent of coverage that we have on our projects, we need to write it to cover all the edge cases of our business logic or all the cases for our utility methods and such stuff. It's very important to keep tests actual and code covered. So yeah I write unit tests and I also write some Spring Boot tests which cover the controller or web layer. But in my experience I didn't write any automation tests which interact between different microservices — so I wrote only tests which can be run on a local machine inside one application."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, makes sense. And it's now a super open question — so it's completely up to you how you see it, there is no one correct answer basically — I would like to ask you in your opinion how a good test should look like. What are the properties of a good test?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so the way I see it is — in the Given-When-Then structure, or there are some different names for that but the sense is the same — it helps us to read the test. Also the name of the test is quite important. There are different methodologies for naming of tests but usually I use such one: testing method name, underscore, state under test, underscore, and expected result. So for example — let's test the method let's say 'uppercase': 'uppercase_allLettersAreLowercase_allLettersAreUppercased' — we can see the result and we can see the state and what this method tests. And we cannot — even if you're new into details you can read the test and you understand it. Some other guys say that it's not quite good to have multiple asserts — for example multiple assertEquals — but I think that it's totally fine because even in a unit test we test only one module, we can check some properties. So that's it. If a result of a test is a list you can check the amount of objects in this list and some properties of this object as well. So I think it is not a big problem."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yeah, okay, that's cool. Okay, so let's leave tests for now and let's go to cloud computing / Azure. So there will be some questions around computing itself and some from Azure. I would like to ask you — okay, maybe let's start from Docker and VMs. What is the difference between Docker and virtual machines? Because even when we use Azure or AWS or any other cloud provider we see the difference — there are some services for virtual machines and there are some services where we can use Docker. So basically what is the major difference between those two?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so Docker is about orchestration first of all. There are two different approaches for the isolation of our software. We can use virtual machines — there is a host machine, it runs some different virtual machines which have their own operation system which we should configure and then we run our software over this operation system. But in the orchestration, which is the Docker approach as well, we don't have — we have the same host machine but we don't need to configure an operation system. In orchestration we have containers which run our applications independently and they use the operation system of the host machine. So in the container or Docker approach we don't need to configure our operation systems and you can run applications easily because you write code describing how our infrastructure should look like and all you need is to run this container. While in the VM you have to configure the operation system and it's quite hard to transfer the solution that we configure to the new machine because you have to install these drivers, maybe some operation system configuration can be different and all this stuff. But containers are not like a silver bullet either — because as they use the same operation system of the host machine, in case of interference, VMs are a little bit safer compared to Docker. But Docker as well is fully isolated from each other."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, makes sense. And do you recall the name of the service in Azure that we can use in order to deploy some Docker containers?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I know that there is one — let me think a little bit. I think I had it on my project and we used Lens for that, so — but while I was learning Azure I uploaded some image, yeah, so I don't remember."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, that's completely fine. Well, do you have some application — there is a way where we can handle some higher traffic and this is called scaling. And basically I would like to ask you what is the difference between vertical and horizontal scaling — do you recall that term from cloud computing?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah, so when we need some performance in our machines — for example our databases or our pods of our applications — we need to scale them. There are two types of scaling: vertical and horizontal. Vertical is when you increase the hardware power of your machines that runs your application — for example you increase the RAM, you increase the CPU, such stuff. Or you can use horizontal scaling which is like increases the amount of the machines that run your application. There are benefits and drawbacks for each approach. For the vertical scaling it's easy, you just need to increase the power, pay some money, but as soon as your application gets some popularity it gets much more expensive — you pay more and more and more for each scale so it will be very expensive. As for the horizontal scaling you need to — you cannot just add the new machine and everything works fine — you have to implement such mechanism like load balancing between them, or if it's a database you will need some replicas, you will need some mechanism for the switching of the main databases, synchronization between them. So you cannot just add a new machine and that's it, that's fine. But as soon as you configure all this stuff you can even add or decrease the amount of machines on demand — for example if your replication is very popular at 5 PM you can add some machines by schedule and it will decrease the loading of your whole system and the user experience will be smoother. Yes, and usually once we have that infrastructure and once we use like Kubernetes service or something then scaling shouldn't be a problem — because we don't connect and we don't call the port by its IP, we use the group of ports and it's load-balanced automatically and we don't need to think about whom should we request — it will be done by the Kubernetes orchestration tool."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, yeah, makes sense. Okay, great. So let's go now strictly to Azure. Let's imagine that we would like to write and deploy some easy application — I mean easy like a short one, not much code, and probably not many services. And let's assume that this is the application which purpose would be to resize images. So let's imagine that we have some way to upload these images and we have some way to execute some operation of the image and then as an output we have an image of different size. If you think about Azure, what would be the services that you could use in such situation? Can you propose some architecture for that?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Even for such simple applications we can use a fully serverless and infra architecture. We can use Azure Functions for this — Azure Functions are the serverless solution by Azure which runs only when the trigger is occurred. So each function has a trigger and the function — you pay only for the time that code is running. So we can imagine such situation where you have an Azure Function which has HTTP trigger — we upload the image by HTTP to it and then our Azure Function uploads this image to blob storage. Then we can use another Azure Function which will listen to any updates in Blob storage — I think it's done by this trigger which is done by the message provider which is a data grid or something like that — so we can add this trigger to the Azure Function and once we add a new blob it will resize it and upload the new one right there. And also we can use some filters to not trigger this function each time — just name this image like 'resized' or 'not resized' to filter the events. That's it. Kind of simple. Of course we can use some Java-based application — it can be a Java-based application, we can use it even with our Spring. This kind of simple application can be implemented via serverless and it will be fine but if we need some other we can use other services for example for the Docker row and other stuff."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "What are the use cases basically for serverless? Because you said that we pay only for execution, right? So it seems that that would be preferred for most of the cases. But apparently it's not so. Basically what are the bottlenecks — what are the risks that come from serverless?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so basically Azure Functions and serverless are used in the event-driven systems as some kind of middlewares where our function processes some events and some maybe messages — some that must be a simple processing. But in case if we need some business logic — if we write all the business logic flow on Azure Functions and we will have like 1,000 of them — it will be quite hard to understand how the system works. So we should use them only as processing tools I think."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, that's exactly this — only some cases when we should use that. Okay, as for the technical questions I think we are good. So let's proceed to some more soft ones — as for the work methodologies and topics like that. Okay, maybe let's start from Scrum because you mentioned that you presently work with that in your project. I would like to ask you what is the difference between Scrum and Agile, because for many people it's kind of a synonym but it's really not a synonym. I would like to ask you for that difference."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so basically Scrum is a methodology while Agile is like a philosophy. Agile defines that we should quite frequently interact with stakeholders, that some requirements might change and we should be flexible. But Scrum defines that we have Sprints, we have special meetings, we have special roles for Scrum. We have like team members — team members must be replaceable for each other, for example in ideal Scrum developers can test in case of some stuff. And yeah, that's the main difference. So for example Kanban is also an Agile methodology but Scrum is about Sprint releases, grooming sessions, etc."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, so you started talking about Scrum ceremonies. What are the Scrum meetings we have in a Sprint?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so in our Sprints we have of course dailies — daily meetings — each part of a team says what they did yesterday, what they're going to do today and maybe some problems that they faced, or yeah, just to know the state of team, how the tasks are completing, maybe they need some help, maybe there are any blockers — that's kind of important and should be verified each day, so that's why the daily exists. Also we have grooming sessions — grooming sessions help us to understand stories, to get some clarifications for stories, to estimate them. In some teams estimations are separate meetings, in some teams estimations are inside of grooming. So that's it. Also we have Sprint demos for the customer or mostly for the PO — so we show what we've done in scope of this Sprint, as a result of the work. And we have the — not grooming, just a moment, one session, I don't remember the name — where we discuss what can we do better, what we did well, and what can be improved so just to improve the future performance of the team. Retrospective — yeah that session. So that's for example people discuss that yeah we did great communication this time, everything was fine, but we had a blocker due to other team communication and how we can improve it — that was a problem — and with the team they set up a goal or action point for some person who will resolve this issue to not repeat it in future. That's it about Scrum — I think I mentioned everything that usually teams have."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay. And as for the estimations — because you said that there is a need to estimate user stories — what technique is used for that, what is the process of estimation that you use?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "That depends on what we estimate. If it's like a usual Sprint we have stories and we have an hour — we can estimate them in story points. We use Planning Poker for example to estimate the stories. Also for example customer wants us to estimate some epics — very very important to do it right now — and we can have some approximate estimations. We can use T-shirt size sets like for the Sprints: four Sprints, three Sprints estimated in Sprints. Or we can use some other techniques but I didn't have an experience with them."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yes. Apparently that's a pretty common situation that we have some requests either from stakeholders or from the client or from the product owner to basically grab something more to the Sprint. And that's quite important from the developer's side to refuse such stories that are grabbed into the Sprint. Because for example some developers say okay we won't write tests and we will release it — no, that's not the story. If they didn't write tests and if the customer wants to add something and the capacity is full they should remove something from the Sprint because no magic it happens. And even if customer wants us to super eagerly estimate something without any details please don't use story points or hours estimation and that's not the right solution."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, and let's imagine that we have a situation where you are the only person from your team in the office that day and there is some sort of a bug on production — super critical — basically major functionalities of the service don't work and you've got a call from the customer regarding that situation. I would like to ask you what are the steps? Let's imagine that you finish the call, you get to know about the bug and the facts — that it's not working properly — and I would like to ask you what are the steps that you are going to perform now."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so that's the production bug and it's critical right. So first of all I'm going to let my team know — even if I'm a single developer I have a team — so I'll let the team know that I pause my current task that I'm working on and I work on the super critical bug. If that's some kind of a task and this task is like five to three points or something like that and it doesn't fit our Sprint, we should remove something. I understand that according to Scrum we cannot change the Sprint tasks during the Sprint but some major things can happen and I think it's okay if you communicate with the PO to remove some tasks and they are totally fine with that. I think we can remove it. So yeah we take this task to Sprint and as it's a production bug I think you will need some help maybe from DevOps for communication, for connection to the logs to the production environment because developers not quite often have such rights. And you start fixing it. I don't know what to add — I think that's the process."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, that would be good to communicate with the person who signaled the problem — so get to know about the progress."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah yeah, of course, of course. Each day you will have to, or even that depends on the size of the task or bug. And I'd like to add — okay let's keep maybe."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, that's great. Cool. Okay, let me take a look on the list if I would like to ask you something more. Yes, maybe maybe last question and then we will proceed to coding task. As for the Scrum — because we mentioned something about the Scrum Master, mentioned something about the product owner — basically what is the team composition and what are the Scrum roles from the purely from the Scrum perspective — not from our experience which is not really according to the book, let's say — but from the theory, what kind of roles should we have in Scrum?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so in Scrum there are three roles. That's Scrum Master, PO and team members. PO is a guy who quite frequently communicates with stakeholders or even sometimes is a part of them, so he knows what should we do in scope of the Sprint and the scope of the release to achieve the project goals and project views on the future. Scrum Master is like the guy who helps the team to follow the Scrum process — he leads all the meetings, ceremonies, and communicates with his managers like POs and stakeholders as well — to not disturb the team with these communications because it takes time and reduces velocity. And team members include developers, IT testers, some maybe UI specialists, automation, DevOps guys — depends on the team and the projects."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay. And as for the Scrum Master — you said that it would be good to have that person during all meetings — but is it really necessary to have a Scrum Master during all Scrum ceremonies?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "You know, I think that Scrum Master is not required for example for grooming sometimes, because sometimes business analysts in the teams communicate regarding the requirements for the stories and developers quite frequently communicate with BAs about such stuff. So I think that that depends on the team composition."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Great. Okay, I think we are good with questions but thank you for that. As I promised now we'll go to the coding task. Let's try to code something in our interview. In the chat I'm testing for you the task. So you can open any tool you want — any coding tool, can be even a simple text editor. As for the task let me quickly say what I would like you to do. So basically we have a string right and we have to determine if that string is a palindrome. So basically a palindrome is a string — it can be a word or the whole sentence or whatever — that reading left to right and right to left is the same. Please consider all alphanumeric characters. So you can for example remove spaces, commas and dots if you cover that. And please ignore cases — so no matter if that's a sentence that starts from the capital letter, we don't care about that. And we have an example — so basically we have 'Red Room sir is murder' — as you can see if you remove all of the spaces and the commas, reading right to left and left to right is the same — and that it means that this is a palindrome. So basically our method should return the information that this is a palindrome. It can be even a Boolean value — that would be great. It doesn't have to be any sophisticated text. Boolean value is completely fine. Please don't care about the whole class, about the imports etc — if you write only the method itself that would be great. Alphanumeric means that we should have numbers and characters as well, right?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes yes yes exactly."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, so first of all I'll add new class which is the PalindromeVerifier. Let's add the method which will be — I think it can be static for such algorithmic stuff — it will be Boolean, it will return Boolean, and let's check if palindrome, consuming a string. And for now that's it. Let's create the test for that just to follow the TDD structure. So let's create two tests: palindrome with provided answer true, and not palindrome answer false. So I can copy your string if you don't mind that you provide it in the task. So please remember that this is only an example. So yeah I think I can add once just to cover the numbers but it should cover all of the cases. So we will have this result and let's add the assertion, let's assert true. I believe yeah that's the result. So for the not palindrome it will be false. These tests are fine — we will have one quite long, it's okay, I don't need to execute it now."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Okay, let's write some code here. First of all I think we should simplify our string because we should remove all the spaces and these three characters here. Then we can lowercase all the string and yeah then reverse it and see what is either equal or not. So let's add a new method as well which will simplify the string. I'll add the test for that — it should remove all the symbols that are not alphanumeric. That's a string result and there we should see something like 'redroomsirismurder'. Okay and the result must be it. Let's now we can implement this method. I think we can use replaceAll — it can replace all these unnecessary symbols with empty string and we will get this string. So it must be — first of all we should lowercase it with toLowerCase and then replace everything which is not from A to Z and from 0 to 9. I believe it must work. And that works. And now we should implement our isPalindrome method. Let's simplify the string first of all. It will be simplified and it must be the same as the reverse string. So let's create a new StringBuilder from simplified and reverse it to string and call it reversed. And reversed must be equal to the simplified string. Let's see what we have. Yeah, that's it. I think we can add something more like zeros for example. Yeah, that works. I think that's the solution for this task."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, let's go back to the class where we have implementation please. Let's think. Okay. So yes, exactly. Yes we could add something like a secure situation when for example string is empty or null, right, to throw something. You don't have to right now but just for the idea to improve that. Maybe that would be something that we could implement. Yes, but overall it looks really good. I'm even a bit surprised that you went with TDD — that's pretty cool. Yeah I think we are good then."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, I think — as there is only one test for that I didn't rename it according to this convention but that's okay, that's fine. Okay, that's cool, thank you for that. I think we are good. As promised that was rather a short one so that's okay. So you can stop sharing the screen. That's fantastic. Okay so we are done with the coding part as well. Thank you for that. And now there is time for your questions if you have any."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I think I should record or write the questions that they had but maybe I'll remember. I can't ask for now."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, that was it. It looks like. And that was a pleasure to talk to you. I really like the fact that during the coding task you are constantly speaking — that's really cool — because one of the most important aspects of the coding task is to kind of verify your way of thinking, right? And yeah yeah, I understand — on our project I conducted a lot of interviews with technical part. We had like mostly technical part. We asked our interviewees to implement some endpoints according to business logic and we asked to comment their actions — that's kind of important. And on daily basis we worked in pairs so we practice pair programming and also that's very important to speak and to explain your thoughts. And yeah it's kind of important to use TDD especially in such algorithmic tasks. Often I solve such tasks on some resources but yeah, write tests for your fragments of the algorithms. It helps a lot because if the task is complex you will have like a lot of failing tests and you won't know which part of your application fails. Definitely good behavior and it's better to go in this way than another one. So yeah that's true."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yeah me too, thank you. Yeah me too. It was a great one so thank you and goodbye."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Goodbye."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "Wow, what an incredible interview there. Now we move on to a really exciting part of the interview where we speak to the individuals separately to get some feedback on how that process went. So first we're going to go to our candidate Rhodian and we're going to find out his impression of the interview."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "Rhodian, tell us — what was your impression of that whole interview session and how did you generally feel that the whole situation progressed?"
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "Saint Chris, that was a great interview, thanks Bartosh. So in my opinion I totally showed the skills that I have, the questions were valid and there were quite great in my opinion, and I liked the technical part where we had the coding task. I really enjoyed it. That's it."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "Excellent. And I think the big question — do you think you get the role? How do you think you performed? If you're looking on your self-reflection of yourself. Oh, I think that interview was kind of smooth and I answered fine so I think that I'll get it."
+    },
+    {
+      "speaker": "UNKNOWN",
+      "text": "Bartosh, how did you think the interview flowed? I think that was a super smooth interview that was a very pleasant one for me as the interviewer and I hope for the candidate as well. Basically I think from the very beginning when I looked at the CV I thought that it's a good match. Looking at the description and the CV it really matches. Basically we touched many topics — Java, Spring, Azure — so we covered lots of ground. From Java I would say there is some space to improve — like for example some minor detailed concepts around the garbage collector, maybe something about the collections. Same for Spring — I think that candidate could speak something more about the advantages of Spring Boot. As for the soft skills I think that was a good one — that was a good exchange of experiences and good exchange of ideas how we could tackle problems and challenges that we have. As for the coding task — that's the part that I think I liked the most. Even in the previous segment of the interview during the questions I could feel that the candidate will be prepared for the role and for the interview itself. Back to coding task — I really like the fact that he spoke about what his coding now and what he's doing right now — that's really great because for me that's the clear indicator of the thinking process of that person. I like the fact that tests were implemented — he was asked only to implement the code itself, the algorithm itself — but using TDD I can see that that person remembers about tests and uses that every day. That's super important. Obviously there could be some small improvements like covering some corner cases — for example empty string — but this is something to do that is rather minor. So I think that's a good fit and as for the feedback it's really positive with some minor aspects that could be improved but these are super minor ones."
+    }
+  ],
+  "training_pairs": [
+    {
+      "question": "I've read through your CV — it's pretty impressive. I would like to hear some facts from your CV — maybe about your last role, what was your main focus and what was the team composition?",
+      "answer": "Okay, so according to my last position I played role of key developer at NFR team. We had quite a big healthcare project with more than 500 people and we were responsible for multi-tenancy implementation, repository migration from mono-repository for microservices to multi-repositories for each microservice as a content. Also I played role of key developer in one of the functional teams in this project — we worked with some third-party content platform for medicine articles and I integrated with this API, synchronized this data between the third-party API and our storage, performed image synchronization for Azure blob storage, such things I think. Also we used TDD on daily basis and we used pair programming. Yeah, that's it. We had a Scrum Master, we had Scrum, two-week Sprints, we had the team leader, backend team leader, and I think four developers and a few QAs and automation QA and DevOps.",
+      "follow_up": "I would like you to name and describe all the OOP principles when you code in Java or in any other language that is object oriented — what principles we should follow."
+    },
+    {
+      "question": "Name and describe all the OOP principles when you code in Java or in any other object-oriented language.",
+      "answer": "OOP is object-oriented programming methodology for programming languages. It includes four principles. First one is abstraction — abstraction is the principle where you focus only on main properties of some objects and don't give any attention to its implementation, so that's it. And second one is encapsulation — it's a property of language which helps us to bundle together methods and data that works with these data inside of a class and it helps us to hide some implementation details via access modifiers. Inheritance is the third one — it allows us to create new classes based on base classes, so we can create derived classes which inherit the properties and methods of the base class. And polymorphism is a feature of language which allows us to manipulate with the derived object class as with the parent object. So that's it.",
+      "follow_up": "What is the contract between hashCode and equals in Java, and how is hashCode related to equals?"
+    },
+    {
+      "question": "What is the contract between hashCode and equals in Java, and how is hashCode related to equals?",
+      "answer": "Of course I'd like to mention that equals and hashCode should be overridden for objects that we use in collections which are HashMaps, HashSets and hash-based collections — and that's mostly some model classes, entity classes. And the contract is — for the same objects which are equal to each other, hashCode should be equal. But for the same hashCode, objects can be different. So that's it.",
+      "follow_up": "Does this pertain only to when you create collections yourself, or should you implement hashCode and equals for every model class you write?"
+    },
+    {
+      "question": "Does this pertain only to when you create collections, or should you implement hashCode and equals for every model class you write?",
+      "answer": "That's required to override these methods because it can be used not only in our code but for example in frameworks — some frameworks can use hashCodes in serialization process or something like that — and it's required.",
+      "follow_up": "What is the garbage collector and what is its purpose in Java?"
+    },
+    {
+      "question": "What is the garbage collector and what is its purpose in Java?",
+      "answer": "Yeah, so basically in Java we don't manage our memory as in C++ for example. We create objects and it automatically manages space in the heap. And when the object is not used we shouldn't clear the space that we used for this object because this is a job of the garbage collector. If no one refers the object anymore, garbage collector will understand that this object can be cleaned up from the heap space. And yeah, that's how it works. There are different algorithms how it works in Java.",
+      "follow_up": "How about triggering garbage collector — is it something we have to take care of or does it happen automatically?"
+    },
+    {
+      "question": "How about triggering garbage collector — is it something we have to take care of, or does it happen automatically? And is there any method to manually trigger it?",
+      "answer": "In most cases, as I saw in some graphics, a garbage collection process occurs when some threshold of heap memory is achieved — for example 70 percent of memory is loaded — so then garbage collection occurs. But that depends on the algorithm — some algorithms can do it from time to time, others based on the threshold. As for manually triggering — I think that there is one but as I didn't work with the memory stuff specifically I don't know, but I'm pretty sure that we can do it.",
+      "follow_up": "What is the difference between TreeSet and HashSet?"
+    },
+    {
+      "question": "What is the difference between TreeSet and HashSet?",
+      "answer": "First of all set is a collection that contains only unique values and we cannot add two same values in the collection — it will just be overridden. In a HashSet, HashSet is based on a hash code. HashSet uses hash code for the objects that we are adding and the order is kind of random because it's based on hash code. But TreeSet is based on a red-black tree and binary tree and it keeps order for the values that we add. And if the object that we add implements Comparable it will use the order of the compareTo method, or we can implement Comparator if we would like to add some specific order mechanism — we can send the implementation of Comparator in the Constructor of TreeSet. Main difference is that we can order in a specific way the objects in TreeSet.",
+      "follow_up": "What is the reason of using HashSet if TreeSet is ordered and seems more useful?"
+    },
+    {
+      "question": "What is the reason of using HashSet if TreeSet seems ordered and potentially more useful for all cases?",
+      "answer": "Of course, as we have the hashCode-based algorithm in the HashSet, that's quite efficient. And for example insertion of the object to HashSet is O(1) — constant value — while for the TreeSet it will be some other O, but not constant, because it depends on order. And the HashSet is quite faster.",
+      "follow_up": "Why are design patterns important and what examples do you use in everyday work?"
+    },
+    {
+      "question": "Why are design patterns important when we code and what examples do you use in your everyday work?",
+      "answer": "Design patterns — everyday programmers face problems and a lot of problems are pretty much the same to each other but in some different ways. The only algorithms and business objects differ but the problem keeps the same. And for such problems design patterns were created — that's a common solution for such problems. For example Strategy — a strategy pattern is a pattern that we can use really on a daily basis. For example we have a Comparator which implements the strategy pattern. When we want to switch the order of the elements that we are using in sort we just change the implementation of this Comparator but the algorithm for the sort keeps the same — but we send our piece of business logic inside of this algorithm. And it helps us to reduce the amount of code. So that's a pretty simple one. We use factories, we use builders on a daily basis, we use proxies etc etc. And even the naming itself is easier to read when we use these model libraries. We see that there is some sort of factory or something then we understand what should happen — it simplifies. Because we write code not only for us and for machines — mostly we read code — and maintaining is even more expensive than writing it for the first time.",
+      "follow_up": "Do you have any experience working with Spring Boot?"
+    },
+    {
+      "question": "Do you have any experience working with Spring Boot?",
+      "answer": "Yeah, I worked with Spring Boot for a few years. On my first project I didn't have it but on my last ones I had it. Spring Boot is a great tool which helps us to put our application together with the Spring framework and different modules of that. For example if we need to add some Azure integration with Spring we just add one of the Azure starters and we remove a big amount of boilerplate code via that. Before Spring Boot was invented we should add the libraries one by one that are needed to our project and configure a lot of beans, a lot of configurations and properties to make these modules work together. But Spring Boot starters help us a lot because we don't need to configure them — they provide some basic configuration for these modules — and if you want you can override them via beans or via some YAML file configurations.",
+      "follow_up": "What is dependency injection and how can we implement it in Spring?"
+    },
+    {
+      "question": "What is dependency injection and how can we implement it in Spring? There are plenty of ways.",
+      "answer": "So in terms of Spring or dependency injection — let's start from definition and then go deeper into Spring itself. So dependency injection — there is dependency inversion and inversion of control. Inversion of control is where our object is not responsible for creating its dependencies — someone else is creating its dependencies. For example we can implement it via factory method pattern where our derived class will provide us the dependency — that's like a kind of simple example of inversion of control. Dependency injection is one of the implementations where we inject our dependencies via some injector element. And in Spring framework we have the dependency injector container, or inversion of control container, which injects all the dependencies between the beans and helps us to decouple the dependencies of our project and decouple the classes — because our classes don't know about implementations. One of the SOLID principles is dependency inversion, where we rely not on implementations but on abstractions. And via inversion of control container and dependency injection we can achieve it.",
+      "follow_up": "What is the difference between constructor injection and setter injection in Spring, and when should we use each?"
+    },
+    {
+      "question": "What is the difference between constructor injection and setter injection in Spring, and when should we use each?",
+      "answer": "Yeah, in Spring we can inject our dependencies via constructor or via setter. Via constructor it's like the best variant because our bean wouldn't be created without dependencies that are needed for that — because if we don't inject one of the dependencies, on a runtime null pointer cannot occur and it's better to inject all the dependencies on an initialization phase when the beans are created. But also we can inject the bean via setter — and it will be set once the bean is created, so we can set it a little bit later. I think it could be done maybe when this bean is quite a loaded one for the memory and it's not needed on initialization phase but it's needed a little bit later — we can initialize it a little bit later to reduce the startup time for the project as an example where we can use it.",
+      "follow_up": "What is the concept of Spring Profiles? Do you have experience with that?"
+    },
+    {
+      "question": "What is the concept of Spring Profiles?",
+      "answer": "Yeah I had experience with Spring Profiles. So we can define Spring profiles and active profiles for the application and basically based on the active profiles we can activate some beans or deactivate some beans. It helps us for example for testing or for development phase or even at production phase we can swap some storage sources or we can change some implementations — for example on local environment we use local DB which is in-memory but for the production environment we use some remote URL for the DB and some other connections. We can set Spring profiles via our VM options, and we can also set the profiles in our YAML or property file. We can create a separate YAML for separate profiles, for example application-test.yaml will be for test profile configuration.",
+      "follow_up": "What kind of tests do you write in your everyday work?"
+    },
+    {
+      "question": "What kind of tests do you write in your everyday work?",
+      "answer": "So on my daily basis I work with unit tests. That's kind of important — and I think that's not just important, it's vital — because if we write tests for our code, not just to cover the X percent of coverage that we have on our projects, we need to write it to cover all the edge cases of our business logic or all the cases for our utility methods and such stuff. It's very important to keep tests actual and code covered. So yeah I write unit tests and I also write some Spring Boot tests which cover the controller or web layer. But in my experience I didn't write any automation tests which interact between different microservices — so I wrote only tests which can be run on a local machine inside one application.",
+      "follow_up": "In your opinion how should a good test look like? What are the properties of a good test?"
+    },
+    {
+      "question": "In your opinion, what are the properties of a good test? How should a good test look?",
+      "answer": "Okay, so the way I see it is — in the Given-When-Then structure, or there are some different names for that but the sense is the same — it helps us to read the test. Also the name of the test is quite important. There are different methodologies for naming of tests but usually I use such one: testing method name, underscore, state under test, underscore, and expected result. So for example — let's test the method 'uppercase': 'uppercase_allLettersAreLowercase_allLettersAreUppercased' — we can see the result and we can see the state and what this method tests. And we cannot — even if you're new into details you can read the test and you understand it. Some other guys say that it's not quite good to have multiple asserts — for example multiple assertEquals — but I think that it's totally fine because even in a unit test we test only one module, we can check some properties. If a result of a test is a list you can check the amount of objects in this list and some properties of this object as well. So I think it is not a big problem.",
+      "follow_up": "What is the difference between Docker and virtual machines?"
+    },
+    {
+      "question": "What is the difference between Docker and virtual machines?",
+      "answer": "Okay, so Docker is about orchestration first of all. There are two different approaches for the isolation of our software. We can use virtual machines — there is a host machine, it runs some different virtual machines which have their own operation system which we should configure and then we run our software over this operation system. But in the orchestration, which is the Docker approach as well, we don't have — we have the same host machine but we don't need to configure an operation system. In orchestration we have containers which run our applications independently and they use the operation system of the host machine. So in the container or Docker approach we don't need to configure our operation systems and you can run applications easily because you write code describing how our infrastructure should look like and all you need is to run this container. While in the VM you have to configure the operation system and it's quite hard to transfer the solution that we configure to the new machine. But containers are not like a silver bullet either — because as they use the same operation system of the host machine, VMs are a little bit safer compared to Docker. But Docker as well is fully isolated from each other.",
+      "follow_up": "What is the difference between vertical and horizontal scaling?"
+    },
+    {
+      "question": "What is the difference between vertical and horizontal scaling?",
+      "answer": "When we need some performance in our machines — for example our databases or our pods — we need to scale them. There are two types of scaling: vertical and horizontal. Vertical is when you increase the hardware power of your machines that runs your application — for example you increase the RAM, you increase the CPU, such stuff. Horizontal scaling increases the amount of the machines that run your application. There are benefits and drawbacks for each approach. For the vertical scaling it's easy, you just need to increase the power, pay some money, but as soon as your application gets some popularity it gets much more expensive — you pay more and more and more for each scale. As for the horizontal scaling you cannot just add the new machine and everything works fine — you have to implement such mechanism like load balancing between them, or if it's a database you will need some replicas, some mechanism for switching the main databases and synchronization between them. But as soon as you configure all this stuff you can even add or decrease the amount of machines on demand — for example if your application is very popular at 5 PM you can add some machines by schedule. And tools like Kubernetes simplify this a lot because you don't call the port by its IP, you use the group of ports and it's load-balanced automatically.",
+      "follow_up": "Design a simple image resizing service in Azure. What services would you use and what architecture would you propose?"
+    },
+    {
+      "question": "Design a simple image resizing service in Azure. What services would you use and what architecture would you propose?",
+      "answer": "Even for such simple applications we can use a fully serverless and infra architecture. We can use Azure Functions for this — Azure Functions are the serverless solution by Azure which runs only when the trigger is occurred. So each function has a trigger and you pay only for the time that code is running. So we can imagine such situation where you have an Azure Function which has HTTP trigger — we upload the image by HTTP to it and then our Azure Function uploads this image to blob storage. Then we can use another Azure Function which will listen to any updates in Blob storage — so we can add this trigger to the Azure Function and once we add a new blob it will resize it and upload the new one right there. And also we can use some filters to not trigger this function each time — just name this image like 'resized' or 'not resized' to filter the events. That's it. Kind of simple.",
+      "follow_up": "What are the use cases for serverless and what are the risks or bottlenecks?"
+    },
+    {
+      "question": "What are the use cases for serverless functions and what are the risks or bottlenecks?",
+      "answer": "Basically Azure Functions and serverless are used in the event-driven systems as some kind of middlewares where our function processes some events and some maybe messages — some that must be a simple processing. But in case if we need some business logic — if we write all the business logic flow on Azure Functions and we will have like 1,000 of them — it will be quite hard to understand how the system works. So we should use them only as processing tools I think.",
+      "follow_up": "What is the difference between Scrum and Agile? Many people use them as synonyms."
+    },
+    {
+      "question": "What is the difference between Scrum and Agile? Many people use them as synonyms but they're really not.",
+      "answer": "Okay, so basically Scrum is a methodology while Agile is like a philosophy. Agile defines that we should quite frequently interact with stakeholders, that some requirements might change and we should be flexible. But Scrum defines that we have Sprints, we have special meetings, we have special roles for Scrum. We have like team members — team members must be replaceable for each other, for example in ideal Scrum developers can test in case of some stuff. And yeah, that's the main difference. So for example Kanban is also an Agile methodology but Scrum is about Sprint releases, grooming sessions, etc.",
+      "follow_up": "What Scrum meetings do we have in a Sprint?"
+    },
+    {
+      "question": "What Scrum ceremonies do we have in a Sprint?",
+      "answer": "Okay, so in our Sprints we have of course dailies — daily meetings — each part of a team says what they did yesterday, what they're going to do today and maybe some problems that they faced, or yeah, just to know the state of team, how the tasks are completing, maybe they need some help, maybe there are any blockers — that's kind of important and should be verified each day, so that's why the daily exists. Also we have grooming sessions — grooming sessions help us to understand stories, to get some clarifications for stories, to estimate them. In some teams estimations are separate meetings, in some teams estimations are inside of grooming. So that's it. Also we have Sprint demos for the customer or mostly for the PO — so we show what we've done in scope of this Sprint, as a result of the work. And we have the — retrospective — yeah that session. So that's for example people discuss that yeah we did great communication this time, everything was fine, but we had a blocker due to other team communication and how we can improve it — and with the team they set up a goal or action point for some person who will resolve this issue to not repeat it in future.",
+      "follow_up": "What estimation technique do you use and what is the process of estimation?"
+    },
+    {
+      "question": "What estimation technique do you use? What is the process of estimation?",
+      "answer": "That depends on what we estimate. If it's like a usual Sprint we have stories and we have an hour — we can estimate them in story points. We use Planning Poker for example to estimate the stories. Also for example customer wants us to estimate some epics — very very important to do it right now — and we can have some approximate estimations. We can use T-shirt size sets like for the Sprints: four Sprints, three Sprints estimated in Sprints. Or we can use some other techniques but I didn't have an experience with them.",
+      "follow_up": "You are the only person from your team in the office and there is a critical production bug — major functionality of the service doesn't work, and you got a call from the customer. What steps do you take?"
+    },
+    {
+      "question": "You are the only person from your team in the office and there is a critical production bug — major functionality doesn't work and you just got a call from the customer. What steps do you perform?",
+      "answer": "Okay, so that's the production bug and it's critical right. So first of all I'm going to let my team know — even if I'm a single developer I have a team — so I'll let the team know that I pause my current task that I'm working on and I work on the super critical bug. If that's some kind of a task and this task is like five to three points or something like that and it doesn't fit our Sprint, we should remove something. I understand that according to Scrum we cannot change the Sprint tasks during the Sprint but some major things can happen and I think it's okay if you communicate with the PO to remove some tasks and they are totally fine with that. So yeah we take this task to Sprint and as it's a production bug I think you will need some help maybe from DevOps for communication, for connection to the logs to the production environment because developers not quite often have such rights. And you start fixing it. And of course each day you will have to communicate with the person who signaled that problem — to let them know about the progress.",
+      "follow_up": "What are the three Scrum roles from a purely theoretical Scrum perspective?"
+    },
+    {
+      "question": "What are the three Scrum roles from a purely theoretical Scrum perspective?",
+      "answer": "Okay, so in Scrum there are three roles. That's Scrum Master, PO and team members. PO is a guy who quite frequently communicates with stakeholders or even sometimes is a part of them, so he knows what should we do in scope of the Sprint and the scope of the release to achieve the project goals and project views on the future. Scrum Master is like the guy who helps the team to follow the Scrum process — he leads all the meetings, ceremonies, and communicates with his managers like POs and stakeholders as well — to not disturb the team with these communications because it takes time and reduces velocity. And team members include developers, IT testers, some maybe UI specialists, automation, DevOps guys — depends on the team and the projects.",
+      "follow_up": "Is it really necessary to have a Scrum Master during all Scrum ceremonies?"
+    },
+    {
+      "question": "Is it really necessary to have a Scrum Master during all Scrum ceremonies?",
+      "answer": "You know, I think that Scrum Master is not required for example for grooming sometimes, because sometimes business analysts in the teams communicate regarding the requirements for the stories and developers quite frequently communicate with BAs about such stuff. So I think that that depends on the team composition.",
+      "follow_up": "NONE"
+    }
+  ]
+}

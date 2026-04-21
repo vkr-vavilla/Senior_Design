@@ -5,14 +5,6 @@
   "turns": [
     {
       "speaker": "INTERVIEWER",
-      "text": "What's your major?"
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "Computer science."
-    },
-    {
-      "speaker": "INTERVIEWER",
       "text": "What is the difference between a process and a thread?"
     },
     {

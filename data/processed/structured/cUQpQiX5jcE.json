@@ -8,26 +8,6 @@
   ],
   "turns": [
     {
-      "speaker": "UNKNOWN",
-      "text": "Hello everyone. This is Alexi Molashina. I'm a product manager. Most of the projects I'm working on are AI or data management projects, or both in one product. I have experience of more than a decade. It's a privilege for me to be here as the host of the interview. You have a great opportunity to check out the interview on machine learning. We have Denise here who will be the interviewer and Mahilo who will be answering. This is what we got."
-    },
-    {
-      "speaker": "UNKNOWN",
-      "text": "Before we start, this video is brought to you with the support of Njax, a program developed by EPAM to boost and spread top-notch software engineering practices and processes across organizations and teams. Njax provides a variety of services, tools, and learning opportunities to keep improving software development performance, integrate best tools into your daily tasks, and promote a culture of excellence and innovations in your teams and companies. Please check out the links below to see more information. Let's meet our interviewer Denise. It's over to you. Please share with us your experience and introduce yourself."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "My name is Dennis. I work at EPAM Systems. At the moment, I have five years of experience in data engineering, machine learning engineering, and MLOps. Currently, I'm mostly involved in projects for developing J&J AI applications, different ML microservices for a big financial company, and I also help them build the infrastructure for MLOps. Shortly about the role, we are looking for an experienced ML engineer who knows how to work with ML systems end-to-end. This includes gathering business requirements, translating these business requirements into ML objectives, preparing data for machine learning model training, deploying the model, and monitoring its performance. This interview will check the mindset of how the engineer can work with the system end-to-end. I think this is from my side, and let's go to Mahilo. Please share with us your experience."
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "Actually, I shifted to the IT sphere. I have a management degree and an engineering degree in aviation, but for the last five years, I moved to the IT sphere. Especially in 2021, I started an external course in EPAM for DevOps engineering, and before that, I also had an interest in ML. So these things together work for me; it's a very interesting field. For the last four years, I've been studying and learning from the DevOps field and also ML. For the moment, I'm working as a Middle Software Engineer in EPAM and approaching ML Ops engineering. So that field should be familiar to me. Thank you."
-    },
-    {
-      "speaker": "UNKNOWN",
-      "text": "Thank you. Now that both of you have introduced yourselves, I think we are ready to do the interview. Let's kick it off. For the viewers, please stay until the end to see the feedback session from both sides. This is something you would never get in an actual interview, so this is a big advantage of our show as well. Let's go to the interview."
-    },
-    {
       "speaker": "INTERVIEWER",
       "text": "Nice to meet you. I suggest we split our interview into three parts. The first part will be about your experience, what projects you worked on, and what achievements you are most proud of. The second part will be about your hard skills, so I will ask different technical questions to understand your knowledge and understanding of ML principles. The third part will be a coding task where I will check your Python knowledge to see if you are able to solve real problems. Got it."
     },

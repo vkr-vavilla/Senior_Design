@@ -8,14 +8,6 @@
   "turns": [
     {
       "speaker": "INTERVIEWER",
-      "text": "Designed a relational model for a calendar application. Hi everyone, we're so excited today to be doing another Exponent mock interview today with Connor. Connor, will you go ahead and introduce yourself?"
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "Yeah, hi everyone. My name is Connor Lindsay. I'm a software engineer at Grafana Labs, currently working on our open-source observability software."
-    },
-    {
-      "speaker": "INTERVIEWER",
       "text": "Okay, so let's get started. Our question today is: design a relational model for a calendar application. To get started, I just want to ask a couple of clarifying questions. I'm talking about a calendar application, I'd love to clarify what features specifically that we're looking to include. I'm assuming things like events, maybe notifications or reminders. Could you provide some more information there?"
     },
     {
@@ -105,26 +97,6 @@
     {
       "speaker": "EMPLOYEE",
       "text": "Yeah, one thing to always consider with a relational model like this is how you're going to be accessing the data. What big joins are going to happen? Which of these tables are going to grow the largest? Events is probably going to be a lot larger than calendar, for example, because the calendar is going to have a ton of different events. So, considering those, and then looking for any data that's hard to access that's going to require a bunch of joins. So, getting maybe a notification channel may be difficult because you're kind of going through, 'Okay, I have a calendar, I'm going to get all the events, I need to join that with notification, and then with user to get the notification channel.' So, effectively, thinking through what data do I have. In that case, getting the notification channel, we already kind of are denormalizing the data, which is a really handy technique to trade off speed versus space. In this case, a notification has a user ID, so that's kind of like extra information that would actually make getting the notification channel a lot faster."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "Okay, yeah, that makes a lot of sense. All right, so thank you so much for doing this mock interview with me. I think now is a good time for us to debrief. What did you think of this interview? How do you think you did? What do you think went well, and what do you think you would want to improve?"
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "Yeah, definitely. I think I was able to think through the entities relatively well. I think clearly mapping out the relationships is always a challenge. It's something that I want to continue to get better at, having that foresight of knowing, based on how the application is going to be built out, using a join table versus foreign keys, and mapping that out so that it's clear how you're able to access the data and how things relate to each other. I think overall it went well, but definitely a lot of room for improvement."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "Okay, well, first of all, congratulations. Personally, on my side, I thought that you did a really great job of clearly outlining what entities are involved in this problem. And then, in order to come up with the relationships, you did a really excellent job at describing how you can use the access patterns to determine what kind of relationships you need in between the entities. You also had great answers to my follow-up questions. One extra thing that I think would have made your answer even better is maybe if you had talked about which columns might be helpful to index. For example, we might want to query often for all of the events that belong to a particular calendar, which means that both event ID and calendar ID might be really great columns to index. That would make our queries a lot more efficient. So, what do you think?"
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "Yeah, that's awesome feedback. There are definitely a lot of other features and aspects of a relational model that I could have reached for when describing that, like indexes, or considering, or maybe it may or may not be relevant to this problem, but things like rollup tables, for example, could be another tool to consider when going through this sort of problem in the future."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "Yeah, that's a really good point. Thanks so much for joining us for this mock interview today, Connor. And for our viewers who are watching, good luck with your upcoming interviews. Bye everyone."
     }
   ],
   "training_pairs": [

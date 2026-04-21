@@ -5,18 +5,6 @@
   "turns": [
     {
       "speaker": "INTERVIEWER",
-      "text": "Design a service like YouTube where users can upload and view videos."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "Hey everyone, welcome back to another system design mock interview with Exponent. My name is Kevin, and on today's show, we have Josefa. We're going to be doing a technical system design interview, and before we do that, Josefa, do you mind just telling the audience a little bit about who you are?"
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "Sure, hey everyone, this is Josefa. I am an engineering manager at Wealthfront. Prior to that, I was at PayPal for about eight and a half years."
-    },
-    {
-      "speaker": "INTERVIEWER",
       "text": "Great, thanks Josefa. We're going to be doing a system design interview like we mentioned, and this is what I'd like to ask: design a service like YouTube where users can upload and view videos."
     },
     {

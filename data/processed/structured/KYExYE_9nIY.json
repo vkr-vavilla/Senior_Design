@@ -5,15 +5,7 @@
   "turns": [
     {
       "speaker": "INTERVIEWER",
-      "text": "Hi everybody and welcome to another mock interview with Exponent. Today we're here with Kevin Jenn. Kevin, would you like to introduce yourself?"
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "Hi, nice to meet you guys. Yeah, my name is Kevin. I am a senior at Vanderbilt studying computer science, and I have interned at a number of different companies, both large and small, such as Google, Tesla, and a couple of other small startups. I'm excited for today."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "That's fantastic. We're excited to have you, Kevin. So today we're going to be doing a system design question, and my question to you is: How would you design Reddit's homepage feed?"
+      "text": "How would you design Reddit's homepage feed?"
     },
     {
       "speaker": "EMPLOYEE",

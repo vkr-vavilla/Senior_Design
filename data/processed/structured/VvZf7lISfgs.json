@@ -5,15 +5,7 @@
   "turns": [
     {
       "speaker": "INTERVIEWER",
-      "text": "Hi everyone, we're here today for another Exponent mock interview with Andreas. Thanks so much for being here with us today, Andreas. Would you quickly introduce yourself to our viewers?"
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "Yeah, I'd be happy to. Hey everyone, my name is Andreas. I'm a software engineer currently at Modern Health, which is a mental health tech startup."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "Awesome, all right, so let's get right into it. The question today is design Netflix. Netflix is composed of things common to a lot of tech platforms: you have users, they can find some sort of video content like movies and TV shows, and then they want to watch that content. Including those things, are we designing the high-level system to include everything from subscriptions, users, search, and videos, or would you like me to focus only on a particular part?"
+      "text": "Design Netflix. Netflix is composed of things common to a lot of tech platforms: you have users, they can find some sort of video content like movies and TV shows, and then they want to watch that content. Including those things, are we designing the high-level system to include everything from subscriptions, users, search, and videos, or would you like me to focus only on a particular part?"
     },
     {
       "speaker": "EMPLOYEE",

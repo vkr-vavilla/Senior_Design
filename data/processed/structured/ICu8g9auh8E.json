@@ -5,15 +5,7 @@
   "turns": [
     {
       "speaker": "INTERVIEWER",
-      "text": "Welcome to this mock system design interview. My name is Mark. I'm a former engineering manager, most of my time at Google, sometime other companies. Our candidate today is Shiali Maurya. She is a senior software engineer at Amazon, has been there seven years. Shiali, welcome and thank you for doing this with us. Tell us a little bit about yourself."
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "Oh, thanks. Thank you. Thanks a lot, Mark, for giving me this opportunity. So, yeah, I have been with Amazon for the last seven years and have gotten a chance to work across various systems, varying from infrastructure to building systems from scratch, various platform systems. And apart from it, I also like doing interviewing, so I have done close to 2,000 interviews. And yeah, so now I'm on the other side and going to have an experience like a candidate. So it's pretty, it's really good. Yeah, good."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "Well, it's good to have you here. So I'm going to ask you to design LinkedIn now. Of course, that's pretty big picture. Yeah."
+      "text": "Shiali, I'm going to ask you to design LinkedIn. Of course, that's pretty big picture."
     },
     {
       "speaker": "EMPLOYEE",
@@ -22,10 +14,6 @@
     {
       "speaker": "INTERVIEWER",
       "text": "Yeah, that's a good idea. I mean, it is big. It is hard to design an entire system in 45 minutes that covers everything. So, good point. You mentioned jobs. Sounds like jobs is kind of, as we would expect, the core feature of LinkedIn. So let's focus on job seekers for purposes of this design. And why don't we focus on the functionality of a job seeker to find a job? So I want to, I'm looking for product manager roles or I'm looking for a test engineering role or whatever it might be. Let's assume that that's the use case we're interested in. Okay?"
-    },
-    {
-      "speaker": "UNKNOWN",
-      "text": "Okay, I understand that now. Right after you get the system design question from the interviewer, you need to set the stage. Shiali did a great job of doing this by sharing her approach, including that she'll be taking notes, as well as summarizing some of the larger features of the application that the system design might be a part of. Great. So, okay, let me try to list down some of the requirements that we are looking for. I'm calling them functional requirements."
     },
     {
       "speaker": "EMPLOYEE",
@@ -40,10 +28,6 @@
       "text": "No, I think that's a very close and relevant use case as well in terms of the search. And of course, I want as a user to be shown the relevant results. So that totally makes sense. I think it's better that we include it. So essentially, we want a relevance angle as well in terms of the job recommendations. And also, AI is one part of it, if we can utilize our current technologies to make it more powerful. Yeah, I think we're okay leaving out the employer side of things for purposes of this design. I think it's a good point that you're, you know, to include that from like a functionality perspective, but for this system design, let's focus on the job seeker side of things."
     },
     {
-      "speaker": "UNKNOWN",
-      "text": "One of the first steps in a system design interview is identifying functional requirements, and this includes typically scoping the problem to something that you can accomplish in the space of an interview. Shiali did a really nice job of this, talking about the different aspects of LinkedIn and what you might do in terms of the use cases. And she also referenced modern technology, in this case, AI. You can do that if that's appropriate."
-    },
-    {
       "speaker": "EMPLOYEE",
       "text": "Okay, great. Now, just thinking in terms of the non-functional requirements, one thing is, as soon as the user searches for it, the results should be quick, so they don't have to wait. What I mean by this is, probably I'm thinking it has to be low latency. Since we are scoping it to backend, maybe something returning results within 200 milliseconds, so that overall the user perceived latency is less than one second."
     },
@@ -54,10 +38,6 @@
     {
       "speaker": "EMPLOYEE",
       "text": "Sounds good to me. Okay, the other thing that I also want to consider is, of course, the availability of the system and the fault tolerance part. So that is definitely the case. And the third thing that I want to think about is the, as in my system, sorry, I think I'm bad with the spelling, so I'll just keep it to fault tolerance. And then the last thing that I want to say is about the consistency part. So I think in this case, probably I don't want it to be strongly consistent. I'm okay with eventual consistent systems. I mean, for example, if the recent job posting is also not appearing in my result, it's still fine. Maybe in the very next set of results, it will be there. Yeah, that sounds fine."
-    },
-    {
-      "speaker": "UNKNOWN",
-      "text": "Non-functional requirements include performance and availability and the usual distributed systems topics. Shiali did a nice job of pointing out the differences between backend and user latencies. In this case, she also did a nice job explaining her choice of eventual consistency."
     },
     {
       "speaker": "EMPLOYEE",
@@ -92,10 +72,6 @@
       "text": "So you're saying 10 million sort of active jobs in the system? Yeah, across different job families every day. That sounds, sounds okay to me."
     },
     {
-      "speaker": "UNKNOWN",
-      "text": "Before you start designing your system, it's a good idea to get a sense of scale. How big is this thing going to be? Shiali did a really nice job of looking at scale for both traffic and data, and mapping the daily active users and traffic for a day down to instantaneous rate, including looking at peak traffic times. She also did a nice job explaining her math. My preference is to write down the math, but as long as the interviewer can follow what you're doing, that's the most important part."
-    },
-    {
       "speaker": "EMPLOYEE",
       "text": "Okay, sounds fine. Okay, yeah, great. So we have done our estimation of scale. Now, shall I now move on to the APIs, maybe?"
     },
@@ -116,10 +92,6 @@
       "text": "Yeah, so essentially, when they're calling my APIs, I need to have that authentication performance. So it can be based on a token that is coming to me in the request, or it can be based on some identifier, which can be like client ID, etc., things like that. So that way we can also do other sets of authorizations if required. And that is also relevant when we have to put in some throttling limits to avoid requests from a lot of bad users and just to keep the system safe from any kind of issues. Yeah."
     },
     {
-      "speaker": "UNKNOWN",
-      "text": "Good point. Even if an API seems really simple, it's a good idea to just write down what it looks like semantically. This doesn't need to be perfect syntax. Shiali did a really nice job of calling this out, including adding some information about possible pagination. She also did a good job mentioning authentication authorization as a potential way to not only protect against attacks, but also to provide rate limiting in case that's needed."
-    },
-    {
       "speaker": "INTERVIEWER",
       "text": "So you're talking about, you know, preventing against denial of service attack, sort of that sort of thing. Okay, gotcha. Okay, okay, okay. So we discussed about API. Shall I now move to a high-level system design for it, or anything else?"
     },
@@ -130,10 +102,6 @@
     {
       "speaker": "EMPLOYEE",
       "text": "Okay, now let's move on to the high-level design. So, let's say we have an API Gateway, which is, yeah, which is actually responsible for load balancing and also at the same time it will be doing the rate limiting as well for me. Now, for now, I'm just going to start with a very basic design, which helps us just fulfill the use case, and I'll try to optimize the design as we go forward. Yeah, okay. So, if we have an API Gateway, let's say we have a Search Service, which is responsible for, Search Jobs Service, which is responsible for helping me search jobs for a user. We put it, yeah. Now, let's say, so the Search Jobs definitely, there is another service that is there in the picture, which is actually given to the employers, will be responsible for inserting the job. For now, I'll just add it so that it becomes clear. So it's like maybe a Job Manager kind of a service, which is responsible for adding the jobs which the employers are adding in my Jobs Data Store, because we'll be utilizing this functionality for our Search Jobs Service. And in addition, I am also having, let's say, the User Profile Database. So I'm just creating here the Users DB as well, this is like User Profile DB, rather, Users Profile Database. So yeah, so we are having these two data stores with us. One is responsible for storing the jobs, and the other is storing the user profile. Now, how my Search Service Jobs is doing? So since we have to return it in a very low latency, what also matters to us is how efficiently can we search the jobs. So I'm thinking to break this into two things, right? First, I need to find out relevant jobs for the user, and then the second thing is, relevant, or rather I would say, first I need to find the applicable jobs for the user, which is, which may be based on their filters that they have added, or it could be also based on their profile. Once I have those applicable jobs with me, what I also need to make sure is the order in which they are returned are also something which is like the top jobs are at the top for the user, so that they can find the most relevant things. So I'm trying to break this into two pieces: one is finding the applicable jobs, and second is ranking them. So, hence, so in order to now focusing on the first part, which is finding the applicable jobs, there the thing is like I should be able to search based on the geo, the location that we talked about, which is like, maybe the country or the state that they're looking for. And the other thing is the job role that they're looking for, and also sometimes the organization, a particular organization they're thinking of. So hence, what I'm also thinking is like we should have another data store, oh sorry, another data store, which is like my job key job data is stored here. So the difference between these two is like, this is the Jobs Data Store, which is primarily for the key CRUD operations, like when someone is, the employer is posting a job. I'll also draw the arrows so that it's clear how I'm thinking about the flow. So essentially, as soon as they are creating the jobs, or updating the jobs, or deleting the jobs, everything is going into the Jobs Data Store. From there, I'm syncing this data to my Jobs Data, another data store. And so that this one could be a very simple data store, since it has to store like 20 million jobs, but I'm not going to use this data store for search, but it's primarily for maintaining the entire details of what happened when. So I can, and but since jobs will have a lot of data, which is like a lot of other fields, and which could be relevant for some, not for others, so it's a very unstructured form of data. And also I need it to be scalable, so I would keep some NoSQL data store for this case. And this, so I probably would like to use some managed data store so that we don't have to hassle about like scaling, descaling things like that. So probably like an Amazon DynamoDB kind of a data store. Okay, while this data store, the other data where I'm syncing jobs here, we'll be putting on those key fields where we want the search to happen, and primarily like the fields like location, the job role, etc. So only that set of data will go into this data store, which will help us figure out the relevant job IDs. And this data store can be something which is very efficient for searching, and also on the multiple fields. So a data store like Elastic Search, again, fully managed service, and you can index a lot of data over there. So yeah, something like this is what I'm thinking. So, for our 20 million jobs, and this Search Job Service will actually query the data from this Elastic Search to figure out first the applicable jobs. Okay, the another thing we also discussed about is, for example, two scenarios: when it has the data already being passed into the filters, and the other case when it doesn't have the data. So in that case, based on the user ID, I'll call this User Profile Database to fetch the relevant things and then information and then make that query."
-    },
-    {
-      "speaker": "UNKNOWN",
-      "text": "Once you get to the high-level design, it's really important that the interviewer can follow your thinking. This is why a drawing tool is essential. It's not important that everything looks perfect; you just need to have the basic components and concepts so that the interviewer can see what you're thinking. Shavali did a really nice job of sharing her approach and her thinking along the way, including identifying the purpose and the type of data stores that she might use as part of her components. She also did a nice job describing the rationale for some of the technology choices. This is really important."
     },
     {
       "speaker": "EMPLOYEE",
@@ -160,10 +128,6 @@
       "text": "Okay, so that's what I'm thinking. And due to this also, the scale of these two, right? Like this will have very high scale in terms of rates, because of course my Search Jobs API would be calling that. And however, this will be very less because the employers are doing those, right? Sure, fair enough."
     },
     {
-      "speaker": "UNKNOWN",
-      "text": "In order to be really clear about your choice of data stores, it's a good idea to use examples like Shiali did to go deeper. It's also useful to touch on scale because that may influence your choices."
-    },
-    {
       "speaker": "EMPLOYEE",
       "text": "So, okay, so now focusing back on this. So, we have found out our relevant jobs from the Elastic Search. The next thing we want to do is rank these jobs. So, maybe I'm, let's take a very simplified version of my Ranking Service. So this service, let me, yeah, so this service is actually responsible for, whatever are my search results, I'll send them to my, oops, let me just choose this arrow rather. I'll send it to my Ranking Service, which will actually rank these jobs and then return the result back. Now, when it comes to ranking, there are different things that we can do around here. So, there are very simple ways of ranking these, which is like, same for all the users, like maybe by the posted date, or maybe by the jobs which are hit very frequently, things like that. So, by hits, I mean like there are a lot of clicks on those jobs, so things like that. We can bring the user personalization angle also into the picture. So, let's say there is a Personalization Service, which can be backed by large language models and GenAI. So, yeah, so this personalization will actually, so we have figured out the relevant job spaces, like first we have done as the, for example, if you are today a software engineer, I figured out the relevant software engineer job roles based on your experience from my active job data search, right? Now I want to rank them so that whatever is the most relevant to you comes at the top. So in order to do so, what I'm doing is I'm trying to bring in this personalization angle, and this will be integrated with the Ranking Service. What this another thing is doing, right? For example, based on my past searches, my past clicks, my past views, etc., and my interactions, everything, capturing that engagement. It's also showing that, apart from though I'm working today in this job role, I may be interested in these things, or even from the active jobs that you have filtered out, maybe this is the most active or most relevant thing for me. Let's start from the Ranking Service, right? So the Ranking Service will actually rank all the jobs which my active job data store has given me. So now, in order to do that ranking, there could be some ways of doing the ranking based on, maybe simple logic as like the job posting date. But also that can be further enhanced by bringing in the personalization angle, where we are not doing just the generic way of ranking for every user, but we are also considering their activities, how they are doing. For example, how they have been interacting on LinkedIn. So we will also utilize that data, which is like, let me say, job activities, right? So based on the job postings, or the, or let's say the job posting activities, or the job activities, anything. So, all the activities that they are doing, so all that data will also go into the Personalization Service. And Personalization Service can also maybe learn a lot more from a user angle, the user profile angle. And in addition, they can also take in the feedback. For example, if a user, let's say, has applied for a posting for that organization before, it's a very strong recommendation, strong signal that they are very interested in it, versus what if they have just viewed that and have not done any action, right? So all those things are signals to the Personalization Service. And there, because we have so much data, we can actually build, use GenAI and build large language models. And yeah, I mean, and our Ranking Service can then utilize this information to rank the jobs for a user. So then the personalization is actually giving me that this is how, like, I mean, for example, for every, the jobs that I've figured out, right, from my active job data store, it's actually giving me maybe a score, like large language models only do, right? So score for each of them. And based on that, I'm actually ranking them that this job is more relevant to the user versus this is less relevant. So, using that, I'm actually ranking my jobs. This is first calling this data store to figure out the active jobs, and then it's making a call to the Ranking Service, and eventually it will return back this result by decorating it with the metadata, for example, the apply links, etc., by querying again from my Jobs NoSQL database, just to fetch this data. It will interact with this as well, and eventually it will return. So it's like, first is this call, second is this Ranking Service call, and third is the metadata call."
     },
@@ -182,10 +146,6 @@
     {
       "speaker": "EMPLOYEE",
       "text": "So yeah, I mean, we exactly, we need to have our inbuilt modeling built for it because it will also be customized for our use case, right? I mean, we don't want it to return something which is out of the context, right? And not, I mean, maybe good for the general context, but not in the LinkedIn context. So I want everything to be in-house. So every, the information, the various information that I'm capturing in LinkedIn from user activities, everything, all of that will reside in my local in-house large language models. And it's like I'm storing all that data, training my model on it, and also taking in the feedback again and again. For example, if I'm returning some results, is the user finding it relevant or not? I may not need to ask them directly whether you're finding it relevant or not. I can also use their signals. For example, if they're clicking and going and applying for a job, probably they are finding it relevant. If they're not doing so, have not taken any actions, it's not relevant for them, and there could be further chance of improving it. So I capture all this data and put it back in my feedback loop. So it will be something that we have to develop in the context of LinkedIn, and in-house is something I'm thinking."
-    },
-    {
-      "speaker": "UNKNOWN",
-      "text": "As you dive deeper into your system design, it's a good idea to clarify what the components are responsible for. Shiali did this by stepping through the API flow, touching on the various components, and also adjusting to the interviewer's direction."
     },
     {
       "speaker": "INTERVIEWER",
@@ -220,10 +180,6 @@
       "text": "Yeah, so the active jobs, if I see, it's like 20 million jobs that we have in this, which are like, let's say, the active jobs, which are, oh, I think I took an estimate of 10 million jobs. So now these 10 million jobs, we'll have, now let's talk about this. Right here, I may want to store a lot of attributes about it, but then again, this data also would not be huge. But like, let's say it's even because there could be a lot of tags associated with jobs and a lot more information. So this data will be a bit bigger in size. So let's say it's like some, maybe, 10 GB of data for each job. So then also it would be, so 10 million, so it's like, I think, 100 GB of cache, right? Cache, that's what I think."
     },
     {
-      "speaker": "UNKNOWN",
-      "text": "When you're refining your design, it's important to focus on the things that matter: which components or aspects would benefit the most from availability or performance improvements. Shiali did a really nice job of looking at those data stores which would benefit from caching, different technologies such as Elastic Search and replication, as well as compliance aspects such as GDPR, which are really important in a global distributed system. Of course, also as part of this refinement, an interviewer may ask you about sizing, so you should be ready to respond with details and maybe even do some math."
-    },
-    {
       "speaker": "INTERVIEWER",
       "text": "What might be an approach where you simplify your architecture and rely more heavily on AI? What would that look like?"
     },
@@ -238,18 +194,6 @@
     {
       "speaker": "EMPLOYEE",
       "text": "So, again, I think in that case, how it would look like is, you are not giving me any parameters, right? So what I'm doing is, there's another, so at a user level, let's say, I have, I mean, I think that information about user details or user profile can also be simply fed into the AI, where it's also decorating, essentially it's also having a lot of information about a user. And so, yeah, it would be then very simple. Like what I'm asking for it, asking it is, 'For this user, tell me what are the relevant jobs.' So it's very simple as chat. So, on the chatbot assistant, let's say you just type in that, 'Okay, find me relevant jobs,' nothing more, nothing else that you're saying or asking it, right? So it's just taking in your user ID, querying, like all the stuff is being managed by AI. So the AI is actually having your information about who you are, where you belong to, your activities, everything. So the system will, in some sense, down the line, will become intelligent enough to decorate and handle this large amount of data and provide you the relevant results."
-    },
-    {
-      "speaker": "UNKNOWN",
-      "text": "If the interviewer asks you to go beyond the stated problem and think bigger, here's your chance to show your creativity. Shiali started from scratch with her diagram and stayed at a high level, talking about AI as a technology and how to integrate, rather than getting into the details. This is a great way to show some quick brainstorming."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "Alright, well, thanks everyone for watching this mock system design video and stay tuned for hopefully more. And if you enjoyed it, you know, give it a thumbs up."
-    },
-    {
-      "speaker": "UNKNOWN",
-      "text": "Hello, really hope you found that useful. If you did, you can like and subscribe, and why not come visit us at interview.com? There you can find more videos, useful frameworks, and question guides, all completely free. And you can also book expert feedback one-to-one with our coaches from Google, Meta, Amazon, etc. Thank you and good luck with your interview."
     }
   ],
   "training_pairs": [

@@ -6,30 +6,6 @@
   ],
   "turns": [
     {
-      "speaker": "UNKNOWN",
-      "text": "Do you know about AWS Budgets service? I want to hear why we need package work. Just an interesting question. In what ways do you use AI tools to boost your productivity? Yeah, this is an interesting response, this is the first time I hear it."
-    },
-    {
-      "speaker": "UNKNOWN",
-      "text": "Hi everyone, my name is Roman Zatisi from Enx, and I'm hosting the English-speaking community here on the YouTube channel today. It's really great to have you here joining us for the interview. Today, we are going to be talking about things about Node.js. But before we start, I'd like to introduce what Enx is. Actually, Enx is a program developed by EPAM that is aimed at enhancing and propagating the best software engineering practices and processes across the whole organization, the teams, and on an individual level. It offers lots of services, tools, and educational programs to continuously improve software development performance and also integrate J-tools into everyday working processes. It's also about a culture of excellence and innovation among the engineering teams. So today, it's an amazing session, and we have an interviewer, Victor Saroka, here and our interview candidate, Shak. The topic would be Node.js. I'd like to give a couple of words to introduce, first of all, our interviewer, Victor Saroka."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "Hey Roman, thank you for the great introduction. I'm happy to be here. I've been working at EPAM for about 10 years, so I have a bunch of experience. Specifically, I'm looking forward to this interview for this role. I think I'm well prepared, so it's going to be really interesting questions. I think it's going to be fun. Thank you very much for the introduction."
-    },
-    {
-      "speaker": "UNKNOWN",
-      "text": "Thank you for joining us today, and of course, our candidate, Shak Zod."
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "Yes, I am Shak Zod. I've been working at EPAM for like two and a half years as a Node.js developer, and I'm pretty excited to be here and participate in this event."
-    },
-    {
-      "speaker": "UNKNOWN",
-      "text": "Great, thank you so much for the introduction. So, we are all set up, both interviewer and candidate are in. I'd like to announce the kickoff, and I, as a host, will disappear in the background. The stage is yours, guys."
-    },
-    {
       "speaker": "INTERVIEWER",
       "text": "So, let's proceed with some general questions. I usually like to ask them at the start of any interview. I just want you to talk about your experience, some challenges that you face, probably describe the problem that you are most proud of to resolve – not necessarily a problem, but a challenge that you had and that you successfully passed. Do you think that this is like the greatest of your achievements?"
     },
@@ -384,34 +360,6 @@
     {
       "speaker": "INTERVIEWER",
       "text": "No problem, just great that you heard about it. This is something about our work, that we have a lot of information; we hear it occasionally. At least in my routine, I just make sure that at least I know roughly what it is about, and in case if needed, I will double-check it additionally, especially now with AI tools, it's really easy. With that said, yes, thank you very much for the answers."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "access to all of them, and you don't share your internal information to the LLMs as you do in the public versions. Now, let's get back to the interview, and I would like to ask you to provide some feedback to each other. I would like first to introduce Victor."
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "I want to say that I think the interview went well. Of course, I asked some deep questions to understand the limits of Shakat. I think you now understand some areas that you can improve based on this interview. But I think for a middle position, you did a great job. And most importantly, as usual, you already have this production experience. We can talk about theory for days, but what is usually important for me is that you already write some production code for real projects. So you have such experience, and of course, you have it. But yeah, just for this interview, we discussed general topics about some quality, about testing, and Shakat managed to answer them great. Also, an important topic right now, even for EPAM as well, I mean, as well as for other industries like clouds. And Shakat also has experience with clouds, with AWS specifically, which is the most popular cloud right now. And yeah, we did not touch a lot about frameworks, not just frameworks, but Shakat wrote some sample application for Express, and we discussed some potential areas that can be improved for production to be considered production-ready. And of course, we discussed the heart of the Node.js event loop, and Shakat was capable of managing it perfectly. So overall, I think Shakat did a great job. That's all that I can say."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "Thank you so much. Now, I think that Shakat, you could also share a couple of thoughts about the interview process."
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "It was a pleasure to participate in this interview, you know, because it was more like just a conversation with a person about some experience of mine. And also, during the interview, I got some details that will be really useful and helpful in my further career and experience. Thank you very much for your feedback."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "So Victor, what's the verdict?"
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "Like I said, I think it went well, so I would hire Shakat. But all the compensation stuff is not on me."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "So what I would like to say, going back to the courses and the programs that I announced, I would like to remind you about Anyware Club and INX. This is a great career path for those who want to pass interviews to EPAM or to any other tech companies like IOM. And also for the teams that already work inside the process, how to implement the AI. This is also very important from our point of view, and it is a real bestseller from our perspective. All the links will be available in the description. Like, share, repost, and stay tuned."
     }
   ],
   "training_pairs": [

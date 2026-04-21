@@ -5,15 +5,7 @@
   "turns": [
     {
       "speaker": "INTERVIEWER",
-      "text": "Hey everyone, welcome back to another Exponent Engineering Manager mock interview. My name's Kevin, and on today's show, we have Vidal. We're going to be doing a behavioral or leadership type question today. Before we get into that, Vidal, do you mind just telling the audience a little bit about what you do and who you are?"
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "Sure, my name is Vidal Garper. I'm an Engineering Manager currently at LinkedIn, and I lead a couple of teams there. I'm really passionate about engineering leadership and management. I also have a website and podcast where I write about it as well."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "Great, thanks for coming on today's show. So we're going to be doing a leadership or behavioral type question today, and this is what I like to ask: Let's say your engineering team has to build two features, but there's only bandwidth to build one of them. What do you do as the engineering manager?"
+      "text": "Let's say your engineering team has to build two features, but there's only bandwidth to build one of them. What do you do as the engineering manager?"
     },
     {
       "speaker": "EMPLOYEE",
@@ -82,18 +74,6 @@
     {
       "speaker": "EMPLOYEE",
       "text": "Yeah, I would say that we're going to fix the issue. We want to have a good customer experience. I wouldn't try to blame anyone for it. Maybe at our retrospective, or if we had to do a post-mortem of this, you could do that, try to understand how this happened so that we could prevent it happening in the future. I mean, no one, again, no one intentionally would code a progress bar like that. So I don't assume any bad intent on anyone's part. It's just like, 'Oh, interesting, progress bar. How did that happen? What can we learn in the future? Let's fix it, let's move on.' But these would be some of the thoughts I'd have."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "Yeah, that makes a lot of sense. Not blaming anyone, making sure that you have a retro, think about what went well, what didn't go well, totally makes a lot of sense. We can stop the mock interview here. Thanks for your time. And I'm thinking now that you were kind of put in the seat of the interviewee, do you have any advice for the viewers who might be going through their own engineering manager interviews?"
-    },
-    {
-      "speaker": "EMPLOYEE",
-      "text": "Like general advice for interviewers or people who are going into engineering manager interviews? Yeah, they're going into it. Well, there are a lot of resources now. I know that Exponent has resources, right? Like you have launched a course. I've written a book on the topic. I think other people have written books on this topic. There's, I think you should prepare for it. You should prepare for it because it's difficult. The engineering manager interview is difficult. It's difficult because companies, there's a natural disinclination to hire an engineering manager if there's any doubt that something could be off, because the impact of making a bad hire for an engineering manager is not just that person. It could impact an entire team, it could impact an entire org. So it's not even just about you. If you're an individual contributor and you get hired and you don't work out, then it's kind of like your localized impact that you had. But an engineering manager or leader, CEO, whatever, has a much broader impact. So I think you should really take the interview very seriously because people are going to be, the higher and higher position it is, I think the more rightly people are going to be asking very hard questions about the person and being maybe a little more disinclined to give them the benefit of the doubt because the risk of a bad hire is much greater."
-    },
-    {
-      "speaker": "INTERVIEWER",
-      "text": "Yeah, that makes sense. Well, thanks for your time, Vidal, and for the viewers at home, good luck with your upcoming engineering manager interviews. Thanks so much for watching. Don't forget to hit the like and subscribe buttons below to let us know that this video is valuable for you, and of course, check out hundreds more videos just like this at tryexponent.com. Thanks for watching, and good luck on your upcoming interview."
     }
   ],
   "training_pairs": [
