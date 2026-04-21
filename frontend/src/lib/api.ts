@@ -1,4 +1,5 @@
 import type { LoginCredentials, RegisterData, User } from '@/types/auth';
+import type { Session } from '@/types/chat';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -80,6 +81,34 @@ export const chatApi = {
     );
     return response.feedback;
   },
+  async transcribe(audioBlob: Blob): Promise<{ text: string }> {
+    const formData = new FormData();
+    formData.append('file', audioBlob, 'recording.webm');
+
+    const response = await fetch(`${API_URL}/chat/transcribe`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Transcription failed');
+    }
+
+    return response.json();
+  },
+  async synthesize(text: string): Promise<Blob> {
+    const response = await fetch(`${API_URL}/chat/synthesize`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Synthesis failed');
+    }
+
+    return response.blob();
+  },
 };
 
 export const interviewApi = {
@@ -92,7 +121,7 @@ export const interviewApi = {
       difficulty: string;
     },
     token: string
-  ): Promise<{ interview_id: string; resume_filename: string; resume_text_preview: string }> {
+  ): Promise<{ interview_id: string }> {
     const formData = new FormData();
     formData.append('resume', data.resume);
     formData.append('job_description', data.jobDescription);
@@ -109,47 +138,53 @@ export const interviewApi = {
     });
 
     if (!response.ok) {
-      let detail: unknown;
-      try {
-        detail = await response.json();
-      } catch {
-        detail = await response.text();
-      }
-      const message =
-        typeof detail === 'object' && detail !== null && 'detail' in detail
-          ? String((detail as { detail: unknown }).detail)
-          : `Upload failed with status ${response.status}`;
-      throw new ApiError(response.status, message, detail);
+      throw new Error('Failed to create interview');
     }
 
     return response.json();
   },
 
-  async getSessions(token: string): Promise<unknown[]> {
+  async startInterview(
+    data: { role: string; interviewType: string; difficulty: string },
+    token: string
+  ): Promise<{ interview_id: string }> {
+    return apiRequest('POST', '/interview/start', {
+      role: data.role,
+      interview_type: data.interviewType,
+      difficulty: data.difficulty,
+    }, token);
+  },
+
+  async getSessions(token: string): Promise<Session[]> {
     return apiRequest('GET', '/interview/sessions', undefined, token);
   },
 
-  async getSession(interviewId: string, token: string): Promise<unknown> {
+  async getSession(interviewId: string, token: string): Promise<Session> {
     return apiRequest('GET', `/interview/${interviewId}`, undefined, token);
   },
 
-  async downloadResume(interviewId: string, token: string, filename: string = 'resume.pdf'): Promise<void> {
+  async downloadResume(interviewId: string, token: string, filename: string) {
     const response = await fetch(`${API_URL}/interview/${interviewId}/resume`, {
+      method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
+
     if (!response.ok) {
-      throw new Error(`Download failed with status ${response.status}`);
+      throw new Error('Failed to download resume');
     }
+
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = filename;
+    a.download = filename || 'resume.pdf';
     document.body.appendChild(a);
     a.click();
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
   },
 };
+
+

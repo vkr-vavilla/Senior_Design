@@ -8,6 +8,9 @@ import { Input, Select } from '@/components/ui/Input';
 import { LoadingPage } from '@/components/ui/LoadingSpinner';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useInterviewChat } from '@/hooks/useInterviewChat';
+import { useAudioRecorder } from '@/hooks/useAudioRecorder';
+import { useTextToSpeech } from '@/hooks/useTextToSpeech';
+import { chatApi } from '@/lib/api';
 import { cn, formatTime } from '@/lib/utils';
 import type { InterviewConfig } from '@/types/chat';
 import {
@@ -21,6 +24,10 @@ import {
     Play,
     Shuffle,
     Square,
+    Volume2,
+    VolumeX,
+    Sparkles,
+    Mic2
 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
@@ -69,6 +76,11 @@ function InterviewPageContent() {
 
   const [hasStarted, setHasStarted] = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
+  const [isVoiceMode, setIsVoiceMode] = useState(true);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+
+  const { isRecording, recordingTime, startRecording, stopRecording } = useAudioRecorder();
+  const { speakStream, stop: stopSpeaking, engine, setEngine, flush } = useTextToSpeech();
 
   // Pre-fill from query params
   const [config, setConfig] = useState<InterviewConfig>({
@@ -89,8 +101,27 @@ function InterviewPageContent() {
 
   const handleStart = () => {
     if (!config.role.trim() || !token) return;
-    startInterview(config, token);
+    startInterview(config, token, (chunk) => {
+      if (isVoiceMode) speakStream(chunk);
+    }, () => {
+      if (isVoiceMode) flush();
+    });
     setHasStarted(true);
+  };
+
+  const handleTranscribeAndSend = async () => {
+    try {
+      const audioBlob = await stopRecording();
+      setIsTranscribing(true);
+      const { text } = await chatApi.transcribe(audioBlob);
+      if (text.trim()) {
+        sendMessage(text);
+      }
+    } catch (err) {
+      console.error('Transcription failed:', err);
+    } finally {
+      setIsTranscribing(false);
+    }
   };
 
   const handleEndInterview = () => {
@@ -98,6 +129,7 @@ function InterviewPageContent() {
       setShowEndConfirm(true);
       return;
     }
+    stopSpeaking();
     endInterview();
     setShowEndConfirm(false);
   };
@@ -278,6 +310,51 @@ function InterviewPageContent() {
               {formatTime(elapsedTime)}
             </div>
 
+            {/* Voice Mode Toggle */}
+            <div className="flex items-center gap-2">
+              {isVoiceMode && (
+                <div className="flex items-center bg-slate-800 rounded-lg p-1 border border-slate-700">
+                  <button
+                    onClick={() => setEngine('premium')}
+                    className={cn(
+                      "flex items-center gap-1.5 px-2 py-1 rounded-md text-[10px] font-bold transition-all",
+                      engine === 'premium' ? "bg-indigo-600 text-white shadow-sm" : "text-slate-500 hover:text-slate-300"
+                    )}
+                  >
+                    <Sparkles className="w-3 h-3" />
+                    PREM
+                  </button>
+                  <button
+                    onClick={() => setEngine('browser')}
+                    className={cn(
+                      "flex items-center gap-1.5 px-2 py-1 rounded-md text-[10px] font-bold transition-all",
+                      engine === 'browser' ? "bg-slate-600 text-white shadow-sm" : "text-slate-500 hover:text-slate-300"
+                    )}
+                  >
+                    <Mic2 className="w-3 h-3" />
+                    STD
+                  </button>
+                </div>
+              )}
+
+              <button
+                onClick={() => {
+                  const next = !isVoiceMode;
+                  setIsVoiceMode(next);
+                  if (!next) stopSpeaking();
+                }}
+                className={cn(
+                  "p-2 rounded-lg border transition-all",
+                  isVoiceMode 
+                    ? "bg-indigo-500/10 border-indigo-500/30 text-indigo-400" 
+                    : "bg-slate-800 border-slate-700 text-slate-500 hover:text-slate-400"
+                )}
+                title={isVoiceMode ? "Voice Mode On" : "Voice Mode Off"}
+              >
+                {isVoiceMode ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+              </button>
+            </div>
+
             {/* End Button */}
             {showEndConfirm ? (
               <div className="flex items-center gap-2">
@@ -317,8 +394,13 @@ function InterviewPageContent() {
         />
         <MessageInput
           onSend={sendMessage}
-          disabled={!isConnected || sessionEnded}
-          isStreaming={isStreaming}
+          disabled={!isConnected || sessionEnded || isTranscribing}
+          isStreaming={isStreaming || isTranscribing}
+          isRecording={isRecording}
+          recordingTime={recordingTime}
+          onStartRecording={startRecording}
+          onStopRecording={handleTranscribeAndSend}
+          placeholder={isTranscribing ? 'Transcribing your voice...' : 'Type or record your response...'}
         />
       </div>
     </div>

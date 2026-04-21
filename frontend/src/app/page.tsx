@@ -2,21 +2,21 @@ import Link from 'next/link';
 import {
   ArrowRight,
   Bot,
-  CheckCircle,
   Users,
   TrendingUp,
   MessageSquare,
   Target,
   Zap,
   Star,
-  Sparkles,
 } from 'lucide-react';
 import { AnimateIn } from '@/components/ui/AnimateIn';
 import { InteractiveRobotSpline } from '@/components/ui/interactive-3d-robot';
 import { ContainerScroll } from '@/components/ui/container-scroll-animation';
 import CelestialSphere from '@/components/ui/celestial-sphere';
 import { FeatureCards } from '@/components/ui/FeatureCards';
-import { AISessionCard, LiveScoreHUD } from '@/components/ui/RobotHUD';
+import { AISessionCard } from '@/components/ui/RobotHUD';
+import { Logo } from '@/components/ui/Logo';
+import { RotatingText } from '@/components/ui/RotatingText';
 
 const ROBOT_SCENE = 'https://prod.spline.design/PyzDhpQ9E5f1E3MT/scene.splinecode';
 
@@ -42,24 +42,8 @@ export default function LandingPage() {
         <div className="relative flex items-center justify-between px-4 py-2.5 rounded-2xl bg-slate-950/80 backdrop-blur-2xl border border-white/[0.07] shadow-2xl shadow-black/50">
 
           {/* ── Brand ── */}
-          <Link href="/" className="flex items-center gap-3 cursor-pointer group">
-            {/* Logo mark with online dot */}
-            <div className="relative flex-shrink-0">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/40 group-hover:shadow-indigo-500/60 transition-shadow duration-300">
-                <Bot className="w-4 h-4 text-white" />
-              </div>
-              <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-slate-950 shadow-sm shadow-emerald-400/60 animate-pulse" />
-            </div>
-
-            {/* Brand wordmark — Space Grotesk */}
-            <div className="flex items-baseline gap-[3px] font-brand">
-              <span className="text-[15px] font-600 tracking-[0.12em] uppercase text-slate-300 leading-none">
-                Final
-              </span>
-              <span className="text-[15px] font-700 tracking-[0.12em] uppercase leading-none bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
-                Round
-              </span>
-            </div>
+          <Link href="/" className="cursor-pointer">
+            <Logo size="md" />
           </Link>
 
           {/* ── Nav actions ── */}
@@ -104,27 +88,6 @@ export default function LandingPage() {
 
             {/* ── Left: text content ── */}
             <div className="flex flex-col order-2 lg:order-1">
-              {/* Badge */}
-              <div className="animate-fade-up self-start mb-8">
-                <div className="relative inline-flex items-center gap-3 px-4 py-2 rounded-xl bg-slate-900/80 backdrop-blur-sm border border-slate-700/60 shadow-lg shadow-black/20 overflow-hidden">
-                  {/* Shimmer sweep */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-500/8 to-transparent -translate-x-full animate-[badgeSweep_3s_ease-in-out_infinite]" />
-
-                  {/* Left accent block */}
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
-                  </div>
-
-                  {/* Right label */}
-                  <span className="text-[11px] font-medium tracking-wide text-slate-300">
-                    AI-Powered Interview Practice
-                  </span>
-
-                  {/* Right glow dot */}
-                  <Sparkles className="w-3 h-3 text-violet-400 flex-shrink-0" />
-                </div>
-              </div>
-
               {/* Headline */}
               <h1
                 className="animate-fade-up text-5xl sm:text-6xl lg:text-[3.75rem] xl:text-7xl font-bold tracking-tight text-white mb-6 leading-[1.07]"
@@ -132,53 +95,17 @@ export default function LandingPage() {
               >
                 Land Your
                 <br />
-                <span className="gradient-text">Dream Job</span>
+                <RotatingText
+                  className="gradient-text inline-block min-h-[1.1em]"
+                  words={['Dream Job', 'Top Offer', 'Big Tech Role', 'FAANG Seat', 'Next Chapter']}
+                />
                 <br />
                 <span className="text-slate-300 text-4xl sm:text-5xl lg:text-[3rem] xl:text-6xl font-semibold">
                   with AI Interviews
                 </span>
               </h1>
 
-              <p
-                className="animate-fade-up text-lg text-slate-400 mb-10 leading-relaxed max-w-lg"
-                style={{ animationDelay: '160ms' }}
-              >
-                Practice with an AI interviewer that adapts to your target role. Get real-time
-                feedback, pinpoint weak spots, and walk in confident every time.
-              </p>
 
-              {/* CTAs */}
-              <div
-                className="animate-fade-up flex flex-col sm:flex-row gap-4 mb-8"
-                style={{ animationDelay: '240ms' }}
-              >
-                <Link
-                  href="/register"
-                  className="group inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-0.5 cursor-pointer text-base"
-                >
-                  Start for Free
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-                </Link>
-                <Link
-                  href="/login"
-                  className="inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-slate-800/70 hover:bg-slate-700/80 text-white font-semibold rounded-xl transition-all duration-200 border border-slate-700 hover:border-slate-600 hover:-translate-y-0.5 cursor-pointer text-base backdrop-blur"
-                >
-                  Sign In
-                </Link>
-              </div>
-
-              {/* Social proof */}
-              <div
-                className="animate-fade-up flex flex-wrap gap-5 text-sm text-slate-500"
-                style={{ animationDelay: '320ms' }}
-              >
-                {['No credit card required', 'Free to start', 'Instant AI feedback'].map((text) => (
-                  <div key={text} className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                    {text}
-                  </div>
-                ))}
-              </div>
             </div>
 
             {/* ── Right: 3D Robot ── */}
@@ -202,7 +129,6 @@ export default function LandingPage() {
               </div>
 
               <AISessionCard />
-              <LiveScoreHUD />
             </div>
 
           </div>
@@ -487,17 +413,9 @@ export default function LandingPage() {
       <footer className="py-10 border-t border-slate-800/40 bg-slate-950/70 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-md shadow-indigo-500/30">
-                <Bot className="w-3.5 h-3.5 text-white" />
-              </div>
-              <div className="flex items-baseline gap-[3px] font-brand">
-                <span className="text-[13px] font-semibold tracking-[0.12em] uppercase text-slate-400">Final</span>
-                <span className="text-[13px] font-bold tracking-[0.12em] uppercase bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">Round</span>
-              </div>
-            </div>
+            <Logo size="sm" showTagline={false} showStatus={false} />
             <p className="text-slate-500 text-sm">
-              &copy; {new Date().getFullYear()} Final Round. Built with AI to help you succeed.
+              &copy; {new Date().getFullYear()} FinalRound. Built with AI to help you succeed.
             </p>
             <div className="flex items-center gap-6 text-sm text-slate-500">
               <Link href="/login" className="hover:text-slate-300 transition-colors duration-200 cursor-pointer">

@@ -6,7 +6,8 @@ import { Input, Select } from '@/components/ui/Input';
 import { LoadingPage } from '@/components/ui/LoadingSpinner';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { interviewApi } from '@/lib/api';
-import { Brain, Briefcase, ChevronRight, Clock, FileText, Layers, Play, Shuffle, Upload, X } from 'lucide-react';
+import { RecentSessions } from '@/components/dashboard/RecentSessions';
+import { Brain, Briefcase, ChevronRight, FileText, Play, Shuffle, Upload, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
@@ -20,6 +21,22 @@ const DIFFICULTY_LEVELS = [
   { value: 'easy', label: 'Easy' },
   { value: 'medium', label: 'Medium' },
   { value: 'hard', label: 'Hard' },
+];
+
+const TARGET_COMPANIES = [
+  'General',
+  'Google',
+  'Meta',
+  'Amazon',
+  'Apple',
+  'Microsoft',
+  'Netflix',
+  'Tesla',
+  'NVIDIA',
+  'Stripe',
+  'Uber',
+  'Airbnb',
+  'LinkedIn',
 ];
 
 const POPULAR_ROLES = [
@@ -62,6 +79,7 @@ export default function DashboardPage() {
   const { user, token, isLoading } = useAuthContext();
 
   const [role, setRole] = useState('Software Engineer');
+  const [targetCompany, setTargetCompany] = useState('General');
   const [interviewType, setInterviewType] = useState('technical');
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
   const [resumeFile, setResumeFile] = useState<File | null>(null);
@@ -69,6 +87,8 @@ export default function DashboardPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
   const [isDragging, setIsDragging] = useState(false);
+  const [sessions, setSessions] = useState<any[]>([]);
+  const [isFetchingSessions, setIsFetchingSessions] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -76,6 +96,21 @@ export default function DashboardPage() {
       router.push('/login');
     }
   }, [user, isLoading, router]);
+
+  useEffect(() => {
+    async function fetchRecent() {
+      if (!token) return;
+      try {
+        const data = await interviewApi.getSessions(token);
+        setSessions((data as any[]).slice(0, 3));
+      } catch (err) {
+        console.error('Failed to fetch sessions', err);
+      } finally {
+        setIsFetchingSessions(false);
+      }
+    }
+    fetchRecent();
+  }, [token]);
 
   if (isLoading) return <LoadingPage />;
   if (!user) return null;
@@ -122,6 +157,7 @@ export default function DashboardPage() {
         const params = new URLSearchParams({
           role: role.trim(),
           type: interviewType,
+          company: targetCompany,
           difficulty,
           interviewId: result.interview_id,
         });
@@ -131,13 +167,24 @@ export default function DashboardPage() {
         setIsUploading(false);
       }
     } else {
-      // No resume — go directly (basic flow without context)
-      const params = new URLSearchParams({
-        role: role.trim(),
-        type: interviewType,
-        difficulty,
-      });
-      router.push(`/interview?${params.toString()}`);
+      // No resume — create a lightweight session so it appears in history
+      setIsUploading(true);
+      try {
+        const result = await interviewApi.startInterview(
+          { role: role.trim(), interviewType, difficulty },
+          token
+        );
+        const params = new URLSearchParams({
+          role: role.trim(),
+          type: interviewType,
+          difficulty,
+          interviewId: result.interview_id,
+        });
+        router.push(`/interview?${params.toString()}`);
+      } catch (err) {
+        setUploadError(err instanceof Error ? err.message : 'Failed to start session');
+        setIsUploading(false);
+      }
     }
   };
 
@@ -202,6 +249,21 @@ export default function DashboardPage() {
                         {r}
                       </button>
                     ))}
+                  </div>
+                </div>
+
+                {/* Target Company */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Select
+                    label="Target Company"
+                    options={TARGET_COMPANIES.map(c => ({ value: c, label: c }))}
+                    value={targetCompany}
+                    onChange={(e) => setTargetCompany(e.target.value)}
+                  />
+                  <div className="flex items-end mb-1">
+                    <p className="text-xs text-slate-500 italic pb-2">
+                       {"AI will tailor questions to this company's specific interview style."}
+                    </p>
                   </div>
                 </div>
 
@@ -385,15 +447,15 @@ export default function DashboardPage() {
               <div className="space-y-3">
                 {[
                   {
-                    icon: '💡',
+                    icon: '•',
                     text: 'Answer questions with structured responses (STAR method for behavioral)',
                   },
                   {
-                    icon: '🎯',
+                    icon: '•',
                     text: 'Be specific — use real examples and concrete numbers when possible',
                   },
                   {
-                    icon: '⏱️',
+                    icon: '•',
                     text: 'Aim for 2-4 minute answers — not too brief, not too long',
                   },
                 ].map((tip, i) => (
@@ -405,24 +467,7 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Recent Sessions Placeholder */}
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-              <div className="flex items-center gap-2 mb-4">
-                <Clock className="w-4 h-4 text-slate-400" />
-                <h3 className="font-semibold text-white text-sm">Recent Sessions</h3>
-              </div>
-              <div className="flex flex-col items-center justify-center py-8 gap-3 text-center">
-                <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center">
-                  <Layers className="w-5 h-5 text-slate-600" />
-                </div>
-                <div>
-                  <p className="text-slate-400 text-sm font-medium">Session history coming soon</p>
-                  <p className="text-slate-600 text-xs mt-1">
-                    Complete a session to see it here
-                  </p>
-                </div>
-              </div>
-            </div>
+            {token && <RecentSessions token={token} />}
           </div>
         </div>
       </main>

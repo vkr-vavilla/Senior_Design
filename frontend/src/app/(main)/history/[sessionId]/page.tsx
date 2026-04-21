@@ -9,16 +9,16 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { interviewApi } from '@/lib/api';
 import { type Message } from '@/types/chat';
 import {
-    ArrowLeft,
-    Bot,
-    Brain,
-    Briefcase,
-    Calendar,
-    Download,
-    FileText,
-    MessageSquare,
-    Shuffle,
-    Star
+  ArrowLeft,
+  Bot,
+  Brain,
+  Briefcase,
+  Calendar,
+  Download,
+  FileText,
+  MessageSquare,
+  Shuffle,
+  Star
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
