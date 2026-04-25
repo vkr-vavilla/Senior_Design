@@ -44,6 +44,11 @@ const DIFFICULTY_LEVELS = [
   { value: 'hard', label: 'Hard' },
 ];
 
+const MODEL_SOURCES = [
+  { value: 'local', label: 'Local (vLLM)' },
+  { value: 'api', label: 'API (Gemini)' },
+];
+
 const typeIcons = {
   technical: Brain,
   behavioral: Briefcase,
@@ -63,6 +68,7 @@ function InterviewPageContent() {
 
   const {
     messages,
+    activeModelSource,
     isConnected,
     isStreaming,
     sessionEnded,
@@ -87,6 +93,7 @@ function InterviewPageContent() {
     role: searchParams.get('role') || 'Software Engineer',
     type: (searchParams.get('type') as InterviewConfig['type']) || 'technical',
     difficulty: (searchParams.get('difficulty') as InterviewConfig['difficulty']) || 'medium',
+    modelSource: (searchParams.get('modelSource') as InterviewConfig['modelSource']) || 'local',
     interviewId: searchParams.get('interviewId') || undefined,
   });
 
@@ -181,6 +188,18 @@ function InterviewPageContent() {
                 setConfig((c) => ({
                   ...c,
                   difficulty: e.target.value as InterviewConfig['difficulty'],
+                }))
+              }
+            />
+
+            <Select
+              label="Model Source"
+              options={MODEL_SOURCES}
+              value={config.modelSource}
+              onChange={(e) =>
+                setConfig((c) => ({
+                  ...c,
+                  modelSource: e.target.value as InterviewConfig['modelSource'],
                 }))
               }
             />
@@ -297,6 +316,10 @@ function InterviewPageContent() {
                   {config.difficulty}
                 </span>
                 <span className="text-xs text-slate-500 capitalize">{config.type}</span>
+                <span className="text-xs text-slate-600">·</span>
+                <span className="text-xs text-slate-500 uppercase">{config.modelSource}</span>
+                <span className="text-xs text-slate-600">·</span>
+                <span className="text-xs text-slate-500 uppercase">active: {activeModelSource}</span>
                 <span className="text-xs text-slate-600">·</span>
                 <span className="text-xs text-slate-500 truncate">{config.role}</span>
               </div>

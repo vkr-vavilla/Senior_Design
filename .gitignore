@@ -8,3 +8,11 @@ __pycache__/
 .DS_Store
 .claude/
 frontend/.next/
+
+# Large model artifacts
+training/artifacts/
+backend/kokoro_models/
+wandb/
+*.bin
+*.onnx
+*.safetensors

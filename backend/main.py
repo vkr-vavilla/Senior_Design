@@ -4,12 +4,14 @@ from contextlib import asynccontextmanager
 from database import connect_db, close_db
 from routers import auth, chat, interview
 import asyncio
+import os
 import subprocess
 import requests
 import time
 
 VLLM_MODEL = "Qwen/Qwen2.5-7B-Instruct"
 VLLM_PORT = 8000
+LORA_ADAPTER_PATH = os.path.join(os.path.dirname(__file__), "../training/artifacts/qwen2.5-7b-chatml-qlora-8192")
 
 vllm_process = None
 
@@ -17,15 +19,25 @@ vllm_process = None
 def start_vllm():
     global vllm_process
     print(f"[vLLM] Starting {VLLM_MODEL} on port {VLLM_PORT}...")
-    vllm_process = subprocess.Popen([
+    cmd = [
         "python", "-m", "vllm.entrypoints.openai.api_server",
         "--model", VLLM_MODEL,
         "--port", str(VLLM_PORT),
-        "--max-num-seqs", "64",
-        "--gpu-memory-utilization", "0.95",
+        "--max-num-seqs", "4",
+        "--gpu-memory-utilization", "0.90",
         "--enforce-eager",
-        "--max-model-len", "4096",
-    ])
+        "--max-model-len", "32768",
+        "--quantization", "bitsandbytes",
+        "--load-format", "bitsandbytes",
+    ]
+    if os.path.isdir(LORA_ADAPTER_PATH):
+        print(f"[vLLM] Loading LoRA adapter from {LORA_ADAPTER_PATH}")
+        cmd += [
+            "--enable-lora",
+            "--max-lora-rank", "64",
+            "--lora-modules", f"interview-adapter={LORA_ADAPTER_PATH}",
+        ]
+    vllm_process = subprocess.Popen(cmd)
     for _ in range(180):
         try:
             r = requests.get(f"http://localhost:{VLLM_PORT}/v1/models", timeout=2)

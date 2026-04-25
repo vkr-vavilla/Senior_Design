@@ -8,6 +8,7 @@ const WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000';
 
 interface UseInterviewChatReturn {
   messages: Message[];
+  activeModelSource: 'local' | 'api';
   isConnected: boolean;
   isStreaming: boolean;
   sessionEnded: boolean;
@@ -21,6 +22,7 @@ interface UseInterviewChatReturn {
 
 export function useInterviewChat(): UseInterviewChatReturn {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [activeModelSource, setActiveModelSource] = useState<'local' | 'api'>('local');
   const [isConnected, setIsConnected] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const [sessionEnded, setSessionEnded] = useState(false);
@@ -69,12 +71,14 @@ export function useInterviewChat(): UseInterviewChatReturn {
       }
 
       const interviewIdParam = config.interviewId ? `&interview_id=${config.interviewId}` : '';
-      const ws = new WebSocket(`${WS_URL}/chat/ws?token=${token}${interviewIdParam}`);
+      const modelSourceParam = `&model_source=${encodeURIComponent(config.modelSource)}`;
+      const ws = new WebSocket(`${WS_URL}/chat/ws?token=${token}${interviewIdParam}${modelSourceParam}`);
       wsRef.current = ws;
 
       ws.onopen = () => {
         setIsConnected(true);
         setMessages([]);
+        setActiveModelSource(config.modelSource);
         setElapsedTime(0);
         setSessionEnded(false);
         startTimer();
@@ -89,6 +93,9 @@ export function useInterviewChat(): UseInterviewChatReturn {
       ws.onmessage = (event) => {
         try {
           const data: ChatChunk = JSON.parse(event.data);
+          if (data.source) {
+            setActiveModelSource(data.source);
+          }
 
           if (!data.done) {
             setIsStreaming(true);
@@ -190,6 +197,7 @@ export function useInterviewChat(): UseInterviewChatReturn {
 
   return {
     messages,
+    activeModelSource,
     isConnected,
     isStreaming,
     sessionEnded,

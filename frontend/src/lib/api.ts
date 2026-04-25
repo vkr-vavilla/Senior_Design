@@ -104,7 +104,14 @@ export const chatApi = {
     });
 
     if (!response.ok) {
-      throw new Error('Synthesis failed');
+      let detail = '';
+      try {
+        const payload = await response.json();
+        detail = typeof payload?.detail === 'string' ? payload.detail : '';
+      } catch {
+        // no-op
+      }
+      throw new Error(detail ? `Synthesis failed: ${detail}` : 'Synthesis failed');
     }
 
     return response.blob();
