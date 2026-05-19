@@ -11,6 +11,9 @@ bcrypt==4.0.1
 passlib==1.7.4
 google-genai==1.66.0
 groq==1.1.2
+openai==1.59.7
+kokoro-onnx==0.5.0
+numpy
 requests==2.32.5
 certifi==2026.2.25
 pydantic==2.12.5

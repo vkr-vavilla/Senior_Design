@@ -8,9 +8,10 @@ import asyncio
 import subprocess
 import requests
 import time
+import os
 
-VLLM_MODEL = "Qwen/Qwen2.5-7B-Instruct"
-VLLM_PORT = 8000
+VLLM_MODEL = os.getenv("VLLM_MODEL", "Qwen/Qwen2.5-7B-Instruct")
+VLLM_PORT = int(os.getenv("VLLM_PRIMARY_PORT", "8080"))
 
 vllm_process = None
 
@@ -53,8 +54,18 @@ def stop_vllm():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await connect_db()
-    if AI_BACKEND not in ["gemini"]:
+    vllm_autostart = os.getenv("VLLM_AUTOSTART", "true").lower() == "true"
+    if AI_BACKEND not in ["gemini"] and vllm_autostart:
         await asyncio.to_thread(start_vllm)
+
+    # Pre-warm Kokoro TTS so the first synthesize request doesn't pay the load cost
+    try:
+        from routers.chat import get_kokoro
+        await asyncio.to_thread(get_kokoro)
+        print("[Kokoro] Pre-warmed.")
+    except Exception as e:
+        print(f"[Kokoro] Pre-warm skipped: {e}")
+
     yield
     await close_db()
     if vllm_process:
@@ -63,9 +74,14 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="FinalRound", lifespan=lifespan)
 
+ALLOWED_ORIGINS = os.getenv(
+    "ALLOWED_ORIGINS",
+    "http://localhost:3000,http://127.0.0.1:3000"
+).split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # tighten this in production
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

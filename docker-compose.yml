@@ -4,13 +4,58 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "8080:8080"
     env_file:
       - ./backend/.env
     environment:
-      - AI_BACKEND=gemini
+      # Override the .env: pick backend without rebuilding the image.
+      # AI_BACKEND=gemini   -> use Gemini cloud API
+      # AI_BACKEND=qwen     -> use the vllm service below
+      - AI_BACKEND=${AI_BACKEND:-gemini}
+      - VLLM_AUTOSTART=false
+      - VLLM_BASE_URL=http://vllm:8001/v1
+      - ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
     volumes:
       - ./backend:/app
+    depends_on:
+      - vllm
+
+  vllm:
+    image: vllm/vllm-openai:v0.7.3
+    command:
+      - --model
+      - Qwen/Qwen2.5-7B-Instruct-AWQ
+      - --quantization
+      - awq_marlin
+      - --dtype
+      - half
+      - --port
+      - "8001"
+      - --max-model-len
+      - "12000"
+      - --gpu-memory-utilization
+      - "0.90"
+      - --enforce-eager
+      - --max-num-seqs
+      - "32"
+      - --enable-lora
+      - --max-lora-rank
+      - "64"
+      - --lora-modules
+      - interviewer=/adapters/qwen2.5-7b-chatml-qlora-8192
+    ports:
+      - "8001:8001"
+    volumes:
+      - ${HOME}/.cache/huggingface:/root/.cache/huggingface
+      - ./training/artifacts:/adapters:ro
+    ipc: host
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
 
   frontend:
     build:
@@ -19,8 +64,9 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
-      - NEXT_PUBLIC_WS_URL=ws://localhost:8000
+      # NEXT_PUBLIC vars are browser-side, so they use the host machine's address
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - NEXT_PUBLIC_WS_URL=ws://localhost:8080
     volumes:
       - ./frontend:/app
       - /app/node_modules
