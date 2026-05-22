@@ -4,9 +4,9 @@ import { ChatInterface } from '@/components/chat/ChatInterface';
 import { FeedbackDisplay } from '@/components/feedback/FeedbackDisplay';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/Button';
-import { LoadingPage } from '@/components/ui/LoadingSpinner';
+import { LoadingPage, LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { useAuthContext } from '@/contexts/AuthContext';
-import { interviewApi } from '@/lib/api';
+import { interviewApi, chatApi } from '@/lib/api';
 import { type Message } from '@/types/chat';
 import {
   ArrowLeft,
@@ -18,6 +18,7 @@ import {
   FileText,
   MessageSquare,
   Shuffle,
+  Sparkles,
   Star
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
@@ -58,6 +59,8 @@ export default function SessionDetailPage() {
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<'feedback' | 'transcript' | 'details'>('feedback');
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generateError, setGenerateError] = useState('');
   
   const dummyRef = useRef<HTMLDivElement>(null);
 
@@ -74,10 +77,8 @@ export default function SessionDetailPage() {
         const data = await interviewApi.getSession(sessionId, token);
         const s = data as SessionDetail;
         setSession(s);
-        if (!s.feedback && s.messages?.length > 0) {
-          setActiveTab('transcript');
-        } else if (!s.feedback && !s.messages?.length) {
-          setActiveTab('details');
+        if (!s.feedback) {
+          setActiveTab(s.messages?.length > 0 ? 'transcript' : 'details');
         }
       } catch (err) {
         setError('Failed to load session details');
@@ -88,6 +89,21 @@ export default function SessionDetailPage() {
     }
     fetchSession();
   }, [sessionId, token]);
+
+  const handleGenerateFeedback = async () => {
+    if (!token) return;
+    setIsGenerating(true);
+    setGenerateError('');
+    try {
+      const feedback = await chatApi.getFeedback(sessionId, token);
+      setSession((prev) => prev ? { ...prev, feedback } : prev);
+      setActiveTab('feedback');
+    } catch (err) {
+      setGenerateError('Failed to generate feedback. Please try again.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const handleDownloadResume = async () => {
     if (!session?.resume_filename || !token) return;
@@ -122,7 +138,7 @@ export default function SessionDetailPage() {
   }));
 
   const tabs = [
-    { id: 'feedback', label: 'AI Feedback', icon: Star, show: !!session.feedback },
+    { id: 'feedback', label: 'AI Feedback', icon: Star, show: true },
     { id: 'transcript', label: 'Chat Transcript', icon: MessageSquare, show: chatMessages.length > 0 },
     { id: 'details', label: 'Interview Details', icon: FileText, show: true },
   ].filter(t => t.show);
@@ -213,9 +229,46 @@ export default function SessionDetailPage() {
 
             {/* Content Area */}
             <div className="flex-1 min-h-0 overflow-y-auto">
-              {activeTab === 'feedback' && session.feedback && (
+              {activeTab === 'feedback' && (
                 <div className="pb-10">
-                  <FeedbackDisplay feedback={session.feedback} sessionId={session._id} />
+                  {session.feedback ? (
+                    <FeedbackDisplay feedback={session.feedback} sessionId={session._id} />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-20 gap-6 text-center">
+                      <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
+                        <Sparkles className="w-8 h-8 text-indigo-400" />
+                      </div>
+                      <div>
+                        <h3 className="text-white font-semibold text-lg mb-2">No feedback yet</h3>
+                        <p className="text-slate-400 text-sm max-w-sm">
+                          Generate AI feedback to see a detailed breakdown of your performance, strengths, and areas to improve.
+                        </p>
+                      </div>
+                      {generateError && (
+                        <p className="text-red-400 text-sm">{generateError}</p>
+                      )}
+                      <Button
+                        onClick={handleGenerateFeedback}
+                        variant="primary"
+                        disabled={isGenerating || !session.messages?.length}
+                      >
+                        {isGenerating ? (
+                          <span className="flex items-center gap-2">
+                            <LoadingSpinner size="sm" />
+                            Generating feedback...
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-2">
+                            <Sparkles className="w-4 h-4" />
+                            Generate Feedback
+                          </span>
+                        )}
+                      </Button>
+                      {!session.messages?.length && (
+                        <p className="text-slate-500 text-xs">No conversation recorded for this session.</p>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 

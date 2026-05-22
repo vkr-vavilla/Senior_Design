@@ -161,6 +161,33 @@ async def chat_ws(websocket: WebSocket, token: str, interview_id: str = "", clie
                 if not resume.strip():
                     print("WARNING: resume_text is empty for this interview")
 
+                if int_type == "behavioral":
+                    interview_type_guidance = (
+                        "You are running a BEHAVIORAL interview. Focus entirely on how the candidate worked with people, "
+                        "handled challenges, and grew as a professional. Ask about: teamwork and collaboration, leadership moments, "
+                        "conflict resolution, times they failed and what they learned, handling pressure or ambiguity, and what they "
+                        "contributed beyond just writing code. Use STAR in your head to probe — if an answer is vague, ask for the "
+                        "specific situation or what they personally did. Do NOT ask technical questions about how systems work, "
+                        "algorithms, or code internals. Keep it human and experience-focused."
+                    )
+                    interview_rotation_focus = "team situations, leadership moments, and challenges from their work history"
+                elif int_type == "technical":
+                    interview_type_guidance = (
+                        "You are running a TECHNICAL interview. Focus on the systems, technologies, code, and architecture "
+                        "behind the candidate's work. Ask about: how specific features were built, why certain technologies were "
+                        "chosen over alternatives, how they handled scale or performance issues, debugging approaches, system design "
+                        "tradeoffs, and depth of knowledge in the tools they listed. Probe for specifics — not just 'I used Redis' "
+                        "but why Redis, how it was configured, what problems it solved. Do NOT ask behavioral or soft-skill questions."
+                    )
+                    interview_rotation_focus = "specific technologies, system design decisions, and technical tradeoffs"
+                else:
+                    interview_type_guidance = (
+                        "You are running a MIXED interview. Balance between technical depth and behavioral questions. "
+                        "Cover both how they built things (technical depth, tradeoffs, architecture) and how they worked with others, "
+                        "led, or overcame challenges (behavioral). Alternate naturally between the two throughout the conversation."
+                    )
+                    interview_rotation_focus = "technical topics, system decisions, team situations, and leadership moments"
+
                 system_prompt = f"""=== CANDIDATE RESUME (your primary source — read this carefully) ===
 {resume}
 
@@ -172,27 +199,41 @@ You are Alex, a warm and experienced senior {role} running a {difficulty} {int_t
 
 GROUNDING RULES (most important):
 - Every question you ask MUST be tied to something concrete in the resume above OR to something the candidate just said. Do not pull generic questions from memory.
-- Before asking about a skill, tool, or framework, scan the resume to confirm it's listed. If it isn't, do NOT ask about it. (Example: don't ask about Selenium, JUnit, or TestNG unless they appear in the resume.)
+- Before asking about a skill, tool, or framework, scan the resume to confirm it's listed. If it isn't, do NOT ask about it.
 - When the candidate asks "is that on my resume?" — actually check. If it's not there, say so honestly and pivot to something that IS in the resume. Never claim something is on the resume when it isn't.
 - Quote or paraphrase real items from the resume (project names, companies, tools, dates) so it's obvious you're reading it.
 
+COVERAGE RULES (critical):
+- The resume has multiple projects, jobs, technologies, and experiences. You MUST explore ALL of them across the interview — not just one.
+- After covering one project or job, move to a completely different area: a different company, a different project, or a different technology stack listed on the resume.
+- Actively ask about the specific technologies the candidate has listed (languages, frameworks, databases, cloud tools, etc.) — probe their depth on each.
+- Use varied, natural transitions when moving topics — never repeat the same one twice. Options: "I want to move to something different —", "Actually, I noticed on your resume —", "Tell me about your time at [Company] —", "One more area I want to cover —", "Moving on —", "I also saw you worked with X —", "Let me ask you about [different project/role] —", "Switching topics —". Pick a different one each time.
+- Think of the resume as a map with many destinations. Navigate across all of it, not back and forth on one spot.
+
 VOICE & STYLE:
-- Talk like a real person across the table from them. Conversational, curious, engaged.
-- React to what they actually said in a sentence or two — show you're listening — then ask your next question. Curiosity, not evaluation.
-- Natural openers: "Walk me through...", "Tell me more about...", "Hmm, what do you mean by...", "Okay, so when you say X — what did that look like?", "Got it. And...".
-- Vary length and energy. Some turns short, some longer when you're genuinely curious. Don't be robotic.
-- Be warm but real. Don't fake-praise. Earn your reactions.
+- Short. Tight. Conversational. Every response must be 1-3 sentences maximum.
+- Acknowledge in 2-3 words max ("Got it.", "Okay.", "Interesting."), then ask your question. That is the whole turn.
+- Natural openers: "Walk me through...", "Tell me about...", "What do you mean by...", "How did you handle...", "Why did you choose...".
+- Do NOT use filler phrases like "uh", "um", "you know", "so basically", or long wind-ups before the question.
 
-INTERVIEWING APPROACH:
-- Ask ONE focused question per turn. Never stack multiple questions.
-- When answers are vague or buzzwordy, dig: ask for a specific story, a number, a tradeoff, what THEY did vs the team.
-- Move the conversation forward — don't paraphrase their answer back.
+INTERVIEW TYPE — {int_type.upper()}:
+{interview_type_guidance}
 
-DON'T:
-- Don't summarize with bullet points or numbered lists. You're a person.
-- Don't walk through the job description, location, hours, or admin details.
-- Don't act like they got the job — you're screening.
-- Don't compliment the structure of an answer. Save evaluation for the post-interview report.
+INTERVIEWING APPROACH — CRITICAL:
+- Ask EXACTLY ONE question per turn. One question, one "?", then stop.
+- Your entire response must be under 40 words. If you are going over, cut it down.
+- Never ask a question with multiple sub-parts ("...and also tell me... and also how..."). Pick one angle only.
+- When answers are vague, ask one short follow-up, then move on.
+- Move the conversation forward — do not paraphrase their answer back.
+- Rotate between: work experiences, personal projects, and {interview_rotation_focus}.
+
+DON'T — these are hard rules, no exceptions:
+- Do NOT give any feedback, evaluation, scoring, or assessment during the interview. Ever. That happens after.
+- Do NOT say: "Great answer", "That's a solid approach", "Good point", "Excellent", "That makes sense", "Impressive", "Nice", or any phrase that judges their answer — positive or negative.
+- Do NOT summarize what they just said back to them.
+- Do NOT use bullet points or numbered lists. You're a person, not a document.
+- Do NOT walk through the job description, location, hours, or admin details.
+- Do NOT loop back to the same project or job you already covered. Move forward.
 
 KICKOFF (first turn only):
 - One short sentence introducing yourself as Alex, then ONE warm opening question tied to a specific project or experience FROM the resume above. Skip all preamble.
@@ -232,11 +273,11 @@ KICKOFF (first turn only):
                     model=VLLM_MODEL,
                     messages=messages,
                     stream=True,
-                    max_tokens=400,
-                    temperature=0.85,
+                    max_tokens=120,
+                    temperature=0.75,
                     top_p=0.9,
-                    presence_penalty=0.6,
-                    frequency_penalty=0.3,
+                    presence_penalty=0.8,
+                    frequency_penalty=0.5,
                 )
                 for chunk in stream:
                     delta = chunk.choices[0].delta.content
@@ -249,12 +290,11 @@ KICKOFF (first turn only):
         # Opening greeting
         full_opening = ""
         kickoff = (
-            "Start the interview. In ONE short sentence introduce yourself as Alex, then "
-            "immediately ask your first opening question. Do NOT walk through the job "
-            "description, requirements, location, hours, eligibility, or any admin details — "
-            "the candidate already knows those. Skip 'confirming' anything. Just briefly say hi "
-            "and ask a real warm-up question (something like 'tell me a bit about yourself' or "
-            "a light question tied to a specific project on their resume)."
+            "Begin the interview. Your response must have exactly two parts:\n"
+            "1. A greeting: introduce yourself as Alex in one short warm sentence (e.g. 'Hi, I'm Alex — good to meet you.').\n"
+            "2. Ask the candidate to briefly introduce themselves — who they are, their background, and what they're looking for. "
+            "Keep it natural and conversational, like a real interviewer would open.\n"
+            "Do not add anything else — no agenda, no mention of duration or format, no list of what you'll cover."
         )
         async for chunk in get_ai_response_stream(kickoff):
             if chunk.startswith("__ERROR__"):
@@ -289,11 +329,28 @@ KICKOFF (first turn only):
 
     except WebSocketDisconnect:
         if history:
+            user_answers = [m["text"] for m in history if m["role"] == "user"]
+            # Build Q&A pairs: model turn followed by user turn
+            qa_pairs = []
+            for i, msg in enumerate(history):
+                if msg["role"] == "model" and i + 1 < len(history) and history[i + 1]["role"] == "user":
+                    qa_pairs.append({"question": msg["text"], "answer": history[i + 1]["text"]})
+
             if interview_id:
-                await db.interviews.update_one({"_id": ObjectId(interview_id)}, {"$set": {"messages": history}})
+                await db.interviews.update_one(
+                    {"_id": ObjectId(interview_id)},
+                    {"$set": {"messages": history, "user_answers": user_answers, "qa_pairs": qa_pairs}},
+                )
             else:
                 _id = client_session_id if client_session_id else str(ObjectId())
-                await db.chat_sessions.insert_one({"_id": _id, "user_id": user_id, "messages": history, "created_at": datetime.now(timezone.utc)})
+                await db.chat_sessions.insert_one({
+                    "_id": _id,
+                    "user_id": user_id,
+                    "messages": history,
+                    "user_answers": user_answers,
+                    "qa_pairs": qa_pairs,
+                    "created_at": datetime.now(timezone.utc),
+                })
 
 
 @router.post("/{session_id}/feedback", response_model=FeedbackResponse)
@@ -302,27 +359,128 @@ async def get_feedback(session_id: str):
     session = await db.interviews.find_one({"_id": ObjectId(session_id)})
     if not session:
         session = await db.chat_sessions.find_one({"_id": ObjectId(session_id)})
-    
+
     if not session or not session.get("messages"):
-        raise HTTPException(status_code=404, detail="Session not found")
+        raise HTTPException(status_code=404, detail="Session not found or no messages recorded")
 
-    transcript = "\n".join([f"{msg['role'].upper()}: {msg['text']}" for msg in session["messages"]])
-    prompt = f"Provide expert interview feedback for this transcript:\n\n{transcript}"
+    # Pull context
+    resume_text = session.get("resume_text", "")
+    job_description = session.get("job_description", "")
+    role = session.get("role", "Software Engineer")
+    interview_type = session.get("interview_type", "general")
+    difficulty = session.get("difficulty", "medium")
 
-    async def get_feedback_text():
+    # Resolve candidate name from the user record
+    candidate_name = "the candidate"
+    user_id = session.get("user_id")
+    if user_id:
+        user_doc = await db.users.find_one({"_id": ObjectId(user_id)}, {"name": 1})
+        if user_doc and user_doc.get("name"):
+            candidate_name = user_doc["name"].split()[0]  # first name only
+
+    # Use pre-extracted Q&A pairs if available, otherwise derive from messages
+    qa_pairs = session.get("qa_pairs") or []
+    if not qa_pairs:
+        messages = session.get("messages", [])
+        for i, msg in enumerate(messages):
+            if msg["role"] == "model" and i + 1 < len(messages) and messages[i + 1]["role"] == "user":
+                qa_pairs.append({"question": msg["text"], "answer": messages[i + 1]["text"]})
+
+    if not qa_pairs:
+        raise HTTPException(status_code=400, detail="No candidate answers found to evaluate")
+
+    # Save user answers to DB if not already there
+    if not session.get("user_answers"):
+        user_answers = [qa["answer"] for qa in qa_pairs]
+        await db.interviews.update_one(
+            {"_id": ObjectId(session_id)},
+            {"$set": {"user_answers": user_answers, "qa_pairs": qa_pairs}},
+        )
+
+    qa_text = "\n\n".join(
+        f"Q{i + 1}: {qa['question']}\nA{i + 1}: {qa['answer']}"
+        for i, qa in enumerate(qa_pairs)
+    )
+
+    context = ""
+    if resume_text:
+        context += f"\n\n=== CANDIDATE RESUME ===\n{resume_text.strip()}"
+    if job_description:
+        context += f"\n\n=== JOB DESCRIPTION ===\n{job_description.strip()}"
+
+    # Pre-build the per-question skeleton with actual questions already inserted
+    breakdown_skeleton = "\n".join(
+        f'- **Q{i + 1} — {qa["question"][:80].strip()}**: [evaluate this answer: was it specific or vague, what worked, what was weak, what a stronger answer would include]'
+        for i, qa in enumerate(qa_pairs)
+    )
+
+    prompt = f"""You are a senior hiring manager giving post-interview feedback after a {difficulty} {interview_type} interview for a {role} position.
+The candidate's name is {candidate_name}. Refer to them by name throughout the feedback — never call them "Alex" or "the candidate".{context}
+
+=== INTERVIEW Q&A ===
+{qa_text}
+
+=== YOUR TASK ===
+Evaluate how the candidate answered each question. Be specific — reference what they actually said, not generic advice.
+
+Output your evaluation in this exact format (** for section headers, - for bullets):
+
+**Overall Score: [X]/10**
+[One honest sentence summarising their overall performance]
+
+**Answer-by-Answer Breakdown**
+{breakdown_skeleton}
+
+**Strengths**
+- **[title]**: [specific thing they said that worked well and why]
+- [more strengths...]
+
+**Areas for Improvement**
+- **[title]**: [exactly what they said that was weak and what a better answer would have included]
+- [more improvements...]
+
+**Communication**
+- **[observation]**: [clarity, structure, conciseness, filler words, rambling — be direct]
+
+**Technical Accuracy**
+- **[topic]**: [was the technical content correct and deep enough for a {difficulty} {role} interview?]
+
+**Key Takeaways**
+- [2-3 specific actionable things to prepare before a real interview]
+
+Rules:
+- Fill in every bullet in the Answer-by-Answer Breakdown above with real evaluation — do not leave placeholders
+- Quote or closely paraphrase what the candidate actually said — no generic advice
+- Flag any resume skills they never mentioned during the interview
+- Score: 9-10 exceptional, 7-8 solid, 5-6 needs work, below 5 significant gaps"""
+
+    async def generate_feedback() -> str:
         if AI_BACKEND == "gemini":
             client = get_gemini_client()
-            resp = await asyncio.to_thread(client.models.generate_content, model="gemini-2.5-flash", contents=prompt)
+            resp = await asyncio.to_thread(
+                client.models.generate_content,
+                model="gemini-2.5-flash",
+                contents=prompt,
+            )
             return resp.text
         else:
             client = get_vllm_client()
-            resp = await asyncio.to_thread(client.chat.completions.create, model=VLLM_MODEL, messages=[{"role": "user", "content": prompt}], max_tokens=1024)
+            resp = await asyncio.to_thread(
+                client.chat.completions.create,
+                model=VLLM_MODEL,
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=2000,
+                temperature=0.3,
+            )
             return resp.choices[0].message.content
 
     try:
-        feedback_text = await get_feedback_text()
+        feedback_text = await generate_feedback()
     except Exception as e:
         feedback_text = f"Feedback generation failed: {e}"
 
-    await db.interviews.update_one({"_id": ObjectId(session_id)}, {"$set": {"feedback": feedback_text}})
+    await db.interviews.update_one(
+        {"_id": ObjectId(session_id)},
+        {"$set": {"feedback": feedback_text}},
+    )
     return FeedbackResponse(feedback=feedback_text)
