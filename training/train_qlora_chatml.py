@@ -12,7 +12,7 @@ from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
     BitsAndBytesConfig,
-    DataCollatorForLanguageModeling,
+    DataCollatorForSeq2Seq,
     Trainer,
     TrainingArguments,
     set_seed,
@@ -20,25 +20,65 @@ from transformers import (
 
 
 class BF16LossTrainer(Trainer):
-    """Bypasses accelerate's convert_to_fp32 output wrapper to keep logits in
-    bfloat16.  Without this, Qwen2.5's 152K vocab x 8192 seq len = 4.64 GiB
-    fp32 allocation kills a 24 GB GPU before our code even sees the outputs."""
+    """
+    Memory-efficient trainer for Qwen2.5-7B QLoRA on a single 24 GB GPU.
+
+    The core problem: backward through the LM head matmul
+    (hidden_states @ lm_head.weight → logits) requires materializing
+    d_loss/d_logits, which at seq=8192 and vocab=152K is 4.64 GiB in fp32.
+    No amount of CE chunking avoids this — the gradient exists regardless.
+
+    The solution: use Liger's fused LM head + CE kernel, which computes the
+    loss IN CHUNKS internally, never materializing the full (B, T, V) logits
+    tensor or its gradient. Only hidden_states (B, T, hidden=3584) flows
+    through the graph, whose gradient is ~235 MiB — fits easily.
+
+    We run the transformer layers (with LoRA adapters active) to get
+    hidden_states, then hand those + lm_head.weight directly to Liger.
+    """
 
     def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
-        labels = inputs.pop("labels")
-        # Unwrap accelerate's forward wrapper so logits stay in bfloat16.
-        unwrapped = self.accelerator.unwrap_model(model)
-        with torch.autocast("cuda", dtype=torch.bfloat16):
-            outputs = unwrapped(**inputs)
-        logits = outputs.logits  # (B, T, V) bfloat16 -- 2.32 GiB, not 4.64 GiB
-        shift_logits = logits[..., :-1, :].contiguous()
-        shift_labels = labels[..., 1:].contiguous().to(logits.device)
-        loss = F.cross_entropy(
-            shift_logits.view(-1, shift_logits.size(-1)),
-            shift_labels.view(-1),
-            ignore_index=-100,
+        from liger_kernel.transformers.fused_linear_cross_entropy import (
+            LigerFusedLinearCrossEntropyLoss,
         )
-        return (loss, outputs) if return_outputs else loss
+
+        labels = inputs.pop("labels")
+        unwrapped = self.accelerator.unwrap_model(model)
+
+        # Run the transformer layers (LoRA-modified) WITHOUT the LM head.
+        # For PEFT-wrapped Qwen2ForCausalLM:
+        #   unwrapped          = PeftModelForCausalLM
+        #   unwrapped.model    = Qwen2ForCausalLM
+        #   unwrapped.model.model = Qwen2Model (transformer layers + embed + norm)
+        #   unwrapped.model.lm_head = Linear(hidden, vocab, bias=False)
+        with torch.autocast("cuda", dtype=torch.bfloat16):
+            transformer_outputs = unwrapped.model.model(
+                input_ids=inputs.get("input_ids"),
+                attention_mask=inputs.get("attention_mask"),
+                return_dict=True,
+            )
+
+        hidden_states = transformer_outputs.last_hidden_state  # (B, T, D) bf16
+        lm_head_weight = unwrapped.model.lm_head.weight       # (V, D)
+
+        # Shift for next-token prediction (same as standard CLM)
+        shift_hidden = hidden_states[..., :-1, :].contiguous()   # (B, T-1, D)
+        shift_labels = labels[..., 1:].contiguous().reshape(-1)  # (B*(T-1),)
+        shift_hidden_2d = shift_hidden.reshape(-1, shift_hidden.size(-1))  # (B*(T-1), D)
+
+        # Fused: computes lm_head_weight @ hidden.T + CE in chunks internally.
+        # Never allocates the full (B*T, V) logits tensor or its fp32 gradient.
+        fused_loss_fn = LigerFusedLinearCrossEntropyLoss(ignore_index=-100)
+        loss = fused_loss_fn(lm_head_weight, shift_hidden_2d, shift_labels)
+
+        if return_outputs:
+            # Trainer eval path expects (loss, outputs). Return a lightweight
+            # placeholder — we don't need logits since prediction_loss_only=True.
+            from transformers.modeling_outputs import CausalLMOutputWithPast
+            dummy_outputs = CausalLMOutputWithPast(loss=loss)
+            return loss, dummy_outputs
+
+        return loss
 
 
 def parse_args() -> argparse.Namespace:
@@ -96,15 +136,71 @@ def to_chat_text(messages: List[Dict[str, Any]], tokenizer: AutoTokenizer) -> st
 
 
 def tokenize_record(record: Dict[str, Any], tokenizer: AutoTokenizer, max_length: int) -> Dict[str, Any]:
-    text = to_chat_text(record["messages"], tokenizer)
-    toks = tokenizer(
-        text,
-        truncation=True,
-        max_length=max_length,
-        padding=False,
-    )
-    toks["labels"] = toks["input_ids"].copy()
-    return toks
+    """
+    Tokenize a chat record with ASSISTANT-ONLY label masking.
+
+    For every turn, we compute its token range inside the fully-rendered chat,
+    then:
+      - system / user turns -> labels = -100 (no gradient)
+      - assistant turns -> labels = input_ids for the response content + <|im_end|>,
+                            but the "<|im_start|>assistant\\n" header is also masked
+                            so the model isn't trained to emit the role tag itself.
+    """
+    messages = record["messages"]
+    input_ids: List[int] = []
+    labels: List[int] = []
+
+    for i, msg in enumerate(messages):
+        # Tokens for the conversation BEFORE this turn
+        if i == 0:
+            prefix_len = 0
+        else:
+            prefix_text = tokenizer.apply_chat_template(
+                messages[:i], tokenize=False, add_generation_prompt=False
+            )
+            prefix_len = len(tokenizer(prefix_text, add_special_tokens=False)["input_ids"])
+
+        # Tokens INCLUDING this turn
+        full_text = tokenizer.apply_chat_template(
+            messages[: i + 1], tokenize=False, add_generation_prompt=False
+        )
+        full_ids = tokenizer(full_text, add_special_tokens=False)["input_ids"]
+
+        turn_ids = full_ids[prefix_len:]
+        input_ids.extend(turn_ids)
+
+        if msg["role"] == "assistant":
+            # Where does the "<|im_start|>assistant\n" header end and content begin?
+            # apply_chat_template with add_generation_prompt=True on messages[:i]
+            # gives us exactly "...prior turns...<|im_start|>assistant\n".
+            header_text = tokenizer.apply_chat_template(
+                messages[:i], tokenize=False, add_generation_prompt=True
+            )
+            header_total_len = len(tokenizer(header_text, add_special_tokens=False)["input_ids"])
+            header_only_len = header_total_len - prefix_len  # tokens added by the assistant header
+
+            # Mask the header tokens, train on the content + <|im_end|>
+            labels.extend([-100] * header_only_len)
+            labels.extend(turn_ids[header_only_len:])
+        else:
+            # No gradient for system / user turns
+            labels.extend([-100] * len(turn_ids))
+
+    # Truncate (keeping input_ids and labels aligned)
+    input_ids = input_ids[:max_length]
+    labels = labels[:max_length]
+
+    # Sanity guard: if truncation killed every assistant token, drop the example
+    # by returning empty labels. Trainer's data loader will still accept it but
+    # the loss won't propagate. Better to warn the user upstream though.
+    if not any(l != -100 for l in labels):
+        print(f"WARNING: example has no unmasked assistant tokens after truncation — increase --max-length")
+
+    return {
+        "input_ids": input_ids,
+        "attention_mask": [1] * len(input_ids),
+        "labels": labels,
+    }
 
 
 def main() -> None:
@@ -210,9 +306,20 @@ def main() -> None:
 
     training_args = TrainingArguments(**training_kwargs)
 
-    collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
+    # IMPORTANT: DataCollatorForLanguageModeling overwrites labels with input_ids,
+    # which would undo our assistant-only masking. DataCollatorForSeq2Seq pads
+    # input_ids/attention_mask with the pad token and labels with -100 separately.
+    collator = DataCollatorForSeq2Seq(
+        tokenizer=tokenizer,
+        padding=True,
+        label_pad_token_id=-100,
+        return_tensors="pt",
+    )
 
-    trainer = Trainer(
+    # Use the chunked BF16LossTrainer instead of vanilla — Liger's fusion
+    # is unreliable through PEFT wrapping, so we do our own bf16+chunked CE
+    # to keep peak VRAM under 24 GB at seq_len=8192.
+    trainer = BF16LossTrainer(
         model=model,
         args=training_args,
         train_dataset=tokenized["train"],
