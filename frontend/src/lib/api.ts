@@ -1,5 +1,6 @@
 import type { LoginCredentials, RegisterData, User } from '@/types/auth';
 import type { Session } from '@/types/chat';
+import type { CodingProblem, RunResult } from '@/types/coding';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -108,6 +109,42 @@ export const chatApi = {
     }
 
     return response.blob();
+  },
+};
+
+export const codingApi = {
+  async getProblem(problemId: string, token?: string): Promise<CodingProblem> {
+    return apiRequest('GET', `/coding/problems/${problemId}`, undefined, token);
+  },
+  async getSessionProblems(sessionId: string, token?: string): Promise<CodingProblem[]> {
+    return apiRequest('GET', `/coding/sessions/${sessionId}/problems`, undefined, token);
+  },
+  async run(
+    data: { problemId: string; language: string; code: string },
+    token?: string
+  ): Promise<RunResult> {
+    return apiRequest(
+      'POST',
+      '/coding/run',
+      { problem_id: data.problemId, language: data.language, code: data.code },
+      token
+    );
+  },
+  async submit(
+    data: { sessionId: string; problemId: string; language: string; code: string },
+    token?: string
+  ): Promise<RunResult> {
+    return apiRequest(
+      'POST',
+      '/coding/submit',
+      {
+        session_id: data.sessionId,
+        problem_id: data.problemId,
+        language: data.language,
+        code: data.code,
+      },
+      token
+    );
   },
 };
 

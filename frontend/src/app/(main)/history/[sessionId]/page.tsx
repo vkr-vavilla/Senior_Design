@@ -119,7 +119,17 @@ export default function SessionDetailPage() {
   };
 
   if (isLoading || isFetching) return <LoadingPage />;
-  if (!user || !session) return null;
+  if (!user) return null;
+  if (!session) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex flex-col">
+        <Navbar />
+        <main className="flex-1 flex items-center justify-center">
+          <p className="text-sm text-red-400">{error || 'Session not found.'}</p>
+        </main>
+      </div>
+    );
+  }
 
   const type = session.interview_type || 'technical';
   const difficulty = session.difficulty || 'medium';
@@ -232,7 +242,34 @@ export default function SessionDetailPage() {
               {activeTab === 'feedback' && (
                 <div className="pb-10">
                   {session.feedback ? (
-                    <FeedbackDisplay feedback={session.feedback} sessionId={session._id} />
+                    <div className="space-y-6">
+                      <div className="flex items-center justify-between gap-3 flex-wrap">
+                        {generateError ? (
+                          <p className="text-red-400 text-sm">{generateError}</p>
+                        ) : (
+                          <span />
+                        )}
+                        <Button
+                          onClick={handleGenerateFeedback}
+                          variant="secondary"
+                          disabled={isGenerating}
+                          className="text-sm bg-slate-800/50 hover:bg-slate-700/50 border-slate-700/50"
+                        >
+                          {isGenerating ? (
+                            <span className="flex items-center gap-2">
+                              <LoadingSpinner size="sm" />
+                              Regenerating...
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-2">
+                              <Sparkles className="w-4 h-4" />
+                              Regenerate Feedback
+                            </span>
+                          )}
+                        </Button>
+                      </div>
+                      <FeedbackDisplay feedback={session.feedback} sessionId={session._id} />
+                    </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center py-20 gap-6 text-center">
                       <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
