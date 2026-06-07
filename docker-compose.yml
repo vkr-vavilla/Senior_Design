@@ -15,10 +15,13 @@ services:
       - VLLM_AUTOSTART=false
       - VLLM_BASE_URL=http://vllm:8001/v1
       - ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+      # Judge0 code-execution sandbox, reachable on the compose network
+      - JUDGE0_URL=http://judge0-server:2358
     volumes:
       - ./backend:/app
     depends_on:
       - vllm
+      - judge0-server
 
   vllm:
     image: vllm/vllm-openai:v0.7.3
@@ -73,3 +76,60 @@ services:
       - /app/.next
     depends_on:
       - backend
+
+  # ── Judge0: sandboxed code execution ────────────────────────────────────────
+  # Runs untrusted candidate code in an isolated sandbox (no network, plus CPU /
+  # memory / time limits). All settings live in ./judge0.conf. `server` and
+  # `workers` need privileged mode because Judge0 uses `isolate`, which requires
+  # cgroup access.
+  #
+  # ⚠️ HOST REQUIREMENT: Judge0 1.13.1 needs cgroup v1. Ubuntu 22.04+/24.04 boots
+  #    with cgroup v2, so the workers will fail until you enable v1 on the host:
+  #      1. add to GRUB_CMDLINE_LINUX in /etc/default/grub:
+  #           systemd.unified_cgroup_hierarchy=0
+  #      2. sudo update-grub && sudo reboot
+  #    If you can't modify GRUB / reboot this machine, tell me and I'll swap the
+  #    stack to Piston, which needs no host changes.
+  judge0-server:
+    image: judge0/judge0:1.13.1
+    volumes:
+      - ./judge0.conf:/judge0.conf:ro
+    ports:
+      - "2358:2358"
+    privileged: true
+    restart: always
+    depends_on:
+      - judge0-db
+      - judge0-redis
+
+  judge0-workers:
+    image: judge0/judge0:1.13.1
+    command: ["./scripts/workers"]
+    volumes:
+      - ./judge0.conf:/judge0.conf:ro
+    privileged: true
+    restart: always
+    depends_on:
+      - judge0-db
+      - judge0-redis
+
+  judge0-db:
+    image: postgres:13.0
+    env_file:
+      - ./judge0.conf
+    volumes:
+      - judge0-postgres-data:/var/lib/postgresql/data/
+    restart: always
+
+  judge0-redis:
+    image: redis:6.0
+    command: ["bash", "-c", 'docker-entrypoint.sh --appendonly no --requirepass "$$REDIS_PASSWORD"']
+    env_file:
+      - ./judge0.conf
+    volumes:
+      - judge0-redis-data:/data
+    restart: always
+
+volumes:
+  judge0-postgres-data:
+  judge0-redis-data:

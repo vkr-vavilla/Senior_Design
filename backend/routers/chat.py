@@ -415,49 +415,92 @@ async def get_feedback(session_id: str):
 
     # Pre-build the per-question skeleton with actual questions already inserted
     breakdown_skeleton = "\n".join(
-        f'- **Q{i + 1} — {qa["question"][:80].strip()}**: [evaluate this answer: was it specific or vague, what worked, what was weak, what a stronger answer would include]'
+        f'- **Q{i + 1} — {qa["question"][:80].strip()}**: [how your answer landed — was it specific or vague? what worked, what fell short, and what a stronger answer would have included]'
         for i, qa in enumerate(qa_pairs)
     )
 
-    prompt = f"""You are a senior hiring manager giving post-interview feedback after a {difficulty} {interview_type} interview for a {role} position.
-The candidate's name is {candidate_name}. Refer to them by name throughout the feedback — never call them "Alex" or "the candidate".{context}
+    # Coding round (if the candidate solved live problems): feed the code + results
+    # to the model and add a Coding Round section to the output. Both strings stay
+    # empty for interviews with no coding attempts, so the prompt is unchanged then.
+    coding_attempts = session.get("coding_attempts") or []
+    coding_block = ""
+    coding_output_section = ""
+    if coding_attempts:
+        attempt_texts = []
+        for i, attempt in enumerate(coding_attempts, 1):
+            verdict = (
+                "all example tests passed"
+                if attempt.get("all_passed")
+                else f"passed {attempt.get('passed', 0)}/{attempt.get('total', 0)} example tests"
+            )
+            attempt_texts.append(
+                f"--- Problem {i}: {attempt.get('title', 'Untitled')} "
+                f"({attempt.get('difficulty', '?')}) ---\n"
+                f"Result: {verdict}\n"
+                f"Language: {attempt.get('language', 'python3')}\n"
+                f"Their solution:\n```\n{(attempt.get('code') or '').strip()}\n```"
+            )
+        coding_block = (
+            "\n\n=== CODING ROUND (live problems the candidate solved) ===\n"
+            + "\n\n".join(attempt_texts)
+            + "\n\nWeigh this coding round alongside the spoken answers in the overall "
+            "score, strengths, and weaknesses."
+        )
+        coding_output_section = f"""
 
-=== INTERVIEW Q&A ===
-{qa_text}
+**Coding Round**
+[Assess their actual code: did it pass the example tests, and is the approach sound? Comment on time/space complexity, edge cases, and whether the code is clean and readable enough for a {role}. Reference what they actually wrote; if a solution failed its tests, say what likely went wrong and how to fix it.]"""
 
-=== YOUR TASK ===
-Evaluate how the candidate answered each question. Be specific — reference what they actually said, not generic advice.
+    prompt = f"""You are an experienced hiring manager who just finished a {difficulty} {interview_type} interview for a {role} role. You're writing honest, personal feedback addressed directly to the candidate, whose first name is {candidate_name}. Judge them the way you actually would as the hiring manager for THIS role — measure every answer against what the {role} position and its job description require.{context}
 
-Output your evaluation in this exact format (** for section headers, - for bullets):
+=== INTERVIEW Q&A (what you asked and how they answered) ===
+{qa_text}{coding_block}
+
+=== HOW TO WRITE THIS ===
+Write the way a thoughtful hiring manager actually talks after an interview — warm but honest, specific, and human. Address the candidate directly as "you" (you can use their name once for warmth, but do not keep referring to them in the third person).
+
+Two rules matter most:
+1. Tie your judgement to the role. When something is a strength or a gap, say what it means for someone doing THIS job, and reference the job description / role requirements where relevant.
+2. Every sentence must say something real about THIS interview. Never write a label and then just restate it.
+
+BAD — robotic, says nothing (never write like this):
+- **Clear**: Your communication was clear.
+- **Concise**: Your communication was concise.
+
+GOOD — specific and tied to the role (write like this):
+- When I asked about scaling the service, you jumped straight to "add caching" without naming the actual bottleneck — for a role that owns production systems, I want to see you diagnose before you optimise.
+- You walked through your fraud-detection project really clearly, which is exactly the kind of ownership this position needs.
+
+Output using this exact structure (** for section headers, - for bullets):
 
 **Overall Score: [X]/10**
-[One honest sentence summarising their overall performance]
+[Two or three honest sentences talking to them: how did they do overall against what this role needs, and what's the headline takeaway?]
 
 **Answer-by-Answer Breakdown**
-{breakdown_skeleton}
+{breakdown_skeleton}{coding_output_section}
 
 **Strengths**
-- **[title]**: [specific thing they said that worked well and why]
-- [more strengths...]
+- [A specific moment that worked and why it matters for this role — reference what you actually said.]
+- [Another, if there is one.]
+
+**Weaknesses**
+- [A specific shortcoming in how you answered — what was missing, wrong, or too shallow for what this role expects.]
+- [Another, if there is one.]
 
 **Areas for Improvement**
-- **[title]**: [exactly what they said that was weak and what a better answer would have included]
-- [more improvements...]
-
-**Communication**
-- **[observation]**: [clarity, structure, conciseness, filler words, rambling — be direct]
-
-**Technical Accuracy**
-- **[topic]**: [was the technical content correct and deep enough for a {difficulty} {role} interview?]
+- [Concrete, actionable guidance to close the gaps above — what to practise and what a stronger answer would have sounded like.]
+- [Another, if there is one.]
 
 **Key Takeaways**
-- [2-3 specific actionable things to prepare before a real interview]
+- [2-3 headline points to remember before a real interview for this kind of role, each tied to something that actually happened above.]
 
 Rules:
-- Fill in every bullet in the Answer-by-Answer Breakdown above with real evaluation — do not leave placeholders
-- Quote or closely paraphrase what the candidate actually said — no generic advice
-- Flag any resume skills they never mentioned during the interview
-- Score: 9-10 exceptional, 7-8 solid, 5-6 needs work, below 5 significant gaps"""
+- Fill in every line of the Answer-by-Answer Breakdown with a real evaluation — no placeholders.
+- Quote or closely paraphrase what the candidate actually said; no generic advice that could apply to anyone.
+- Frame strengths and gaps in terms of fit for this specific {role} role and its job description.
+- Keep Weaknesses (what fell short) and Areas for Improvement (how to fix it) distinct — do not just repeat the same points.
+- If their resume lists skills they never demonstrated in the interview, say so honestly.
+- Be honest with the score: 9-10 exceptional, 7-8 solid, 5-6 needs work, below 5 significant gaps."""
 
     async def generate_feedback() -> str:
         if AI_BACKEND == "gemini":
@@ -474,8 +517,8 @@ Rules:
                 client.chat.completions.create,
                 model=VLLM_MODEL,
                 messages=[{"role": "user", "content": prompt}],
-                max_tokens=2000,
-                temperature=0.3,
+                max_tokens=2600,
+                temperature=0.6,
             )
             return resp.choices[0].message.content
 

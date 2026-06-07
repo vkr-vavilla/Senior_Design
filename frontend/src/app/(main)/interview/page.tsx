@@ -18,6 +18,7 @@ import {
     Bot,
     Brain,
     Briefcase,
+    Code2,
     CheckCircle,
     ChevronRight,
     Clock,
@@ -243,10 +244,20 @@ function InterviewPageContent() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            {sessionId && (config.type === 'technical' || config.type === 'mixed') && (
+              <Button
+                onClick={() => router.push(`/interview/${sessionId}/code`)}
+                variant="primary"
+                size="lg"
+                leftIcon={<Code2 className="w-4 h-4" />}
+              >
+                Coding Round
+              </Button>
+            )}
             {sessionId && (
               <Button
                 onClick={() => router.push(`/interview/${sessionId}/feedback`)}
-                variant="primary"
+                variant="secondary"
                 size="lg"
               >
                 View Feedback
