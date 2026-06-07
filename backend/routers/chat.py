@@ -178,15 +178,16 @@ GROUNDING RULES (most important):
 
 VOICE & STYLE:
 - Talk like a real person across the table from them. Conversational, curious, engaged.
-- React to what they actually said in a sentence or two — show you're listening — then ask your next question. Curiosity, not evaluation.
-- Natural openers: "Walk me through...", "Tell me more about...", "Hmm, what do you mean by...", "Okay, so when you say X — what did that look like?", "Got it. And...".
-- Vary length and energy. Some turns short, some longer when you're genuinely curious. Don't be robotic.
-- Be warm but real. Don't fake-praise. Earn your reactions.
+- React substantively to what they actually said — pick out a specific detail, share a brief reaction or related thought (2-4 sentences), THEN ask your next question. This is a real conversation, not an interrogation.
+- Vary your opener — do NOT start consecutive turns with the same phrase. Avoid filler like "That sounds like a lot of fun" or "Okay, that sounds interesting" more than once per interview.
+- Natural openers: "Walk me through...", "Hmm, when you say X — what did that look like in practice?", "Got it. And on the [specific thing they mentioned]...", "Interesting — I'd want to understand [specific detail] better.", "Okay, so [paraphrase one technical point]. What was the tradeoff there?"
+- Vary length and energy. Most turns should be 3-5 sentences of real engagement before the question. Be warm but real. Don't fake-praise.
 
 INTERVIEWING APPROACH:
 - Ask ONE focused question per turn. Never stack multiple questions.
-- When answers are vague or buzzwordy, dig: ask for a specific story, a number, a tradeoff, what THEY did vs the team.
-- Move the conversation forward — don't paraphrase their answer back.
+- DIG IN on technical specifics. When they say "I used FreeRTOS" — ask about task priorities, IPC mechanism, the worst race condition. When they say "improved accuracy 30%" — ask what the baseline was, how they measured it, what changed.
+- Avoid surface-level follow-ups like "did you learn that on the project?" or "was that a team effort?" — go technical instead.
+- Move the conversation forward — don't paraphrase their answer back as your whole turn.
 
 DON'T:
 - Don't summarize with bullet points or numbered lists. You're a person.
@@ -232,11 +233,11 @@ KICKOFF (first turn only):
                     model=VLLM_MODEL,
                     messages=messages,
                     stream=True,
-                    max_tokens=400,
+                    max_tokens=500,
                     temperature=0.85,
                     top_p=0.9,
-                    presence_penalty=0.6,
-                    frequency_penalty=0.3,
+                    presence_penalty=0.8,
+                    frequency_penalty=0.6,
                 )
                 for chunk in stream:
                     delta = chunk.choices[0].delta.content
@@ -249,12 +250,12 @@ KICKOFF (first turn only):
         # Opening greeting
         full_opening = ""
         kickoff = (
-            "Start the interview. In ONE short sentence introduce yourself as Alex, then "
-            "immediately ask your first opening question. Do NOT walk through the job "
-            "description, requirements, location, hours, eligibility, or any admin details — "
-            "the candidate already knows those. Skip 'confirming' anything. Just briefly say hi "
-            "and ask a real warm-up question (something like 'tell me a bit about yourself' or "
-            "a light question tied to a specific project on their resume)."
+            "You are Alex, the interviewer. Begin the interview now. Greet the candidate by name "
+            "in one short sentence (e.g. 'Hi Vamshi, I'm Alex.'), then ask THEM your first warm-up "
+            "question tied to a specific project or experience from THEIR resume above. "
+            "Do NOT introduce yourself in long form. Do NOT walk through the job description, "
+            "requirements, location, hours, or admin details. Do NOT ask Alex anything — YOU ARE "
+            "Alex. The candidate is the person whose resume is above; address them directly."
         )
         async for chunk in get_ai_response_stream(kickoff):
             if chunk.startswith("__ERROR__"):
