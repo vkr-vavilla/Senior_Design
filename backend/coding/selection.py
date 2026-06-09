@@ -11,6 +11,9 @@ across page reloads.
 """
 from bson import ObjectId
 
+from config import PROBLEMS_COLLECTION
+from coding.normalize import normalize_problem
+
 DIFFICULTY_PLAN = {
     "easy": ["easy"],
     "medium": ["medium"],
@@ -19,13 +22,29 @@ DIFFICULTY_PLAN = {
 
 CODING_INTERVIEW_TYPES = {"technical", "mixed"}
 
+# Problems the Python function driver can't run:
+#  - linked-list / tree: need ListNode/TreeNode typing the stored docs don't carry
+#  - database / shell / concurrency: SQL / Bash / threading problems, not Python functions
+_UNSUPPORTED_TAGS = [
+    "linked-list", "doubly-linked-list",
+    "tree", "binary-tree", "binary-search-tree", "n-ary-tree",
+    "database", "shell", "concurrency",
+]
+
 
 def _gradeable_match(difficulty: str) -> dict:
-    # Only function-style problems with a Python starter + parsed metadata are runnable.
+    # Stored docs use capitalized difficulty ("Easy"/"Medium"); match case-insensitively.
+    # A problem is gradeable if it has examples we can derive a signature + tests from
+    # (leetcode collection) OR already carries a python starter (scraped docs).
     return {
-        "difficulty": difficulty,
-        "code_snippets.python3": {"$exists": True, "$ne": ""},
-        "meta_data.name": {"$exists": True, "$ne": ""},
+        "difficulty": {"$regex": f"^{difficulty}$", "$options": "i"},
+        "tags": {"$nin": _UNSUPPORTED_TAGS},
+        # Premium problems (🔒) have inconsistent/missing example data; skip them.
+        "title": {"$not": {"$regex": "🔒"}},
+        "$or": [
+            {"examples.0": {"$exists": True}},
+            {"code_snippets.python3": {"$exists": True, "$ne": ""}},
+        ],
     }
 
 
@@ -34,20 +53,28 @@ async def _sample_problem(db, difficulty: str, exclude_ids: list):
     match = _gradeable_match(difficulty)
     if exclude_ids:
         match["_id"] = {"$nin": exclude_ids}
-    docs = await db.problems.aggregate(
+    docs = await db[PROBLEMS_COLLECTION].aggregate(
         [{"$match": match}, {"$sample": {"size": 1}}]
     ).to_list(1)
-    return docs[0] if docs else None
+    return normalize_problem(docs[0]) if docs else None
 
 
-def _valid_oids(ids) -> list:
-    out = []
-    for value in ids or []:
-        try:
-            out.append(ObjectId(value))
-        except Exception:
-            continue
-    return out
+def ids_filter(values) -> dict:
+    """Build `{"_id": {"$in": [...]}}` matching a problem id however the collection
+    keys it. The `leetcode` collection keys by INTEGER LeetCode number, but ids
+    travel as strings (JSON / persisted on the interview doc); also tolerate
+    ObjectId-keyed collections. So for "1850" we match both 1850 and "1850"."""
+    candidates = []
+    for v in (values if isinstance(values, (list, tuple)) else [values]):
+        candidates.append(v)
+        if isinstance(v, str):
+            if v.lstrip("-").isdigit():
+                candidates.append(int(v))
+            try:
+                candidates.append(ObjectId(v))
+            except Exception:
+                pass
+    return {"_id": {"$in": candidates}}
 
 
 async def select_problems_for_session(db, session: dict) -> list:
@@ -57,11 +84,11 @@ async def select_problems_for_session(db, session: dict) -> list:
         return []
 
     # Reuse a previous selection so reloads stay stable.
-    existing = _valid_oids(session.get("coding_problem_ids"))
+    existing = session.get("coding_problem_ids") or []
     if existing:
-        docs = await db.problems.find({"_id": {"$in": existing}}).to_list(len(existing))
-        by_id = {d["_id"]: d for d in docs}
-        ordered = [by_id[oid] for oid in existing if oid in by_id]
+        docs = await db[PROBLEMS_COLLECTION].find(ids_filter(existing)).to_list(len(existing))
+        by_id = {str(d["_id"]): d for d in docs}
+        ordered = [normalize_problem(by_id[str(v)]) for v in existing if str(v) in by_id]
         if ordered:
             return ordered
 

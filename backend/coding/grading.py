@@ -71,7 +71,8 @@ async def grade_submission(
 ) -> dict:
     """Run + grade `user_code` for a problem doc against its example test cases."""
     # Imported lazily so the pure parser/compare helpers don't require httpx.
-    from coding.judge0_client import run_program
+    # Dispatches to the backend chosen by CODE_EXECUTOR (local subprocess by default).
+    from coding.executor import run_program
 
     program = build_program(user_code, problem.get("meta_data") or {})
     stdin = problem.get("example_testcases") or ""
@@ -79,7 +80,9 @@ async def grade_submission(
     result = await run_program(program, stdin, language_id)
 
     stdout = result.get("stdout") or ""
-    expected = parse_expected_outputs(problem.get("content_html") or "")
+    # Prefer the example outputs carried on the (normalized) problem doc; fall back
+    # to scraping them out of the HTML statement for older/scraped docs.
+    expected = problem.get("expected_outputs") or parse_expected_outputs(problem.get("content_html") or "")
     actual_lines = stdout.split("\n") if stdout else []
     cases = compare_results(actual_lines, expected)
     passed = sum(1 for c in cases if c["passed"])

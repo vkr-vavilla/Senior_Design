@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Input, Select } from '@/components/ui/Input';
 import { LoadingPage } from '@/components/ui/LoadingSpinner';
 import { useAuthContext } from '@/contexts/AuthContext';
-import { interviewApi } from '@/lib/api';
+import { interviewApi, ApiError } from '@/lib/api';
 import { RecentSessions } from '@/components/dashboard/RecentSessions';
 import { Brain, Briefcase, ChevronRight, FileText, Play, Shuffle, Upload, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -76,7 +76,18 @@ const difficultyConfig = {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user, token, isLoading } = useAuthContext();
+  const { user, token, isLoading, logout } = useAuthContext();
+
+  // A 401 from a protected request means the token expired (no refresh flow):
+  // clear the session and send the user to log in again with a clear message.
+  const handleAuthError = (err: unknown): boolean => {
+    if (err instanceof ApiError && err.status === 401) {
+      logout();
+      router.push('/login?expired=1');
+      return true;
+    }
+    return false;
+  };
 
   const [role, setRole] = useState('Software Engineer');
   const [targetCompany, setTargetCompany] = useState('General');
@@ -163,6 +174,7 @@ export default function DashboardPage() {
         });
         router.push(`/interview?${params.toString()}`);
       } catch (err) {
+        if (handleAuthError(err)) return;
         setUploadError(err instanceof Error ? err.message : 'Upload failed');
         setIsUploading(false);
       }
@@ -182,6 +194,7 @@ export default function DashboardPage() {
         });
         router.push(`/interview?${params.toString()}`);
       } catch (err) {
+        if (handleAuthError(err)) return;
         setUploadError(err instanceof Error ? err.message : 'Failed to start session');
         setIsUploading(false);
       }

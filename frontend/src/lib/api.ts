@@ -175,7 +175,17 @@ export const interviewApi = {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to create interview');
+      let detail: unknown;
+      try {
+        detail = await response.json();
+      } catch {
+        detail = await response.text();
+      }
+      const message =
+        typeof detail === 'object' && detail !== null && 'detail' in detail
+          ? String((detail as { detail: unknown }).detail)
+          : `Failed to create interview (status ${response.status})`;
+      throw new ApiError(response.status, message, detail);
     }
 
     return response.json();
