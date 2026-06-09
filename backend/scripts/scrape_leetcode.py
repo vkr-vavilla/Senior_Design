@@ -45,6 +45,7 @@ load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
 DB_NAME = os.getenv("DB_NAME", "prepai")
+PROBLEMS_COLLECTION = os.getenv("PROBLEMS_COLLECTION", "leetcode")
 LEETCODE_SESSION = os.getenv("LEETCODE_SESSION", "")
 LEETCODE_CSRF = os.getenv("LEETCODE_CSRF", "")
 
@@ -206,7 +207,7 @@ def main():
     args = parser.parse_args()
 
     client = MongoClient(MONGODB_URI, tlsCAFile=certifi.where())
-    problems = client[DB_NAME]["problems"]
+    problems = client[DB_NAME][PROBLEMS_COLLECTION]
     problems.create_index("slug", unique=True)
     problems.create_index("difficulty")
 
@@ -234,7 +235,7 @@ def main():
             print(f"  wrote {saved} {difficulty} problems")
 
     print(f"\nDone. {total_saved} problems written this run.")
-    print(f"Total in {DB_NAME}.problems: {problems.count_documents({})}")
+    print(f"Total in {DB_NAME}.{PROBLEMS_COLLECTION}: {problems.count_documents({})}")
     client.close()
 
 

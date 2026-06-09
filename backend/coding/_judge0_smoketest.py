@@ -34,7 +34,8 @@ TWO_SUM_SOLUTION = (
 def main():
     uri = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
     db_name = os.getenv("DB_NAME", "prepai")
-    problems = MongoClient(uri, tlsCAFile=certifi.where())[db_name]["problems"]
+    coll = os.getenv("PROBLEMS_COLLECTION", "leetcode")
+    problems = MongoClient(uri, tlsCAFile=certifi.where())[db_name][coll]
 
     problem = problems.find_one({"slug": "two-sum"})
     if not problem:

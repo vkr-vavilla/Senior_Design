@@ -15,9 +15,11 @@ from pydantic import BaseModel
 
 from auth.jwt import get_current_user
 from bson import ObjectId
+from config import PROBLEMS_COLLECTION
 from database import get_db
 from coding.grading import grade_submission
-from coding.selection import select_problems_for_session
+from coding.normalize import normalize_problem
+from coding.selection import ids_filter, select_problems_for_session
 
 router = APIRouter(prefix="/coding", tags=["coding"])
 
@@ -44,10 +46,12 @@ def _oid(value: str, label: str) -> ObjectId:
 
 async def _load_problem(problem_id: str) -> dict:
     db = get_db()
-    problem = await db.problems.find_one({"_id": _oid(problem_id, "problem")})
+    # Problems are keyed by integer LeetCode number in the `leetcode` collection,
+    # so match by id type rather than forcing an ObjectId (which 400'd on "1850").
+    problem = await db[PROBLEMS_COLLECTION].find_one(ids_filter(problem_id))
     if not problem:
         raise HTTPException(status_code=404, detail="Problem not found")
-    return problem
+    return normalize_problem(problem)
 
 
 def _language_id(language: str) -> int:

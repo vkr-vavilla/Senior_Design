@@ -7,7 +7,7 @@ import { LoadingPage, LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { codingApi } from '@/lib/api';
 import type { CodingProblem, RunResult } from '@/types/coding';
-import { ArrowLeft, CheckCircle2, Play, Send, XCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Flag, Play, Send, XCircle } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -88,6 +88,22 @@ export default function CodingPage() {
     }
   };
 
+  const submittedCount = Object.values(submittedIds).filter(Boolean).length;
+
+  // End the coding round: submitted answers are already saved to the session, so
+  // we just confirm (if nothing was submitted) and hand off to the feedback page,
+  // which now includes a dedicated Coding Round slide.
+  const finishRound = () => {
+    if (isRunning || isSubmitting) return;
+    if (submittedCount === 0) {
+      const proceed = window.confirm(
+        "You haven't submitted any solutions yet. End the coding round anyway?"
+      );
+      if (!proceed) return;
+    }
+    router.push(`/interview/${sessionId}/feedback`);
+  };
+
   if (isLoading || isFetching) return <LoadingPage />;
   if (!user) return null;
 
@@ -114,13 +130,27 @@ export default function CodingPage() {
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-5">
         {/* Header */}
         <div className="shrink-0">
-          <button
-            onClick={() => router.push('/dashboard')}
-            className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors mb-4"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Dashboard
-          </button>
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Dashboard
+            </button>
+
+            <Button
+              onClick={finishRound}
+              variant="primary"
+              disabled={isRunning || isSubmitting}
+              className="text-sm"
+            >
+              <span className="flex items-center gap-2">
+                <Flag className="w-4 h-4" />
+                Finish &amp; View Feedback
+              </span>
+            </Button>
+          </div>
 
           {/* Problem switcher (only when there's more than one) */}
           {problems.length > 1 && (

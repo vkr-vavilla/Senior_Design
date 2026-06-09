@@ -15,6 +15,9 @@ services:
       - VLLM_AUTOSTART=false
       - VLLM_BASE_URL=http://vllm:8001/v1
       - ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+      # Code execution: "local" runs candidate code in a subprocess (works on
+      # cgroup v2); set to "judge0" to use the sandbox below (needs cgroup v1).
+      - CODE_EXECUTOR=${CODE_EXECUTOR:-local}
       # Judge0 code-execution sandbox, reachable on the compose network
       - JUDGE0_URL=http://judge0-server:2358
     volumes:
