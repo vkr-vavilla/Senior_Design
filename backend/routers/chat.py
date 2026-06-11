@@ -2,6 +2,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPExce
 from jose import JWTError, jwt
 from groq import Groq
 from datetime import datetime, timezone
+from auth.jwt import get_current_user
 from database import get_db
 from config import GEMINI_API_KEY, VLLM_BASE_URL, VLLM_MODEL, AI_BACKEND, JWT_SECRET, JWT_ALGORITHM, GROQ_API_KEY
 from models.chat import ChatMessage, FeedbackResponse
@@ -57,7 +58,7 @@ def verify_token(token: str) -> str:
 
 
 @router.post("/transcribe")
-async def transcribe_audio(file: UploadFile = File(...)):
+async def transcribe_audio(file: UploadFile = File(...), user_id: str = Depends(get_current_user)):
     try:
         with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1]) as tmp:
             content = await file.read()
@@ -84,7 +85,7 @@ async def transcribe_audio(file: UploadFile = File(...)):
 
 
 @router.post("/synthesize")
-async def synthesize_speech(request: dict):
+async def synthesize_speech(request: dict, user_id: str = Depends(get_current_user)):
     try:
         text = request.get("text")
         if not text:
@@ -122,14 +123,20 @@ async def synthesize_speech(request: dict):
 
 
 @router.websocket("/ws")
-async def chat_ws(websocket: WebSocket, token: str, interview_id: str = "", client_session_id: str = ""):
+async def chat_ws(websocket: WebSocket, token: str = "", interview_id: str = "", client_session_id: str = ""):
+    await websocket.accept()
+
+    # Auth: prefer a {"token": ...} first message so the JWT stays out of the URL
+    # (query strings end up in proxy/access logs); the query param remains as a
+    # fallback for older clients.
     try:
+        if not token:
+            first = await asyncio.wait_for(websocket.receive_text(), timeout=10)
+            token = json.loads(first).get("token", "")
         user_id = verify_token(token)
-    except ValueError:
+    except Exception:
         await websocket.close(code=4001)
         return
-
-    await websocket.accept()
     print(f"DEBUG: WebSocket accepted. Preferred backend: {AI_BACKEND}")
 
     history = [] 
@@ -359,14 +366,38 @@ KICKOFF (first turn only):
 
 
 @router.post("/{session_id}/feedback", response_model=FeedbackResponse)
-async def get_feedback(session_id: str):
+async def get_feedback(session_id: str, user_id: str = Depends(get_current_user)):
     db = get_db()
-    session = await db.interviews.find_one({"_id": ObjectId(session_id)})
+    collection = db.interviews
+    session = None
+    try:
+        oid = ObjectId(session_id)
+    except Exception:
+        oid = None
+    if oid is not None:
+        session = await collection.find_one({"_id": oid, "user_id": user_id})
     if not session:
-        session = await db.chat_sessions.find_one({"_id": ObjectId(session_id)})
+        # Sessionless chats are stored in chat_sessions with a string _id.
+        session = await db.chat_sessions.find_one({"_id": session_id, "user_id": user_id})
+        if session:
+            collection = db.chat_sessions
 
     if not session or not session.get("messages"):
         raise HTTPException(status_code=404, detail="Session not found or no messages recorded")
+
+    session_filter = {"_id": session["_id"]}
+
+    # Reuse stored feedback unless a coding attempt landed after it was written;
+    # regenerating on every page view costs an LLM call and rewrites the report.
+    existing_feedback = session.get("feedback")
+    feedback_at = session.get("feedback_generated_at")
+    last_attempt_at = max(
+        (a.get("submitted_at") for a in session.get("coding_attempts") or [] if a.get("submitted_at")),
+        default=None,
+    )
+    stale = last_attempt_at is not None and (feedback_at is None or last_attempt_at > feedback_at)
+    if existing_feedback and not stale:
+        return FeedbackResponse(feedback=existing_feedback)
 
     # Pull context
     resume_text = session.get("resume_text", "")
@@ -377,11 +408,9 @@ async def get_feedback(session_id: str):
 
     # Resolve candidate name from the user record
     candidate_name = "the candidate"
-    user_id = session.get("user_id")
-    if user_id:
-        user_doc = await db.users.find_one({"_id": ObjectId(user_id)}, {"name": 1})
-        if user_doc and user_doc.get("name"):
-            candidate_name = user_doc["name"].split()[0]  # first name only
+    user_doc = await db.users.find_one({"_id": ObjectId(user_id)}, {"name": 1})
+    if user_doc and user_doc.get("name"):
+        candidate_name = user_doc["name"].split()[0]  # first name only
 
     # Use pre-extracted Q&A pairs if available, otherwise derive from messages
     qa_pairs = session.get("qa_pairs") or []
@@ -397,8 +426,8 @@ async def get_feedback(session_id: str):
     # Save user answers to DB if not already there
     if not session.get("user_answers"):
         user_answers = [qa["answer"] for qa in qa_pairs]
-        await db.interviews.update_one(
-            {"_id": ObjectId(session_id)},
+        await collection.update_one(
+            session_filter,
             {"$set": {"user_answers": user_answers, "qa_pairs": qa_pairs}},
         )
 
@@ -525,10 +554,12 @@ Rules:
     try:
         feedback_text = await generate_feedback()
     except Exception as e:
-        feedback_text = f"Feedback generation failed: {e}"
+        # Don't persist the failure text — a later retry should regenerate.
+        print(f"Feedback generation error: {e}")
+        raise HTTPException(status_code=502, detail="Feedback generation failed; please try again.")
 
-    await db.interviews.update_one(
-        {"_id": ObjectId(session_id)},
-        {"$set": {"feedback": feedback_text}},
+    await collection.update_one(
+        session_filter,
+        {"$set": {"feedback": feedback_text, "feedback_generated_at": datetime.now(timezone.utc)}},
     )
     return FeedbackResponse(feedback=feedback_text)

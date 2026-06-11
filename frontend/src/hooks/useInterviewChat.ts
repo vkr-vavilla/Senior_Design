@@ -68,11 +68,16 @@ export function useInterviewChat(): UseInterviewChatReturn {
         setSessionId(config.interviewId);
       }
 
-      const interviewIdParam = config.interviewId ? `&interview_id=${config.interviewId}` : '';
-      const ws = new WebSocket(`${WS_URL}/chat/ws?token=${token}${interviewIdParam}`);
+      // The JWT is sent as the first WS message instead of a query param so it
+      // stays out of server/proxy access logs.
+      const interviewIdParam = config.interviewId
+        ? `?interview_id=${encodeURIComponent(config.interviewId)}`
+        : '';
+      const ws = new WebSocket(`${WS_URL}/chat/ws${interviewIdParam}`);
       wsRef.current = ws;
 
       ws.onopen = () => {
+        ws.send(JSON.stringify({ token }));
         setIsConnected(true);
         setMessages([]);
         setElapsedTime(0);

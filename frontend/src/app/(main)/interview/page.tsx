@@ -114,7 +114,7 @@ function InterviewPageContent() {
     try {
       const audioBlob = await stopRecording();
       setIsTranscribing(true);
-      const { text } = await chatApi.transcribe(audioBlob);
+      const { text } = await chatApi.transcribe(audioBlob, token ?? undefined);
       if (text.trim()) {
         sendMessage(text);
       }

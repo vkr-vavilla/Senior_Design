@@ -82,12 +82,13 @@ export const chatApi = {
     );
     return response.feedback;
   },
-  async transcribe(audioBlob: Blob): Promise<{ text: string }> {
+  async transcribe(audioBlob: Blob, token?: string): Promise<{ text: string }> {
     const formData = new FormData();
     formData.append('file', audioBlob, 'recording.webm');
 
     const response = await fetch(`${API_URL}/chat/transcribe`, {
       method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       body: formData,
     });
 
@@ -97,10 +98,13 @@ export const chatApi = {
 
     return response.json();
   },
-  async synthesize(text: string): Promise<Blob> {
+  async synthesize(text: string, token?: string): Promise<Blob> {
     const response = await fetch(`${API_URL}/chat/synthesize`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       body: JSON.stringify({ text }),
     });
 

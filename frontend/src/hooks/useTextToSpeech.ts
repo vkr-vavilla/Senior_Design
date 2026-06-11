@@ -2,10 +2,12 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { chatApi } from '@/lib/api';
+import { useAuthContext } from '@/contexts/AuthContext';
 
 export type VoiceEngine = 'premium' | 'browser';
 
 export function useTextToSpeech() {
+  const { token } = useAuthContext();
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [engine, setEngine] = useState<VoiceEngine>('premium');
   
@@ -89,7 +91,7 @@ export function useTextToSpeech() {
     
     if (engine === 'premium') {
       try {
-        const audioBlob = await chatApi.synthesize(text);
+        const audioBlob = await chatApi.synthesize(text, token ?? undefined);
         const url = URL.createObjectURL(audioBlob);
         playQueueRef.current.push({ type: 'url', value: url });
         processQueue();
@@ -102,7 +104,7 @@ export function useTextToSpeech() {
       playQueueRef.current.push({ type: 'text', value: text });
       processQueue();
     }
-  }, [engine, processQueue]);
+  }, [engine, processQueue, token]);
 
   const speakStream = useCallback(async (chunk: string) => {
     sentenceBufferRef.current += chunk;
@@ -136,7 +138,7 @@ export function useTextToSpeech() {
           // a shorter clause finishes synthesis faster than an earlier longer one.
           synthChainRef.current = synthChainRef.current.then(async () => {
             try {
-              const blob = await chatApi.synthesize(sentence);
+              const blob = await chatApi.synthesize(sentence, token ?? undefined);
               const url = URL.createObjectURL(blob);
               playQueueRef.current.push({ type: 'url', value: url });
               processQueue();
@@ -151,7 +153,7 @@ export function useTextToSpeech() {
         }
       }
     }
-  }, [engine, processQueue]);
+  }, [engine, processQueue, token]);
 
   const flush = useCallback(async () => {
     if (sentenceBufferRef.current.trim()) {
@@ -161,7 +163,7 @@ export function useTextToSpeech() {
       if (engine === 'premium') {
         synthChainRef.current = synthChainRef.current.then(async () => {
           try {
-            const blob = await chatApi.synthesize(remaining);
+            const blob = await chatApi.synthesize(remaining, token ?? undefined);
             const url = URL.createObjectURL(blob);
             playQueueRef.current.push({ type: 'url', value: url });
             processQueue();
@@ -175,7 +177,7 @@ export function useTextToSpeech() {
         processQueue();
       }
     }
-  }, [engine, processQueue]);
+  }, [engine, processQueue, token]);
 
   return {
     isSpeaking,
