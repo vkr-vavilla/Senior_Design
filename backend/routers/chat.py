@@ -1,6 +1,8 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException, File, UploadFile
 from jose import JWTError, jwt
 from groq import Groq
+from openai import OpenAI
+from google import genai
 from datetime import datetime, timezone
 from database import get_db
 from config import GEMINI_API_KEY, VLLM_BASE_URL, VLLM_MODEL, AI_BACKEND, JWT_SECRET, JWT_ALGORITHM, GROQ_API_KEY
@@ -15,13 +17,6 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 
 groq_client = Groq(api_key=GROQ_API_KEY)
 
-VLLM_BASE_URL = os.getenv("VLLM_PRIMARY_URL", "http://localhost:8000/v1")
-_LORA_ADAPTER_PATH = os.path.join(os.path.dirname(__file__), "../../training/artifacts/qwen2.5-7b-chatml-qlora-v2")
-VLLM_MODEL = (
-    "interview-adapter"
-    if os.path.isdir(_LORA_ADAPTER_PATH)
-    else os.getenv("VLLM_PRIMARY_MODEL", "Qwen/Qwen2.5-7B-Instruct")
-)
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
 
 vllm_client = OpenAI(base_url=VLLM_BASE_URL, api_key="not-needed")
@@ -269,7 +264,7 @@ async def synthesize_speech(request: dict):
         natural_text = re.sub(r"\s+", " ", text.strip())
         natural_text = natural_text.replace("—", ", ").replace(" - ", ", ")
 
-        kokoro = await asyncio.to_thread(get_kokoro)
+        kokoro = await asyncio.to_thread(_get_kokoro)
         samples, sample_rate = await asyncio.to_thread(
             kokoro.create, natural_text, voice=voice, speed=speed, lang="en-us"
         )
@@ -389,13 +384,17 @@ COVERAGE RULES (critical):
 - Think of the resume as a map with many destinations. Navigate across all of it, not back and forth on one spot.
 
 VOICE & STYLE:
-- Short. Tight. Conversational. Every response must be 1-3 sentences maximum.
-- Acknowledge in 2-3 words max ("Got it.", "Okay.", "Interesting."), then ask your question. That is the whole turn.
-- Natural openers: "Walk me through...", "Tell me about...", "What do you mean by...", "How did you handle...", "Why did you choose...".
-- Do NOT use filler phrases like "uh", "um", "you know", "so basically", or long wind-ups before the question.
+- Talk like a real person across the table from them. Conversational, curious, engaged.
+- React substantively to what they actually said — pick out a specific detail, share a brief reaction or related thought (2-4 sentences), THEN ask your next question. This is a real conversation, not an interrogation.
+- Vary your opener — do NOT start consecutive turns with the same phrase. Avoid filler like "That sounds like a lot of fun" or "Okay, that sounds interesting" more than once per interview.
+- Natural openers: "Walk me through...", "Hmm, when you say X — what did that look like in practice?", "Got it. And on the [specific thing they mentioned]...", "Interesting — I'd want to understand [specific detail] better.", "Okay, so [paraphrase one technical point]. What was the tradeoff there?"
+- Vary length and energy. Most turns should be 3-5 sentences of real engagement before the question. Be warm but real. Don't fake-praise.
 
-INTERVIEW TYPE — {int_type.upper()}:
-{interview_type_guidance}
+INTERVIEWING APPROACH:
+- Ask ONE focused question per turn. Never stack multiple questions.
+- DIG IN on technical specifics. When they say "I used FreeRTOS" — ask about task priorities, IPC mechanism, the worst race condition. When they say "improved accuracy 30%" — ask what the baseline was, how they measured it, what changed.
+- Avoid surface-level follow-ups like "did you learn that on the project?" or "was that a team effort?" — go technical instead.
+- Move the conversation forward — don't paraphrase their answer back as your whole turn.
 
 INTERVIEWING APPROACH — CRITICAL:
 - Ask EXACTLY ONE question per turn. One question, one "?", then stop.
@@ -461,6 +460,7 @@ KICKOFF (first turn only):
             "Begin the interview. Your response must have exactly two parts:\n"
             "1. A greeting: introduce yourself as Alex in one short warm sentence (e.g. 'Hi, I'm Alex — good to meet you.').\n"
             "2. Ask the candidate to briefly introduce themselves — who they are, their background, and what they're looking for. "
+            "question tied to a specific project or experience from THEIR resume above. "
             "Keep it natural and conversational, like a real interviewer would open.\n"
             "Do not add anything else — no agenda, no mention of duration or format, no list of what you'll cover."
         )
@@ -692,18 +692,16 @@ Rules:
 - Be honest with the score: 9-10 exceptional, 7-8 solid, 5-6 needs work, below 5 significant gaps."""
 
     async def generate_feedback() -> str:
-        if AI_BACKEND == "gemini":
-            client = get_gemini_client()
+        if AI_BACKEND == "gemini" and gemini_client:
             resp = await asyncio.to_thread(
-                client.models.generate_content,
-                model="gemini-2.5-flash",
+                gemini_client.models.generate_content,
+                model=GEMINI_MODEL,
                 contents=prompt,
             )
             return resp.text
         else:
-            client = get_vllm_client()
             resp = await asyncio.to_thread(
-                client.chat.completions.create,
+                vllm_client.chat.completions.create,
                 model=VLLM_MODEL,
                 messages=[{"role": "user", "content": prompt}],
                 max_tokens=2600,

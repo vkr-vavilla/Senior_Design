@@ -15,9 +15,10 @@ export function useTextToSpeech() {
   // Queue stores items to play
   const playQueueRef = useRef<{ type: 'url' | 'text', value: string }[]>([]);
   const isPlayingRef = useRef<boolean>(false);
-<<<<<<< HEAD
   const premiumFailureCountRef = useRef<number>(0);
   const premiumDisabledUntilRef = useRef<number>(0);
+  // Serializes synthesize requests so audio chunks enter the play queue in order
+  const synthChainRef = useRef<Promise<void>>(Promise.resolve());
 
   const canUsePremium = useCallback(() => Date.now() >= premiumDisabledUntilRef.current, []);
 
@@ -35,10 +36,6 @@ export function useTextToSpeech() {
   const handlePremiumSuccess = useCallback(() => {
     premiumFailureCountRef.current = 0;
   }, []);
-=======
-  // Serializes synthesize requests so audio chunks enter the play queue in order
-  const synthChainRef = useRef<Promise<void>>(Promise.resolve());
->>>>>>> origin/origin/updates
 
   const processQueue = useCallback(async () => {
     if (isPlayingRef.current || playQueueRef.current.length === 0) return;
@@ -155,36 +152,23 @@ export function useTextToSpeech() {
       sentenceBufferRef.current = buf.slice(cutIndex);
 
       if (sentence.length > 2) {
-<<<<<<< HEAD
         if (engine === 'premium' && canUsePremium()) {
-          try {
-            const blob = await chatApi.synthesize(sentence);
-            handlePremiumSuccess();
-            const url = URL.createObjectURL(blob);
-            playQueueRef.current.push({ type: 'url', value: url });
-            processQueue();
-          } catch (err) {
-            handlePremiumFailure();
-            // FALLBACK to browser voice if synthesis fails (rate limits)
-            playQueueRef.current.push({ type: 'text', value: sentence });
-            processQueue();
-          }
-=======
-        if (engine === 'premium') {
           // Chain synth requests so the play queue is populated in order even if
           // a shorter clause finishes synthesis faster than an earlier longer one.
           synthChainRef.current = synthChainRef.current.then(async () => {
             try {
               const blob = await chatApi.synthesize(sentence);
+              handlePremiumSuccess();
               const url = URL.createObjectURL(blob);
               playQueueRef.current.push({ type: 'url', value: url });
               processQueue();
             } catch (err) {
+              handlePremiumFailure();
+              // FALLBACK to browser voice if synthesis fails (rate limits)
               playQueueRef.current.push({ type: 'text', value: sentence });
               processQueue();
             }
           });
->>>>>>> origin/origin/updates
         } else {
           playQueueRef.current.push({ type: 'text', value: sentence });
           processQueue();
@@ -197,35 +181,21 @@ export function useTextToSpeech() {
     if (sentenceBufferRef.current.trim()) {
       const remaining = sentenceBufferRef.current.trim();
       sentenceBufferRef.current = '';
-<<<<<<< HEAD
-      
-      if (engine === 'premium' && canUsePremium()) {
-        try {
-          const blob = await chatApi.synthesize(remaining);
-          handlePremiumSuccess();
-          const url = URL.createObjectURL(blob);
-          playQueueRef.current.push({ type: 'url', value: url });
-          processQueue();
-        } catch (err) {
-          handlePremiumFailure();
-          playQueueRef.current.push({ type: 'text', value: remaining });
-          processQueue();
-        }
-=======
 
-      if (engine === 'premium') {
+      if (engine === 'premium' && canUsePremium()) {
         synthChainRef.current = synthChainRef.current.then(async () => {
           try {
             const blob = await chatApi.synthesize(remaining);
+            handlePremiumSuccess();
             const url = URL.createObjectURL(blob);
             playQueueRef.current.push({ type: 'url', value: url });
             processQueue();
           } catch (err) {
+            handlePremiumFailure();
             playQueueRef.current.push({ type: 'text', value: remaining });
             processQueue();
           }
         });
->>>>>>> origin/origin/updates
       } else {
         playQueueRef.current.push({ type: 'text', value: remaining });
         processQueue();

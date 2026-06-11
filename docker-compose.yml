@@ -11,7 +11,7 @@ services:
       # Override the .env: pick backend without rebuilding the image.
       # AI_BACKEND=gemini   -> use Gemini cloud API
       # AI_BACKEND=qwen     -> use the vllm service below
-      - AI_BACKEND=${AI_BACKEND:-gemini}
+      - AI_BACKEND=${AI_BACKEND:-qwen}
       - VLLM_AUTOSTART=false
       - VLLM_BASE_URL=http://vllm:8001/v1
       - ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
@@ -48,7 +48,7 @@ services:
       - --max-lora-rank
       - "64"
       - --lora-modules
-      - interviewer=/adapters/qwen2.5-7b-chatml-qlora-8192
+      - interviewer=/adapters/qwen2.5-7b-chatml-qlora-10k
     ports:
       - "8001:8001"
     volumes:
