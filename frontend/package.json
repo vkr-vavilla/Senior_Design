@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.6.0",
     "@splinetool/react-spline": "^4.1.0",
     "@types/three": "^0.183.1",
     "clsx": "^2.1.1",

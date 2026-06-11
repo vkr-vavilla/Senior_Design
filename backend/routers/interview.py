@@ -1,4 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException
+from pydantic import BaseModel
 from auth.jwt import get_current_user
 from database import get_db
 from bson import ObjectId, Binary
@@ -7,6 +8,38 @@ import pdfplumber
 import io
 
 router = APIRouter(prefix="/interview", tags=["interview"])
+
+
+class StartInterviewRequest(BaseModel):
+    role: str
+    interviewType: str = "behavioral"
+    difficulty: str = "medium"
+
+
+@router.post("/start")
+async def start_interview(
+    body: StartInterviewRequest,
+    user_id: str = Depends(get_current_user),
+):
+    """Create a lightweight interview session without a resume (used for quick-start / behavioral interviews)."""
+    db = get_db()
+    doc = {
+        "user_id": user_id,
+        "role": body.role,
+        "interview_type": body.interviewType,
+        "difficulty": body.difficulty,
+        "resume_pdf": None,
+        "resume_filename": None,
+        "resume_text": "",
+        "job_description": "",
+        "messages": [],
+        "user_answers": [],
+        "qa_pairs": [],
+        "feedback": None,
+        "created_at": datetime.now(timezone.utc),
+    }
+    result = await db.interviews.insert_one(doc)
+    return {"interview_id": str(result.inserted_id)}
 
 
 @router.post("/create")

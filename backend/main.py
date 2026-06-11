@@ -2,16 +2,17 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from database import connect_db, close_db
-from routers import auth, chat, interview
+from routers import auth, chat, interview, coding
+from config import AI_BACKEND
 import asyncio
 import os
 import subprocess
 import requests
 import time
+import os
 
-VLLM_MODEL = "Qwen/Qwen2.5-7B-Instruct"
-VLLM_PORT = 8000
-LORA_ADAPTER_PATH = os.path.join(os.path.dirname(__file__), "../training/artifacts/qwen2.5-7b-chatml-qlora-v2")
+VLLM_MODEL = os.getenv("VLLM_MODEL", "Qwen/Qwen2.5-7B-Instruct")
+VLLM_PORT = int(os.getenv("VLLM_PRIMARY_PORT", "8080"))
 
 vllm_process = None
 
@@ -64,17 +65,34 @@ def stop_vllm():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await connect_db()
-    await asyncio.to_thread(start_vllm)
+    vllm_autostart = os.getenv("VLLM_AUTOSTART", "true").lower() == "true"
+    if AI_BACKEND not in ["gemini"] and vllm_autostart:
+        await asyncio.to_thread(start_vllm)
+
+    # Pre-warm Kokoro TTS so the first synthesize request doesn't pay the load cost
+    try:
+        from routers.chat import get_kokoro
+        await asyncio.to_thread(get_kokoro)
+        print("[Kokoro] Pre-warmed.")
+    except Exception as e:
+        print(f"[Kokoro] Pre-warm skipped: {e}")
+
     yield
     await close_db()
-    stop_vllm()
+    if vllm_process:
+        stop_vllm()
 
 
-app = FastAPI(title="PrepAI API", lifespan=lifespan)
+app = FastAPI(title="FinalRound", lifespan=lifespan)
+
+ALLOWED_ORIGINS = os.getenv(
+    "ALLOWED_ORIGINS",
+    "http://localhost:3000,http://127.0.0.1:3000"
+).split(",")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # tighten this in production
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -83,6 +101,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(chat.router)
 app.include_router(interview.router)
+app.include_router(coding.router)
 
 
 @app.get("/")

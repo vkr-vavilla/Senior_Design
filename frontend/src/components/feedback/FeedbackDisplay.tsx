@@ -2,10 +2,12 @@
 
 import { useMemo, useState } from 'react';
 import {
+  AlertTriangle,
   Award,
   CheckCircle,
   ChevronLeft,
   ChevronRight,
+  Code2,
   Lightbulb,
   MessageSquare,
   Sparkles,
@@ -22,8 +24,10 @@ interface FeedbackDisplayProps {
 type SectionCategory =
   | 'strengths'
   | 'improvements'
+  | 'weaknesses'
   | 'communication'
   | 'technical'
+  | 'coding'
   | 'takeaways'
   | 'overall'
   | 'general';
@@ -108,8 +112,9 @@ function getScoreTheme(score: number) {
 function categorize(title: string): SectionCategory {
   const lower = title.toLowerCase();
   if (lower.includes('strength')) return 'strengths';
-  if (lower.includes('improve') || lower.includes('weakness') || lower.includes('areas'))
-    return 'improvements';
+  if (lower.includes('coding') || lower.includes('code')) return 'coding';
+  if (lower.includes('weakness')) return 'weaknesses';
+  if (lower.includes('improve') || lower.includes('areas')) return 'improvements';
   if (lower.includes('communicat') || lower.includes('clarity')) return 'communication';
   if (lower.includes('technical') || lower.includes('accuracy')) return 'technical';
   if (lower.includes('takeaway') || lower.includes('key') || lower.includes('focus'))
@@ -146,6 +151,14 @@ const CATEGORY_STYLE: Record<
     pill: 'bg-amber-500/10 text-amber-300 border-amber-500/20',
     label: 'Improve',
   },
+  weaknesses: {
+    icon: AlertTriangle,
+    iconColor: 'text-rose-400',
+    iconBg: 'bg-rose-500/10 border-rose-500/20',
+    accent: 'from-rose-500/20 to-transparent',
+    pill: 'bg-rose-500/10 text-rose-300 border-rose-500/20',
+    label: 'Weaknesses',
+  },
   communication: {
     icon: MessageSquare,
     iconColor: 'text-sky-400',
@@ -161,6 +174,14 @@ const CATEGORY_STYLE: Record<
     accent: 'from-violet-500/20 to-transparent',
     pill: 'bg-violet-500/10 text-violet-300 border-violet-500/20',
     label: 'Technical',
+  },
+  coding: {
+    icon: Code2,
+    iconColor: 'text-cyan-400',
+    iconBg: 'bg-cyan-500/10 border-cyan-500/20',
+    accent: 'from-cyan-500/20 to-transparent',
+    pill: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/20',
+    label: 'Coding',
   },
   takeaways: {
     icon: Lightbulb,
@@ -361,6 +382,29 @@ function renderInline(text: string): React.ReactNode {
   });
 }
 
+// Detects a bullet whose body merely restates its title — e.g. title "Clear"
+// with body "Your communication was clear." — so we can show just the title.
+// Only collapses true tautologies; real short insights are kept.
+function bodyRestatesTitle(title: string, body: string): boolean {
+  const norm = (s: string) =>
+    s.toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
+  const t = norm(title);
+  const b = norm(body);
+  if (!b) return true;
+  if (!t || !b.includes(t)) return false;
+  const FILLER = new Set([
+    'you', 'your', 'the', 'a', 'an', 'is', 'was', 'were', 'are', 'and',
+    'communication', 'response', 'responses', 'answer', 'answers', 'overall',
+    'very', 'quite', 'generally', 'it', 'this', 'that', 'their', 'they',
+    'candidate', 'style', 'well', 'be', 'been', 'pretty', 'mostly',
+  ]);
+  const leftover = b
+    .replace(t, ' ')
+    .split(' ')
+    .filter((w) => w && !FILLER.has(w));
+  return leftover.length === 0;
+}
+
 // ----- Score Hero -----
 
 function ScoreHero({ score }: { score: number }) {
@@ -473,19 +517,24 @@ function CardView({
 
       {/* Body — list of items */}
       <div className="relative flex-1 px-8 sm:px-10 py-7 space-y-5 overflow-y-auto">
-        {card.items.map((item, i) => (
-          <div key={i} className="flex gap-3">
-            <span className={`mt-2.5 w-1.5 h-1.5 rounded-full shrink-0 ${style.iconColor.replace('text-', 'bg-')}`} />
-            <div className="flex-1 min-w-0">
-              {item.title && (
-                <p className="text-white font-semibold text-[15px] mb-1">{item.title}</p>
-              )}
-              <p className="text-slate-300 text-[15px] leading-relaxed">
-                {renderInline(item.body)}
-              </p>
+        {card.items.map((item, i) => {
+          const bodyIsRedundant = item.title ? bodyRestatesTitle(item.title, item.body) : false;
+          return (
+            <div key={i} className="flex gap-3">
+              <span className={`mt-2.5 w-1.5 h-1.5 rounded-full shrink-0 ${style.iconColor.replace('text-', 'bg-')}`} />
+              <div className="flex-1 min-w-0">
+                {item.title && (
+                  <p className="text-white font-semibold text-[15px] mb-1">{item.title}</p>
+                )}
+                {!bodyIsRedundant && (
+                  <p className="text-slate-300 text-[15px] leading-relaxed">
+                    {renderInline(item.body)}
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

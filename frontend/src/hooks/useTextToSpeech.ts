@@ -11,10 +11,11 @@ export function useTextToSpeech() {
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const sentenceBufferRef = useRef<string>('');
-  
+
   // Queue stores items to play
   const playQueueRef = useRef<{ type: 'url' | 'text', value: string }[]>([]);
   const isPlayingRef = useRef<boolean>(false);
+<<<<<<< HEAD
   const premiumFailureCountRef = useRef<number>(0);
   const premiumDisabledUntilRef = useRef<number>(0);
 
@@ -34,6 +35,10 @@ export function useTextToSpeech() {
   const handlePremiumSuccess = useCallback(() => {
     premiumFailureCountRef.current = 0;
   }, []);
+=======
+  // Serializes synthesize requests so audio chunks enter the play queue in order
+  const synthChainRef = useRef<Promise<void>>(Promise.resolve());
+>>>>>>> origin/origin/updates
 
   const processQueue = useCallback(async () => {
     if (isPlayingRef.current || playQueueRef.current.length === 0) return;
@@ -98,6 +103,7 @@ export function useTextToSpeech() {
     isPlayingRef.current = false;
     setIsSpeaking(false);
     sentenceBufferRef.current = '';
+    synthChainRef.current = Promise.resolve();
   }, []);
 
   const speak = useCallback(async (text: string) => {
@@ -125,14 +131,31 @@ export function useTextToSpeech() {
   const speakStream = useCallback(async (chunk: string) => {
     sentenceBufferRef.current += chunk;
 
-    const sentenceEndRegex = /[.!?](\s|$)/;
-    const match = sentenceEndRegex.exec(sentenceBufferRef.current);
+    // Flush at the first natural pause: sentence end, comma, semicolon, colon, or dash.
+    // This lets the voice start within ~1 sec instead of waiting for a full sentence.
+    const buf = sentenceBufferRef.current;
+    const minChars = 18;
+    let cutIndex = -1;
+    if (buf.length >= minChars) {
+      const strong = /[.!?](\s|$)/.exec(buf);
+      const soft = /[,;:](\s|$)/.exec(buf);
+      const dash = / [—-] /.exec(buf);
+      const candidates = [strong, soft, dash].filter(Boolean) as RegExpExecArray[];
+      if (candidates.length) {
+        cutIndex = Math.min(...candidates.map(m => m.index + 1));
+      } else if (buf.length > 80) {
+        // Hard cut if a clause runs too long without punctuation
+        const lastSpace = buf.lastIndexOf(' ', 80);
+        if (lastSpace > minChars) cutIndex = lastSpace;
+      }
+    }
 
-    if (match) {
-      const sentence = sentenceBufferRef.current.slice(0, match.index + 1).trim();
-      sentenceBufferRef.current = sentenceBufferRef.current.slice(match.index + 1);
+    if (cutIndex > 0) {
+      const sentence = buf.slice(0, cutIndex).trim();
+      sentenceBufferRef.current = buf.slice(cutIndex);
 
       if (sentence.length > 2) {
+<<<<<<< HEAD
         if (engine === 'premium' && canUsePremium()) {
           try {
             const blob = await chatApi.synthesize(sentence);
@@ -146,6 +169,22 @@ export function useTextToSpeech() {
             playQueueRef.current.push({ type: 'text', value: sentence });
             processQueue();
           }
+=======
+        if (engine === 'premium') {
+          // Chain synth requests so the play queue is populated in order even if
+          // a shorter clause finishes synthesis faster than an earlier longer one.
+          synthChainRef.current = synthChainRef.current.then(async () => {
+            try {
+              const blob = await chatApi.synthesize(sentence);
+              const url = URL.createObjectURL(blob);
+              playQueueRef.current.push({ type: 'url', value: url });
+              processQueue();
+            } catch (err) {
+              playQueueRef.current.push({ type: 'text', value: sentence });
+              processQueue();
+            }
+          });
+>>>>>>> origin/origin/updates
         } else {
           playQueueRef.current.push({ type: 'text', value: sentence });
           processQueue();
@@ -158,6 +197,7 @@ export function useTextToSpeech() {
     if (sentenceBufferRef.current.trim()) {
       const remaining = sentenceBufferRef.current.trim();
       sentenceBufferRef.current = '';
+<<<<<<< HEAD
       
       if (engine === 'premium' && canUsePremium()) {
         try {
@@ -171,6 +211,21 @@ export function useTextToSpeech() {
           playQueueRef.current.push({ type: 'text', value: remaining });
           processQueue();
         }
+=======
+
+      if (engine === 'premium') {
+        synthChainRef.current = synthChainRef.current.then(async () => {
+          try {
+            const blob = await chatApi.synthesize(remaining);
+            const url = URL.createObjectURL(blob);
+            playQueueRef.current.push({ type: 'url', value: url });
+            processQueue();
+          } catch (err) {
+            playQueueRef.current.push({ type: 'text', value: remaining });
+            processQueue();
+          }
+        });
+>>>>>>> origin/origin/updates
       } else {
         playQueueRef.current.push({ type: 'text', value: remaining });
         processQueue();
