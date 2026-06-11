@@ -164,13 +164,35 @@ ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 
 ### 3. Run with Docker (recommended)
 
-```bash
-# Cloud LLM (Gemini) — no GPU required
-AI_BACKEND=gemini docker compose up backend frontend judge0-server judge0-workers judge0-db judge0-redis
+The **same compose file** serves both deployments. The Qwen vLLM service sits behind
+a `gpu` [Compose profile](https://docs.docker.com/compose/profiles/), so it only starts
+when you ask for it — no separate compose files, no editing service lists.
 
-# OR the full local stack incl. the Qwen vLLM service (needs an NVIDIA GPU)
-AI_BACKEND=qwen docker compose up
+```bash
+# GPU box — local model. The "gpu" profile starts vLLM; AI_BACKEND defaults to qwen.
+docker compose --profile gpu up -d
+
+# Gemini / AWS box — no GPU. No profile → vLLM is never started; Gemini serves requests.
+AI_BACKEND=gemini docker compose up -d
 ```
+
+**Why this works**
+
+| | GPU box (`--profile gpu`) | Gemini box (no profile) |
+|---|---|---|
+| vLLM container | starts (loads Qwen + LoRA) | **not started** — no GPU needed |
+| Interview + feedback | local QLoRA model | Gemini cloud API |
+| Coding round + Judge0 | start normally | start normally |
+
+Only `vllm` is gated by the profile. The backend, frontend, and all Judge0 services start
+in both modes, so the **coding round is unaffected by the switch**. The backend talks to vLLM
+lazily over the network only when `AI_BACKEND=qwen`, so it never errors on the Gemini box.
+
+> **Tip:** to make the Gemini box a plain `docker compose up -d`, put `AI_BACKEND=gemini` in
+> that machine's `backend/.env` (it's gitignored and per-machine) instead of passing it inline.
+
+> **Note:** because vLLM is now profiled, always include `--profile gpu` on the GPU box. A plain
+> `docker compose up` there will leave vLLM stopped (Compose treats it as out-of-profile).
 
 Then open:
 
@@ -293,8 +315,10 @@ All protected routes expect an `Authorization: Bearer <token>` header.
   ```
 
 ### LLM backend
-- **`gemini`:** calls Gemini 2.5 Flash. No GPU, simplest path.
-- **`qwen`:** vLLM serves `Qwen2.5-7B-Instruct-AWQ` with the fine-tuned **`interviewer`** QLoRA adapter from `training/artifacts/`. Needs an NVIDIA GPU; the `vllm` service in `docker-compose.yml` handles it.
+- **`gemini`:** calls Gemini 2.5 Flash. No GPU, simplest path. Run **without** the `gpu` profile so the vLLM container never starts.
+- **`qwen`:** vLLM serves `Qwen2.5-7B-Instruct-AWQ` with the fine-tuned **`interviewer`** QLoRA adapter from `training/artifacts/`. Needs an NVIDIA GPU. Start it with `docker compose --profile gpu up -d` (the `vllm` service is gated by the `gpu` profile in `docker-compose.yml`).
+
+Switching servers is just the profile flag + `AI_BACKEND` — one compose file, no per-host copies. See [Run with Docker](#3-run-with-docker-recommended) for the exact commands.
 
 ---
 

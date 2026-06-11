@@ -22,12 +22,18 @@ services:
       - JUDGE0_URL=http://judge0-server:2358
     volumes:
       - ./backend:/app
+    # Note: vllm is intentionally NOT in depends_on. It lives behind the "gpu"
+    # profile, so on a Gemini/AWS box it simply isn't started, and the backend
+    # reaches it lazily over the network only when AI_BACKEND=qwen.
     depends_on:
-      - vllm
       - judge0-server
 
   vllm:
     image: vllm/vllm-openai:v0.7.3
+    # Local-model server only. Starts ONLY when the "gpu" profile is active:
+    #   GPU box:    docker compose --profile gpu up -d   (AI_BACKEND defaults to qwen)
+    #   Gemini box: docker compose up -d                 (no profile → vllm skipped)
+    profiles: ["gpu"]
     command:
       - --model
       - Qwen/Qwen2.5-7B-Instruct-AWQ
@@ -38,7 +44,7 @@ services:
       - --port
       - "8001"
       - --max-model-len
-      - "12000"
+      - "24576"
       - --gpu-memory-utilization
       - "0.90"
       - --enforce-eager

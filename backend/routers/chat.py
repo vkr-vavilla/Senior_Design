@@ -26,11 +26,15 @@ gemini_client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
 def _normalize_model_source(source: str | None) -> str:
     if source in {"local", "api"}:
         return source
-    return "local"
+    # No explicit client choice → follow the server's configured backend.
+    return "api" if AI_BACKEND == "gemini" else "local"
 
 
 def _ordered_sources(preferred: str) -> list[str]:
     normalized = _normalize_model_source(preferred)
+    # Gemini-only deployment: never touch vLLM — the container may not be running.
+    if AI_BACKEND == "gemini":
+        return ["api"]
     if normalized == "api":
         return ["api", "local"]
     return ["local", "api"]
@@ -94,6 +98,9 @@ def _stream_with_fallback(
                     stream=True,
                     max_tokens=max_tokens,
                     temperature=temperature,
+                    top_p=0.9,
+                    presence_penalty=0.8,
+                    frequency_penalty=0.6,
                 )
                 for chunk in stream:
                     delta = chunk.choices[0].delta.content
@@ -292,7 +299,7 @@ async def chat_ws(
     token: str,
     interview_id: str = "",
     client_session_id: str = "",
-    model_source: str = "local",
+    model_source: str = "",
 ):
     try:
         user_id = verify_token(token)
@@ -391,17 +398,10 @@ VOICE & STYLE:
 - Vary length and energy. Most turns should be 3-5 sentences of real engagement before the question. Be warm but real. Don't fake-praise.
 
 INTERVIEWING APPROACH:
-- Ask ONE focused question per turn. Never stack multiple questions.
+- Ask ONE focused question per turn. Never stack multiple questions or sub-parts ("...and also tell me... and also how...") — pick one angle only.
 - DIG IN on technical specifics. When they say "I used FreeRTOS" — ask about task priorities, IPC mechanism, the worst race condition. When they say "improved accuracy 30%" — ask what the baseline was, how they measured it, what changed.
 - Avoid surface-level follow-ups like "did you learn that on the project?" or "was that a team effort?" — go technical instead.
 - Move the conversation forward — don't paraphrase their answer back as your whole turn.
-
-INTERVIEWING APPROACH — CRITICAL:
-- Ask EXACTLY ONE question per turn. One question, one "?", then stop.
-- Your entire response must be under 40 words. If you are going over, cut it down.
-- Never ask a question with multiple sub-parts ("...and also tell me... and also how..."). Pick one angle only.
-- When answers are vague, ask one short follow-up, then move on.
-- Move the conversation forward — do not paraphrase their answer back.
 - Rotate between: work experiences, personal projects, and {interview_rotation_focus}.
 
 DON'T — these are hard rules, no exceptions:
