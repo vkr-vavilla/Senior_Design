@@ -1,0 +1,59 @@
+{
+  "video_id": "hf_vue_001",
+  "summary": "The candidate demonstrated knowledge of Vue, including state preservation, Vue CLI features, displaying store state, and best practices for mutations and actions.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Hello, thanks for taking the time to chat with me today. I'd love to discuss some Vue-related topics. Can you start by telling me about state preservation rules in hot reloading?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "State preservation in hot reloading is about maintaining the component's state when the code changes. This is useful for debugging because you don't lose the current state of your application. For example, if you're filling out a form and you make a code change, the form data will still be there after the reload."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "That's a good point. Moving on, what features does Vue CLI provide to developers?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Vue CLI provides a lot of features out of the box, such as project scaffolding, a development server, and build configurations. It also supports various plugins for things like routing, state management, and CSS pre-processing. For instance, you can easily add Vue Router or Vuex to your project using the CLI."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "How do you typically display store state in Vue components?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "To display store state in Vue components, you can use the $store.state property directly in your template, or you can create a computed property that returns the desired state. This way, your component will reactively update when the store state changes. For example, if you have a counter in your store, you can display its value in a component using $store.state.counter."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "That makes sense. Why is it recommended that mutations should be synchronous?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Mutations should be synchronous because they are used to mutate the state in a predictable way. If mutations were asynchronous, it would be harder to track the state changes and debug issues. By keeping mutations synchronous, you can easily follow the flow of state changes in your application."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Can you dispatch an action using a payload or an object?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, you can dispatch an action with either a payload or an object. The payload can be a simple value, such as a string or a number, while an object can contain multiple properties. For example, you can dispatch an action to add a new item to a list, passing the item details as an object."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Just to confirm, what is Vue CLI, and why is it useful for developers?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Vue CLI is a command-line tool that helps you create, build, and manage Vue.js applications. It's useful because it provides a standardized way of setting up and configuring projects, which saves time and reduces the complexity of managing dependencies and build processes."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Got it, that covers it. Let's switch gears — do you have any questions for me about the company or the role?"
+    }
+  ]
+}

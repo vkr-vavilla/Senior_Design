@@ -1,0 +1,43 @@
+{
+  "video_id": "hf_vue_000",
+  "summary": "The candidate demonstrates a good understanding of Vue.js concepts, including object style commit, non-prop attributes, async components, and directive hook arguments.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Good to meet you — let's get started. Can you tell me about object style commit in Vue?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Object style commit is a way to commit changes to the Vuex store in a more structured and explicit way. Instead of just calling a mutation function, you pass an object with a type property and any other payload that the mutation needs. This makes it easier to track and understand the changes being made to the store."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, noted. What about non-prop attributes in Vue — how do those work?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Non-prop attributes are attributes that are passed to a component, but are not explicitly defined as props. These attributes are automatically added to the component's root element, which can be useful for adding classes or styles to a component. For example, if you have a component with a div root element, you can pass a class attribute to the component and it will be added to the div."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Got it. What about async components, how do they work in Vue?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Async components are a way to load components asynchronously, which can help improve the performance of your application. When you define an async component, Vue will only load the component when it's actually needed, rather than loading it upfront. This can be especially useful for large components or components that have a lot of dependencies. You can define an async component using the asyncComponent function, which returns a Promise that resolves to the component definition."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Fair enough. Tell me more about the directive hook arguments in Vue."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Directive hook arguments are the arguments that are passed to a directive's hook functions, such as the bind, update, and unbind functions. These arguments provide context about the directive and the element it's being used on, such as the element's value, the expression being bound, and the Vue instance. For example, the bind hook function receives the el, binding, and vnode arguments, which can be used to manipulate the element or update the component's state."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Alright, that covers Vue. Thanks for walking me through those."
+    }
+  ]
+}

@@ -11,7 +11,7 @@ import time
 
 VLLM_MODEL = "Qwen/Qwen2.5-7B-Instruct"
 VLLM_PORT = 8000
-LORA_ADAPTER_PATH = os.path.join(os.path.dirname(__file__), "../training/artifacts/qwen2.5-7b-chatml-qlora-8192")
+LORA_ADAPTER_PATH = os.path.join(os.path.dirname(__file__), "../training/artifacts/qwen2.5-7b-chatml-qlora-v2")
 
 vllm_process = None
 

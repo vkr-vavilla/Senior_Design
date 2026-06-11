@@ -1,0 +1,43 @@
+{
+  "video_id": "hf_angular_000",
+  "summary": "The candidate demonstrated a solid understanding of Angular, covering custom elements, animation modules, form model updates, and type narrowing.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Appreciate you coming in. Let's jump right into Angular — do I need to bootstrap custom elements?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "No, you don't necessarily need to bootstrap custom elements. However, if you're using a custom element in your Angular application, it needs to be declared in the NgModule where it's used, or made available through an import. This is usually done by adding it to the declarations array in your module."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Right, makes sense. Walk me through the steps to use the animation module in Angular."
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "To use the animation module, you first need to import the BrowserAnimationsModule in your app module. Then, you can define your animations using the animation function, specifying the styles at different states or during transitions. You also need to add the animations property to your component's metadata, where you reference the animations you've defined."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Got it. How about updating specific properties of a form model, can you walk me through that?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Updating specific properties of a form model can be done using the patchValue method for simple changes, or setValue for more comprehensive updates. For example, if you have a FormGroup and you want to update one of its FormControls, you can use the patchValue method on the FormGroup instance, passing in an object with the new value for the control you want to update."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "That's helpful. Finally, what is type narrowing, and how does it relate to Angular or TypeScript in general?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Type narrowing is a concept in TypeScript where the type checker can infer a more specific type for a value based on certain conditions, such as type guards or conditional statements. In Angular, you might use type narrowing when working with potentially null or undefined values, or when dealing with generics, to ensure type safety and avoid errors."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Good, that gives me a solid picture of your Angular knowledge. We can wrap up here."
+    }
+  ]
+}

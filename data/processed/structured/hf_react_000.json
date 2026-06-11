@@ -1,0 +1,59 @@
+{
+  "video_id": "hf_react_000",
+  "summary": "The candidate demonstrated a strong understanding of React, its tools, and lifecycle, as well as the ability to compare it with other frameworks and utilize its various hooks.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Thanks for making the time. Can you start by telling me about React Dev Tools and how you've used them?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "React Dev Tools is a browser extension that allows you to inspect and debug React components. I've used it to identify performance issues, inspect component state and props, and debug rendering problems. For example, I once used it to track down a tricky bug where a component was re-rendering unnecessarily."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Nice, debugging unnecessary re-renders is a pain. Can you explain the purpose of forward ref in Higher-Order Components?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Forward ref is a way to pass a ref from a parent component to a child component, even if there are multiple layers of abstraction in between. This is useful when you need to access a DOM node or a child component's methods from a parent component. For instance, I've used it to focus a text input field from a parent component."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "How do you access the imperative API of web components, say if you're using React with a third-party web component library?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "To access the imperative API of a web component, you can use a ref to get a reference to the DOM node, and then use the ref to call methods on the component. Alternatively, you can use the `useImperativeHandle` hook in React to create a custom ref that exposes a specific API. I've done this when integrating a third-party date picker component with my React app."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "That's helpful. Can you walk me through the different phases of a component's lifecycle in React?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "The different phases are: mounting, where the component is initialized and rendered; updating, where the component's state or props change; and unmounting, where the component is removed from the DOM. There are also various lifecycle methods that can be used to perform actions at each phase, such as `componentDidMount` or `componentWillUnmount`. I've used these methods to handle tasks like data fetching or cleanup."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Right, the lifecycle methods do a lot of heavy lifting. How does React compare to Angular in your opinion — where would you pick one over the other?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "React and Angular are both popular front-end frameworks, but they have different design principles and use cases. React is more focused on the view layer and is often used for building reusable UI components, while Angular is a full-fledged framework that includes a lot of built-in features like dependency injection and services. I've worked with both, and I think React is a better fit for smaller, more modular applications, while Angular might be more suitable for larger, more complex systems."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "What about the difference between `useState` and `useRef` hooks in React?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "The main difference is that `useState` is used to store state that should trigger a re-render when it changes, while `useRef` is used to store a value that persists between renders, but doesn't trigger a re-render. For example, I might use `useState` to store a user's input, but `useRef` to store a DOM node or a timer ID."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yep, that's a clean distinction. Alright, that wraps up the React section — do you have any questions for me?"
+    }
+  ]
+}

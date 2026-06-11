@@ -1,0 +1,59 @@
+{
+  "video_id": "hf_java_000",
+  "summary": "The candidate demonstrated a strong understanding of Java fundamentals, including garbage collection, class structure, access modifiers, and data structures.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Hello, thanks for coming in today. To get started, can you tell me a bit about garbage collection in Java?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Garbage collection is a process where the Java Virtual Machine automatically frees up memory occupied by objects that are no longer in use. This helps prevent memory leaks and reduces the risk of bugs. It's a key feature that sets Java apart from other languages."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "That's right. Now, I'd like to talk about class structure. Can you create an inner class inside a method in Java?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, you can create an inner class inside a method in Java. This is called a local inner class or anonymous inner class. It's useful when you need to create a class that's only used within the scope of that method."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, got it. What about access modifiers? What access types of variables can be accessed from a sub class in the same package?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "In the same package, a subclass can access public, protected, and default variables from its superclass. The private variables are not accessible directly, but can be accessed through getter and setter methods if provided."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "And what if the subclass is in a different package?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "If the subclass is in a different package, it can only access public and protected variables from its superclass. The default variables are not accessible because they are package-private."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Moving on to data structures, what are the different methods in a HashMap?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "HashMap has methods like put, get, remove, containsKey, and containsValue. You can also use the keySet method to get a set of all keys, and the values method to get a collection of all values. Additionally, you can use the entrySet method to get a set of all key-value pairs."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Last question: How do you create a thread in Java?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "You can create a thread in Java by extending the Thread class or implementing the Runnable interface. If you extend the Thread class, you need to override the run method. If you implement the Runnable interface, you also need to override the run method. Then, you can start the thread using the start method."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Got it, that covers it. Let's switch gears – thank you for walking me through these Java concepts."
+    }
+  ]
+}

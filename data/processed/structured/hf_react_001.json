@@ -1,0 +1,35 @@
+{
+  "video_id": "hf_react_001",
+  "summary": "The candidate demonstrated knowledge of state management and navigation in React applications.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Welcome — let's dive straight in. How is Relay different from Redux?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Relay and Redux are both used for state management, but they have different design centers. Relay is more focused on data fetching and caching, and it's specifically designed to work with GraphQL. Redux, on the other hand, is more of a general-purpose state management library. For example, in a recent project, we used Relay to manage our API data and Redux for local state."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "That's a great point about the focus on data fetching. Now, let's talk about React Router - how do you pass parameters to the history.push method in React Router v4?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "In React Router v4, you can pass parameters to the history.push method by using an object with a pathname and a state property. For instance, if you want to navigate to a user profile page, you might do something like history.push('/users/' + userId, { userEmail: 'user@example.com' }). You can also use the useHistory hook from React Router to get the history object and push a new location."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay, that makes sense. Can you tell me a bit more about what 'context' is in React, and how it's used?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Context in React is a way to share data between components without having to pass props down manually. It's like a global object that's available to all components in the tree. You can use the createContext hook to create a context, and then use the Provider component to make it available to child components. For example, we used context to manage our app's theme and localization settings."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Makes sense. Context is underused honestly. Okay, I think that covers what I wanted to get through — thanks."
+    }
+  ]
+}

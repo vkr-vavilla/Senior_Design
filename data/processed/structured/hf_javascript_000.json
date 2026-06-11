@@ -1,0 +1,35 @@
+{
+  "video_id": "hf_javascript_000",
+  "summary": "The candidate demonstrated a solid understanding of JavaScript concepts, including environment records, IIFE, and the differences between spread and rest syntax.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Hello, let's get started with the interview. Can you tell me a little bit about environment records in JavaScript?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Environment records are a concept in JavaScript that refer to the mapping between identifiers and their values. They're essentially a way to keep track of variables and their scopes within a given environment. For example, when you declare a variable with let or const, it gets added to the environment record of the current scope. This helps the JavaScript engine resolve variable references and enforce scoping rules."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Got it, good explanation. Let's move to IIFE — can you explain what it is and when you'd reach for it?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "IIFE is a function that's defined and immediately invoked. It's often used to create a new scope and avoid polluting the global namespace. For instance, you can use an IIFE to encapsulate some initialization code or to create a singleton object. It's also useful when you need to execute some code only once, like setting up an event listener or initializing a library."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Okay. What about spread syntax — what are the benefits, and how does it differ from rest syntax?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Spread syntax is useful when you need to expand an array or an object into a new array or object. For example, you can use it to merge two arrays or to convert a NodeList to an array. On the other hand, rest syntax is used to collect multiple arguments into an array. The key difference is that spread syntax is used to expand, while rest syntax is used to collect. A simple example would be using spread to merge two objects, like const merged = { ...obj1, ...obj2 }, versus using rest to collect arguments, like function sum(...args) { return args.reduce((a, b) => a + b, 0); }."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Right, that's a clear breakdown. Good work on the JS fundamentals."
+    }
+  ]
+}

@@ -18,7 +18,7 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 groq_client = Groq(api_key=GROQ_API_KEY)
 
 VLLM_BASE_URL = os.getenv("VLLM_PRIMARY_URL", "http://localhost:8000/v1")
-_LORA_ADAPTER_PATH = os.path.join(os.path.dirname(__file__), "../../training/artifacts/qwen2.5-7b-chatml-qlora-8192")
+_LORA_ADAPTER_PATH = os.path.join(os.path.dirname(__file__), "../../training/artifacts/qwen2.5-7b-chatml-qlora-v2")
 VLLM_MODEL = (
     "interview-adapter"
     if os.path.isdir(_LORA_ADAPTER_PATH)

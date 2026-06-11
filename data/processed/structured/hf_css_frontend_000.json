@@ -1,0 +1,51 @@
+{
+  "video_id": "hf_css_frontend_000",
+  "summary": "The candidate demonstrated a solid understanding of CSS fundamentals, frontend development best practices, and familiarity with various tools and technologies.",
+  "quality_flags": [],
+  "turns": [
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Let's dive right into CSS - can you tell me about CSS selector specificity and how it works?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "CSS selector specificity is a set of rules that determines which CSS styles are applied to an element when there are conflicting styles. It's based on a point system, where inline styles are the most specific, followed by IDs, classes, and then tag names. The browser calculates the specificity of each selector and applies the styles from the most specific one. For example, if you have a style defined for a class and another style defined for an ID, the ID style will override the class style because IDs have higher specificity."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Yep, the ID vs class specificity trips people up. Why is it generally a good idea to put CSS links in the head and JS scripts just before the closing body tag?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "It's a good practice to put CSS links in the head section because the browser renders the page from top to bottom, and it needs to know about the styles before it starts rendering the content. If the CSS links are at the bottom, the page might flicker or render incorrectly for a split second. On the other hand, JavaScript scripts should be placed just before the body closing tag because they often manipulate the DOM, and the DOM needs to be fully loaded before the scripts can run. However, there are exceptions, such as when you're using asynchronous script loading or certain libraries that require scripts to be in the head."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "What about positioning - can you explain the difference between relative, fixed, absolute, and statically positioned elements?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Relative positioning means the element is positioned relative to its normal position, and it still takes up space in the layout. Absolute positioning removes the element from the layout, and it's positioned relative to its nearest positioned ancestor. Fixed positioning is similar to absolute, but it's positioned relative to the viewport, so it stays in the same place even when you scroll. Static positioning is the default, where the element is positioned according to the normal flow of the document. For example, if you have a fixed header, it will stay at the top of the page even when you scroll down."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Good, fixed headers are a classic use case. What do you like most about your dev tools — Chrome DevTools, Firefox, anything else?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "I really like the inspector and the console in Chrome DevTools. The inspector allows me to quickly identify and modify styles, and the console is great for debugging JavaScript issues. I also appreciate the performance and auditing tools, which help me optimize my code and identify potential issues. Additionally, I use tools like Webpack and Babel to manage my code and dependencies."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Have you used different HTML templating languages before, such as Handlebars or Pug?"
+    },
+    {
+      "speaker": "EMPLOYEE",
+      "text": "Yes, I've used Handlebars and Mustache in previous projects. I like how they allow me to separate presentation logic from application logic and make it easier to manage complex templates. I've also experimented with Pug, which I think is a great alternative to traditional HTML templates."
+    },
+    {
+      "speaker": "INTERVIEWER",
+      "text": "Nice, Handlebars and Pug are both solid choices. Alright, that covers the frontend fundamentals."
+    }
+  ]
+}
