@@ -475,6 +475,14 @@ Output using this exact structure (** for section headers, - for bullets):
 **Overall Score: [X]/10**
 [Two or three honest sentences talking to them: how did they do overall against what this role needs, and what's the headline takeaway?]
 
+**Skill Ratings**
+- Clarity: [X]/10
+- Depth: [X]/10
+- Structure: [X]/10
+- Examples: [X]/10
+- Confidence: [X]/10
+- Conciseness: [X]/10
+
 **Answer-by-Answer Breakdown**
 {breakdown_skeleton}{coding_output_section}
 
@@ -492,6 +500,15 @@ Output using this exact structure (** for section headers, - for bullets):
 
 **Key Takeaways**
 - [2-3 headline points to remember before a real interview for this kind of role, each tied to something that actually happened above.]
+
+For the Skill Ratings, score each dimension as a whole integer from 1 to 10 based on how the candidate actually performed across this interview. Keep the exact "Name: X/10" format on its own bullet — these feed a chart, so do not add commentary on those lines. What each dimension means:
+- Clarity — how easy their answers were to follow; clear articulation over rambling or vague wording.
+- Depth — technical substance and detail; did they go beyond surface level for what this role needs.
+- Structure — how well-organised each answer was (a logical arc, e.g. STAR for behavioural) versus disjointed.
+- Examples — use of concrete, specific evidence and real situations rather than generic claims.
+- Confidence — conviction and composure; owning their answers without excessive hedging.
+- Conciseness — getting to the point efficiently without padding or trailing off.
+Make the ratings consistent with everything else you write — they should reflect the same strengths and gaps you describe below, not contradict them.
 
 Rules:
 - Fill in every line of the Answer-by-Answer Breakdown with a real evaluation — no placeholders.
