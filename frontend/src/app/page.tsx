@@ -2,9 +2,8 @@ import { AnimateIn } from '@/components/ui/AnimateIn';
 import CelestialSphere from '@/components/ui/celestial-sphere';
 import { ContainerScroll } from '@/components/ui/container-scroll-animation';
 import { FeatureCards } from '@/components/ui/FeatureCards';
-import { InteractiveRobotSpline } from '@/components/ui/interactive-3d-robot';
+import heroInterview from '@/components/ui/Gemini_Generated_Image_r0l4zer0l4zer0l4.png';
 import { Logo } from '@/components/ui/Logo';
-import { AISessionCard } from '@/components/ui/RobotHUD';
 import { RotatingText } from '@/components/ui/RotatingText';
 import {
   ArrowRight,
@@ -16,9 +15,8 @@ import {
   Users,
   Zap,
 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
-
-const ROBOT_SCENE = 'https://prod.spline.design/PyzDhpQ9E5f1E3MT/scene.splinecode';
 
 export default function LandingPage() {
   return (
@@ -84,7 +82,7 @@ export default function LandingPage() {
         />
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-16">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+          <div className="grid lg:grid-cols-[0.75fr_1.25fr] gap-12 lg:gap-6 items-center">
 
             {/* ── Left: text content ── */}
             <div className="flex flex-col order-2 lg:order-1">
@@ -108,27 +106,30 @@ export default function LandingPage() {
 
             </div>
 
-            {/* ── Right: 3D Robot ── */}
+            {/* ── Right: live interview visual ── */}
             <div
-              className="animate-fade-up relative order-1 lg:order-2 h-[380px] sm:h-[500px] lg:h-[640px]"
+              className="animate-fade-up relative order-1 lg:order-2 w-full aspect-[1408/768]"
               style={{ animationDelay: '150ms' }}
             >
               {/* Outer glow */}
               <div className="absolute -inset-4 bg-indigo-500/8 rounded-3xl blur-2xl pointer-events-none" />
 
-              {/* Robot container */}
+              {/* Interview screenshot container */}
               <div className="relative w-full h-full rounded-2xl overflow-hidden border border-slate-800/60">
-                {/* Left blend — merges robot into dark bg */}
-                <div className="absolute inset-0 pointer-events-none z-10 bg-gradient-to-r from-slate-950/60 via-transparent to-transparent" />
+                {/* Left blend — merges image into dark bg */}
+                <div className="absolute inset-0 pointer-events-none z-10 bg-gradient-to-r from-slate-950/40 via-transparent to-transparent" />
                 {/* Bottom blend */}
-                <div className="absolute bottom-0 inset-x-0 h-28 pointer-events-none z-10 bg-gradient-to-t from-slate-950 to-transparent" />
+                <div className="absolute bottom-0 inset-x-0 h-20 pointer-events-none z-10 bg-gradient-to-t from-slate-950 to-transparent" />
                 {/* Top blend */}
-                <div className="absolute top-0 inset-x-0 h-16 pointer-events-none z-10 bg-gradient-to-b from-slate-950/40 to-transparent" />
+                <div className="absolute top-0 inset-x-0 h-12 pointer-events-none z-10 bg-gradient-to-b from-slate-950/40 to-transparent" />
 
-                <InteractiveRobotSpline scene={ROBOT_SCENE} className="w-full h-full" />
+                <Image
+                  src={heroInterview}
+                  alt="Live remote coding interview with a shared code editor and video call"
+                  className="w-full h-full object-cover"
+                  priority
+                />
               </div>
-
-              <AISessionCard />
             </div>
 
           </div>

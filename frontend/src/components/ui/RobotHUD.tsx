@@ -38,7 +38,7 @@ export function AISessionCard() {
 
   return (
     <motion.div
-      className="absolute top-4 right-4 z-20 pointer-events-none"
+      className="absolute -top-5 -right-3 z-20 pointer-events-none"
       initial={{ opacity: 0, y: -12, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ delay: 1.2, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
