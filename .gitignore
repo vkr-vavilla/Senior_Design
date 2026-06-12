@@ -30,6 +30,9 @@ frontend/.env.local
 training/artifacts/
 training/checkpoints/
 training/runs/
+# LoRA adapter export dirs dropped at repo root (multi-GB)
+qwen2.5-7b-chatml-qlora-v2/
+qwen*-qlora*/
 *.safetensors
 *.bin
 *.pt
