@@ -460,8 +460,8 @@ KICKOFF (first turn only):
             "Begin the interview. Your response must have exactly two parts:\n"
             "1. A greeting: introduce yourself as Alex in one short warm sentence (e.g. 'Hi, I'm Alex — good to meet you.').\n"
             "2. Ask the candidate to briefly introduce themselves — who they are, their background, and what they're looking for. "
-            "question tied to a specific project or experience from THEIR resume above. "
             "Keep it natural and conversational, like a real interviewer would open.\n"
+            "Ask ONLY this one opening question. Do NOT ask a second question or any technical follow-up yet — wait for their answer first.\n"
             "Do not add anything else — no agenda, no mention of duration or format, no list of what you'll cover."
         )
 

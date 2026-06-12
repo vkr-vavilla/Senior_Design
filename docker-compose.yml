@@ -56,7 +56,7 @@ services:
       - --max-lora-rank
       - "64"
       - --lora-modules
-      - interviewer=/adapters/qwen2.5-7b-chatml-qlora-10k
+      - interviewer=/adapters/qwen2.5-7b-chatml-qlora-v2
     ports:
       - "8001:8001"
     volumes:

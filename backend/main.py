@@ -71,8 +71,8 @@ async def lifespan(app: FastAPI):
 
     # Pre-warm Kokoro TTS so the first synthesize request doesn't pay the load cost
     try:
-        from routers.chat import get_kokoro
-        await asyncio.to_thread(get_kokoro)
+        from routers.chat import _get_kokoro
+        await asyncio.to_thread(_get_kokoro)
         print("[Kokoro] Pre-warmed.")
     except Exception as e:
         print(f"[Kokoro] Pre-warm skipped: {e}")
