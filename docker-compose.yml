@@ -15,18 +15,20 @@ services:
       - VLLM_AUTOSTART=false
       - VLLM_BASE_URL=http://vllm:8001/v1
       - ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
-      # Code execution: "local" runs candidate code in a subprocess (works on
-      # cgroup v2); set to "judge0" to use the sandbox below (needs cgroup v1).
-      - CODE_EXECUTOR=${CODE_EXECUTOR:-local}
-      # Judge0 code-execution sandbox, reachable on the compose network
-      - JUDGE0_URL=http://judge0-server:2358
+      # Code execution: "piston" (sandboxed, default) or "local" (subprocess,
+      # no isolation — trusted/demo only).
+      - CODE_EXECUTOR=${CODE_EXECUTOR:-piston}
+      # Piston code-execution sandbox, reachable on the compose network
+      - PISTON_URL=http://piston:2000
     volumes:
       - ./backend:/app
     # Note: vllm is intentionally NOT in depends_on. It lives behind the "gpu"
     # profile, so on a Gemini/AWS box it simply isn't started, and the backend
     # reaches it lazily over the network only when AI_BACKEND=qwen.
+    # piston IS a dependency: it's the code-execution sandbox used in every
+    # deployment (CODE_EXECUTOR=piston), so it should always come up with backend.
     depends_on:
-      - judge0-server
+      - piston
 
   vllm:
     image: vllm/vllm-openai:v0.7.3
@@ -86,59 +88,32 @@ services:
     depends_on:
       - backend
 
-  # ── Judge0: sandboxed code execution ────────────────────────────────────────
-  # Runs untrusted candidate code in an isolated sandbox (no network, plus CPU /
-  # memory / time limits). All settings live in ./judge0.conf. `server` and
-  # `workers` need privileged mode because Judge0 uses `isolate`, which requires
-  # cgroup access.
-  #
-  # ⚠️ HOST REQUIREMENT: Judge0 1.13.1 needs cgroup v1. Ubuntu 22.04+/24.04 boots
-  #    with cgroup v2, so the workers will fail until you enable v1 on the host:
-  #      1. add to GRUB_CMDLINE_LINUX in /etc/default/grub:
-  #           systemd.unified_cgroup_hierarchy=0
-  #      2. sudo update-grub && sudo reboot
-  #    If you can't modify GRUB / reboot this machine, tell me and I'll swap the
-  #    stack to Piston, which needs no host changes.
-  judge0-server:
-    image: judge0/judge0:1.13.1
-    volumes:
-      - ./judge0.conf:/judge0.conf:ro
+  # ── Piston: self-hosted multi-language sandbox ──────────────────────────────
+  # The code-execution backend (CODE_EXECUTOR=piston). No API key, runs offline.
+  # Real isolation (cgroup + namespace) unlike CODE_EXECUTOR=local, and runs on
+  # a stock cgroup v2 host with no kernel changes. Always on (backend depends on it).
+  #   # one-time, install the language(s) you want — e.g. Python:
+  #   curl -s -X POST localhost:2000/api/v2/packages \
+  #        -H 'Content-Type: application/json' \
+  #        -d '{"language":"python","version":"3.12.0"}'
+  # NOTE: coding/driver.py is Python-only, so only Python submissions GRADE
+  #       today; other languages execute but need a per-language driver first.
+  piston:
+    image: ghcr.io/engineer-man/piston:latest
+    privileged: true
     ports:
-      - "2358:2358"
-    privileged: true
-    restart: always
-    depends_on:
-      - judge0-db
-      - judge0-redis
-
-  judge0-workers:
-    image: judge0/judge0:1.13.1
-    command: ["./scripts/workers"]
+      - "2000:2000"
+    environment:
+      # Raise the per-request caps (defaults are 3000ms run / 10000ms compile) so
+      # they accommodate the grader's wall_time_limit (10s). Requests may not
+      # exceed these, so they must be >= what piston_client sends.
+      - PISTON_RUN_TIMEOUT=15000
+      - PISTON_COMPILE_TIMEOUT=30000
     volumes:
-      - ./judge0.conf:/judge0.conf:ro
-    privileged: true
-    restart: always
-    depends_on:
-      - judge0-db
-      - judge0-redis
-
-  judge0-db:
-    image: postgres:13.0
-    env_file:
-      - ./judge0.conf
-    volumes:
-      - judge0-postgres-data:/var/lib/postgresql/data/
-    restart: always
-
-  judge0-redis:
-    image: redis:6.0
-    command: ["bash", "-c", 'docker-entrypoint.sh --appendonly no --requirepass "$$REDIS_PASSWORD"']
-    env_file:
-      - ./judge0.conf
-    volumes:
-      - judge0-redis-data:/data
+      - piston-packages:/piston/packages
+    tmpfs:
+      - /tmp:exec
     restart: always
 
 volumes:
-  judge0-postgres-data:
-  judge0-redis-data:
+  piston-packages:

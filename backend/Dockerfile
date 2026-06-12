@@ -1,11 +1,11 @@
-FROM nvidia/cuda:12.1.0-runtime-ubuntu22.04
+FROM python:3.12-slim
 
 WORKDIR /app
 
+# libgomp1: required by onnxruntime (kokoro-onnx TTS) or it fails to import.
+# wget/ca-certificates: used below to fetch the Kokoro model files.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc python3 python3-pip python3-dev wget ca-certificates \
-    && ln -sf python3 /usr/bin/python \
-    && ln -sf pip3 /usr/bin/pip \
+    libgomp1 wget ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements-docker.txt .

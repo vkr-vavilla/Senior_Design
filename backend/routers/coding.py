@@ -6,7 +6,7 @@ Coding-round endpoints.
   POST /coding/submit                 -> grade + persist the attempt on the interview
 
 Grading runs through coding.grading.grade_submission, which wraps the user's code
-with the driver and executes it in the Judge0 sandbox.
+with the driver and executes it in the Piston sandbox.
 """
 from datetime import datetime, timezone
 
@@ -23,7 +23,7 @@ from coding.selection import ids_filter, select_problems_for_session
 
 router = APIRouter(prefix="/coding", tags=["coding"])
 
-# Supported languages -> Judge0 language id. Python only for now.
+# Supported languages -> numeric language id. Python only for now.
 LANGUAGE_IDS = {"python3": 71}
 
 

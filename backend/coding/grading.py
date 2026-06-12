@@ -6,8 +6,8 @@ Flow:
      HTML statement (we only have the visible examples — LeetCode's hidden judge
      suite is not exposed via GraphQL).
   2. build_program() wraps the user's Solution with the driver.
-  3. Judge0 runs it once with the example inputs as stdin; the driver prints one
-     line per case.
+  3. the executor runs it once with the example inputs as stdin; the driver
+     prints one line per case.
   4. compare_results() diffs the printed lines against the expected outputs,
      normalizing JSON so spacing/format differences don't cause false failures.
 

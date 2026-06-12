@@ -24,7 +24,7 @@ Stored schema (one document per problem):
   content_html,                         # problem statement (raw HTML)
   code_snippets: { langSlug: code },    # starter code per language
   example_testcases, sample_test_case,  # VISIBLE example inputs only (no hidden judge tests)
-  meta_data: {...},                     # function name + param/return types (needed by the Judge0 driver)
+  meta_data: {...},                     # function name + param/return types (needed by the driver)
   hints: [...],
   scraped_at,
 }

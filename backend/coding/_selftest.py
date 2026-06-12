@@ -1,5 +1,5 @@
 """
-Local proof that the driver works — no Judge0, no DB required.
+Local proof that the driver works — no sandbox, no DB required.
 
     python3 backend/coding/_selftest.py
 

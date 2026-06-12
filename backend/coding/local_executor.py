@@ -1,11 +1,10 @@
 """
-Local Python executor — a drop-in alternative to the Judge0 client.
+Local Python executor — a drop-in alternative to the Piston client.
 
-Judge0's `isolate` sandbox needs cgroup v1; on a cgroup v2 host it can't run at
-all. This executor runs the generated program in a plain subprocess instead, so
-code execution works with no host changes and no extra services.
+This executor runs the generated program in a plain subprocess, so code execution
+works with no extra services (handy for a bare `uvicorn` dev run).
 
-It returns the SAME result dict shape as `judge0_client.run_program`
+It returns the SAME result dict shape as `piston_client.run_program`
 (stdout / stderr / compile_output / status{id,description} / time / memory), so
 the grader and frontend need no changes. Which backend is used is decided by the
 `CODE_EXECUTOR` env var (see `coding/executor.py`).
@@ -13,7 +12,7 @@ the grader and frontend need no changes. Which backend is used is decided by the
 SECURITY NOTE: this runs candidate code with the backend process's privileges
 (inside the backend container) — there is no real sandbox. A wall-clock timeout
 and a CPU-time rlimit guard against runaway code, but this is intended for a
-trusted/demo setting. For untrusted users, use the Judge0 or Piston backend.
+trusted/demo setting. For untrusted users, use the Piston backend.
 """
 import asyncio
 import os
@@ -46,7 +45,7 @@ async def run_program(
     poll_interval: float = 0.4,
     timeout: float = 30.0,
 ) -> dict:
-    """Run `source_code` against `stdin` in a local subprocess; Judge0-shaped result."""
+    """Run `source_code` against `stdin` in a local subprocess; standard result shape."""
     if language_id != PYTHON3_LANGUAGE_ID:
         return {
             "stdout": None,
@@ -100,7 +99,7 @@ async def run_program(
     if proc.returncode == 0:
         status = {"id": 3, "description": "Accepted"}
     elif "SyntaxError" in stderr or "IndentationError" in stderr:
-        # Surface syntax problems the way Judge0 surfaces compile errors.
+        # Surface syntax problems as a compilation error (status id 6).
         return {
             "stdout": stdout,
             "stderr": stderr,

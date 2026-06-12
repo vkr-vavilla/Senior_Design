@@ -7,7 +7,7 @@ MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
 DB_NAME = os.getenv("DB_NAME", "prepai")
 # Collection holding the LeetCode problem bank (statement, starter code, tests, meta).
 PROBLEMS_COLLECTION = os.getenv("PROBLEMS_COLLECTION", "leetcode")
-# Code-execution backend: "local" (subprocess, default) or "judge0" (needs cgroup v1).
+# Code-execution backend: "piston" (sandboxed) or "local" (subprocess, no isolation).
 CODE_EXECUTOR = os.getenv("CODE_EXECUTOR", "local")
 JWT_SECRET = os.getenv("JWT_SECRET", "changeme")
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")

@@ -21,7 +21,7 @@ It can run entirely on a **cloud LLM (Google Gemini)** with zero GPU, or fully *
 - **AI feedback report** rendered as swipeable cards — overall score, answer-by-answer breakdown, a dedicated **Coding Round** slide, strengths, weaknesses, and concrete areas to improve.
 - **Session history** — every interview, transcript, and feedback report is saved and re-openable.
 - **Pluggable AI backend:** flip a single env var between **Gemini (cloud)** and **Qwen + vLLM (local GPU)**.
-- **Pluggable code executor:** a simple **local subprocess** runner (default, works anywhere) or a sandboxed **Judge0** stack.
+- **Pluggable code executor:** a sandboxed **Piston** stack (default) or a simple **local subprocess** runner for trusted/dev use.
 
 ---
 
@@ -40,7 +40,7 @@ It can run entirely on a **cloud LLM (Google Gemini)** with zero GPU, or fully *
         ▼                             ▼                                ▼
   MongoDB (Atlas/local)      LLM backend                       Code execution
   - users                    ├─ Gemini 2.5 Flash (cloud)       ├─ local subprocess (default)
-  - interviews               └─ vLLM → Qwen2.5-7B-Instruct-AWQ  └─ Judge0 sandbox (optional)
+  - interviews               └─ vLLM → Qwen2.5-7B-Instruct-AWQ  └─ Piston sandbox (default)
   - leetcode (problem bank)        + "interviewer" LoRA adapter
 ```
 
@@ -55,7 +55,7 @@ It can run entirely on a **cloud LLM (Google Gemini)** with zero GPU, or fully *
 | Speech-to-text   | Groq Whisper |
 | Text-to-speech   | Kokoro ONNX |
 | Résumé parsing   | pdfplumber |
-| Coding sandbox   | Local subprocess runner / Judge0 (Postgres + Redis) |
+| Coding sandbox   | Piston (sandboxed, default) / local subprocess runner |
 | Database         | MongoDB |
 | Orchestration    | Docker Compose |
 
@@ -81,9 +81,9 @@ It can run entirely on a **cloud LLM (Google Gemini)** with zero GPU, or fully *
 │   │   ├── normalize.py         # Adapts stored LeetCode docs → internal shape
 │   │   ├── driver.py            # Wraps Solution-method code for stdin/stdout execution
 │   │   ├── grading.py           # Runs code vs example tests, returns pass/fail
-│   │   ├── executor.py          # Dispatches to local or judge0
-│   │   ├── local_executor.py    # Subprocess runner (default)
-│   │   └── judge0_client.py     # Judge0 sandbox client
+│   │   ├── executor.py          # Dispatches to piston or local
+│   │   ├── piston_client.py     # Piston sandbox client (default)
+│   │   └── local_executor.py    # Subprocess runner (trusted/dev)
 │   ├── scripts/scrape_leetcode.py  # Seeds MongoDB with LeetCode problems
 │   ├── requirements.txt
 │   └── Dockerfile
@@ -98,9 +98,8 @@ It can run entirely on a **cloud LLM (Google Gemini)** with zero GPU, or fully *
 │       ├── lib/api.ts           # Typed API client
 │       └── types/
 ├── training/                    # Fine-tuning artifacts (LoRA adapter; weights gitignored)
-├── docker-compose.yml           # Full local stack (backend + vLLM + frontend + Judge0)
-├── docker-compose.prod.yml
-└── judge0.conf                  # Judge0 sandbox config
+├── docker-compose.yml           # Full local stack (backend + vLLM + frontend + Piston)
+└── docker-compose.prod.yml
 ```
 
 ---
@@ -148,8 +147,9 @@ GEMINI_API_KEY=your-gemini-api-key-here
 # Speech-to-text
 GROQ_API_KEY=your-groq-api-key-here
 
-# Coding round executor: "local" (subprocess, default) or "judge0" (needs cgroup v1)
-CODE_EXECUTOR=local
+# Coding round executor: "piston" (sandboxed) or "local" (subprocess, no isolation)
+CODE_EXECUTOR=piston
+PISTON_URL=http://piston:2000
 PROBLEMS_COLLECTION=leetcode
 
 # Local LLM (only used when AI_BACKEND=qwen)
@@ -182,9 +182,9 @@ AI_BACKEND=gemini docker compose up -d
 |---|---|---|
 | vLLM container | starts (loads Qwen + LoRA) | **not started** — no GPU needed |
 | Interview + feedback | local QLoRA model | Gemini cloud API |
-| Coding round + Judge0 | start normally | start normally |
+| Coding round + Piston | start normally | start normally |
 
-Only `vllm` is gated by the profile. The backend, frontend, and all Judge0 services start
+Only `vllm` is gated by the profile. The backend, frontend, and Piston start
 in both modes, so the **coding round is unaffected by the switch**. The backend talks to vLLM
 lazily over the network only when `AI_BACKEND=qwen`, so it never errors on the Gemini box.
 
@@ -295,7 +295,7 @@ All protected routes expect an `Authorization: Bearer <token>` header.
 | `AI_BACKEND` | `gemini` | `gemini` (cloud) or `qwen` (local vLLM) |
 | `GEMINI_API_KEY` | — | Required when `AI_BACKEND=gemini` |
 | `GROQ_API_KEY` | — | Required for speech-to-text |
-| `CODE_EXECUTOR` | `local` | `local` subprocess or `judge0` sandbox |
+| `CODE_EXECUTOR` | `piston` | `piston` sandbox or `local` subprocess |
 | `PROBLEMS_COLLECTION` | `leetcode` | MongoDB collection holding the problem bank |
 | `VLLM_BASE_URL` | `http://localhost:8001/v1` | vLLM OpenAI-compatible endpoint |
 | `VLLM_MODEL` | `interviewer` | Served model / LoRA adapter name |
@@ -306,13 +306,13 @@ All protected routes expect an `Authorization: Bearer <token>` header.
 ## 🧪 The two execution backends
 
 ### Code executor
-- **`local` (default):** runs candidate code in a Python subprocess with a wall-clock timeout and CPU rlimit. Works on any host (incl. cgroup v2). Not a hardened sandbox — fine for trusted/demo use, not untrusted production.
-- **`judge0`:** runs code in the isolated Judge0 sandbox. **Requires the host to use cgroup v1.** On Ubuntu 22.04+/24.04 (cgroup v2) enable it via GRUB:
+- **`piston` (default):** runs candidate code in the self-hosted [Piston](https://github.com/engineer-man/piston) sandbox — real isolation (cgroup + namespace), no API key, offline, and runs on a stock cgroup v2 host with no kernel changes. **One-time per machine:** install the language runtime(s) you want, e.g. Python:
+  ```bash
+  curl -s -X POST localhost:2000/api/v2/packages \
+       -H 'Content-Type: application/json' \
+       -d '{"language":"python","version":"3.12.0"}'
   ```
-  # /etc/default/grub  →  GRUB_CMDLINE_LINUX
-  systemd.unified_cgroup_hierarchy=0
-  sudo update-grub && sudo reboot
-  ```
+- **`local`:** runs candidate code in a Python subprocess with a wall-clock timeout and CPU rlimit. Works anywhere with no extra service, but is **not** a hardened sandbox — trusted/demo use only.
 
 ### LLM backend
 - **`gemini`:** calls Gemini 2.5 Flash. No GPU, simplest path. Run **without** the `gpu` profile so the vLLM container never starts.

@@ -1,5 +1,5 @@
 """
-Local proof for the HTML output parser + comparison (no Judge0 needed).
+Local proof for the HTML output parser + comparison (no sandbox needed).
 
     cd backend && python3 -m coding._grading_selftest
 """

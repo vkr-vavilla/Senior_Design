@@ -1,5 +1,5 @@
 """
-Python driver that bridges LeetCode's function-call format to Judge0's
+Python driver that bridges LeetCode's function-call format to the executor's
 stdin/stdout model.
 
 LeetCode hands the candidate a method to fill in:
@@ -7,7 +7,7 @@ LeetCode hands the candidate a method to fill in:
     class Solution:
         def twoSum(self, nums: List[int], target: int) -> List[int]:
 
-Judge0 only runs a *program* (stdin -> stdout). So for every run we build:
+The executor only runs a *program* (stdin -> stdout). So for every run we build:
 
     [ HEADER ]   typing + collections imports, ListNode / TreeNode defs
     [ USER CODE] the candidate's `class Solution`
@@ -16,15 +16,15 @@ Judge0 only runs a *program* (stdin -> stdout). So for every run we build:
                  prints one normalized JSON line per test case.
 
 The footer chunks stdin into groups of `len(params)` lines (LeetCode puts one
-JSON value per line), so a single Judge0 submission grades *all* example cases.
+JSON value per line), so a single submission grades *all* example cases.
 Each case is wrapped in try/except, so one crash doesn't lose the other results.
 
 `build_program(user_code, meta_data)` returns the full source string to send to
-Judge0. `normalize_output(s)` canonicalizes a value for comparison.
+the executor. `normalize_output(s)` canonicalizes a value for comparison.
 """
 import json
 
-# Judge0 language id for Python 3 (in the 1.13.x language table).
+# Numeric language id for Python 3 (the internal language-id convention).
 PYTHON3_LANGUAGE_ID = 71
 
 # Sentinel a case prints when the user's code raised at runtime.
@@ -163,7 +163,7 @@ _run()
 
 
 def build_program(user_code: str, meta_data: dict) -> str:
-    """Assemble the full Judge0 program: header + user Solution + driver footer."""
+    """Assemble the full program: header + user Solution + driver footer."""
     meta_json = json.dumps(meta_data or {})
     footer = _FOOTER.replace("__META_JSON_LITERAL__", repr(meta_json))
     return _HEADER + "\n" + (user_code or "").strip() + "\n" + footer

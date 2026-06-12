@@ -80,7 +80,7 @@ export default function CodingPage() {
       setResults((prev) => ({ ...prev, [active.id]: res }));
       if (mode === 'submit') setSubmittedIds((prev) => ({ ...prev, [active.id]: true }));
     } catch (err) {
-      setError('Could not reach the execution service. Is Judge0 running?');
+      setError('Could not reach the execution service. Is the code sandbox running?');
       console.error(err);
     } finally {
       if (mode === 'run') setIsRunning(false);

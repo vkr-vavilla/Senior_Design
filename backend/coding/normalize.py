@@ -8,7 +8,7 @@ The stored docs look like:
       examples: [ { input: "nums = [2,7,11,15], target = 9",
                     output: "[0,1]", explanation: "..." }, ... ] }
 
-But the Judge0 driver / grader / frontend were built around a richer shape with
+But the driver / grader / frontend were built around a richer shape with
 `code_snippets.python3`, `meta_data` (function name + params), `content_html`,
 `example_testcases` (stdin) and expected outputs. None of those are stored, so we
 *derive* them here:
