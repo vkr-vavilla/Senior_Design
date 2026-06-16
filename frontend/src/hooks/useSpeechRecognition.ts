@@ -15,6 +15,7 @@ export function useSpeechRecognition() {
   const recognitionRef = useRef<any>(null);
   const silenceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const transcriptRef = useRef('');
+  const isListeningRef = useRef(false);
 
   // Save latest transcript in ref to avoid closure issues in callbacks
   useEffect(() => {
@@ -51,8 +52,17 @@ export function useSpeechRecognition() {
 
     silenceTimeoutRef.current = setTimeout(() => {
       console.log('DEBUG: 10s silence timeout triggered');
+      isListeningRef.current = false;
+      setIsListening(false);
       if (recognitionRef.current) {
-        recognitionRef.current.stop(); // This triggers onend which cleans up
+        recognitionRef.current.onresult = null;
+        recognitionRef.current.onerror = null;
+        recognitionRef.current.onend = null;
+        try {
+          recognitionRef.current.stop();
+        } catch (e) {
+          // ignore
+        }
       }
       const text = transcriptRef.current;
       transcriptRef.current = '';
@@ -67,9 +77,16 @@ export function useSpeechRecognition() {
       return;
     }
 
-    // Stop any existing instance
+    // Stop and completely clean up any existing instance
     if (recognitionRef.current) {
-      recognitionRef.current.abort();
+      try {
+        recognitionRef.current.onresult = null;
+        recognitionRef.current.onerror = null;
+        recognitionRef.current.onend = null;
+        recognitionRef.current.abort();
+      } catch (e) {
+        // ignore
+      }
     }
 
     const SpeechRecognition =
@@ -84,6 +101,7 @@ export function useSpeechRecognition() {
     setTranscript('');
     transcriptRef.current = '';
     setIsListening(true);
+    isListeningRef.current = true;
 
     const handleTimeout = (text: string) => {
       if (options?.onSilenceTimeout) {
@@ -95,6 +113,7 @@ export function useSpeechRecognition() {
     resetSilenceTimer(handleTimeout);
 
     recognition.onresult = (event: any) => {
+      if (!isListeningRef.current) return;
       let interimTranscript = '';
       let finalTranscript = '';
 
@@ -128,11 +147,13 @@ export function useSpeechRecognition() {
     };
 
     recognition.onerror = (event: any) => {
+      if (!isListeningRef.current) return;
       console.error('Speech recognition error:', event.error);
       if (event.error === 'no-speech') {
         // Silently ignore or handle
       } else {
         setIsListening(false);
+        isListeningRef.current = false;
         if (silenceTimeoutRef.current) {
           clearTimeout(silenceTimeoutRef.current);
         }
@@ -140,7 +161,9 @@ export function useSpeechRecognition() {
     };
 
     recognition.onend = () => {
+      if (!isListeningRef.current) return;
       setIsListening(false);
+      isListeningRef.current = false;
       if (silenceTimeoutRef.current) {
         clearTimeout(silenceTimeoutRef.current);
       }
@@ -156,14 +179,21 @@ export function useSpeechRecognition() {
         silenceTimeoutRef.current = null;
       }
 
+      isListeningRef.current = false;
+      setIsListening(false);
+
       if (recognitionRef.current) {
+        recognitionRef.current.onresult = null;
+        recognitionRef.current.onerror = null;
         recognitionRef.current.onend = () => {
-          setIsListening(false);
           resolve(transcriptRef.current);
         };
-        recognitionRef.current.stop();
+        try {
+          recognitionRef.current.stop();
+        } catch (e) {
+          resolve(transcriptRef.current);
+        }
       } else {
-        setIsListening(false);
         resolve(transcriptRef.current);
       }
     });
