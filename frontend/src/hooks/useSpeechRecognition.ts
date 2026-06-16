@@ -179,23 +179,23 @@ export function useSpeechRecognition() {
         silenceTimeoutRef.current = null;
       }
 
+      const currentTranscript = transcriptRef.current;
+
       isListeningRef.current = false;
       setIsListening(false);
 
       if (recognitionRef.current) {
+        // Clear handlers immediately to avoid firing stale callbacks or hanging the promise
         recognitionRef.current.onresult = null;
         recognitionRef.current.onerror = null;
-        recognitionRef.current.onend = () => {
-          resolve(transcriptRef.current);
-        };
+        recognitionRef.current.onend = null;
         try {
           recognitionRef.current.stop();
         } catch (e) {
-          resolve(transcriptRef.current);
+          // ignore
         }
-      } else {
-        resolve(transcriptRef.current);
       }
+      resolve(currentTranscript);
     });
   }, []);
 

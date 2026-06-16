@@ -1,7 +1,7 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException, File, UploadFile, Header
 from jose import JWTError, jwt
 from groq import Groq
-from openai import OpenAI
+from openai import AsyncOpenAI
 from google import genai
 from datetime import datetime, timezone
 from database import get_db
@@ -12,6 +12,7 @@ import json
 import asyncio
 import tempfile
 import os
+from concurrent.futures import ThreadPoolExecutor
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -19,8 +20,10 @@ groq_client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 
-vllm_client = OpenAI(base_url=VLLM_BASE_URL, api_key="not-needed")
+vllm_client = AsyncOpenAI(base_url=VLLM_BASE_URL, api_key="not-needed")
 gemini_client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
+
+_kokoro_executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="kokoro-tts")
 
 
 def _normalize_model_source(source: str | None) -> str:
@@ -79,7 +82,7 @@ def _gemini_contents(messages: list[dict]) -> tuple[list[dict], str]:
     return contents, "\n\n".join(system_parts)
 
 
-def _stream_with_fallback(
+async def _stream_with_fallback(
     messages: list[dict],
     max_tokens: int,
     temperature: float,
@@ -93,7 +96,7 @@ def _stream_with_fallback(
             try:
                 if source_used is not None:
                     source_used["value"] = "local"
-                stream = vllm_client.chat.completions.create(
+                stream = await vllm_client.chat.completions.create(
                     model=VLLM_MODEL,
                     messages=messages,
                     stream=True,
@@ -102,8 +105,9 @@ def _stream_with_fallback(
                     top_p=0.9,
                     presence_penalty=0.8,
                     frequency_penalty=0.6,
+                    timeout=5.0,
                 )
-                for chunk in stream:
+                async for chunk in stream:
                     delta = chunk.choices[0].delta.content
                     if delta:
                         yield delta
@@ -130,12 +134,12 @@ def _stream_with_fallback(
                 if system_instruction:
                     config["system_instruction"] = system_instruction
 
-                stream = client.models.generate_content_stream(
+                stream = await client.aio.models.generate_content_stream(
                     model=GEMINI_MODEL,
                     contents=contents,
                     config=config,
                 )
-                for chunk in stream:
+                async for chunk in stream:
                     text = getattr(chunk, "text", None)
                     if text:
                         yield text
@@ -148,7 +152,7 @@ def _stream_with_fallback(
     raise RuntimeError("All model providers failed: " + " | ".join(errors))
 
 
-def _single_with_fallback(
+async def _single_with_fallback(
     messages: list[dict],
     max_tokens: int,
     temperature: float,
@@ -159,11 +163,12 @@ def _single_with_fallback(
     for source in _ordered_sources(preferred_source):
         if source == "local":
             try:
-                response = vllm_client.chat.completions.create(
+                response = await vllm_client.chat.completions.create(
                     model=VLLM_MODEL,
                     messages=messages,
                     max_tokens=max_tokens,
                     temperature=temperature,
+                    timeout=5.0,
                 )
                 return response.choices[0].message.content or ""
             except Exception as vllm_error:
@@ -186,7 +191,7 @@ def _single_with_fallback(
                 if system_instruction:
                     config["system_instruction"] = system_instruction
 
-                response = client.models.generate_content(
+                response = await client.aio.models.generate_content(
                     model=GEMINI_MODEL,
                     contents=contents,
                     config=config,
@@ -292,8 +297,14 @@ async def synthesize_speech(request: dict):
         natural_text = natural_text.replace("—", ", ").replace(" - ", ", ")
 
         kokoro = await get_kokoro_instance()
-        samples, sample_rate = await asyncio.to_thread(
-            kokoro.create, natural_text, voice=voice, speed=speed, lang="en-us"
+        loop = asyncio.get_running_loop()
+        samples, sample_rate = await loop.run_in_executor(
+            _kokoro_executor,
+            kokoro.create,
+            natural_text,
+            voice,
+            speed,
+            "en-us"
         )
 
         import io, wave, numpy as np
@@ -447,37 +458,6 @@ KICKOFF (first turn only):
         {"role": "system", "content": system_prompt}
     ]
 
-    loop = asyncio.get_running_loop()
-
-    def _run_stream(stream_messages, max_tokens, temperature):
-        """Run _stream_with_fallback in a thread, yielding chunks via a queue."""
-        queue: asyncio.Queue = asyncio.Queue()
-
-        def worker():
-            nonlocal last_source_used
-            try:
-                source_used = {"value": selected_model_source}
-                for delta in _stream_with_fallback(
-                    stream_messages,
-                    max_tokens=max_tokens,
-                    temperature=temperature,
-                    preferred_source=selected_model_source,
-                    source_used=source_used,
-                    custom_gemini_client=custom_client,
-                ):
-                    loop.call_soon_threadsafe(
-                        queue.put_nowait,
-                        {"delta": delta, "source": source_used.get("value", selected_model_source)},
-                    )
-                last_source_used = source_used.get("value", selected_model_source)
-            except Exception as e:
-                loop.call_soon_threadsafe(queue.put_nowait, f"__ERROR__:{e}")
-            finally:
-                loop.call_soon_threadsafe(queue.put_nowait, None)
-
-        loop.run_in_executor(None, worker)
-        return queue
-
     try:
         # Opening greeting
         opening_reply = ""
@@ -490,22 +470,24 @@ KICKOFF (first turn only):
             "Do not add anything else — no agenda, no mention of duration or format, no list of what you'll cover."
         )
 
-        queue = _run_stream(messages + [{"role": "user", "content": kickoff}], max_tokens=2048, temperature=0.7)
-        while True:
-            item = await queue.get()
-            if item is None:
-                break
-            if isinstance(item, str) and item.startswith("__ERROR__"):
-                error_details = item.replace("__ERROR__:", "")
-                print(f"[WebSocket Error] Kickoff failed: {error_details}")
-                error_msg = "I'm sorry, I'm having trouble connecting to the AI model. Please check your Gemini API key, billing status, or rate limits, and try again."
-                await websocket.send_text(json.dumps({"chunk": error_msg, "done": False, "is_error": True}))
-                await websocket.send_text(json.dumps({"chunk": "", "done": True, "is_error": True}))
-                break
-            delta = item["delta"]
-            source = item.get("source", selected_model_source)
-            opening_reply += delta
-            await websocket.send_text(json.dumps({"chunk": delta, "done": False, "source": source}))
+        try:
+            source_used = {"value": selected_model_source}
+            async for delta in _stream_with_fallback(
+                messages + [{"role": "user", "content": kickoff}],
+                max_tokens=2048,
+                temperature=0.7,
+                preferred_source=selected_model_source,
+                source_used=source_used,
+                custom_gemini_client=custom_client,
+            ):
+                opening_reply += delta
+                await websocket.send_text(json.dumps({"chunk": delta, "done": False, "source": source_used.get("value", selected_model_source)}))
+            last_source_used = source_used.get("value", selected_model_source)
+        except Exception as e:
+            print(f"[WebSocket Error] Kickoff failed: {e}")
+            error_msg = "I'm sorry, I'm having trouble connecting to the AI model. Please check your Gemini API key, billing status, or rate limits, and try again."
+            await websocket.send_text(json.dumps({"chunk": error_msg, "done": False, "is_error": True}))
+            await websocket.send_text(json.dumps({"chunk": "", "done": True, "is_error": True}))
 
         await websocket.send_text(json.dumps({"chunk": "", "done": True, "source": last_source_used}))
         messages.append({"role": "assistant", "content": opening_reply})
@@ -532,22 +514,24 @@ KICKOFF (first turn only):
             messages.append({"role": "user", "content": message})
 
             full_reply = ""
-            queue = _run_stream(messages, max_tokens=8192, temperature=0.8)
-            while True:
-                item = await queue.get()
-                if item is None:
-                    break
-                if isinstance(item, str) and item.startswith("__ERROR__"):
-                    error_details = item.replace("__ERROR__:", "")
-                    print(f"[WebSocket Error] Stream failed: {error_details}")
-                    error_msg = "I'm sorry, I'm having trouble connecting to the AI model. Please check your Gemini API key, billing status, or rate limits, and try again."
-                    await websocket.send_text(json.dumps({"chunk": error_msg, "done": False, "is_error": True}))
-                    await websocket.send_text(json.dumps({"chunk": "", "done": True, "is_error": True}))
-                    break
-                delta = item["delta"]
-                source = item.get("source", selected_model_source)
-                full_reply += delta
-                await websocket.send_text(json.dumps({"chunk": delta, "done": False, "source": source}))
+            try:
+                source_used = {"value": selected_model_source}
+                async for delta in _stream_with_fallback(
+                    messages,
+                    max_tokens=8192,
+                    temperature=0.8,
+                    preferred_source=selected_model_source,
+                    source_used=source_used,
+                    custom_gemini_client=custom_client,
+                ):
+                    full_reply += delta
+                    await websocket.send_text(json.dumps({"chunk": delta, "done": False, "source": source_used.get("value", selected_model_source)}))
+                last_source_used = source_used.get("value", selected_model_source)
+            except Exception as e:
+                print(f"[WebSocket Error] Stream failed: {e}")
+                error_msg = "I'm sorry, I'm having trouble connecting to the AI model. Please check your Gemini API key, billing status, or rate limits, and try again."
+                await websocket.send_text(json.dumps({"chunk": error_msg, "done": False, "is_error": True}))
+                await websocket.send_text(json.dumps({"chunk": "", "done": True, "is_error": True}))
 
             messages.append({"role": "assistant", "content": full_reply})
             history.append({"role": "model", "text": full_reply})
@@ -737,19 +721,18 @@ Rules:
         if x_gemini_key:
             client = genai.Client(api_key=x_gemini_key)
         if AI_BACKEND == "gemini" and client:
-            resp = await asyncio.to_thread(
-                client.models.generate_content,
+            resp = await client.aio.models.generate_content(
                 model=GEMINI_MODEL,
                 contents=prompt,
             )
             return resp.text
         else:
-            resp = await asyncio.to_thread(
-                vllm_client.chat.completions.create,
+            resp = await vllm_client.chat.completions.create(
                 model=VLLM_MODEL,
                 messages=[{"role": "user", "content": prompt}],
                 max_tokens=2600,
                 temperature=0.6,
+                timeout=30.0,
             )
             return resp.choices[0].message.content
 

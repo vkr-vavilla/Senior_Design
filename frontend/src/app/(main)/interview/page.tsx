@@ -79,7 +79,14 @@ function InterviewPageContent() {
     sendMessage,
     endInterview,
     messagesEndRef,
-  } = useInterviewChat();
+  } = useInterviewChat({
+    onChunk: (chunk, isError) => {
+      if (isVoiceMode && !isError) speakStream(chunk);
+    },
+    onDone: () => {
+      if (isVoiceMode) flush();
+    }
+  });
 
   const [hasStarted, setHasStarted] = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
@@ -135,11 +142,7 @@ function InterviewPageContent() {
 
   const handleStart = () => {
     if (!config.role.trim() || !token) return;
-    startInterview(config, token, (chunk, isError) => {
-      if (isVoiceMode && !isError) speakStream(chunk);
-    }, () => {
-      if (isVoiceMode) flush();
-    });
+    startInterview(config, token);
     setHasStarted(true);
   };
 

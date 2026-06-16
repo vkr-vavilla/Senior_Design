@@ -6,6 +6,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000';
 
+interface UseInterviewChatOptions {
+  onChunk?: (chunk: string, isError?: boolean) => void;
+  onDone?: () => void;
+}
+
 interface UseInterviewChatReturn {
   messages: Message[];
   activeModelSource: 'local' | 'api';
@@ -14,13 +19,13 @@ interface UseInterviewChatReturn {
   sessionEnded: boolean;
   elapsedTime: number;
   sessionId: string | null;
-  startInterview: (config: InterviewConfig, token: string, onChunk?: (chunk: string, isError?: boolean) => void, onDone?: () => void) => void;
+  startInterview: (config: InterviewConfig, token: string) => void;
   sendMessage: (text: string) => void;
   endInterview: () => void;
   messagesEndRef: React.RefObject<HTMLDivElement>;
 }
 
-export function useInterviewChat(): UseInterviewChatReturn {
+export function useInterviewChat(options?: UseInterviewChatOptions): UseInterviewChatReturn {
   const [messages, setMessages] = useState<Message[]>([]);
   const [activeModelSource, setActiveModelSource] = useState<'local' | 'api'>('local');
   const [isConnected, setIsConnected] = useState(false);
@@ -33,6 +38,14 @@ export function useInterviewChat(): UseInterviewChatReturn {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const streamingIdRef = useRef<string | null>(null);
+
+  const onChunkRef = useRef(options?.onChunk);
+  const onDoneRef = useRef(options?.onDone);
+
+  useEffect(() => {
+    onChunkRef.current = options?.onChunk;
+    onDoneRef.current = options?.onDone;
+  }, [options?.onChunk, options?.onDone]);
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -60,7 +73,7 @@ export function useInterviewChat(): UseInterviewChatReturn {
   }, []);
 
   const startInterview = useCallback(
-    (config: InterviewConfig, token: string, onChunk?: (chunk: string, isError?: boolean) => void, onDone?: () => void) => {
+    (config: InterviewConfig, token: string) => {
       if (wsRef.current) {
         wsRef.current.close();
       }
@@ -128,8 +141,8 @@ export function useInterviewChat(): UseInterviewChatReturn {
             }
             
             // Call the callback for Speech-to-Speech
-            if (onChunk) {
-              onChunk(data.chunk, data.is_error);
+            if (onChunkRef.current) {
+              onChunkRef.current(data.chunk, data.is_error);
             }
           } else {
             // Stream complete
@@ -145,7 +158,7 @@ export function useInterviewChat(): UseInterviewChatReturn {
               );
             }
             
-            if (onDone) onDone();
+            if (onDoneRef.current) onDoneRef.current();
           }
         } catch (err) {
           console.error('Failed to parse WS message:', err);
