@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   AlertTriangle,
   Award,
@@ -59,6 +59,42 @@ function parseScore(text: string): number | null {
     }
   }
   return null;
+}
+
+// ----- Skill ratings (hexagon radar) -----
+
+// Fixed order — the six axes the backend emits, drawn clockwise from the top.
+const SKILL_AXES = [
+  'Clarity',
+  'Depth',
+  'Structure',
+  'Examples',
+  'Confidence',
+  'Conciseness',
+] as const;
+
+interface SkillRating {
+  axis: string;
+  value: number; // 0–10
+}
+
+/**
+ * Pulls the six "Name: X/10" skill scores out of the feedback markdown.
+ * Returns null unless all six are present, so the radar only shows when the
+ * model actually produced a complete set (older feedback has none).
+ */
+function parseSkillRatings(text: string): SkillRating[] | null {
+  const ratings: SkillRating[] = [];
+  for (const axis of SKILL_AXES) {
+    // Tolerate markdown/punctuation between the label and the number
+    // (e.g. "**Clarity:** 8/10", "Clarity - 8/10"). The "/10" anchor keeps it tight.
+    const re = new RegExp(`${axis}[\\s:*\\-–—]*(\\d+(?:\\.\\d+)?)\\s*/\\s*10`, 'i');
+    const match = text.match(re);
+    if (!match) continue;
+    const value = parseFloat(match[1]);
+    if (value >= 0 && value <= 10) ratings.push({ axis, value });
+  }
+  return ratings.length === SKILL_AXES.length ? ratings : null;
 }
 
 function getScoreLabel(score: number): string {
@@ -405,6 +441,172 @@ function bodyRestatesTitle(title: string, body: string): boolean {
   return leftover.length === 0;
 }
 
+// ----- Skill Radar (hexagon) -----
+
+function valueColor(v: number): { bar: string; text: string; dot: string } {
+  if (v >= 8) return { bar: 'bg-emerald-400', text: 'text-emerald-400', dot: '#34d399' };
+  if (v >= 6) return { bar: 'bg-indigo-400', text: 'text-indigo-400', dot: '#818cf8' };
+  if (v >= 4) return { bar: 'bg-amber-400', text: 'text-amber-400', dot: '#fbbf24' };
+  return { bar: 'bg-rose-400', text: 'text-rose-400', dot: '#fb7185' };
+}
+
+function SkillRadar({ ratings }: { ratings: SkillRating[] }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    const t = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(t);
+  }, []);
+
+  const W = 320;
+  const H = 270;
+  const cx = W / 2;
+  const cy = H / 2;
+  const maxR = 92;
+  const n = ratings.length;
+
+  const angle = (i: number) => (-90 + (360 / n) * i) * (Math.PI / 180);
+  const at = (i: number, r: number) => ({
+    x: cx + r * Math.cos(angle(i)),
+    y: cy + r * Math.sin(angle(i)),
+  });
+  const ring = (frac: number) =>
+    ratings.map((_, i) => { const p = at(i, maxR * frac); return `${p.x},${p.y}`; }).join(' ');
+  const dataPoly = ratings
+    .map((r, i) => { const p = at(i, maxR * (r.value / 10)); return `${p.x},${p.y}`; })
+    .join(' ');
+
+  const avg = ratings.reduce((s, r) => s + r.value, 0) / n;
+
+  return (
+    <div className="relative overflow-hidden bg-slate-900/60 backdrop-blur-sm border border-slate-800 rounded-3xl p-6 sm:p-8">
+      <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-indigo-500/10 to-transparent pointer-events-none" />
+
+      <div className="relative flex flex-col sm:flex-row items-center gap-6 sm:gap-10">
+        {/* Hexagon */}
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-[340px] shrink-0">
+          <defs>
+            <linearGradient id="radarFill" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#6366f1" stopOpacity="0.55" />
+              <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.35" />
+            </linearGradient>
+          </defs>
+
+          {/* Grid rings */}
+          {[0.25, 0.5, 0.75, 1].map((frac) => (
+            <polygon
+              key={frac}
+              points={ring(frac)}
+              fill="none"
+              stroke="#1e293b"
+              strokeWidth="1"
+            />
+          ))}
+
+          {/* Spokes */}
+          {ratings.map((_, i) => {
+            const p = at(i, maxR);
+            return (
+              <line key={i} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke="#1e293b" strokeWidth="1" />
+            );
+          })}
+
+          {/* Data polygon (animated from center) */}
+          <polygon
+            points={dataPoly}
+            fill="url(#radarFill)"
+            stroke="#a78bfa"
+            strokeWidth="2"
+            strokeLinejoin="round"
+            style={{
+              transformOrigin: `${cx}px ${cy}px`,
+              transform: mounted ? 'scale(1)' : 'scale(0)',
+              opacity: mounted ? 1 : 0,
+              transition: 'transform 0.9s cubic-bezier(0.16,1,0.3,1), opacity 0.6s ease-out',
+            }}
+          />
+
+          {/* Vertex dots + axis labels */}
+          {ratings.map((r, i) => {
+            const v = at(i, maxR * (r.value / 10));
+            const lp = at(i, maxR + 20);
+            const anchor = lp.x > cx + 1 ? 'start' : lp.x < cx - 1 ? 'end' : 'middle';
+            const dy = lp.y > cy + 1 ? 10 : lp.y < cy - 1 ? -2 : 4;
+            const c = valueColor(r.value);
+            return (
+              <g key={i}>
+                <circle
+                  cx={v.x}
+                  cy={v.y}
+                  r="3.5"
+                  fill={c.dot}
+                  style={{
+                    opacity: mounted ? 1 : 0,
+                    transition: `opacity 0.4s ease-out ${0.5 + i * 0.06}s`,
+                  }}
+                />
+                <text
+                  x={lp.x}
+                  y={lp.y}
+                  dy={dy}
+                  textAnchor={anchor}
+                  className="fill-slate-300 text-[11px] font-medium"
+                >
+                  {r.axis}
+                </text>
+                <text
+                  x={lp.x}
+                  y={lp.y}
+                  dy={dy + 13}
+                  textAnchor={anchor}
+                  className="text-[11px] font-bold"
+                  fill={c.dot}
+                >
+                  {r.value}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+
+        {/* Per-axis breakdown */}
+        <div className="flex-1 w-full min-w-0">
+          <div className="flex items-center justify-between mb-4">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-indigo-300 text-xs font-medium">
+              <TrendingUp className="w-3 h-3" />
+              Skill Profile
+            </span>
+            <span className="text-xs text-slate-500">
+              avg <span className="text-slate-300 font-semibold">{avg.toFixed(1)}</span>/10
+            </span>
+          </div>
+          <div className="space-y-2.5">
+            {ratings.map((r) => {
+              const c = valueColor(r.value);
+              return (
+                <div key={r.axis} className="flex items-center gap-3">
+                  <span className="text-[13px] text-slate-300 w-24 shrink-0">{r.axis}</span>
+                  <div className="flex-1 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full ${c.bar}`}
+                      style={{
+                        width: mounted ? `${(r.value / 10) * 100}%` : '0%',
+                        transition: 'width 0.9s cubic-bezier(0.16,1,0.3,1)',
+                      }}
+                    />
+                  </div>
+                  <span className={`text-[13px] font-semibold tabular-nums w-7 text-right ${c.text}`}>
+                    {r.value}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ----- Score Hero -----
 
 function ScoreHero({ score }: { score: number }) {
@@ -598,7 +800,13 @@ function PaginationControls({
 
 export function FeedbackDisplay({ feedback, sessionId }: FeedbackDisplayProps) {
   const score = parseScore(feedback);
-  const cards = useMemo(() => parseCards(feedback), [feedback]);
+  const ratings = useMemo(() => parseSkillRatings(feedback), [feedback]);
+  const cards = useMemo(() => {
+    const all = parseCards(feedback);
+    // The radar already shows the skill scores — drop the redundant text card,
+    // but only when we actually parsed a full set (otherwise keep the info).
+    return ratings ? all.filter((c) => !/skill rating|skill profile/i.test(c.sectionTitle)) : all;
+  }, [feedback, ratings]);
 
   const [activeIndex, setActiveIndex] = useState(0);
   const safeIndex = Math.min(activeIndex, Math.max(cards.length - 1, 0));
@@ -610,6 +818,8 @@ export function FeedbackDisplay({ feedback, sessionId }: FeedbackDisplayProps) {
   return (
     <div className="space-y-8">
       {score !== null && <ScoreHero score={score} />}
+
+      {ratings && <SkillRadar ratings={ratings} />}
 
       {cards.length > 0 && activeCard && (
         <div className="space-y-5">
