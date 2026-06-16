@@ -14,7 +14,7 @@ interface UseInterviewChatReturn {
   sessionEnded: boolean;
   elapsedTime: number;
   sessionId: string | null;
-  startInterview: (config: InterviewConfig, token: string, onChunk?: (chunk: string) => void, onDone?: () => void) => void;
+  startInterview: (config: InterviewConfig, token: string, onChunk?: (chunk: string, isError?: boolean) => void, onDone?: () => void) => void;
   sendMessage: (text: string) => void;
   endInterview: () => void;
   messagesEndRef: React.RefObject<HTMLDivElement>;
@@ -60,7 +60,7 @@ export function useInterviewChat(): UseInterviewChatReturn {
   }, []);
 
   const startInterview = useCallback(
-    (config: InterviewConfig, token: string, onChunk?: (chunk: string) => void, onDone?: () => void) => {
+    (config: InterviewConfig, token: string, onChunk?: (chunk: string, isError?: boolean) => void, onDone?: () => void) => {
       if (wsRef.current) {
         wsRef.current.close();
       }
@@ -72,7 +72,9 @@ export function useInterviewChat(): UseInterviewChatReturn {
 
       const interviewIdParam = config.interviewId ? `&interview_id=${config.interviewId}` : '';
       const modelSourceParam = `&model_source=${encodeURIComponent(config.modelSource)}`;
-      const ws = new WebSocket(`${WS_URL}/chat/ws?token=${token}${interviewIdParam}${modelSourceParam}`);
+      const geminiKey = typeof window !== 'undefined' ? (localStorage.getItem('gemini_api_key') || '') : '';
+      const geminiKeyParam = geminiKey ? `&gemini_key=${encodeURIComponent(geminiKey)}` : '';
+      const ws = new WebSocket(`${WS_URL}/chat/ws?token=${token}${interviewIdParam}${modelSourceParam}${geminiKeyParam}`);
       wsRef.current = ws;
 
       ws.onopen = () => {
@@ -127,7 +129,7 @@ export function useInterviewChat(): UseInterviewChatReturn {
             
             // Call the callback for Speech-to-Speech
             if (onChunk) {
-              onChunk(data.chunk);
+              onChunk(data.chunk, data.is_error);
             }
           } else {
             // Stream complete

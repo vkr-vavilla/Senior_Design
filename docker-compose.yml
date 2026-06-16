@@ -20,6 +20,7 @@ services:
       - CODE_EXECUTOR=${CODE_EXECUTOR:-piston}
       # Piston code-execution sandbox, reachable on the compose network
       - PISTON_URL=http://piston:2000
+      - PYTHONUNBUFFERED=1
     volumes:
       - ./backend:/app
     # Note: vllm is intentionally NOT in depends_on. It lives behind the "gpu"
@@ -77,10 +78,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+    stdin_open: true
+    tty: true
     environment:
       # NEXT_PUBLIC vars are browser-side, so they use the host machine's address
       - NEXT_PUBLIC_API_URL=http://localhost:8080
       - NEXT_PUBLIC_WS_URL=ws://localhost:8080
+      - CI=true
     volumes:
       - ./frontend:/app
       - /app/node_modules

@@ -14,7 +14,9 @@ JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 # No refresh-token flow exists, so tokens must outlast a full session
 # (login -> set up resume/JD -> create interview). Default: 7 days.
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 10080))
+# Gemini API Key (Optional: can be supplied dynamically by the user on the frontend)
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+# Groq API Key (Optional: browser Web Speech API replaces backend speech-to-text)
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 VLLM_BASE_URL = os.getenv("VLLM_BASE_URL", "http://localhost:8080/v1")
 VLLM_MODEL = os.getenv("VLLM_MODEL", "Qwen/Qwen2.5-7B-Instruct")

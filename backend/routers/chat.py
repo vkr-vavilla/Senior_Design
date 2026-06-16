@@ -1,4 +1,4 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException, File, UploadFile
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException, File, UploadFile, Header
 from jose import JWTError, jwt
 from groq import Groq
 from openai import OpenAI
@@ -15,9 +15,9 @@ import os
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
-groq_client = Groq(api_key=GROQ_API_KEY)
+groq_client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 
 vllm_client = OpenAI(base_url=VLLM_BASE_URL, api_key="not-needed")
 gemini_client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
@@ -85,6 +85,7 @@ def _stream_with_fallback(
     temperature: float,
     preferred_source: str,
     source_used: dict | None = None,
+    custom_gemini_client = None,
 ):
     errors: list[str] = []
     for source in _ordered_sources(preferred_source):
@@ -113,7 +114,8 @@ def _stream_with_fallback(
                 continue
 
         if source == "api":
-            if not gemini_client:
+            client = custom_gemini_client or gemini_client
+            if not client:
                 errors.append("api(Gemini): GEMINI_API_KEY is not configured")
                 continue
 
@@ -128,7 +130,7 @@ def _stream_with_fallback(
                 if system_instruction:
                     config["system_instruction"] = system_instruction
 
-                stream = gemini_client.models.generate_content_stream(
+                stream = client.models.generate_content_stream(
                     model=GEMINI_MODEL,
                     contents=contents,
                     config=config,
@@ -146,7 +148,13 @@ def _stream_with_fallback(
     raise RuntimeError("All model providers failed: " + " | ".join(errors))
 
 
-def _single_with_fallback(messages: list[dict], max_tokens: int, temperature: float, preferred_source: str) -> str:
+def _single_with_fallback(
+    messages: list[dict],
+    max_tokens: int,
+    temperature: float,
+    preferred_source: str,
+    custom_gemini_client = None,
+) -> str:
     errors: list[str] = []
     for source in _ordered_sources(preferred_source):
         if source == "local":
@@ -164,7 +172,8 @@ def _single_with_fallback(messages: list[dict], max_tokens: int, temperature: fl
                 continue
 
         if source == "api":
-            if not gemini_client:
+            client = custom_gemini_client or gemini_client
+            if not client:
                 errors.append("api(Gemini): GEMINI_API_KEY is not configured")
                 continue
 
@@ -177,7 +186,7 @@ def _single_with_fallback(messages: list[dict], max_tokens: int, temperature: fl
                 if system_instruction:
                     config["system_instruction"] = system_instruction
 
-                response = gemini_client.models.generate_content(
+                response = client.models.generate_content(
                     model=GEMINI_MODEL,
                     contents=contents,
                     config=config,
@@ -209,6 +218,9 @@ async def transcribe_audio(file: UploadFile = File(...)):
             content = await file.read()
             tmp.write(content)
             tmp_path = tmp.name
+
+        if not groq_client:
+            raise HTTPException(status_code=400, detail="Groq API key is not configured on the server.")
 
         try:
             with open(tmp_path, "rb") as audio_file:
@@ -255,6 +267,14 @@ def _get_kokoro():
 _kokoro_instance = None
 _kokoro_lock = asyncio.Lock()
 
+async def get_kokoro_instance():
+    global _kokoro_instance
+    if _kokoro_instance is None:
+        async with _kokoro_lock:
+            if _kokoro_instance is None:
+                _kokoro_instance = await asyncio.to_thread(_get_kokoro)
+    return _kokoro_instance
+
 @router.post("/synthesize")
 async def synthesize_speech(request: dict):
     try:
@@ -271,7 +291,7 @@ async def synthesize_speech(request: dict):
         natural_text = re.sub(r"\s+", " ", text.strip())
         natural_text = natural_text.replace("—", ", ").replace(" - ", ", ")
 
-        kokoro = await asyncio.to_thread(_get_kokoro)
+        kokoro = await get_kokoro_instance()
         samples, sample_rate = await asyncio.to_thread(
             kokoro.create, natural_text, voice=voice, speed=speed, lang="en-us"
         )
@@ -300,8 +320,12 @@ async def chat_ws(
     interview_id: str = "",
     client_session_id: str = "",
     model_source: str = "",
+    gemini_key: str = "",
 ):
     try:
+        custom_client = None
+        if gemini_key:
+            custom_client = genai.Client(api_key=gemini_key)
         user_id = verify_token(token)
     except ValueError:
         await websocket.close(code=4001)
@@ -439,6 +463,7 @@ KICKOFF (first turn only):
                     temperature=temperature,
                     preferred_source=selected_model_source,
                     source_used=source_used,
+                    custom_gemini_client=custom_client,
                 ):
                     loop.call_soon_threadsafe(
                         queue.put_nowait,
@@ -470,8 +495,12 @@ KICKOFF (first turn only):
             item = await queue.get()
             if item is None:
                 break
-            if isinstance(item, str) and item.startswith("__ERROR__:"):
-                await websocket.send_text(json.dumps({"chunk": f"AI Error: {item}", "done": False}))
+            if isinstance(item, str) and item.startswith("__ERROR__"):
+                error_details = item.replace("__ERROR__:", "")
+                print(f"[WebSocket Error] Kickoff failed: {error_details}")
+                error_msg = "I'm sorry, I'm having trouble connecting to the AI model. Please check your Gemini API key, billing status, or rate limits, and try again."
+                await websocket.send_text(json.dumps({"chunk": error_msg, "done": False, "is_error": True}))
+                await websocket.send_text(json.dumps({"chunk": "", "done": True, "is_error": True}))
                 break
             delta = item["delta"]
             source = item.get("source", selected_model_source)
@@ -508,8 +537,12 @@ KICKOFF (first turn only):
                 item = await queue.get()
                 if item is None:
                     break
-                if isinstance(item, str) and item.startswith("__ERROR__:"):
-                    await websocket.send_text(json.dumps({"chunk": f"AI Error: {item}", "done": False}))
+                if isinstance(item, str) and item.startswith("__ERROR__"):
+                    error_details = item.replace("__ERROR__:", "")
+                    print(f"[WebSocket Error] Stream failed: {error_details}")
+                    error_msg = "I'm sorry, I'm having trouble connecting to the AI model. Please check your Gemini API key, billing status, or rate limits, and try again."
+                    await websocket.send_text(json.dumps({"chunk": error_msg, "done": False, "is_error": True}))
+                    await websocket.send_text(json.dumps({"chunk": "", "done": True, "is_error": True}))
                     break
                 delta = item["delta"]
                 source = item.get("source", selected_model_source)
@@ -520,7 +553,15 @@ KICKOFF (first turn only):
             history.append({"role": "model", "text": full_reply})
             await websocket.send_text(json.dumps({"chunk": "", "done": True, "source": last_source_used}))
 
-    except WebSocketDisconnect:
+    except Exception as e:
+        from fastapi import WebSocketDisconnect
+        if isinstance(e, WebSocketDisconnect):
+            print("DEBUG: WebSocket disconnected cleanly by client.")
+        else:
+            print(f"DEBUG: WebSocket crashed with exception: {e}")
+            import traceback
+            traceback.print_exc()
+
         if history:
             user_answers = [m["text"] for m in history if m["role"] == "user"]
             # Build Q&A pairs: model turn followed by user turn
@@ -548,7 +589,7 @@ KICKOFF (first turn only):
 
 
 @router.post("/{session_id}/feedback", response_model=FeedbackResponse)
-async def get_feedback(session_id: str):
+async def get_feedback(session_id: str, x_gemini_key: str | None = Header(None, alias="X-Gemini-Key")):
     db = get_db()
     session = await db.interviews.find_one({"_id": ObjectId(session_id)})
     if not session:
@@ -692,9 +733,12 @@ Rules:
 - Be honest with the score: 9-10 exceptional, 7-8 solid, 5-6 needs work, below 5 significant gaps."""
 
     async def generate_feedback() -> str:
-        if AI_BACKEND == "gemini" and gemini_client:
+        client = gemini_client
+        if x_gemini_key:
+            client = genai.Client(api_key=x_gemini_key)
+        if AI_BACKEND == "gemini" and client:
             resp = await asyncio.to_thread(
-                gemini_client.models.generate_content,
+                client.models.generate_content,
                 model=GEMINI_MODEL,
                 contents=prompt,
             )

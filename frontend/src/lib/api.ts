@@ -29,6 +29,13 @@ export async function apiRequest<T>(
     headers['Authorization'] = `Bearer ${token}`;
   }
 
+  if (typeof window !== 'undefined') {
+    const geminiKey = localStorage.getItem('gemini_api_key');
+    if (geminiKey) {
+      headers['X-Gemini-Key'] = geminiKey;
+    }
+  }
+
   const response = await fetch(`${API_URL}${path}`, {
     method,
     headers,

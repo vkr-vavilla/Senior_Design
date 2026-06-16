@@ -8,7 +8,7 @@ import { Input, Select } from '@/components/ui/Input';
 import { LoadingPage } from '@/components/ui/LoadingSpinner';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useInterviewChat } from '@/hooks/useInterviewChat';
-import { useAudioRecorder } from '@/hooks/useAudioRecorder';
+import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import { useTextToSpeech } from '@/hooks/useTextToSpeech';
 import { chatApi } from '@/lib/api';
 import { cn, formatTime } from '@/lib/utils';
@@ -85,8 +85,34 @@ function InterviewPageContent() {
   const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [isVoiceMode, setIsVoiceMode] = useState(true);
   const [isTranscribing, setIsTranscribing] = useState(false);
+  const [geminiKey, setGeminiKey] = useState('');
 
-  const { isRecording, recordingTime, startRecording, stopRecording } = useAudioRecorder();
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setGeminiKey(localStorage.getItem('gemini_api_key') || '');
+    }
+  }, []);
+
+  const {
+    isListening: isRecording,
+    isSupported: isSpeechSupported,
+    startListening,
+    stopListening,
+  } = useSpeechRecognition();
+
+  const [recordingTime, setRecordingTime] = useState(0);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isRecording) {
+      setRecordingTime(0);
+      interval = setInterval(() => {
+        setRecordingTime((t) => t + 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isRecording]);
+
   const { speakStream, stop: stopSpeaking, engine, setEngine, flush } = useTextToSpeech();
 
   // Pre-fill from query params
@@ -109,19 +135,29 @@ function InterviewPageContent() {
 
   const handleStart = () => {
     if (!config.role.trim() || !token) return;
-    startInterview(config, token, (chunk) => {
-      if (isVoiceMode) speakStream(chunk);
+    startInterview(config, token, (chunk, isError) => {
+      if (isVoiceMode && !isError) speakStream(chunk);
     }, () => {
       if (isVoiceMode) flush();
     });
     setHasStarted(true);
   };
 
+  const handleStartRecording = () => {
+    startListening({
+      onSilenceTimeout: (finalText) => {
+        console.log('DEBUG: 10s silence timeout triggered. Sending:', finalText);
+        if (finalText.trim()) {
+          sendMessage(finalText);
+        }
+      }
+    });
+  };
+
   const handleTranscribeAndSend = async () => {
     try {
-      const audioBlob = await stopRecording();
       setIsTranscribing(true);
-      const { text } = await chatApi.transcribe(audioBlob);
+      const text = await stopListening();
       if (text.trim()) {
         sendMessage(text);
       }
@@ -204,6 +240,19 @@ function InterviewPageContent() {
                 }))
               }
             />
+
+            {config.modelSource === 'api' && (
+              <Input
+                label="Gemini API Key"
+                type="password"
+                placeholder="AIzaSy... (Optional if configured on server)"
+                value={geminiKey}
+                onChange={(e) => {
+                  setGeminiKey(e.target.value);
+                  localStorage.setItem('gemini_api_key', e.target.value);
+                }}
+              />
+            )}
 
             <Button
               onClick={handleStart}
@@ -432,7 +481,7 @@ function InterviewPageContent() {
           isStreaming={isStreaming || isTranscribing}
           isRecording={isRecording}
           recordingTime={recordingTime}
-          onStartRecording={startRecording}
+          onStartRecording={isSpeechSupported ? handleStartRecording : undefined}
           onStopRecording={handleTranscribeAndSend}
           placeholder={isTranscribing ? 'Transcribing your voice...' : 'Type or record your response...'}
         />
