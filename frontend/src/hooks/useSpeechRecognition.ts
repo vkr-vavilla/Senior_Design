@@ -4,7 +4,6 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 
 interface UseSpeechRecognitionOptions {
   onResult?: (text: string) => void;
-  onSilenceTimeout?: (finalText: string) => void;
 }
 
 export function useSpeechRecognition() {
@@ -45,31 +44,7 @@ export function useSpeechRecognition() {
     };
   }, []);
 
-  const resetSilenceTimer = useCallback((onTimeoutCallback: (finalText: string) => void) => {
-    if (silenceTimeoutRef.current) {
-      clearTimeout(silenceTimeoutRef.current);
-    }
-
-    silenceTimeoutRef.current = setTimeout(() => {
-      console.log('DEBUG: 10s silence timeout triggered');
-      isListeningRef.current = false;
-      setIsListening(false);
-      if (recognitionRef.current) {
-        recognitionRef.current.onresult = null;
-        recognitionRef.current.onerror = null;
-        recognitionRef.current.onend = null;
-        try {
-          recognitionRef.current.stop();
-        } catch (e) {
-          // ignore
-        }
-      }
-      const text = transcriptRef.current;
-      transcriptRef.current = '';
-      setTranscript('');
-      onTimeoutCallback(text);
-    }, 10000); // 10 seconds of silence
-  }, []);
+  // Silence timeout logic removed.
 
   const startListening = useCallback((options?: UseSpeechRecognitionOptions) => {
     if (!isSupported) {
@@ -103,15 +78,6 @@ export function useSpeechRecognition() {
     setIsListening(true);
     isListeningRef.current = true;
 
-    const handleTimeout = (text: string) => {
-      if (options?.onSilenceTimeout) {
-        options.onSilenceTimeout(text);
-      }
-    };
-
-    // Initial 10-second silence timer
-    resetSilenceTimer(handleTimeout);
-
     recognition.onresult = (event: any) => {
       if (!isListeningRef.current) return;
       let interimTranscript = '';
@@ -141,8 +107,6 @@ export function useSpeechRecognition() {
         if (options?.onResult) {
           options.onResult(cleanedFullText);
         }
-        // Reset silence timer on active speaking/results
-        resetSilenceTimer(handleTimeout);
       }
     };
 
@@ -170,7 +134,7 @@ export function useSpeechRecognition() {
     };
 
     recognition.start();
-  }, [isSupported, resetSilenceTimer]);
+  }, [isSupported]);
 
   const stopListening = useCallback((): Promise<string> => {
     return new Promise((resolve) => {

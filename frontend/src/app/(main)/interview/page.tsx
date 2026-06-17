@@ -31,6 +31,7 @@ import {
     Mic2
 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { Suspense, useEffect, useState } from 'react';
 
 const INTERVIEW_TYPES = [
@@ -147,14 +148,7 @@ function InterviewPageContent() {
   };
 
   const handleStartRecording = () => {
-    startListening({
-      onSilenceTimeout: (finalText) => {
-        console.log('DEBUG: 10s silence timeout triggered. Sending:', finalText);
-        if (finalText.trim()) {
-          sendMessage(finalText);
-        }
-      }
-    });
+    startListening();
   };
 
   const handleTranscribeAndSend = async () => {
@@ -190,13 +184,13 @@ function InterviewPageContent() {
         <Navbar />
         <div className="max-w-2xl mx-auto px-4 py-12">
           <div className="mb-8">
-            <button
-              onClick={() => router.push('/dashboard')}
+            <Link
+              href="/dashboard"
               className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors mb-6"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Dashboard
-            </button>
+            </Link>
             <h1 className="text-2xl font-bold text-white">Configure Interview</h1>
             <p className="text-slate-400 mt-1 text-sm">Set up your mock interview session</p>
           </div>
@@ -316,31 +310,28 @@ function InterviewPageContent() {
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             {sessionId && (config.type === 'technical' || config.type === 'mixed') && (
-              <Button
+              <button
                 onClick={() => router.push(`/interview/${sessionId}/code`)}
-                variant="primary"
-                size="lg"
-                leftIcon={<Code2 className="w-4 h-4" />}
+                className="inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 px-6 py-3 text-base rounded-xl gap-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 border border-transparent"
               >
+                <Code2 className="w-4 h-4" />
                 Coding Round
-              </Button>
+              </button>
             )}
             {sessionId && (
-              <Button
+              <button
                 onClick={() => router.push(`/interview/${sessionId}/feedback`)}
-                variant="secondary"
-                size="lg"
+                className="inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 px-6 py-3 text-base rounded-xl gap-2 bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 hover:border-slate-600"
               >
                 View Feedback
-              </Button>
+              </button>
             )}
-            <Button
+            <button
               onClick={() => router.push('/dashboard')}
-              variant="secondary"
-              size="lg"
+              className="inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 px-6 py-3 text-base rounded-xl gap-2 bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 hover:border-slate-600"
             >
               Back to Dashboard
-            </Button>
+            </button>
           </div>
         </div>
       </div>
