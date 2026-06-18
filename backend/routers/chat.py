@@ -633,24 +633,38 @@ async def get_feedback(session_id: str):
             "\n\n=== CODING ROUND (live problems the candidate solved) ===\n"
             + "\n\n".join(attempt_texts)
             + "\n\nWeigh this coding round alongside the spoken answers in the overall "
-            "score, strengths, and weaknesses."
+            "score and the criteria below."
         )
         coding_output_section = f"""
 
-**Coding Round**
-[Assess their actual code: did it pass the example tests, and is the approach sound? Comment on time/space complexity, edge cases, and whether the code is clean and readable enough for a {role}. Reference what they actually wrote; if a solution failed its tests, say what likely went wrong and how to fix it.]"""
+**Coding Ability**
+- Correctness — [did their solution actually pass the example tests / produce the right output?]
+- Time Complexity — [is the time complexity appropriate for the problem?]
+- Space Complexity — [memory usage and any space/time tradeoffs they made.]
+- Code Readability — [naming, structure, and clarity of the code they wrote for a {role}.]
+- Edge Case Handling — [which edge cases they handled or missed.]
+If a solution failed its tests, say what likely went wrong and how to fix it.
 
-    prompt = f"""You are an experienced hiring manager who just finished a {difficulty} {interview_type} interview for a {role} role. You're writing honest, personal feedback addressed directly to the candidate, whose first name is {candidate_name}. Judge them the way you actually would as the hiring manager for THIS role — measure every answer against what the {role} position and its job description require.{context}
+**System Design**
+[ONLY if this interview actually covered system design. Assess Scalability, Reliability, Tradeoff Analysis, and Architecture Decisions, citing what they said. If no system design came up, write exactly: "Not assessed — no system design questions in this interview." Do not invent.]
+
+**Coding & Design Scores**
+- Coding: [X]/10
+- Data Structures & Algorithms: [X]/10
+- System Design: [X]/10   [or write "N/A" if system design was not discussed]"""
+
+    prompt = f"""You are an expert technical interviewer and hiring manager who just finished a {difficulty} {interview_type} interview for a {role} role. You're writing honest, evidence-based feedback addressed directly to the candidate, whose first name is {candidate_name}. Judge them the way you actually would as the hiring manager for THIS role — measure every point against what the {role} position and its job description require.{context}
 
 === INTERVIEW Q&A (what you asked and how they answered) ===
 {qa_text}{coding_block}
 
 === HOW TO WRITE THIS ===
-Write the way a thoughtful hiring manager actually talks after an interview — warm but honest, specific, and human. Address the candidate directly as "you" (you can use their name once for warmth, but do not keep referring to them in the third person).
+Write the way a thoughtful interviewer actually talks after an interview — warm but honest, specific, and human. Address the candidate directly as "you" (use their name once for warmth, but do not keep referring to them in the third person).
 
-Two rules matter most:
-1. Tie your judgement to the role. When something is a strength or a gap, say what it means for someone doing THIS job, and reference the job description / role requirements where relevant.
-2. Every sentence must say something real about THIS interview. Never write a label and then just restate it.
+Three rules matter most:
+1. Reference specific examples. Every point must quote or closely paraphrase something they actually said in THIS interview — never a generic label you could paste into any report.
+2. Do not invent information. Evaluate only what is in the transcript above. If something was never demonstrated, say so honestly rather than assuming it.
+3. Be constructive, actionable, and tied to the role. For every gap, say what a stronger answer would have sounded like and what to practise for what THIS {role} job needs.
 
 BAD — robotic, says nothing (never write like this):
 - **Clear**: Your communication was clear.
@@ -663,7 +677,7 @@ GOOD — specific and tied to the role (write like this):
 Output using this exact structure (** for section headers, - for bullets):
 
 **Overall Score: [X]/10**
-[Two or three honest sentences talking to them: how did they do overall against what this role needs, and what's the headline takeaway?]
+[Two or three honest sentences on their overall interview performance: how they did against what this role needs, and the headline takeaway.]
 
 **Skill Ratings**
 - Clarity: [X]/10
@@ -673,39 +687,52 @@ Output using this exact structure (** for section headers, - for bullets):
 - Confidence: [X]/10
 - Conciseness: [X]/10
 
+**Technical Knowledge**
+- [Accuracy of their answers — cite a specific answer that was correct, partial, or wrong.]
+- [Depth of understanding — where they went deep versus stayed surface-level.]
+- [Ability to explain concepts — how clearly they conveyed technical ideas.]
+
+**Problem Solving**
+- [Logical thinking — how they reasoned through a problem you posed.]
+- [Breaking down problems — did they decompose before diving in?]
+- [Handling edge cases — did they consider failure modes, limits, or tradeoffs?]
+
+**Communication**
+- [Clarity — how easy their answers were to follow.]
+- [Structure of responses — a logical arc versus rambling.]
+- [Professionalism — tone, engagement, and how they carried the conversation.]
+
+**Confidence**
+- [Certainty when answering — conviction versus excessive hedging.]
+- [Defending decisions — did they justify their choices when you pushed back?]
+- [Handling uncertainty — how they responded when they didn't know something.]
+
 **Answer-by-Answer Breakdown**
 {breakdown_skeleton}{coding_output_section}
 
-**Strengths**
-- [A specific moment that worked and why it matters for this role — reference what you actually said.]
-- [Another, if there is one.]
-
-**Weaknesses**
-- [A specific shortcoming in how you answered — what was missing, wrong, or too shallow for what this role expects.]
-- [Another, if there is one.]
-
 **Areas for Improvement**
-- [Concrete, actionable guidance to close the gaps above — what to practise and what a stronger answer would have sounded like.]
+- [Concrete, actionable next step tied to a gap above — what to practise and what a stronger answer would have sounded like.]
 - [Another, if there is one.]
 
-**Key Takeaways**
-- [2-3 headline points to remember before a real interview for this kind of role, each tied to something that actually happened above.]
+SCORING PRINCIPLE — every score in this report (the Overall Score, the Skill Ratings, and any Coding & Design Scores) starts at 0/10. The candidate EARNS each point by actually demonstrating that competence in THIS interview. Do not hand out baseline or benefit-of-the-doubt points: a candidate who showed little earns a low number, and a dimension they never demonstrated is a 0. If the interview barely started or they gave almost nothing, the Overall Score stays at or near 0.
 
-For the Skill Ratings, score each dimension as a whole integer from 1 to 10 based on how the candidate actually performed across this interview. Keep the exact "Name: X/10" format on its own bullet — these feed a chart, so do not add commentary on those lines. What each dimension means:
+For the Skill Ratings, score each dimension as a whole integer from 0 to 10 on that earn-it basis. Keep the exact "Name: X/10" format on its own bullet — these feed a chart, so do not add commentary on those lines. What each dimension means:
 - Clarity — how easy their answers were to follow; clear articulation over rambling or vague wording.
 - Depth — technical substance and detail; did they go beyond surface level for what this role needs.
 - Structure — how well-organised each answer was (a logical arc, e.g. STAR for behavioural) versus disjointed.
 - Examples — use of concrete, specific evidence and real situations rather than generic claims.
 - Confidence — conviction and composure; owning their answers without excessive hedging.
 - Conciseness — getting to the point efficiently without padding or trailing off.
-Make the ratings consistent with everything else you write — they should reflect the same strengths and gaps you describe below, not contradict them.
+Make the ratings consistent with the four criteria sections — they should reflect the same strengths and gaps, not contradict them.
 
 Rules:
 - Fill in every line of the Answer-by-Answer Breakdown with a real evaluation — no placeholders.
+- Under each criterion, drop any sub-bullet the interview gave no evidence for rather than inventing one. If a whole criterion was never exercised (e.g. no coding problem in a behavioural interview), say so in one honest line instead of fabricating an assessment.
 - Quote or closely paraphrase what the candidate actually said; no generic advice that could apply to anyone.
 - Frame strengths and gaps in terms of fit for this specific {role} role and its job description.
-- Keep Weaknesses (what fell short) and Areas for Improvement (how to fix it) distinct — do not just repeat the same points.
 - If their resume lists skills they never demonstrated in the interview, say so honestly.
+- Across the whole interview (spoken answers included), reward clean reasoning, iterative improvement when you pushed back, and clearly communicating their thought process; penalize incorrect or hand-wavy answers, gaps they glossed over, and points they couldn't back up.
+- When a coding round is present, additionally penalize incorrect solutions, missing edge cases, and poor time/space complexity choices, and reward iterating toward a working, cleaner solution.
 - Be honest with the score: 9-10 exceptional, 7-8 solid, 5-6 needs work, below 5 significant gaps."""
 
     async def generate_feedback() -> str:
