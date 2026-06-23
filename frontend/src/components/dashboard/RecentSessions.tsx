@@ -50,13 +50,7 @@ export function RecentSessions({ token }: Props) {
   }, [token]);
 
   const handleSessionClick = (session: Session) => {
-    if (session.feedback) {
-      router.push(`/interview/${session._id}/feedback`);
-    } else {
-      router.push(
-        `/interview?role=${encodeURIComponent(session.role)}&type=${session.interview_type}&difficulty=${session.difficulty}&interviewId=${session._id}`
-      );
-    }
+    router.push(`/history/${session._id}`);
   };
 
   return (
