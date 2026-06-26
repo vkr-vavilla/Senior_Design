@@ -9,7 +9,9 @@ DB_NAME = os.getenv("DB_NAME", "prepai")
 PROBLEMS_COLLECTION = os.getenv("PROBLEMS_COLLECTION", "leetcode")
 # Code-execution backend: "piston" (sandboxed) or "local" (subprocess, no isolation).
 CODE_EXECUTOR = os.getenv("CODE_EXECUTOR", "local")
-JWT_SECRET = os.getenv("JWT_SECRET", "changeme")
+JWT_SECRET = os.getenv("JWT_SECRET")
+if not JWT_SECRET:
+    raise RuntimeError("JWT_SECRET environment variable is not set. Generate one with: openssl rand -hex 64")
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 # No refresh-token flow exists, so tokens must outlast a full session
 # (login -> set up resume/JD -> create interview). Default: 7 days.
