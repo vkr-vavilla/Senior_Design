@@ -725,7 +725,7 @@ Rules:
         client = gemini_client
         if x_gemini_key:
             client = genai.Client(api_key=x_gemini_key)
-        if AI_BACKEND == "gemini" and client:
+        if client:
             resp = await client.aio.models.generate_content(
                 model=GEMINI_MODEL,
                 contents=prompt,

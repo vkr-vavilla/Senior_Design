@@ -90,6 +90,8 @@ services:
       - NEXT_PUBLIC_API_URL=http://localhost:8080
       - NEXT_PUBLIC_WS_URL=ws://localhost:8080
       - CI=true
+      # Monaco Editor compilation is heavy in dev mode — give Node.js enough heap
+      - NODE_OPTIONS=--max-old-space-size=4096
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -109,6 +111,7 @@ services:
   #       today; other languages execute but need a per-language driver first.
   piston:
     image: ghcr.io/engineer-man/piston:latest
+    platform: linux/amd64
     privileged: true
     ports:
       - "2000:2000"

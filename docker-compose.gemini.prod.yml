@@ -37,6 +37,7 @@ services:
 
   piston:
     image: ghcr.io/engineer-man/piston:latest
+    platform: linux/amd64
     privileged: true
     ports:
       - "2000:2000"
