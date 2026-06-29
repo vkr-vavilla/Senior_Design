@@ -158,3 +158,14 @@ app.include_router(coding.router)
 @app.get("/")
 async def root():
     return {"message": "PrepAI API is running"}
+
+
+@app.get("/health")
+async def health():
+    from database import client
+    from fastapi.responses import JSONResponse
+    try:
+        await client.admin.command("ping")
+        return {"status": "ok"}
+    except Exception as e:
+        return JSONResponse(status_code=503, content={"status": "unavailable", "detail": str(e)})
