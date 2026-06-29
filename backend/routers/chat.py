@@ -327,22 +327,27 @@ async def synthesize_speech(request: dict):
 @router.websocket("/ws")
 async def chat_ws(
     websocket: WebSocket,
-    token: str,
     interview_id: str = "",
     client_session_id: str = "",
     model_source: str = "",
-    gemini_key: str = "",
 ):
+    await websocket.accept()
+
     try:
+        raw = await asyncio.wait_for(websocket.receive_text(), timeout=10.0)
+        auth = json.loads(raw)
+        if auth.get("type") != "auth":
+            await websocket.close(code=4001)
+            return
+        token = auth.get("token", "")
+        gemini_key = auth.get("gemini_key", "")
         custom_client = None
         if gemini_key:
             custom_client = genai.Client(api_key=gemini_key)
         user_id = verify_token(token)
-    except ValueError:
+    except (ValueError, asyncio.TimeoutError, Exception):
         await websocket.close(code=4001)
         return
-
-    await websocket.accept()
     print(f"DEBUG: WebSocket accepted. Preferred backend: {AI_BACKEND}")
 
     selected_model_source = _normalize_model_source(model_source)

@@ -86,11 +86,15 @@ export function useInterviewChat(options?: UseInterviewChatOptions): UseIntervie
       const interviewIdParam = config.interviewId ? `&interview_id=${config.interviewId}` : '';
       const modelSourceParam = `&model_source=${encodeURIComponent(config.modelSource)}`;
       const geminiKey = typeof window !== 'undefined' ? (localStorage.getItem('gemini_api_key') || '') : '';
-      const geminiKeyParam = geminiKey ? `&gemini_key=${encodeURIComponent(geminiKey)}` : '';
-      const ws = new WebSocket(`${WS_URL}/chat/ws?token=${token}${interviewIdParam}${modelSourceParam}${geminiKeyParam}`);
+      const ws = new WebSocket(`${WS_URL}/chat/ws?${interviewIdParam ? interviewIdParam.slice(1) + '&' : ''}${modelSourceParam.slice(1)}`);
       wsRef.current = ws;
 
       ws.onopen = () => {
+        ws.send(JSON.stringify({
+          type: 'auth',
+          token,
+          ...(geminiKey ? { gemini_key: geminiKey } : {}),
+        }));
         setIsConnected(true);
         setMessages([]);
         setActiveModelSource(config.modelSource);
