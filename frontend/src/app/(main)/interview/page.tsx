@@ -73,11 +73,13 @@ function InterviewPageContent() {
     isConnected,
     isStreaming,
     sessionEnded,
+    inactivityWarning,
     elapsedTime,
     sessionId,
     startInterview,
     sendMessage,
     endInterview,
+    resetInactivity,
     messagesEndRef,
   } = useInterviewChat();
 
@@ -420,6 +422,7 @@ function InterviewPageContent() {
       </div>
 
       {/* Chat Interface */}
+      {/* Chat Interface */}
       <div className="flex-1 overflow-hidden flex flex-col">
         <ChatInterface
           messages={messages}
@@ -437,6 +440,28 @@ function InterviewPageContent() {
           placeholder={isTranscribing ? 'Transcribing your voice...' : 'Type or record your response...'}
         />
       </div>
+
+      {/* Inactivity Warning Overlay */}
+      {inactivityWarning && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
+            <div className="w-16 h-16 bg-amber-500/10 border border-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Clock className="w-8 h-8 text-amber-400" />
+            </div>
+            <h2 className="text-xl font-bold text-white mb-3">Are you still there?</h2>
+            <p className="text-slate-400 mb-8 text-sm leading-relaxed">
+              You have been inactive for 15 minutes. Please submit a response or the session will end automatically in 1 minute.
+            </p>
+            <Button
+              onClick={resetInactivity}
+              variant="primary"
+              className="w-full py-6 text-lg"
+            >
+              I am present
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
