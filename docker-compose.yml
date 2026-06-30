@@ -20,6 +20,7 @@ services:
       - CODE_EXECUTOR=${CODE_EXECUTOR:-piston}
       # Piston code-execution sandbox, reachable on the compose network
       - PISTON_URL=http://piston:2000
+      - PYTHONUNBUFFERED=1
     volumes:
       - ./backend:/app
     # Note: vllm is intentionally NOT in depends_on. It lives behind the "gpu"
@@ -28,7 +29,12 @@ services:
     # piston IS a dependency: it's the code-execution sandbox used in every
     # deployment (CODE_EXECUTOR=piston), so it should always come up with backend.
     depends_on:
-      - piston
+      piston:
+        condition: service_started
+      # Wait until the runtime(s) are actually installed, so the first coding
+      # submission after `up` doesn't hit an empty Piston.
+      piston-init:
+        condition: service_completed_successfully
 
   vllm:
     image: vllm/vllm-openai:v0.7.3
@@ -77,10 +83,15 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+    stdin_open: true
+    tty: true
     environment:
       # NEXT_PUBLIC vars are browser-side, so they use the host machine's address
       - NEXT_PUBLIC_API_URL=http://localhost:8080
       - NEXT_PUBLIC_WS_URL=ws://localhost:8080
+      - CI=true
+      # Monaco Editor compilation is heavy in dev mode — give Node.js enough heap
+      - NODE_OPTIONS=--max-old-space-size=4096
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -100,6 +111,7 @@ services:
   #       today; other languages execute but need a per-language driver first.
   piston:
     image: ghcr.io/engineer-man/piston:latest
+    platform: linux/amd64
     privileged: true
     ports:
       - "2000:2000"
@@ -114,6 +126,42 @@ services:
     tmpfs:
       - /tmp:exec
     restart: always
+
+  # ── Piston bootstrap: install language runtimes automatically ───────────────
+  # Piston keeps installed packages in the `piston-packages` named volume, which
+  # is NOT part of the image — so a fresh machine (empty volume) starts with zero
+  # runtimes and coding submissions fail. This one-shot service waits for Piston,
+  # installs the language(s) we need (idempotent: skips anything already present),
+  # then exits. backend depends_on it with service_completed_successfully, so the
+  # stack is never "up" before Python is runnable. Add more PISTON_PACKAGES to
+  # provision additional languages (space-separated "language:version" pairs).
+  piston-init:
+    image: curlimages/curl:latest
+    depends_on:
+      - piston
+    environment:
+      - PISTON_PACKAGES=python:3.12.0
+    entrypoint: ["sh", "-c"]
+    command:
+      - |
+        set -e
+        echo "piston-init: waiting for Piston API..."
+        until curl -sf http://piston:2000/api/v2/runtimes >/dev/null; do sleep 1; done
+        installed=$$(curl -s http://piston:2000/api/v2/runtimes)
+        for pkg in $$PISTON_PACKAGES; do
+          lang=$${pkg%:*}; ver=$${pkg#*:}
+          if echo "$$installed" | grep -q "\"language\":\"$$lang\""; then
+            echo "piston-init: $$lang already installed, skipping."
+            continue
+          fi
+          echo "piston-init: installing $$lang $$ver ..."
+          curl -sf -X POST http://piston:2000/api/v2/packages \
+            -H 'Content-Type: application/json' \
+            -d "{\"language\":\"$$lang\",\"version\":\"$$ver\"}"
+          echo
+        done
+        echo "piston-init: done."
+    restart: "no"
 
 volumes:
   piston-packages:

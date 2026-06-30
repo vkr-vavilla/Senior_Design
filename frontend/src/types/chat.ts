@@ -17,6 +17,7 @@ export interface ChatChunk {
   chunk: string;
   done: boolean;
   source?: 'local' | 'api';
+  is_error?: boolean;
 }
 
 export interface Session {

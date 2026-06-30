@@ -62,6 +62,54 @@ def stop_vllm():
             vllm_process.kill()
 
 
+async def ensure_piston_python():
+    """Ensure Python is installed in the Piston sandbox container."""
+    import httpx
+    piston_url = os.getenv("PISTON_URL", "http://localhost:2000")
+    code_executor = os.getenv("CODE_EXECUTOR", "local").lower()
+    if code_executor != "piston":
+        print(f"[Piston] CODE_EXECUTOR is '{code_executor}', skipping Piston check.")
+        return
+
+    print(f"[Piston] Checking/installing Python runtime at {piston_url}...")
+    # Retry up to 30 times (30 seconds) in case Piston is booting up
+    async with httpx.AsyncClient(base_url=piston_url) as client:
+        for attempt in range(1, 31):
+            try:
+                # 1. Check if Python is already installed
+                r = await client.get("/api/v2/runtimes", timeout=2.0)
+                if r.status_code == 200:
+                    runtimes = r.json()
+                    python_installed = False
+                    for rt in runtimes:
+                        if rt.get("language") == "python":
+                            python_installed = True
+                            print(f"[Piston] Python {rt.get('version')} is already installed.")
+                            break
+                    
+                    if python_installed:
+                        return
+                    
+                    # 2. Python is not installed. Let's install it.
+                    print("[Piston] Python is not installed. Installing python 3.12.0...")
+                    install_resp = await client.post(
+                        "/api/v2/packages",
+                        json={"language": "python", "version": "3.12.0"},
+                        timeout=30.0
+                    )
+                    if install_resp.status_code in (200, 201):
+                        print("[Piston] Python 3.12.0 installed successfully.")
+                        return
+                    else:
+                        print(f"[Piston] Install failed: {install_resp.status_code} - {install_resp.text}")
+                        return
+            except Exception as e:
+                # Wait before retrying if Piston is not reachable yet
+                if attempt == 30:
+                    print(f"[Piston] Error ensuring Python in Piston after 30 attempts: {e}")
+                await asyncio.sleep(1)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await connect_db()
@@ -69,10 +117,13 @@ async def lifespan(app: FastAPI):
     if AI_BACKEND not in ["gemini"] and vllm_autostart:
         await asyncio.to_thread(start_vllm)
 
+    # Automatically install Python on Piston sandbox if running with Piston executor
+    asyncio.create_task(ensure_piston_python())
+
     # Pre-warm Kokoro TTS so the first synthesize request doesn't pay the load cost
     try:
-        from routers.chat import _get_kokoro
-        await asyncio.to_thread(_get_kokoro)
+        from routers.chat import get_kokoro_instance
+        await get_kokoro_instance()
         print("[Kokoro] Pre-warmed.")
     except Exception as e:
         print(f"[Kokoro] Pre-warm skipped: {e}")
@@ -107,3 +158,14 @@ app.include_router(coding.router)
 @app.get("/")
 async def root():
     return {"message": "PrepAI API is running"}
+
+
+@app.get("/health")
+async def health():
+    from database import client
+    from fastapi.responses import JSONResponse
+    try:
+        await client.admin.command("ping")
+        return {"status": "ok"}
+    except Exception as e:
+        return JSONResponse(status_code=503, content={"status": "unavailable", "detail": str(e)})

@@ -11,6 +11,7 @@ export function useTextToSpeech() {
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const sentenceBufferRef = useRef<string>('');
+  const playSessionIdRef = useRef<number>(0);
 
   // Queue stores items to play
   const playQueueRef = useRef<{ type: 'url' | 'text', value: string }[]>([]);
@@ -91,6 +92,7 @@ export function useTextToSpeech() {
   }, []);
 
   const stop = useCallback(() => {
+    playSessionIdRef.current += 1;
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
@@ -106,14 +108,17 @@ export function useTextToSpeech() {
   const speak = useCallback(async (text: string) => {
     if (!text.trim()) return;
     
+    const currentSessionId = playSessionIdRef.current;
     if (engine === 'premium' && canUsePremium()) {
       try {
         const audioBlob = await chatApi.synthesize(text);
+        if (playSessionIdRef.current !== currentSessionId) return;
         handlePremiumSuccess();
         const url = URL.createObjectURL(audioBlob);
         playQueueRef.current.push({ type: 'url', value: url });
         processQueue();
       } catch (err) {
+        if (playSessionIdRef.current !== currentSessionId) return;
         handlePremiumFailure();
         // FALLBACK
         playQueueRef.current.push({ type: 'text', value: text });
@@ -152,17 +157,20 @@ export function useTextToSpeech() {
       sentenceBufferRef.current = buf.slice(cutIndex);
 
       if (sentence.length > 2) {
+        const currentSessionId = playSessionIdRef.current;
         if (engine === 'premium' && canUsePremium()) {
           // Chain synth requests so the play queue is populated in order even if
           // a shorter clause finishes synthesis faster than an earlier longer one.
           synthChainRef.current = synthChainRef.current.then(async () => {
             try {
               const blob = await chatApi.synthesize(sentence);
+              if (playSessionIdRef.current !== currentSessionId) return;
               handlePremiumSuccess();
               const url = URL.createObjectURL(blob);
               playQueueRef.current.push({ type: 'url', value: url });
               processQueue();
             } catch (err) {
+              if (playSessionIdRef.current !== currentSessionId) return;
               handlePremiumFailure();
               // FALLBACK to browser voice if synthesis fails (rate limits)
               playQueueRef.current.push({ type: 'text', value: sentence });
@@ -182,15 +190,18 @@ export function useTextToSpeech() {
       const remaining = sentenceBufferRef.current.trim();
       sentenceBufferRef.current = '';
 
+      const currentSessionId = playSessionIdRef.current;
       if (engine === 'premium' && canUsePremium()) {
         synthChainRef.current = synthChainRef.current.then(async () => {
           try {
             const blob = await chatApi.synthesize(remaining);
+            if (playSessionIdRef.current !== currentSessionId) return;
             handlePremiumSuccess();
             const url = URL.createObjectURL(blob);
             playQueueRef.current.push({ type: 'url', value: url });
             processQueue();
           } catch (err) {
+            if (playSessionIdRef.current !== currentSessionId) return;
             handlePremiumFailure();
             playQueueRef.current.push({ type: 'text', value: remaining });
             processQueue();

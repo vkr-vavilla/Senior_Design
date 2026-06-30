@@ -8,7 +8,7 @@ import { Input, Select } from '@/components/ui/Input';
 import { LoadingPage } from '@/components/ui/LoadingSpinner';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useInterviewChat } from '@/hooks/useInterviewChat';
-import { useAudioRecorder } from '@/hooks/useAudioRecorder';
+import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import { useTextToSpeech } from '@/hooks/useTextToSpeech';
 import { chatApi } from '@/lib/api';
 import { cn, formatTime } from '@/lib/utils';
@@ -31,6 +31,7 @@ import {
     Mic2
 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { Suspense, useEffect, useState } from 'react';
 
 const INTERVIEW_TYPES = [
@@ -79,14 +80,47 @@ function InterviewPageContent() {
     sendMessage,
     endInterview,
     messagesEndRef,
-  } = useInterviewChat();
+  } = useInterviewChat({
+    onChunk: (chunk, isError) => {
+      if (isVoiceMode && !isError) speakStream(chunk);
+    },
+    onDone: () => {
+      if (isVoiceMode) flush();
+    }
+  });
 
   const [hasStarted, setHasStarted] = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [isVoiceMode, setIsVoiceMode] = useState(true);
   const [isTranscribing, setIsTranscribing] = useState(false);
+  const [geminiKey, setGeminiKey] = useState('');
 
-  const { isRecording, recordingTime, startRecording, stopRecording } = useAudioRecorder();
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setGeminiKey(localStorage.getItem('gemini_api_key') || '');
+    }
+  }, []);
+
+  const {
+    isListening: isRecording,
+    isSupported: isSpeechSupported,
+    startListening,
+    stopListening,
+  } = useSpeechRecognition();
+
+  const [recordingTime, setRecordingTime] = useState(0);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isRecording) {
+      setRecordingTime(0);
+      interval = setInterval(() => {
+        setRecordingTime((t) => t + 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isRecording]);
+
   const { speakStream, stop: stopSpeaking, engine, setEngine, flush } = useTextToSpeech();
 
   // Pre-fill from query params
@@ -109,19 +143,18 @@ function InterviewPageContent() {
 
   const handleStart = () => {
     if (!config.role.trim() || !token) return;
-    startInterview(config, token, (chunk) => {
-      if (isVoiceMode) speakStream(chunk);
-    }, () => {
-      if (isVoiceMode) flush();
-    });
+    startInterview(config, token);
     setHasStarted(true);
+  };
+
+  const handleStartRecording = () => {
+    startListening();
   };
 
   const handleTranscribeAndSend = async () => {
     try {
-      const audioBlob = await stopRecording();
       setIsTranscribing(true);
-      const { text } = await chatApi.transcribe(audioBlob);
+      const text = await stopListening();
       if (text.trim()) {
         sendMessage(text);
       }
@@ -151,13 +184,13 @@ function InterviewPageContent() {
         <Navbar />
         <div className="max-w-2xl mx-auto px-4 py-12">
           <div className="mb-8">
-            <button
-              onClick={() => router.push('/dashboard')}
+            <Link
+              href="/dashboard"
               className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors mb-6"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Dashboard
-            </button>
+            </Link>
             <h1 className="text-2xl font-bold text-white">Configure Interview</h1>
             <p className="text-slate-400 mt-1 text-sm">Set up your mock interview session</p>
           </div>
@@ -204,6 +237,19 @@ function InterviewPageContent() {
                 }))
               }
             />
+
+            {config.modelSource === 'api' && (
+              <Input
+                label="Gemini API Key"
+                type="password"
+                placeholder="AIzaSy... (Optional if configured on server)"
+                value={geminiKey}
+                onChange={(e) => {
+                  setGeminiKey(e.target.value);
+                  localStorage.setItem('gemini_api_key', e.target.value);
+                }}
+              />
+            )}
 
             <Button
               onClick={handleStart}
@@ -264,31 +310,28 @@ function InterviewPageContent() {
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             {sessionId && (config.type === 'technical' || config.type === 'mixed') && (
-              <Button
+              <button
                 onClick={() => router.push(`/interview/${sessionId}/code`)}
-                variant="primary"
-                size="lg"
-                leftIcon={<Code2 className="w-4 h-4" />}
+                className="inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 px-6 py-3 text-base rounded-xl gap-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 border border-transparent"
               >
+                <Code2 className="w-4 h-4" />
                 Coding Round
-              </Button>
+              </button>
             )}
             {sessionId && (
-              <Button
+              <button
                 onClick={() => router.push(`/interview/${sessionId}/feedback`)}
-                variant="secondary"
-                size="lg"
+                className="inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 px-6 py-3 text-base rounded-xl gap-2 bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 hover:border-slate-600"
               >
                 View Feedback
-              </Button>
+              </button>
             )}
-            <Button
+            <button
               onClick={() => router.push('/dashboard')}
-              variant="secondary"
-              size="lg"
+              className="inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 px-6 py-3 text-base rounded-xl gap-2 bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 hover:border-slate-600"
             >
               Back to Dashboard
-            </Button>
+            </button>
           </div>
         </div>
       </div>
@@ -432,7 +475,7 @@ function InterviewPageContent() {
           isStreaming={isStreaming || isTranscribing}
           isRecording={isRecording}
           recordingTime={recordingTime}
-          onStartRecording={startRecording}
+          onStartRecording={isSpeechSupported ? handleStartRecording : undefined}
           onStopRecording={handleTranscribeAndSend}
           placeholder={isTranscribing ? 'Transcribing your voice...' : 'Type or record your response...'}
         />

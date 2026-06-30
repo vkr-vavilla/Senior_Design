@@ -75,7 +75,7 @@ export default function SessionDetailPage() {
       if (!sessionId || !token) return;
       try {
         const data = await interviewApi.getSession(sessionId, token);
-        const s = data as SessionDetail;
+        const s = data as unknown as SessionDetail;
         setSession(s);
         if (!s.feedback) {
           setActiveTab(s.messages?.length > 0 ? 'transcript' : 'details');
