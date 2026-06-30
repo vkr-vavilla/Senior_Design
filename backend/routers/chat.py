@@ -1,4 +1,5 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException, File, UploadFile, Header
+from auth.jwt import get_current_user
 from jose import JWTError, jwt
 from groq import Groq
 from openai import AsyncOpenAI
@@ -217,7 +218,7 @@ def verify_token(token: str) -> str:
 
 
 @router.post("/transcribe")
-async def transcribe_audio(file: UploadFile = File(...)):
+async def transcribe_audio(file: UploadFile = File(...), user_id: str = Depends(get_current_user)):
     try:
         with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1]) as tmp:
             content = await file.read()
@@ -281,7 +282,7 @@ async def get_kokoro_instance():
     return _kokoro_instance
 
 @router.post("/synthesize")
-async def synthesize_speech(request: dict):
+async def synthesize_speech(request: dict, user_id: str = Depends(get_current_user)):
     try:
         text = request.get("text", "").strip()
         if not text:
@@ -612,6 +613,18 @@ async def get_feedback(session_id: str, x_gemini_key: str | None = Header(None, 
 
     if not qa_pairs:
         raise HTTPException(status_code=400, detail="No candidate answers found to evaluate")
+
+    # Return cached feedback unless a coding attempt was submitted after it was generated,
+    # which would make the existing report stale (missing the new coding round results).
+    existing_feedback = session.get("feedback")
+    feedback_at = session.get("feedback_generated_at")
+    last_attempt_at = max(
+        (a.get("submitted_at") for a in session.get("coding_attempts") or [] if a.get("submitted_at")),
+        default=None,
+    )
+    stale = last_attempt_at is not None and (feedback_at is None or last_attempt_at > feedback_at)
+    if existing_feedback and not stale:
+        return FeedbackResponse(feedback=existing_feedback)
 
     # Save user answers to DB if not already there
     if not session.get("user_answers"):
