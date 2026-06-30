@@ -1,4 +1,5 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException, File, UploadFile, Header
+from auth.jwt import get_current_user
 from jose import JWTError, jwt
 from groq import Groq
 from openai import AsyncOpenAI
@@ -217,7 +218,7 @@ def verify_token(token: str) -> str:
 
 
 @router.post("/transcribe")
-async def transcribe_audio(file: UploadFile = File(...)):
+async def transcribe_audio(file: UploadFile = File(...), user_id: str = Depends(get_current_user)):
     try:
         with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1]) as tmp:
             content = await file.read()
@@ -281,7 +282,7 @@ async def get_kokoro_instance():
     return _kokoro_instance
 
 @router.post("/synthesize")
-async def synthesize_speech(request: dict):
+async def synthesize_speech(request: dict, user_id: str = Depends(get_current_user)):
     try:
         text = request.get("text", "").strip()
         if not text:
