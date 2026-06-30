@@ -1,0 +1,6 @@
+Branch	Full SHA	Last Commit
+bugfix/security-and-feedback	386cc6a3d614ada60c7fc099ef689a63db3e8957	fixing Frontend
+demo	e8a08a5	Readme
+mergedbranch	229fc3c	Merge remote-tracking branch origin/updates into mergedbranch
+mergedbranch2	0374164	changed feedback system prompt
+origin/updates	2544c09	hexa feedback
