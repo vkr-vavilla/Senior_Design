@@ -7,12 +7,18 @@
 # By hand:
 #   docker compose -f docker-compose.local.yml --profile gpu up -d          # NVIDIA GPU: local Qwen
 #   AI_BACKEND=gemini docker compose -f docker-compose.local.yml up -d      # no GPU: Gemini key
+
+# Own project name: keeps the package's containers/volumes separate from a dev
+# stack started from docker-compose.yml in this same directory.
+name: prepai-local
+
 services:
   # ── MongoDB: bundled database (replaces Atlas for the local package) ────────
+  # No host port: only the backend talks to it, over the compose network. (A
+  # mapping would collide with any MongoDB already installed on the machine.
+  # To inspect: docker compose -f docker-compose.local.yml exec mongo mongosh)
   mongo:
     image: mongo:7
-    ports:
-      - "127.0.0.1:27017:27017"   # localhost-only, for debugging with mongosh
     volumes:
       - mongo-data:/data/db
     restart: always
@@ -173,10 +179,10 @@ services:
     restart: "no"
 
   # ── Redis: per-turn crash-safety snapshot of the live interview ─────────────
+  # No host port (backend-only, compose network) — avoids colliding with a Redis
+  # already installed on the machine.
   redis:
     image: redis:7.4-alpine
-    ports:
-      - "127.0.0.1:6379:6379"
     volumes:
       - redis-data:/data
     restart: always

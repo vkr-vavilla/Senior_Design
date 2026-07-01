@@ -35,10 +35,11 @@ import os
 import time
 from datetime import datetime, timezone
 
-import certifi
 import requests
 from dotenv import load_dotenv
 from pymongo import MongoClient, UpdateOne
+
+from database import mongo_client_kwargs
 
 # Load backend/.env no matter where the script is launched from
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
@@ -206,7 +207,7 @@ def main():
                         help="seconds to wait between LeetCode requests (be polite; default 1.0)")
     args = parser.parse_args()
 
-    client = MongoClient(MONGODB_URI, tlsCAFile=certifi.where())
+    client = MongoClient(MONGODB_URI, **mongo_client_kwargs(MONGODB_URI))
     problems = client[DB_NAME][PROBLEMS_COLLECTION]
     problems.create_index("slug", unique=True)
     problems.create_index("difficulty")
