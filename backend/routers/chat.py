@@ -6,7 +6,7 @@ from openai import AsyncOpenAI
 from google import genai
 from datetime import datetime, timezone
 from database import get_db
-from config import GEMINI_API_KEY, VLLM_BASE_URL, VLLM_MODEL, AI_BACKEND, JWT_SECRET, JWT_ALGORITHM, GROQ_API_KEY, REDIS_URL
+from config import GEMINI_API_KEY, VLLM_BASE_URL, VLLM_MODEL, AI_BACKEND, JWT_SECRET, JWT_ALGORITHM, GROQ_API_KEY, REDIS_URL, STT_BACKEND
 from models.chat import ChatMessage, FeedbackResponse
 from bson import ObjectId
 import json
@@ -307,10 +307,18 @@ async def transcribe_audio(file: UploadFile = File(...), user_id: str = Depends(
             tmp.write(content)
             tmp_path = tmp.name
 
-        if not groq_client:
-            raise HTTPException(status_code=400, detail="Groq API key is not configured on the server.")
-
         try:
+            # Local mode (downloadable package): faster-whisper on CPU, no API key.
+            if STT_BACKEND == "local":
+                from stt_local import transcribe_file
+                return {"text": await transcribe_file(tmp_path)}
+
+            if not groq_client:
+                raise HTTPException(
+                    status_code=400,
+                    detail="No STT configured: set GROQ_API_KEY or STT_BACKEND=local on the server.",
+                )
+
             with open(tmp_path, "rb") as audio_file:
                 transcription = groq_client.audio.transcriptions.create(
                     file=(file.filename, audio_file.read()),
@@ -324,6 +332,8 @@ async def transcribe_audio(file: UploadFile = File(...), user_id: str = Depends(
             if os.path.exists(tmp_path):
                 os.remove(tmp_path)
 
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"Transcription error: {e}")
         raise HTTPException(status_code=500, detail=str(e))

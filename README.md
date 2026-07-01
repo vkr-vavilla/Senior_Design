@@ -106,6 +106,10 @@ It can run entirely on a **cloud LLM (Google Gemini)** with zero GPU, or fully *
 
 ## 🚀 Getting started
 
+> **Want everything on your own machine?** The self-contained local package
+> (bundled MongoDB, offline speech-to-text, no API keys in GPU mode) is a single
+> script: `./setup_local.sh` — see [docs/LOCAL_SETUP.md](docs/LOCAL_SETUP.md).
+
 ### Prerequisites
 
 - **Docker** & **Docker Compose** (recommended path)

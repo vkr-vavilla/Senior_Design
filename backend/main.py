@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from database import connect_db, close_db
 from routers import auth, chat, interview, coding
-from config import AI_BACKEND
+from config import AI_BACKEND, STT_BACKEND
 import asyncio
 import os
 import subprocess
@@ -137,6 +137,16 @@ async def lifespan(app: FastAPI):
         print("[Kokoro] Pre-warmed.")
     except Exception as e:
         print(f"[Kokoro] Pre-warm skipped: {e}")
+
+    # Pre-warm local Whisper STT (downloads the model on first run) so the first
+    # spoken answer isn't stuck behind a model download mid-interview.
+    if STT_BACKEND == "local":
+        try:
+            from stt_local import get_whisper_instance
+            await get_whisper_instance()
+            print("[Whisper] Pre-warmed.")
+        except Exception as e:
+            print(f"[Whisper] Pre-warm skipped: {e}")
 
     yield
     await close_db()
