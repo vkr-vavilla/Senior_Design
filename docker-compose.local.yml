@@ -28,6 +28,9 @@ services:
     environment:
       - MONGODB_URI=mongodb://mongo:27017
       - DB_NAME=FinalRound
+      # Personal machine: keep users logged in for 90 days instead of the hosted
+      # default of 7, so opening the app drops them straight onto their history.
+      - ACCESS_TOKEN_EXPIRE_MINUTES=129600
       # AI_BACKEND=qwen   -> local model via the vllm service (needs --profile gpu)
       # AI_BACKEND=gemini -> Gemini cloud API (user-supplied key)
       - AI_BACKEND=${AI_BACKEND:-qwen}
