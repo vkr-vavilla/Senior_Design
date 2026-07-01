@@ -6,7 +6,7 @@ from openai import AsyncOpenAI
 from google import genai
 from datetime import datetime, timezone
 from database import get_db
-from config import GEMINI_API_KEY, VLLM_BASE_URL, VLLM_MODEL, AI_BACKEND, JWT_SECRET, JWT_ALGORITHM, GROQ_API_KEY
+from config import GEMINI_API_KEY, VLLM_BASE_URL, VLLM_MODEL, AI_BACKEND, JWT_SECRET, JWT_ALGORITHM, GROQ_API_KEY, REDIS_URL
 from models.chat import ChatMessage, FeedbackResponse
 from bson import ObjectId
 import json
@@ -25,6 +25,88 @@ vllm_client = AsyncOpenAI(base_url=VLLM_BASE_URL, api_key="not-needed")
 gemini_client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
 
 _kokoro_executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="kokoro-tts")
+
+# ── Redis: best-effort per-turn crash-safety snapshot of the live interview ────
+# If the backend process dies mid-interview (hard crash, OOM, container kill) the
+# WebSocket disconnect handler never runs, so the transcript would be lost. We
+# snapshot the running transcript to Redis every turn; main.py sweeps any orphaned
+# snapshots into MongoDB on startup. All Redis ops are best-effort — a Redis
+# outage never breaks an interview (MongoDB remains the source of truth).
+try:
+    import redis.asyncio as aioredis
+    redis_client = aioredis.from_url(REDIS_URL, decode_responses=True)
+except Exception as e:  # noqa: BLE001
+    print(f"[Redis] client init failed, crash-safety disabled: {e}")
+    redis_client = None
+
+INTERVIEW_SNAPSHOT_TTL = 6 * 60 * 60  # snapshots self-expire after 6h
+
+
+def _interview_key(interview_id: str) -> str:
+    return f"interview:{interview_id}"
+
+
+async def snapshot_interview(interview_id: str, history: list, model_source: str, user_id: str) -> None:
+    """Best-effort: persist the running transcript to Redis every turn. Never raises."""
+    if not redis_client or not interview_id:
+        return
+    try:
+        payload = json.dumps({"history": history, "model_source": model_source, "user_id": user_id})
+        await redis_client.set(_interview_key(interview_id), payload, ex=INTERVIEW_SNAPSHOT_TTL)
+    except Exception as e:  # noqa: BLE001
+        print(f"[Redis] snapshot failed: {e}")
+
+
+async def clear_interview_snapshot(interview_id: str) -> None:
+    """Best-effort: drop the Redis snapshot once the transcript is safely in Mongo."""
+    if not redis_client or not interview_id:
+        return
+    try:
+        await redis_client.delete(_interview_key(interview_id))
+    except Exception as e:  # noqa: BLE001
+        print(f"[Redis] clear failed: {e}")
+
+
+async def flush_interview_history(db, interview_id: str, history: list, model_source: str) -> None:
+    """Write the transcript + derived answers/Q&A to the interview doc in Mongo.
+    Shared by the disconnect handler and the startup crash-recovery sweep."""
+    user_answers = [m["text"] for m in history if m["role"] == "user"]
+    qa_pairs = []
+    for i, msg in enumerate(history):
+        if msg["role"] == "model" and i + 1 < len(history) and history[i + 1]["role"] == "user":
+            qa_pairs.append({"question": msg["text"], "answer": history[i + 1]["text"]})
+    await db.interviews.update_one(
+        {"_id": ObjectId(interview_id)},
+        {"$set": {"messages": history, "model_source": model_source,
+                  "user_answers": user_answers, "qa_pairs": qa_pairs}},
+    )
+
+
+async def sweep_orphaned_interviews(db) -> None:
+    """On startup, flush interview snapshots a crashed backend left in Redis into
+    Mongo, then delete them. Any key present at startup belongs to a session whose
+    connection died with the process. Best-effort."""
+    if not redis_client:
+        return
+    try:
+        keys = [k async for k in redis_client.scan_iter(match="interview:*")]
+    except Exception as e:  # noqa: BLE001
+        print(f"[Redis] sweep scan failed (redis down?): {e}")
+        return
+    for key in keys:
+        try:
+            raw = await redis_client.get(key)
+            if not raw:
+                continue
+            snap = json.loads(raw)
+            interview_id = key.split("interview:", 1)[-1]
+            history = snap.get("history") or []
+            if history:
+                await flush_interview_history(db, interview_id, history, snap.get("model_source", "local"))
+                print(f"[Redis] recovered orphaned interview {interview_id} ({len(history)} turns) -> Mongo")
+            await redis_client.delete(key)
+        except Exception as e:  # noqa: BLE001
+            print(f"[Redis] sweep of {key} failed: {e}")
 
 
 def _normalize_model_source(source: str | None) -> str:
@@ -443,6 +525,7 @@ INTERVIEWING APPROACH:
 - DIG IN on technical specifics. When they say "I used FreeRTOS" — ask about task priorities, IPC mechanism, the worst race condition. When they say "improved accuracy 30%" — ask what the baseline was, how they measured it, what changed.
 - Avoid surface-level follow-ups like "did you learn that on the project?" or "was that a team effort?" — go technical instead.
 - Move the conversation forward — don't paraphrase their answer back as your whole turn.
+- If the candidate gives a non-answer, a joke, or something off-topic ("im chilling", "idk", "nothing much"), do NOT pretend they answered and do NOT invent a smooth transition into a resume topic. Say plainly that you didn't quite get an answer, and re-ask your question. Only respond to what they ACTUALLY said — never attribute claims, projects, or words to them that are not in their message.
 - Rotate between: work experiences, personal projects, and {interview_rotation_focus}.
 
 DON'T — these are hard rules, no exceptions:
@@ -498,6 +581,7 @@ KICKOFF (first turn only):
         await websocket.send_text(json.dumps({"chunk": "", "done": True, "source": last_source_used}))
         messages.append({"role": "assistant", "content": opening_reply})
         history.append({"role": "model", "text": opening_reply})
+        await snapshot_interview(interview_id, history, selected_model_source, user_id)
 
         # Main Loop
         while True:
@@ -514,6 +598,7 @@ KICKOFF (first turn only):
                 messages.append({"role": "assistant", "content": deterministic})
                 await websocket.send_text(json.dumps({"chunk": deterministic, "done": False, "source": last_source_used}))
                 await websocket.send_text(json.dumps({"chunk": "", "done": True, "source": last_source_used}))
+                await snapshot_interview(interview_id, history, selected_model_source, user_id)
                 continue
 
             history.append({"role": "user", "text": message})
@@ -541,6 +626,7 @@ KICKOFF (first turn only):
 
             messages.append({"role": "assistant", "content": full_reply})
             history.append({"role": "model", "text": full_reply})
+            await snapshot_interview(interview_id, history, selected_model_source, user_id)
             await websocket.send_text(json.dumps({"chunk": "", "done": True, "source": last_source_used}))
 
     except Exception as e:
@@ -561,10 +647,8 @@ KICKOFF (first turn only):
                     qa_pairs.append({"question": msg["text"], "answer": history[i + 1]["text"]})
 
             if interview_id:
-                await db.interviews.update_one(
-                    {"_id": ObjectId(interview_id)},
-                    {"$set": {"messages": history, "model_source": selected_model_source, "user_answers": user_answers, "qa_pairs": qa_pairs}}
-                )
+                await flush_interview_history(db, interview_id, history, selected_model_source)
+                await clear_interview_snapshot(interview_id)
             else:
                 _id = client_session_id if client_session_id else str(ObjectId())
                 await db.chat_sessions.insert_one({

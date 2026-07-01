@@ -23,3 +23,6 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 VLLM_BASE_URL = os.getenv("VLLM_BASE_URL", "http://localhost:8080/v1")
 VLLM_MODEL = os.getenv("VLLM_MODEL", "Qwen/Qwen2.5-7B-Instruct")
 AI_BACKEND = os.getenv("AI_BACKEND", "gemini")  # "gemini" or "qwen"
+# Redis: per-turn crash-safety snapshot of the live interview (best-effort; the
+# interview still works if Redis is unreachable).
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")

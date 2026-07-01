@@ -113,6 +113,16 @@ async def ensure_piston_python():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await connect_db()
+
+    # Crash recovery: flush any interview snapshots a previously-crashed backend
+    # left in Redis into Mongo, then clear them (best-effort; no-op if Redis down).
+    try:
+        from database import get_db
+        from routers.chat import sweep_orphaned_interviews
+        await sweep_orphaned_interviews(get_db())
+    except Exception as e:
+        print(f"[Redis] startup sweep skipped: {e}")
+
     vllm_autostart = os.getenv("VLLM_AUTOSTART", "true").lower() == "true"
     if AI_BACKEND not in ["gemini"] and vllm_autostart:
         await asyncio.to_thread(start_vllm)

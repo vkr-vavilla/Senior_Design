@@ -20,6 +20,8 @@ services:
       - CODE_EXECUTOR=${CODE_EXECUTOR:-piston}
       # Piston code-execution sandbox, reachable on the compose network
       - PISTON_URL=http://piston:2000
+      # Redis: per-turn crash-safety snapshot of the live interview (best-effort)
+      - REDIS_URL=redis://redis:6379/0
       - PYTHONUNBUFFERED=1
     volumes:
       - ./backend:/app
@@ -35,6 +37,8 @@ services:
       # submission after `up` doesn't hit an empty Piston.
       piston-init:
         condition: service_completed_successfully
+      redis:
+        condition: service_started
 
   vllm:
     image: vllm/vllm-openai:v0.7.3
@@ -56,6 +60,9 @@ services:
       - --gpu-memory-utilization
       - "0.90"
       - --enforce-eager
+      # Reuse the KV cache for the long, per-interview system prompt (resume + JD +
+      # persona) that repeats on every turn — cuts prefill cost/latency each turn.
+      - --enable-prefix-caching
       - --max-num-seqs
       - "32"
       - --enable-lora
@@ -163,5 +170,18 @@ services:
         echo "piston-init: done."
     restart: "no"
 
+  # ── Redis: per-turn crash-safety snapshot of the live interview ─────────────
+  # chat_ws writes the running transcript to Redis every turn (best-effort). If
+  # the backend crashes mid-interview, the state survives and is restored when the
+  # client reconnects. MongoDB is still the source of truth (flushed on disconnect).
+  redis:
+    image: redis:7.4-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: always
+
 volumes:
   piston-packages:
+  redis-data:
