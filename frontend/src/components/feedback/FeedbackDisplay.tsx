@@ -15,10 +15,15 @@ import {
   Target,
   TrendingUp,
 } from 'lucide-react';
+import type { FeedbackMetrics } from '@/types/chat';
 
 interface FeedbackDisplayProps {
   feedback: string;
   sessionId: string;
+  // Structured scores from the backend judge. When present they drive the
+  // score ring and radar directly; markdown parsing remains as the fallback
+  // for feedback generated before metrics existed.
+  metrics?: FeedbackMetrics | null;
 }
 
 type SectionCategory =
@@ -61,10 +66,20 @@ function parseScore(text: string): number | null {
   return null;
 }
 
-// ----- Skill ratings (hexagon radar) -----
+// ----- Skill ratings radar -----
 
-// Fixed order — the six axes the backend emits, drawn clockwise from the top.
+// Fixed order — the axes the backend emits, drawn clockwise from the top.
 const SKILL_AXES = [
+  'Correctness',
+  'Depth',
+  'Clarity',
+  'Examples',
+  'Resume Knowledge',
+] as const;
+
+// Axes of feedback generated before the SWE-focused set — still rendered for
+// old sessions.
+const LEGACY_SKILL_AXES = [
   'Clarity',
   'Depth',
   'Structure',
@@ -73,19 +88,26 @@ const SKILL_AXES = [
   'Conciseness',
 ] as const;
 
+// metrics.skill_ratings key -> radar label, in display order (covers both eras).
+const AXIS_LABELS: Array<[string, string]> = [
+  ['correctness', 'Correctness'],
+  ['depth', 'Depth'],
+  ['clarity', 'Clarity'],
+  ['examples', 'Examples'],
+  ['resume_knowledge', 'Resume Knowledge'],
+  ['structure', 'Structure'],
+  ['confidence', 'Confidence'],
+  ['conciseness', 'Conciseness'],
+];
+
 interface SkillRating {
   axis: string;
   value: number; // 0–10
 }
 
-/**
- * Pulls the six "Name: X/10" skill scores out of the feedback markdown.
- * Returns null unless all six are present, so the radar only shows when the
- * model actually produced a complete set (older feedback has none).
- */
-function parseSkillRatings(text: string): SkillRating[] | null {
+function parseAxes(text: string, axes: readonly string[]): SkillRating[] | null {
   const ratings: SkillRating[] = [];
-  for (const axis of SKILL_AXES) {
+  for (const axis of axes) {
     // Tolerate markdown/punctuation between the label and the number
     // (e.g. "**Clarity:** 8/10", "Clarity - 8/10"). The "/10" anchor keeps it tight.
     const re = new RegExp(`${axis}[\\s:*\\-–—]*(\\d+(?:\\.\\d+)?)\\s*/\\s*10`, 'i');
@@ -94,7 +116,17 @@ function parseSkillRatings(text: string): SkillRating[] | null {
     const value = parseFloat(match[1]);
     if (value >= 0 && value <= 10) ratings.push({ axis, value });
   }
-  return ratings.length === SKILL_AXES.length ? ratings : null;
+  return ratings.length === axes.length ? ratings : null;
+}
+
+/**
+ * Pulls the "Name: X/10" skill scores out of the feedback markdown — current
+ * axes first, then the legacy set for older feedback. Returns null unless a
+ * complete set is found, so the radar only shows when the model actually
+ * produced one.
+ */
+function parseSkillRatings(text: string): SkillRating[] | null {
+  return parseAxes(text, SKILL_AXES) ?? parseAxes(text, LEGACY_SKILL_AXES);
 }
 
 function getScoreLabel(score: number): string {
@@ -798,9 +830,20 @@ function PaginationControls({
 
 // ----- Main Display -----
 
-export function FeedbackDisplay({ feedback, sessionId }: FeedbackDisplayProps) {
-  const score = parseScore(feedback);
-  const ratings = useMemo(() => parseSkillRatings(feedback), [feedback]);
+export function FeedbackDisplay({ feedback, sessionId, metrics }: FeedbackDisplayProps) {
+  const score = metrics?.overall_score ?? parseScore(feedback);
+  const ratings = useMemo(() => {
+    const sr = metrics?.skill_ratings;
+    if (sr) {
+      // Render whichever known axes this feedback was stored with (current
+      // 5-axis SWE set, or the legacy 6-axis set for older sessions).
+      const fromMetrics = AXIS_LABELS.filter(
+        ([key]) => typeof sr[key] === 'number' && sr[key] >= 0 && sr[key] <= 10
+      ).map(([key, label]) => ({ axis: label, value: sr[key] }));
+      if (fromMetrics.length >= 5) return fromMetrics;
+    }
+    return parseSkillRatings(feedback);
+  }, [feedback, metrics]);
   const cards = useMemo(() => {
     const all = parseCards(feedback);
     // The radar already shows the skill scores — drop the redundant text card,

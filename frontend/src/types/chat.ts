@@ -20,6 +20,30 @@ export interface ChatChunk {
   is_error?: boolean;
 }
 
+// Keyed by rating name. Current set: correctness/depth/clarity/examples/
+// resume_knowledge; feedback stored before the SWE-focused axes has
+// clarity/depth/structure/examples/confidence/conciseness instead.
+export type SkillRatingsMetrics = Record<string, number>;
+
+// Structured scores from the judge + objective stats computed in backend code.
+// Absent (or partially absent) for feedback generated before this existed —
+// consumers fall back to parsing the markdown report.
+export interface FeedbackMetrics {
+  overall_score?: number;
+  skill_ratings?: SkillRatingsMetrics;
+  computed?: {
+    questions_answered: number;
+    total_answer_words: number;
+    avg_answer_words: number;
+    coding?: { attempts: number; solved: number; tests_passed: number; tests_total: number };
+  };
+}
+
+export interface FeedbackResult {
+  feedback: string;
+  metrics?: FeedbackMetrics | null;
+}
+
 export interface Session {
   _id: string;
   role: string;

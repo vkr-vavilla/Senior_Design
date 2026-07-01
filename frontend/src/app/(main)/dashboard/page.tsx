@@ -2,7 +2,7 @@
 
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/Button';
-import { Input, Select } from '@/components/ui/Input';
+import { Input } from '@/components/ui/Input';
 import { LoadingPage } from '@/components/ui/LoadingSpinner';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { interviewApi, ApiError } from '@/lib/api';
@@ -11,32 +11,10 @@ import { Brain, Briefcase, ChevronRight, FileText, Play, Shuffle, Upload, X } fr
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
-const INTERVIEW_TYPES = [
-  { value: 'technical', label: 'Technical' },
-  { value: 'behavioral', label: 'Behavioral' },
-  { value: 'mixed', label: 'Mixed' },
-];
-
 const DIFFICULTY_LEVELS = [
   { value: 'easy', label: 'Easy' },
   { value: 'medium', label: 'Medium' },
   { value: 'hard', label: 'Hard' },
-];
-
-const TARGET_COMPANIES = [
-  'General',
-  'Google',
-  'Meta',
-  'Amazon',
-  'Apple',
-  'Microsoft',
-  'Netflix',
-  'Tesla',
-  'NVIDIA',
-  'Stripe',
-  'Uber',
-  'Airbnb',
-  'LinkedIn',
 ];
 
 const POPULAR_ROLES = [
@@ -90,7 +68,6 @@ export default function DashboardPage() {
   };
 
   const [role, setRole] = useState('Software Engineer');
-  const [targetCompany, setTargetCompany] = useState('General');
   const [interviewType, setInterviewType] = useState('technical');
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
   const [resumeFile, setResumeFile] = useState<File | null>(null);
@@ -168,7 +145,6 @@ export default function DashboardPage() {
         const params = new URLSearchParams({
           role: role.trim(),
           type: interviewType,
-          company: targetCompany,
           difficulty,
           interviewId: result.interview_id,
         });
@@ -265,30 +241,12 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                {/* Target Company */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Select
-                    label="Target Company"
-                    options={TARGET_COMPANIES.map(c => ({ value: c, label: c }))}
-                    value={targetCompany}
-                    onChange={(e) => setTargetCompany(e.target.value)}
-                  />
-                  <div className="flex items-end mb-1">
-                    <p className="text-xs text-slate-500 italic pb-2">
-                       {"AI will tailor questions to this company's specific interview style."}
-                    </p>
-                  </div>
-                </div>
-
                 {/* Interview Type */}
                 <div>
-                  <Select
-                    label="Interview Type"
-                    options={INTERVIEW_TYPES}
-                    value={interviewType}
-                    onChange={(e) => setInterviewType(e.target.value)}
-                  />
-                  <div className="mt-2 grid grid-cols-3 gap-2">
+                  <label className="text-sm font-medium text-slate-300 block mb-2">
+                    Interview Type
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
                     {[
                       {
                         value: 'technical',

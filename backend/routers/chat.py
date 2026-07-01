@@ -6,11 +6,12 @@ from openai import AsyncOpenAI
 from google import genai
 from datetime import datetime, timezone
 from database import get_db
-from config import GEMINI_API_KEY, VLLM_BASE_URL, VLLM_MODEL, AI_BACKEND, JWT_SECRET, JWT_ALGORITHM, GROQ_API_KEY, REDIS_URL, STT_BACKEND
-from models.chat import ChatMessage, FeedbackResponse
+from config import GEMINI_API_KEY, VLLM_BASE_URL, VLLM_MODEL, VLLM_BASE_MODEL, AI_BACKEND, JWT_SECRET, JWT_ALGORITHM, GROQ_API_KEY, REDIS_URL, STT_BACKEND
+from models.chat import ChatMessage, FeedbackResponse, FeedbackJudgment
 from bson import ObjectId
 import json
 import asyncio
+import re
 import tempfile
 import os
 from concurrent.futures import ThreadPoolExecutor
@@ -20,6 +21,9 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 groq_client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+# Feedback grading is a separate "judge" call from the live interview — override
+# independently (e.g. to a cheaper tier) without touching interview-time behavior.
+GEMINI_JUDGE_MODEL = os.getenv("GEMINI_JUDGE_MODEL", GEMINI_MODEL)
 
 vllm_client = AsyncOpenAI(base_url=VLLM_BASE_URL, api_key="not-needed")
 gemini_client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
@@ -514,11 +518,14 @@ GROUNDING RULES (most important):
 - Every question you ask MUST be tied to something concrete in the resume above OR to something the candidate just said. Do not pull generic questions from memory.
 - Before asking about a skill, tool, or framework, scan the resume to confirm it's listed. If it isn't, do NOT ask about it.
 - When the candidate asks "is that on my resume?" — actually check. If it's not there, say so honestly and pivot to something that IS in the resume. Never claim something is on the resume when it isn't.
-- Quote or paraphrase real items from the resume (project names, companies, tools, dates) so it's obvious you're reading it.
+- Quote or paraphrase real items from the resume (project names, companies, tools, dates) so it's obvious you're reading it. Keep quotes to a short phrase, not whole resume lines — you're recalling it in conversation, not reading the document aloud.
+- Never attribute a claim, detail, or word to the candidate that they did not literally say in this conversation — on ANY turn, not just when they go off-topic. If you're not sure whether they said something, don't assume it.
+- You are the interviewer, not a peer with your own war stories. Do NOT claim personal projects, past employers, or hands-on experience for yourself ("I've used Redis too") — react to what they said without inventing a shared background.
 
 COVERAGE RULES (critical):
 - The resume has multiple projects, jobs, technologies, and experiences. You MUST explore ALL of them across the interview — not just one.
 - After covering one project or job, move to a completely different area: a different company, a different project, or a different technology stack listed on the resume.
+- Depth before breadth: when an answer is rich, it's fine to ask one or two digging follow-ups on that same topic before rotating — just don't camp on one project for many turns.
 - Actively ask about the specific technologies the candidate has listed (languages, frameworks, databases, cloud tools, etc.) — probe their depth on each.
 - Use varied, natural transitions when moving topics — never repeat the same one twice. Options: "I want to move to something different —", "Actually, I noticed on your resume —", "Tell me about your time at [Company] —", "One more area I want to cover —", "Moving on —", "I also saw you worked with X —", "Let me ask you about [different project/role] —", "Switching topics —". Pick a different one each time.
 - Think of the resume as a map with many destinations. Navigate across all of it, not back and forth on one spot.
@@ -529,22 +536,25 @@ VOICE & STYLE:
 - Vary your opener — do NOT start consecutive turns with the same phrase. Avoid filler like "That sounds like a lot of fun" or "Okay, that sounds interesting" more than once per interview.
 - Natural openers: "Walk me through...", "Hmm, when you say X — what did that look like in practice?", "Got it. And on the [specific thing they mentioned]...", "Interesting — I'd want to understand [specific detail] better.", "Okay, so [paraphrase one technical point]. What was the tradeoff there?"
 - Vary length and energy. Most turns should be 3-5 sentences of real engagement before the question. Be warm but real. Don't fake-praise.
+- Brief neutral acknowledgments are natural and allowed — "Okay.", "Right.", "Got it —" receive their answer without judging it. Use them where a real interviewer would, instead of praise.
+- Vary the SHAPE of your turns, not just the words. Don't fall into [comment] + [restate their answer] + [question] every time — sometimes lead with the question itself, sometimes with the detail that caught your ear, sometimes with a brief acknowledgment and a pivot.
 
 INTERVIEWING APPROACH:
-- Ask ONE focused question per turn. Never stack multiple questions or sub-parts ("...and also tell me... and also how...") — pick one angle only.
+- Ask ONE focused question per turn — one question mark, one angle. "What libraries did you use, and what challenges did you face?" is TWO questions: pick one and save the other for a follow-up. Keep the question itself to one or two sentences.
 - DIG IN on technical specifics. When they say "I used FreeRTOS" — ask about task priorities, IPC mechanism, the worst race condition. When they say "improved accuracy 30%" — ask what the baseline was, how they measured it, what changed.
 - Avoid surface-level follow-ups like "did you learn that on the project?" or "was that a team effort?" — go technical instead.
 - Move the conversation forward — don't paraphrase their answer back as your whole turn.
-- If the candidate gives a non-answer, a joke, or something off-topic ("im chilling", "idk", "nothing much"), do NOT pretend they answered and do NOT invent a smooth transition into a resume topic. Say plainly that you didn't quite get an answer, and re-ask your question. Only respond to what they ACTUALLY said — never attribute claims, projects, or words to them that are not in their message.
+- Occasionally tie a new question back to something they said earlier in the conversation ("Earlier you mentioned X — how did that play into..."). It shows you've been listening across the whole interview, not just the last answer.
+- If the candidate gives a non-answer, a joke, or something off-topic ("im chilling", "idk", "nothing much"), do NOT pretend they answered and do NOT invent a smooth transition into a resume topic. Say plainly that you didn't quite get an answer, and re-ask your question.
 - Rotate between: work experiences, personal projects, and {interview_rotation_focus}.
 
 DON'T — these are hard rules, no exceptions:
 - Do NOT give any feedback, evaluation, scoring, or assessment during the interview. Ever. That happens after.
 - Do NOT say: "Great answer", "That's a solid approach", "Good point", "Excellent", "That makes sense", "Impressive", "Nice", or any phrase that judges their answer — positive or negative.
+- The "That's a [great/thorough/smart/practical]..." turn-opener is still praise — never start a turn with it. Open with the substance instead: a neutral acknowledgment, a specific detail you're curious about, or just the question itself.
 - Do NOT summarize what they just said back to them.
 - Do NOT use bullet points or numbered lists. You're a person, not a document.
 - Do NOT walk through the job description, location, hours, or admin details.
-- Do NOT loop back to the same project or job you already covered. Move forward.
 
 KICKOFF (first turn only):
 - One short sentence introducing yourself as Alex, then ONE warm opening question tied to a specific project or experience FROM the resume above. Skip all preamble.
@@ -718,7 +728,7 @@ async def get_feedback(session_id: str, x_gemini_key: str | None = Header(None, 
     )
     stale = last_attempt_at is not None and (feedback_at is None or last_attempt_at > feedback_at)
     if existing_feedback and not stale:
-        return FeedbackResponse(feedback=existing_feedback)
+        return FeedbackResponse(feedback=existing_feedback, metrics=session.get("feedback_metrics"))
 
     # Save user answers to DB if not already there
     if not session.get("user_answers"):
@@ -732,6 +742,36 @@ async def get_feedback(session_id: str, x_gemini_key: str | None = Header(None, 
         f"Q{i + 1}: {qa['question']}\nA{i + 1}: {qa['answer']}"
         for i, qa in enumerate(qa_pairs)
     )
+
+    # Objective engagement signal computed in code (not the model's opinion), so
+    # scoring has a numeric anchor instead of relying on the model to "eyeball"
+    # whether this was a real interview or a two-message joke. This is what lets
+    # a near-empty/off-topic session actually land near 0 instead of drifting to
+    # the generic "safe middle" score LLM judges default to without an anchor.
+    total_candidate_words = sum(len((qa.get("answer") or "").split()) for qa in qa_pairs)
+    avg_words = total_candidate_words / len(qa_pairs) if qa_pairs else 0
+    MINIMAL_SIGNAL_WORD_THRESHOLD = 25
+    validity_flag = ""
+    if total_candidate_words < MINIMAL_SIGNAL_WORD_THRESHOLD:
+        validity_flag = (
+            "\n⚠️ MINIMAL SIGNAL: this is far too little material to demonstrate real competence. "
+            "Unless every word was exceptionally dense with substance, the Overall Score and most "
+            "Skill Ratings must land in the 0-2 range — do not round up out of politeness."
+        )
+    engagement_stats = (
+        f"\n\n=== INTERVIEW ENGAGEMENT STATS (objective — weigh this, it is not your opinion) ===\n"
+        f"- Candidate answered {len(qa_pairs)} question(s).\n"
+        f"- Total words across all their answers: {total_candidate_words}.\n"
+        f"- Average answer length: {avg_words:.0f} words.{validity_flag}"
+    )
+
+    # Same objective numbers, stored alongside the judge's scores so the frontend
+    # gets metrics the model can't fudge (and can't format wrong).
+    computed_stats = {
+        "questions_answered": len(qa_pairs),
+        "total_answer_words": total_candidate_words,
+        "avg_answer_words": round(avg_words),
+    }
 
     context = ""
     if resume_text:
@@ -752,6 +792,12 @@ async def get_feedback(session_id: str, x_gemini_key: str | None = Header(None, 
     coding_block = ""
     coding_output_section = ""
     if coding_attempts:
+        computed_stats["coding"] = {
+            "attempts": len(coding_attempts),
+            "solved": sum(1 for a in coding_attempts if a.get("all_passed")),
+            "tests_passed": sum(a.get("passed", 0) for a in coding_attempts),
+            "tests_total": sum(a.get("total", 0) for a in coding_attempts),
+        }
         attempt_texts = []
         for i, attempt in enumerate(coding_attempts, 1):
             verdict = (
@@ -793,7 +839,7 @@ If a solution failed its tests, say what likely went wrong and how to fix it.
     prompt = f"""You are an expert technical interviewer and hiring manager who just finished a {difficulty} {interview_type} interview for a {role} role. You're writing honest, evidence-based feedback addressed directly to the candidate, whose first name is {candidate_name}. Judge them the way you actually would as the hiring manager for THIS role — measure every point against what the {role} position and its job description require.{context}
 
 === INTERVIEW Q&A (what you asked and how they answered) ===
-{qa_text}{coding_block}
+{qa_text}{coding_block}{engagement_stats}
 
 === HOW TO WRITE THIS ===
 Write the way a thoughtful interviewer actually talks after an interview — warm but honest, specific, and human. Address the candidate directly as "you" (use their name once for warmth, but do not keep referring to them in the third person).
@@ -817,12 +863,11 @@ Output using this exact structure (** for section headers, - for bullets):
 [Two or three honest sentences on their overall interview performance: how they did against what this role needs, and the headline takeaway.]
 
 **Skill Ratings**
-- Clarity: [X]/10
+- Correctness: [X]/10
 - Depth: [X]/10
-- Structure: [X]/10
+- Clarity: [X]/10
 - Examples: [X]/10
-- Confidence: [X]/10
-- Conciseness: [X]/10
+- Resume Knowledge: [X]/10
 
 **Technical Knowledge**
 - [Accuracy of their answers — cite a specific answer that was correct, partial, or wrong.]
@@ -844,6 +889,10 @@ Output using this exact structure (** for section headers, - for bullets):
 - [Defending decisions — did they justify their choices when you pushed back?]
 - [Handling uncertainty — how they responded when they didn't know something.]
 
+**Resume Knowledge**
+- [Could they back up what their resume claims? Cite a listed project or skill they explained convincingly under questioning.]
+- [Gaps between paper and person — listed skills they couldn't speak to, or claims that got vague when probed.]
+
 **Answer-by-Answer Breakdown**
 {breakdown_skeleton}{coding_output_section}
 
@@ -853,14 +902,21 @@ Output using this exact structure (** for section headers, - for bullets):
 
 SCORING PRINCIPLE — every score in this report (the Overall Score, the Skill Ratings, and any Coding & Design Scores) starts at 0/10. The candidate EARNS each point by actually demonstrating that competence in THIS interview. Do not hand out baseline or benefit-of-the-doubt points: a candidate who showed little earns a low number, and a dimension they never demonstrated is a 0. If the interview barely started or they gave almost nothing, the Overall Score stays at or near 0.
 
+SCORE BANDS (use these, do not default to a "safe middle" score):
+- 0-2: no real signal — off-topic, one-word answers, joke responses, or barely engaged. Say plainly that there wasn't enough substance to evaluate, rather than inventing strengths to be kind.
+- 3-4: attempted real answers but shallow, vague, or mostly incorrect.
+- 5-6: adequate — answered the actual questions with some substance, but noticeably thin on depth, specifics, or technical accuracy for this role.
+- 7-8: solid — specific, mostly accurate, engaged with the technical depth this role needs.
+- 9-10: exceptional — precise, deep, and clearly senior-level for this role.
+A short, coherent, on-topic interview and a two-message non-interview must NOT land on the same score. If the engagement stats above show minimal signal, you are in the 0-2 band regardless of tone.
+
 For the Skill Ratings, score each dimension as a whole integer from 0 to 10 on that earn-it basis. Keep the exact "Name: X/10" format on its own bullet — these feed a chart, so do not add commentary on those lines. What each dimension means:
-- Clarity — how easy their answers were to follow; clear articulation over rambling or vague wording.
+- Correctness — technical accuracy of what they said: were their explanations, claims, and answers actually right? Wrong or hand-wavy technical claims drag this down hard, no matter how confidently delivered.
 - Depth — technical substance and detail; did they go beyond surface level for what this role needs.
-- Structure — how well-organised each answer was (a logical arc, e.g. STAR for behavioural) versus disjointed.
+- Clarity — how easy their answers were to follow; clear articulation over rambling or vague wording.
 - Examples — use of concrete, specific evidence and real situations rather than generic claims.
-- Confidence — conviction and composure; owning their answers without excessive hedging.
-- Conciseness — getting to the point efficiently without padding or trailing off.
-Make the ratings consistent with the four criteria sections — they should reflect the same strengths and gaps, not contradict them.
+- Resume Knowledge — how well they know their own resume: could they back up, explain, and go deep on the projects, skills, and claims listed on it when asked?
+Make the ratings consistent with the criteria sections — they should reflect the same strengths and gaps, not contradict them.
 
 Rules:
 - Fill in every line of the Answer-by-Answer Breakdown with a real evaluation — no placeholders.
@@ -870,35 +926,94 @@ Rules:
 - If their resume lists skills they never demonstrated in the interview, say so honestly.
 - Across the whole interview (spoken answers included), reward clean reasoning, iterative improvement when you pushed back, and clearly communicating their thought process; penalize incorrect or hand-wavy answers, gaps they glossed over, and points they couldn't back up.
 - When a coding round is present, additionally penalize incorrect solutions, missing edge cases, and poor time/space complexity choices, and reward iterating toward a working, cleaner solution.
-- Be honest with the score: 9-10 exceptional, 7-8 solid, 5-6 needs work, below 5 significant gaps."""
+- Be honest with the score: 9-10 exceptional, 7-8 solid, 5-6 needs work, below 5 significant gaps.
 
-    async def generate_feedback() -> str:
+OUTPUT FORMAT — return JSON with three fields, in this order:
+- report_markdown: the complete written report following the exact structure above (headers, bullets, Skill Ratings lines and all). It MUST contain real newline characters: every **section header** and every bullet on its own line, a blank line between sections — never run the report together into one paragraph.
+- overall_score: the same integer 0-10 as the report's Overall Score line.
+- skill_ratings: the same six integers as the report's Skill Ratings bullets.
+The numbers MUST match what the report says — they are the same scores, machine-readable."""
+
+    # Section headers the report template uses — anchors for re-breaking a
+    # collapsed report (see _ensure_report_newlines).
+    _REPORT_HEADERS = (
+        "Overall Score|Skill Ratings|Technical Knowledge|Problem Solving|Communication|"
+        "Confidence|Resume Knowledge|Answer-by-Answer Breakdown|Areas for Improvement|"
+        "Coding Ability|System Design|Coding & Design Scores"
+    )
+
+    def _ensure_report_newlines(report: str) -> str:
+        """Models generating the report inside a JSON string sometimes drop
+        newlines, which flattens the frontend's line-based section parser into
+        wall-of-text cards. Re-break at the known section headers and bullet
+        seams — every rule is idempotent on already-correct text, so this runs
+        unconditionally (a newline *count* can look healthy from the rating
+        bullets alone while section headers are still glued into paragraphs)."""
+        report = re.sub(rf"\s*\*\*({_REPORT_HEADERS})", r"\n\n**\1", report)
+        report = re.sub(r"(\*\*)\s*-\s+", r"\1\n- ", report)          # header glued to first bullet
+        report = re.sub(r"(\d+\s*/\s*10)\s*-\s+", r"\1\n- ", report)  # rating bullets run together
+        report = re.sub(r"([.!?\]])\s*-\s+(?=[A-Z\[*])", r"\1\n- ", report)  # prose bullets run together
+        return report.strip()
+
+    async def generate_feedback() -> tuple[str, dict | None]:
+        """Returns (report_markdown, judge_scores | None). Both judge paths force
+        the FeedbackJudgment schema, so the chart scores can't be lost to a
+        formatting slip; if validation still fails, the raw text becomes the
+        report and scores fall back to frontend markdown parsing."""
+        # Grading is a judge call, not a conversation: low temperature so the SAME
+        # transcript scores consistently across regenerations, instead of drifting
+        # each time on Gemini's much higher conversational default (~1.0).
         client = gemini_client
         if x_gemini_key:
             client = genai.Client(api_key=x_gemini_key)
         if client:
             resp = await client.aio.models.generate_content(
-                model=GEMINI_MODEL,
+                model=GEMINI_JUDGE_MODEL,
                 contents=prompt,
+                config={
+                    "temperature": 0.2,
+                    "max_output_tokens": 3200,
+                    "response_mime_type": "application/json",
+                    "response_schema": FeedbackJudgment,
+                },
             )
-            return resp.text
+            raw = resp.text
         else:
+            # Grade with the BASE model, not VLLM_MODEL (the "interviewer" LoRA) —
+            # that adapter is fine-tuned to be warm and encouraging, so using it to
+            # also grade the interview biases every score upward.
             resp = await vllm_client.chat.completions.create(
-                model=VLLM_MODEL,
+                model=VLLM_BASE_MODEL,
                 messages=[{"role": "user", "content": prompt}],
-                max_tokens=2600,
-                temperature=0.6,
+                max_tokens=2800,
+                temperature=0.2,
                 timeout=30.0,
+                extra_body={"guided_json": FeedbackJudgment.model_json_schema()},
             )
-            return resp.choices[0].message.content
+            raw = resp.choices[0].message.content
+        try:
+            judgment = FeedbackJudgment.model_validate_json(raw)
+        except Exception as e:  # noqa: BLE001
+            print(f"[Feedback] judge returned unparseable JSON, falling back to raw text: {e}")
+            return raw, None
+        return _ensure_report_newlines(judgment.report_markdown), {
+            "overall_score": judgment.overall_score,
+            "skill_ratings": judgment.skill_ratings.model_dump(),
+        }
 
+    judge_scores = None
     try:
-        feedback_text = await generate_feedback()
+        feedback_text, judge_scores = await generate_feedback()
     except Exception as e:
-        feedback_text = f"Feedback generation failed: {e}"
+        # Don't persist failures — a cached error would be served on every
+        # future visit; leaving the doc untouched makes the next visit retry.
+        return FeedbackResponse(feedback=f"Feedback generation failed: {e}")
 
+    feedback_metrics = {**(judge_scores or {}), "computed": computed_stats}
     await db.interviews.update_one(
         {"_id": ObjectId(session_id)},
-        {"$set": {"feedback": feedback_text}},
+        {"$set": {"feedback": feedback_text,
+                  "feedback_metrics": feedback_metrics,
+                  "feedback_generated_at": datetime.now(timezone.utc)}},
     )
-    return FeedbackResponse(feedback=feedback_text)
+    return FeedbackResponse(feedback=feedback_text, metrics=feedback_metrics)

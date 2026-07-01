@@ -93,6 +93,11 @@ services:
       - "64"
       - --lora-modules
       - interviewer=/adapters/qwen2.5-7b-chatml-qlora-v2
+    environment:
+      # Model + adapter are already on disk (mounted below) — skip the Hub
+      # file-listing call vLLM makes on startup, which otherwise hard-fails
+      # on machines with no internet access instead of just using the cache.
+      - HF_HUB_OFFLINE=1
     ports:
       - "8001:8001"
     volumes:

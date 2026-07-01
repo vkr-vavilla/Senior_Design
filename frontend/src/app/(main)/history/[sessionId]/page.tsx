@@ -95,8 +95,8 @@ export default function SessionDetailPage() {
     setIsGenerating(true);
     setGenerateError('');
     try {
-      const feedback = await chatApi.getFeedback(sessionId, token);
-      setSession((prev) => prev ? { ...prev, feedback } : prev);
+      const result = await chatApi.getFeedback(sessionId, token);
+      setSession((prev) => prev ? { ...prev, feedback: result.feedback } : prev);
       setActiveTab('feedback');
     } catch (err) {
       setGenerateError('Failed to generate feedback. Please try again.');
