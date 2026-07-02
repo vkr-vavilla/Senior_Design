@@ -5,7 +5,7 @@ import { chatApi } from '@/lib/api';
 
 export type VoiceEngine = 'premium' | 'browser';
 
-export function useTextToSpeech() {
+export function useTextToSpeech(token?: string) {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [engine, setEngine] = useState<VoiceEngine>('premium');
   
@@ -20,6 +20,8 @@ export function useTextToSpeech() {
   const premiumDisabledUntilRef = useRef<number>(0);
   // Serializes synthesize requests so audio chunks enter the play queue in order
   const synthChainRef = useRef<Promise<void>>(Promise.resolve());
+  const tokenRef = useRef<string | undefined>(token);
+  tokenRef.current = token;
 
   const canUsePremium = useCallback(() => Date.now() >= premiumDisabledUntilRef.current, []);
 
@@ -111,7 +113,7 @@ export function useTextToSpeech() {
     const currentSessionId = playSessionIdRef.current;
     if (engine === 'premium' && canUsePremium()) {
       try {
-        const audioBlob = await chatApi.synthesize(text);
+        const audioBlob = await chatApi.synthesize(text, tokenRef.current);
         if (playSessionIdRef.current !== currentSessionId) return;
         handlePremiumSuccess();
         const url = URL.createObjectURL(audioBlob);
@@ -163,7 +165,7 @@ export function useTextToSpeech() {
           // a shorter clause finishes synthesis faster than an earlier longer one.
           synthChainRef.current = synthChainRef.current.then(async () => {
             try {
-              const blob = await chatApi.synthesize(sentence);
+              const blob = await chatApi.synthesize(sentence, tokenRef.current);
               if (playSessionIdRef.current !== currentSessionId) return;
               handlePremiumSuccess();
               const url = URL.createObjectURL(blob);
@@ -194,7 +196,7 @@ export function useTextToSpeech() {
       if (engine === 'premium' && canUsePremium()) {
         synthChainRef.current = synthChainRef.current.then(async () => {
           try {
-            const blob = await chatApi.synthesize(remaining);
+            const blob = await chatApi.synthesize(remaining, tokenRef.current);
             if (playSessionIdRef.current !== currentSessionId) return;
             handlePremiumSuccess();
             const url = URL.createObjectURL(blob);
