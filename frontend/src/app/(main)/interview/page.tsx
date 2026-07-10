@@ -121,7 +121,7 @@ function InterviewPageContent() {
     return () => clearInterval(interval);
   }, [isRecording]);
 
-  const { speakStream, stop: stopSpeaking, engine, setEngine, flush } = useTextToSpeech();
+  const { speakStream, stop: stopSpeaking, engine, setEngine, flush } = useTextToSpeech(token ?? undefined);
 
   // Pre-fill from query params
   const [config, setConfig] = useState<InterviewConfig>({

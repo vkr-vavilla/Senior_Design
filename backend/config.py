@@ -13,9 +13,10 @@ JWT_SECRET = os.getenv("JWT_SECRET")
 if not JWT_SECRET:
     raise RuntimeError("JWT_SECRET environment variable is not set. Generate one with: openssl rand -hex 64")
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
-# No refresh-token flow exists, so tokens must outlast a full session
-# (login -> set up resume/JD -> create interview). Default: 7 days.
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 10080))
+# Refresh-token flow is implemented to improve security.
+# Access tokens are short-lived (15 min), refresh tokens are long-lived (30 days).
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 15))
+REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", 30))
 # Gemini API Key (Optional: can be supplied dynamically by the user on the frontend)
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 # Groq API Key (Optional: browser Web Speech API replaces backend speech-to-text)
