@@ -1,0 +1,9 @@
+# Node
+node_modules/
+
+# Rust / Tauri build output
+src-tauri/target/
+src-tauri/gen/
+
+# Source icon (icons/ is generated + committed; the 1024px source is not needed)
+app-icon.png

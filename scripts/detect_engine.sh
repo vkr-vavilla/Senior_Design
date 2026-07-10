@@ -1,0 +1,151 @@
+#!/usr/bin/env bash
+# PrepAI — inference-engine auto-detection.
+#
+# Inspects the host (OS, CPU arch, GPU vendor + VRAM, total RAM) and picks the
+# best local inference engine, then prints a shell-eval-able block of the env
+# vars the backend needs. The backend itself never branches on engine type — it
+# only reads VLLM_BASE_URL / VLLM_MODEL / VLLM_BASE_MODEL / AI_BACKEND (see
+# backend/routers/chat.py:28) — so "add an engine" lives entirely here.
+#
+# Engine matrix:
+#   NVIDIA GPU + Linux, >=10 GB VRAM  -> vllm   (AWQ base + interviewer LoRA)
+#   Apple Silicon / AMD / other GPU   -> ollama (GGUF; Metal/ROCm/Vulkan)
+#   CPU-only with enough RAM          -> ollama (GGUF q4, slow)
+#   not enough local capacity         -> gemini (cloud, BYO key)
+#
+# Usage:
+#   eval "$(scripts/detect_engine.sh)"     # export the chosen env into the shell
+#   scripts/detect_engine.sh --explain     # human-readable reasoning on stderr
+#   scripts/detect_engine.sh --engine E    # force vllm|ollama|gemini, skip probing
+#
+# Notes vars are printed to stdout as `KEY=value` lines (eval-friendly);
+# diagnostics go to stderr so `eval "$(...)"` stays clean.
+set -euo pipefail
+
+# ── Tunables (override from the environment) ─────────────────────────────────
+# Min VRAM (GiB) to prefer vLLM over Ollama on an NVIDIA box.
+MIN_VLLM_VRAM_GB="${PREPAI_MIN_VLLM_VRAM_GB:-10}"
+# Min system RAM (GiB) to run the 7B GGUF on CPU before falling back to Gemini.
+MIN_CPU_RAM_GB="${PREPAI_MIN_CPU_RAM_GB:-12}"
+# Where each engine listens. Overridable so the same detection works whether the
+# engine runs as a native sidecar (localhost) or a compose service (service name).
+OLLAMA_URL="${PREPAI_OLLAMA_URL:-http://localhost:11434/v1}"
+VLLM_URL="${PREPAI_VLLM_URL:-http://localhost:8001/v1}"
+# Model names/tags. These MUST match what the engines actually serve:
+#   - vLLM: --lora-modules interviewer=... (docker-compose.local.yml) and the
+#     AWQ base id used for grading.
+#   - Ollama: the two tags produced by scripts/build_gguf.sh from the Modelfiles.
+INTERVIEWER_TAG="${PREPAI_INTERVIEWER_TAG:-interviewer}"
+VLLM_BASE_ID="${PREPAI_VLLM_BASE_ID:-Qwen/Qwen2.5-7B-Instruct-AWQ}"
+OLLAMA_BASE_TAG="${PREPAI_OLLAMA_BASE_TAG:-qwen2.5-7b-instruct}"
+
+FORCED_ENGINE=""
+EXPLAIN=0
+for arg in "$@"; do
+  case "$arg" in
+    --explain) EXPLAIN=1 ;;
+    --engine) shift; FORCED_ENGINE="${1:-}" ;;
+    --engine=*) FORCED_ENGINE="${arg#*=}" ;;
+    -h|--help) sed -n '2,27p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    *) ;;
+  esac
+done
+
+log() { [ "$EXPLAIN" -eq 1 ] && echo "detect_engine: $*" >&2 || true; }
+
+# ── Probes ───────────────────────────────────────────────────────────────────
+OS="$(uname -s 2>/dev/null || echo unknown)"
+ARCH="$(uname -m 2>/dev/null || echo unknown)"
+
+is_apple_silicon() {
+  [ "$OS" = "Darwin" ] && { [ "$ARCH" = "arm64" ] || \
+    [ "$(sysctl -n hw.optional.arm64 2>/dev/null || echo 0)" = "1" ]; }
+}
+
+# Largest single-GPU VRAM in GiB, or empty if no NVIDIA GPU / no nvidia-smi.
+nvidia_vram_gb() {
+  command -v nvidia-smi >/dev/null 2>&1 || return 0
+  nvidia-smi >/dev/null 2>&1 || return 0
+  local mib
+  mib="$(nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits 2>/dev/null \
+          | tr -d ' ' | sort -n | tail -1)"
+  [ -n "$mib" ] && echo $(( mib / 1024 )) || true
+}
+
+has_amd_gpu() {
+  command -v rocminfo >/dev/null 2>&1 && rocminfo >/dev/null 2>&1 && return 0
+  # Vulkan can drive AMD (and Intel) GPUs via Ollama too.
+  command -v vulkaninfo >/dev/null 2>&1 && vulkaninfo >/dev/null 2>&1 && return 0
+  return 1
+}
+
+# Total system RAM in GiB (Linux + macOS).
+total_ram_gb() {
+  if [ "$OS" = "Darwin" ]; then
+    local b; b="$(sysctl -n hw.memsize 2>/dev/null || echo 0)"
+    echo $(( b / 1024 / 1024 / 1024 ))
+  elif [ -r /proc/meminfo ]; then
+    awk '/MemTotal/ {printf "%d", $2/1024/1024}' /proc/meminfo
+  else
+    echo 0
+  fi
+}
+
+# ── Decide ───────────────────────────────────────────────────────────────────
+ENGINE="$FORCED_ENGINE"
+if [ -n "$ENGINE" ]; then
+  log "engine forced to '$ENGINE' — skipping probes"
+else
+  VRAM_GB="$(nvidia_vram_gb || true)"
+  RAM_GB="$(total_ram_gb || echo 0)"
+  log "OS=$OS ARCH=$ARCH nvidia_vram_gb=${VRAM_GB:-none} ram_gb=$RAM_GB"
+
+  if [ "$OS" = "Linux" ] && [ -n "${VRAM_GB:-}" ] && [ "${VRAM_GB:-0}" -ge "$MIN_VLLM_VRAM_GB" ]; then
+    ENGINE="vllm"
+    log "NVIDIA GPU with ${VRAM_GB} GiB VRAM on Linux -> vllm"
+  elif is_apple_silicon; then
+    ENGINE="ollama"
+    log "Apple Silicon -> ollama (Metal)"
+  elif [ -n "${VRAM_GB:-}" ]; then
+    # NVIDIA present but under the vLLM VRAM bar, or non-Linux NVIDIA (Windows).
+    ENGINE="ollama"
+    log "NVIDIA GPU (${VRAM_GB} GiB / non-Linux) -> ollama"
+  elif has_amd_gpu; then
+    ENGINE="ollama"
+    log "AMD/Vulkan GPU -> ollama (ROCm/Vulkan)"
+  elif [ "${RAM_GB:-0}" -ge "$MIN_CPU_RAM_GB" ]; then
+    ENGINE="ollama"
+    log "no supported GPU but ${RAM_GB} GiB RAM -> ollama (CPU, slow)"
+  else
+    ENGINE="gemini"
+    log "no GPU and only ${RAM_GB} GiB RAM -> gemini (cloud fallback)"
+  fi
+fi
+
+# ── Emit env for the chosen engine ───────────────────────────────────────────
+case "$ENGINE" in
+  vllm)
+    echo "INFERENCE_ENGINE=vllm"
+    echo "AI_BACKEND=qwen"
+    echo "VLLM_BASE_URL=$VLLM_URL"
+    echo "VLLM_MODEL=$INTERVIEWER_TAG"
+    echo "VLLM_BASE_MODEL=$VLLM_BASE_ID"
+    echo "COMPOSE_PROFILES=gpu"
+    ;;
+  ollama)
+    echo "INFERENCE_ENGINE=ollama"
+    echo "AI_BACKEND=qwen"          # backend's local (OpenAI-compatible) path
+    echo "VLLM_BASE_URL=$OLLAMA_URL"
+    echo "VLLM_MODEL=$INTERVIEWER_TAG"
+    echo "VLLM_BASE_MODEL=$OLLAMA_BASE_TAG"
+    echo "COMPOSE_PROFILES=ollama"
+    ;;
+  gemini)
+    echo "INFERENCE_ENGINE=gemini"
+    echo "AI_BACKEND=gemini"
+    ;;
+  *)
+    echo "detect_engine: unknown engine '$ENGINE' (want vllm|ollama|gemini)" >&2
+    exit 1
+    ;;
+esac
