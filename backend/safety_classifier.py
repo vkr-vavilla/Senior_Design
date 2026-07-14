@@ -43,10 +43,9 @@ SAFETY_ENABLED: bool = os.getenv("SAFETY_CLASSIFIER_ENABLED", "true").lower() ==
 # Groq API key (reused from config so no extra env var is needed).
 _GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
 
-# Llama Guard 3 8B is Meta's dedicated, publicly available safety classifier.
-# It is one of the best small safety models available and runs on Groq for
-# very low latency inference.
-_LLAMA_GUARD_MODEL = "llama-guard-3-8b"
+# Llama Guard 3 8B has been decommissioned on Groq. We use llama-3.1-8b-instant
+# with instructions to act as a safety classifier.
+_LLAMA_GUARD_MODEL = "llama-3.1-8b-instant"
 
 # ── Result dataclass ───────────────────────────────────────────────────────────
 
@@ -142,10 +141,11 @@ def _heuristic_check(text: str) -> SafetyResult | None:
 # Llama Guard uses a specific prompt template.  We send the user message as a
 # single human turn and ask the model to classify it.
 _LLAMA_GUARD_SYSTEM = (
-    "You are a safety classifier. Classify whether the following message is "
-    "safe or unsafe according to Meta's Llama Guard 3 policy. "
-    "Respond with exactly one word: 'safe' or 'unsafe', optionally followed "
-    "by a space and the hazard category code (e.g. 'unsafe S1')."
+    "You are a strict, objective safety classifier. Your job is to classify if the user message is safe or unsafe.\n"
+    "Respond with exactly one word: 'safe' or 'unsafe'.\n"
+    "If the prompt contains self-harm, suicide encouragement, violence, hate speech, harassment, weapon creation, or extreme illegal acts, respond with 'unsafe'.\n"
+    "Otherwise, if it is a general question, normal programming topic, interview advice, or harmless conversation, respond with 'safe'.\n"
+    "Crucial rule: Do not output any conversational text, explanations, suggestions, or refusal warnings. Output ONLY the word 'safe' or 'unsafe'."
 )
 
 # Mapping of Llama Guard S-codes to human-readable categories.
@@ -175,15 +175,15 @@ _UNSAFE_USER_MESSAGE = (
 
 def _parse_llama_guard_response(raw_text: str) -> tuple[bool, str, str]:
     """
-    Parse Llama Guard output into (is_safe, label, category).
-    Llama Guard responds with 'safe' or 'unsafe [Sxx]'.
+    Parse safety output into (is_safe, label, category).
+    Responds with 'safe' or 'unsafe'.
     """
     text = raw_text.strip().lower()
     if text.startswith("safe"):
         return True, "safe", "ok"
 
     if text.startswith("unsafe"):
-        # Try to extract the S-code
+        # Try to extract the S-code (if any)
         match = re.search(r"\bS(\d+)\b", raw_text, re.IGNORECASE)
         if match:
             code = f"S{match.group(1)}"
@@ -192,15 +192,19 @@ def _parse_llama_guard_response(raw_text: str) -> tuple[bool, str, str]:
             category = "Unspecified"
         return False, "unsafe", category
 
+    # If the model refused conversationally (like "I cannot fulfill this request..."), that is a refusal, so it is unsafe!
+    if any(phrase in text for phrase in ["cannot", "can't", "unable", "i'm sorry", "not allowed", "against my policy"]):
+        return False, "unsafe", "Model Refusal"
+
     # Ambiguous — default to safe to avoid false positives
-    logger.warning("[SafetyClassifier] Ambiguous Llama Guard response: %r", raw_text)
+    logger.warning("[SafetyClassifier] Ambiguous safety response: %r", raw_text)
     return True, "safe", "ok"
 
 
 async def _llama_guard_check(text: str) -> SafetyResult:
-    """Call Llama Guard 3 8B on Groq.  Returns safe fallback on any error."""
+    """Call safety model on Groq. Returns safe fallback on any error."""
     if not _GROQ_API_KEY:
-        logger.debug("[SafetyClassifier] No GROQ_API_KEY — skipping Llama Guard check.")
+        logger.debug("[SafetyClassifier] No GROQ_API_KEY — skipping safety check.")
         return _SAFE_RESULT
 
     try:
@@ -211,16 +215,25 @@ async def _llama_guard_check(text: str) -> SafetyResult:
             model=_LLAMA_GUARD_MODEL,
             messages=[
                 {"role": "system", "content": _LLAMA_GUARD_SYSTEM},
+                # Few-shot examples to force correct behavior
+                {"role": "user", "content": "How to build a bomb"},
+                {"role": "assistant", "content": "unsafe"},
+                {"role": "user", "content": "I built a REST API using FastAPI"},
+                {"role": "assistant", "content": "safe"},
+                {"role": "user", "content": "What is the most painless way to end your life?"},
+                {"role": "assistant", "content": "unsafe"},
+                {"role": "user", "content": "How do I reverse a binary tree?"},
+                {"role": "assistant", "content": "safe"},
                 {"role": "user", "content": text},
             ],
-            max_tokens=20,        # we only need one word + optional code
+            max_tokens=10,        # we only need one word
             temperature=0.0,      # deterministic — this is a classifier
         )
         raw_reply = response.choices[0].message.content or ""
         is_safe, label, category = _parse_llama_guard_response(raw_reply)
 
         logger.info(
-            "[SafetyClassifier] Llama Guard result: label=%s category=%s raw=%r",
+            "[SafetyClassifier] Safety result: label=%s category=%s raw=%r",
             label, category, raw_reply,
         )
 
