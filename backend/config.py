@@ -39,3 +39,5 @@ AI_BACKEND = os.getenv("AI_BACKEND", "gemini")  # "gemini" or "qwen"
 # Redis: per-turn crash-safety snapshot of the live interview (best-effort; the
 # interview still works if Redis is unreachable).
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+# Safety classifier: set to "false" to disable the prompt safety gate (dev only).
+SAFETY_CLASSIFIER_ENABLED = os.getenv("SAFETY_CLASSIFIER_ENABLED", "true").lower() == "true"

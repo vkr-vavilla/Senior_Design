@@ -19,26 +19,32 @@ def verify_password(plain: str, hashed: str) -> bool:
 
 def create_access_token(data: dict) -> str:
     payload = data.copy()
+    payload.update({"type": "access"})
     payload["exp"] = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
 def create_refresh_token(data: dict) -> str:
     payload = data.copy()
+    payload.update({"type": "refresh"})
     payload["exp"] = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
 def verify_refresh_token(token: str) -> str:
-    """Decodes a refresh token and returns the user_id (sub) if valid."""
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        if payload.get("type") != "refresh":
+            raise JWTError("Not a refresh token")
         user_id: str = payload.get("sub")
         if user_id is None:
-            return None
+            raise JWTError("Invalid token payload")
         return user_id
     except JWTError:
-        return None
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired refresh token",
+        )
 
 
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
@@ -49,6 +55,8 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(b
     )
     try:
         payload = jwt.decode(credentials.credentials, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        if payload.get("type") != "access":
+            raise credentials_exception
         user_id: str = payload.get("sub")
         if user_id is None:
             raise credentials_exception

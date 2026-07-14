@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // On mount, check localStorage for stored token and listen for refreshes
+  // On mount, check localStorage for stored token
   useEffect(() => {
     const stored = localStorage.getItem(TOKEN_KEY);
     if (stored) {
@@ -43,14 +43,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } else {
       setIsLoading(false);
     }
-
-    const handleTokenRefresh = (event: Event) => {
-      const newToken = (event as CustomEvent).detail as string;
-      setToken(newToken);
-    };
-
-    window.addEventListener('token-refreshed', handleTokenRefresh);
-    return () => window.removeEventListener('token-refreshed', handleTokenRefresh);
   }, [fetchUser]);
 
   const login = useCallback(async (tkn: string) => {
@@ -58,16 +50,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await fetchUser(tkn);
   }, [fetchUser]);
 
-  const logout = useCallback(async () => {
-    try {
-      await authApi.logout();
-    } catch (err) {
-      console.error('Logout request failed', err);
-    } finally {
-      localStorage.removeItem(TOKEN_KEY);
-      setToken(null);
-      setUser(null);
-    }
+  const logout = useCallback(() => {
+    localStorage.removeItem(TOKEN_KEY);
+    setToken(null);
+    setUser(null);
   }, []);
 
   const register = useCallback(async (tkn: string) => {

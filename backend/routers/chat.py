@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from database import get_db
 from config import GEMINI_API_KEY, VLLM_BASE_URL, VLLM_MODEL, VLLM_BASE_MODEL, AI_BACKEND, JWT_SECRET, JWT_ALGORITHM, GROQ_API_KEY, REDIS_URL, STT_BACKEND
 from models.chat import ChatMessage, FeedbackResponse, FeedbackJudgment
+from safety_classifier import classify_prompt
 from bson import ObjectId
 import json
 import asyncio
@@ -620,6 +621,24 @@ KICKOFF (first turn only):
                 await websocket.send_text(json.dumps({"chunk": "", "done": True, "source": last_source_used}))
                 await snapshot_interview(interview_id, history, selected_model_source, user_id)
                 continue
+
+            # ── Safety classifier gate ────────────────────────────────────────
+            # Run the two-stage classifier (heuristic → Llama Guard 3 8B) before
+            # the message reaches the main LLM.  Unsafe messages are recorded in
+            # history so the transcript stays complete, but the LLM is skipped.
+            safety = await classify_prompt(message)
+            if not safety.is_safe:
+                print(f"[SafetyClassifier] Blocked message — stage={safety.stage} category={safety.category}")
+                block_reply = safety.reason
+                history.append({"role": "user", "text": message})
+                history.append({"role": "model", "text": block_reply})
+                messages.append({"role": "user", "content": message})
+                messages.append({"role": "assistant", "content": block_reply})
+                await websocket.send_text(json.dumps({"chunk": block_reply, "done": False, "source": last_source_used, "is_safety_block": True}))
+                await websocket.send_text(json.dumps({"chunk": "", "done": True, "source": last_source_used, "is_safety_block": True}))
+                await snapshot_interview(interview_id, history, selected_model_source, user_id)
+                continue
+            # ─────────────────────────────────────────────────────────────────
 
             history.append({"role": "user", "text": message})
             messages.append({"role": "user", "content": message})
