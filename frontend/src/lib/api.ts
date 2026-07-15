@@ -15,6 +15,14 @@ export class ApiError extends Error {
   }
 }
 
+// Bearer header for raw fetch() calls (transcribe/synthesize) that bypass apiRequest.
+// Reads the same token AuthContext persists under 'prepai_token'.
+function authHeaders(): Record<string, string> {
+  if (typeof window === 'undefined') return {};
+  const token = localStorage.getItem('prepai_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export async function apiRequest<T>(
   method: string,
   path: string,
@@ -95,6 +103,7 @@ export const chatApi = {
 
     const response = await fetch(`${API_URL}/chat/transcribe`, {
       method: 'POST',
+      headers: authHeaders(),
       body: formData,
     });
 
@@ -107,7 +116,7 @@ export const chatApi = {
   async synthesize(text: string): Promise<Blob> {
     const response = await fetch(`${API_URL}/chat/synthesize`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify({ text }),
     });
 

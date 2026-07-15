@@ -41,8 +41,12 @@ services:
       # AI_BACKEND=gemini -> Gemini cloud API (user-supplied key)
       - AI_BACKEND=${AI_BACKEND:-qwen}
       - VLLM_AUTOSTART=false
-      - VLLM_BASE_URL=http://vllm:8001/v1
-      - VLLM_MODEL=interviewer
+      # Parametrized so the same backend points at either engine (set by
+      # setup_local.sh via detect_engine.sh): vLLM (--profile gpu) or Ollama
+      # (--profile ollama). Defaults keep the original vLLM behavior.
+      - VLLM_BASE_URL=${VLLM_BASE_URL:-http://vllm:8001/v1}
+      - VLLM_MODEL=${VLLM_MODEL:-interviewer}
+      - VLLM_BASE_MODEL=${VLLM_BASE_MODEL:-Qwen/Qwen2.5-7B-Instruct-AWQ}
       - ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
       - CODE_EXECUTOR=piston
       - PISTON_URL=http://piston:2000
@@ -93,6 +97,11 @@ services:
       - "64"
       - --lora-modules
       - interviewer=/adapters/qwen2.5-7b-chatml-qlora-v2
+    environment:
+      # Model + adapter are already on disk (mounted below) — skip the Hub
+      # file-listing call vLLM makes on startup, which otherwise hard-fails
+      # on machines with no internet access instead of just using the cache.
+      - HF_HUB_OFFLINE=1
     ports:
       - "8001:8001"
     volumes:
@@ -108,6 +117,52 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
+
+  # ── Ollama: cross-platform local inference (Mac/AMD/CPU/Windows) ────────────
+  # Serves the same OpenAI-compatible /v1 API as vLLM, so the backend is
+  # unchanged — only VLLM_BASE_URL differs. Enabled with: --profile ollama.
+  # Requires the GGUF artifacts in ./ollama/models (produced once by
+  # scripts/build_gguf.sh with CREATE_OLLAMA=0).
+  ollama:
+    image: ollama/ollama:latest
+    profiles: ["ollama"]
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+      # Modelfiles + models/*.gguf; relative FROM/ADAPTER paths resolve here.
+      - ./ollama:/modelfiles:ro
+    restart: always
+
+  # One-shot: register the two models (base for grading, interviewer=base+LoRA)
+  # from the mounted Modelfiles. Idempotent — skips tags that already exist.
+  ollama-init:
+    image: ollama/ollama:latest
+    profiles: ["ollama"]
+    depends_on:
+      - ollama
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        echo "ollama-init: waiting for Ollama API..."
+        until ollama list >/dev/null 2>&1; do sleep 1; done
+        if ollama list | grep -q '^qwen2.5-7b-instruct'; then
+          echo "ollama-init: base already present, skipping."
+        else
+          echo "ollama-init: creating base model (grading)..."
+          ollama create qwen2.5-7b-instruct -f /modelfiles/Modelfile.base
+        fi
+        if ollama list | grep -q '^interviewer'; then
+          echo "ollama-init: interviewer already present, skipping."
+        else
+          echo "ollama-init: creating interviewer model (base + LoRA)..."
+          ollama create interviewer -f /modelfiles/Modelfile.interviewer
+        fi
+        echo "ollama-init: done."
+    restart: "no"
 
   frontend:
     build:
@@ -192,3 +247,4 @@ volumes:
   piston-packages:
   redis-data:
   hf-cache:
+  ollama-data:

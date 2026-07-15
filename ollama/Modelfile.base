@@ -1,0 +1,31 @@
+# PrepAI base model for Ollama (grading / judge).
+#
+# This is the plain Qwen2.5-7B-Instruct base — NO interviewer LoRA — used only to
+# grade feedback, matching VLLM_BASE_MODEL in the vLLM path (see
+# backend/routers/chat.py:1058). Built by scripts/build_gguf.sh, which fills in
+# the GGUF path and runs `ollama create qwen2.5-7b-instruct -f ollama/Modelfile.base`.
+#
+# FROM is a placeholder; build_gguf.sh rewrites it to the produced GGUF (or you
+# can point it at an existing Ollama tag like `qwen2.5:7b-instruct`).
+FROM ./models/qwen2.5-7b-instruct.Q4_K_M.gguf
+
+# Qwen2.5 ChatML. Ollama also reads the template embedded in the GGUF metadata,
+# but we pin it here so grading prompts render identically to the vLLM path.
+TEMPLATE """{{- if .System }}<|im_start|>system
+{{ .System }}<|im_end|>
+{{ end }}
+{{- range .Messages }}
+{{- if eq .Role "user" }}<|im_start|>user
+{{ .Content }}<|im_end|>
+{{ else if eq .Role "assistant" }}<|im_start|>assistant
+{{ .Content }}<|im_end|>
+{{ end }}
+{{- end }}<|im_start|>assistant
+"""
+
+PARAMETER stop "<|im_start|>"
+PARAMETER stop "<|im_end|>"
+PARAMETER stop "<|endoftext|>"
+# Deterministic-ish grading: low temperature so scores are stable across runs.
+PARAMETER temperature 0.2
+PARAMETER num_ctx 8192

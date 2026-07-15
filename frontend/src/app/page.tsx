@@ -76,12 +76,9 @@ export default function LandingPage() {
       {/* ── Hero — split layout ───────────────────────────────── */}
       <section className="relative min-h-screen flex items-center pt-20 pb-8 overflow-hidden">
         {/* Ambient orb — left side behind text */}
-        <div className="absolute top-1/3 -left-32 w-[600px] h-[600px] bg-indigo-600/12 rounded-full blur-[130px] pointer-events-none animate-float" />
+        <div className="absolute top-1/3 -left-32 w-[600px] h-[600px] bg-indigo-600/12 rounded-full blur-[130px] pointer-events-none" />
         {/* Ambient orb — right top */}
-        <div
-          className="absolute top-0 right-0 w-[500px] h-[500px] bg-violet-500/8 rounded-full blur-[100px] pointer-events-none animate-float"
-          style={{ animationDelay: '4s' }}
-        />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-violet-500/8 rounded-full blur-[100px] pointer-events-none" />
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-16">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
@@ -357,7 +354,7 @@ export default function LandingPage() {
 
       {/* ── Final CTA ─────────────────────────────────────────── */}
       <section className="py-28 relative overflow-hidden bg-slate-950/40 backdrop-blur-sm">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-indigo-600/18 rounded-full blur-[140px] pointer-events-none animate-float-slow" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-indigo-600/18 rounded-full blur-[140px] pointer-events-none" />
 
         <div className="relative max-w-4xl mx-auto px-4">
           <AnimateIn>

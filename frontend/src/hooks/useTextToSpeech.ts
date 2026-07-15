@@ -5,6 +5,12 @@ import { chatApi } from '@/lib/api';
 
 export type VoiceEngine = 'premium' | 'browser';
 
+// The Tauri desktop webview (WebKitGTK on Linux) does not implement the Web
+// Speech API, so window.speechSynthesis is undefined there. Access it only
+// through this guard so calls no-op instead of throwing a TypeError.
+const getSpeechSynthesis = (): SpeechSynthesis | null =>
+  typeof window !== 'undefined' && 'speechSynthesis' in window ? window.speechSynthesis : null;
+
 export function useTextToSpeech() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [engine, setEngine] = useState<VoiceEngine>('premium');
@@ -70,8 +76,18 @@ export function useTextToSpeech() {
         processQueue();
       }
     } else {
+      const synth = getSpeechSynthesis();
+      if (!synth || typeof SpeechSynthesisUtterance === 'undefined') {
+        // No browser TTS in this environment (e.g. Tauri/WebKitGTK) — skip the
+        // spoken fallback and advance the queue so playback never stalls.
+        setIsSpeaking(false);
+        isPlayingRef.current = false;
+        processQueue();
+        return;
+      }
+
       const utterance = new SpeechSynthesisUtterance(item.value);
-      const voices = window.speechSynthesis.getVoices();
+      const voices = synth.getVoices();
       const voice = voices.find(v => v.name.includes('Google US English') || v.name.includes('Samantha') || v.lang.startsWith('en'));
       if (voice) utterance.voice = voice;
 
@@ -87,7 +103,7 @@ export function useTextToSpeech() {
         processQueue();
       };
 
-      window.speechSynthesis.speak(utterance);
+      synth.speak(utterance);
     }
   }, []);
 
@@ -97,7 +113,7 @@ export function useTextToSpeech() {
       audioRef.current.pause();
       audioRef.current = null;
     }
-    window.speechSynthesis.cancel();
+    getSpeechSynthesis()?.cancel();
     playQueueRef.current = [];
     isPlayingRef.current = false;
     setIsSpeaking(false);

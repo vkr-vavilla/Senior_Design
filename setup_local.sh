@@ -6,18 +6,21 @@
 # problem bank. Idempotent: safe to re-run any time.
 #
 # Usage:
-#   ./setup_local.sh          # auto-detect: NVIDIA GPU -> local Qwen model, else Gemini
-#   ./setup_local.sh --gpu    # force the local Qwen model (needs NVIDIA GPU, ~10 GB VRAM)
-#   ./setup_local.sh --api    # force Gemini API mode (no GPU; bring your own key)
+#   ./setup_local.sh           # auto-detect engine (NVIDIA->vLLM, Mac/AMD/CPU->Ollama, else Gemini)
+#   ./setup_local.sh --gpu     # force local Qwen via vLLM (needs NVIDIA GPU, ~10 GB VRAM)
+#   ./setup_local.sh --ollama  # force local Qwen via Ollama (Mac/AMD/CPU; needs ./ollama/models GGUFs)
+#   ./setup_local.sh --api     # force Gemini API mode (no GPU; bring your own key)
 set -euo pipefail
 
 cd "$(dirname "$0")"
 COMPOSE="docker compose -f docker-compose.local.yml"
 
+# MODE mirrors the inference engine: vllm | ollama | gemini.
 MODE=""
 for arg in "$@"; do
   case "$arg" in
-    --gpu) MODE=qwen ;;
+    --gpu) MODE=vllm ;;
+    --ollama) MODE=ollama ;;
     --api) MODE=gemini ;;
     -h|--help)
       sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'
@@ -37,16 +40,25 @@ if ! docker compose version >/dev/null 2>&1; then
   exit 1
 fi
 
-# ── 2. Pick the AI backend ───────────────────────────────────────────────────
-if [ -z "$MODE" ]; then
-  if command -v nvidia-smi >/dev/null 2>&1 && nvidia-smi >/dev/null 2>&1; then
-    MODE=qwen
-    echo "NVIDIA GPU detected -> using the local Qwen model (override with --api)."
-  else
-    MODE=gemini
-    echo "No NVIDIA GPU detected -> using Gemini API mode (override with --gpu)."
-  fi
-fi
+# ── 2. Pick the inference engine ─────────────────────────────────────────────
+# detect_engine.sh inspects OS/GPU/RAM and emits the engine + the backend env
+# (VLLM_BASE_URL/VLLM_MODEL/VLLM_BASE_MODEL/AI_BACKEND). We point it at the
+# compose service names so the URLs resolve on the compose network.
+DETECT="scripts/detect_engine.sh"
+DETECT_ARGS=(--explain)
+[ -n "$MODE" ] && DETECT_ARGS=(--engine "$MODE" --explain)
+ENGINE_ENV="$(PREPAI_OLLAMA_URL=http://ollama:11434/v1 \
+              PREPAI_VLLM_URL=http://vllm:8001/v1 \
+              "$DETECT" "${DETECT_ARGS[@]}" 2>/dev/null)"
+# shellcheck disable=SC2046
+export $(echo "$ENGINE_ENV" | xargs)
+MODE="$INFERENCE_ENGINE"
+case "$MODE" in
+  vllm)   echo "Engine: vLLM (NVIDIA GPU). Override with --ollama or --api." ;;
+  ollama) echo "Engine: Ollama (Mac/AMD/CPU). Override with --gpu or --api." ;;
+  gemini) echo "Engine: Gemini API (no local model). Override with --gpu/--ollama." ;;
+  *) echo "ERROR: engine detection failed."; exit 1 ;;
+esac
 
 # ── 3. Generate backend/.env on first run ────────────────────────────────────
 ENV_FILE=backend/.env
@@ -76,14 +88,28 @@ if [ "$MODE" = "gemini" ] && ! grep -q '^GEMINI_API_KEY=..*' "$ENV_FILE"; then
 fi
 
 # ── 4. Start the stack ───────────────────────────────────────────────────────
-if [ "$MODE" = "qwen" ]; then
-  echo "Starting PrepAI with the local Qwen model."
-  echo "(first run downloads ~5.5 GB of model weights into the hf-cache volume)"
-  AI_BACKEND=qwen $COMPOSE --profile gpu up -d --build
-else
-  echo "Starting PrepAI in Gemini API mode (no GPU services)."
-  AI_BACKEND=gemini $COMPOSE up -d --build
-fi
+# detect_engine.sh exported AI_BACKEND / VLLM_BASE_URL / VLLM_MODEL /
+# VLLM_BASE_MODEL — compose interpolates them into the backend service.
+case "$MODE" in
+  vllm)
+    echo "Starting PrepAI with the local Qwen model via vLLM."
+    echo "(first run downloads ~5.5 GB of model weights into the hf-cache volume)"
+    $COMPOSE --profile gpu up -d --build
+    ;;
+  ollama)
+    if [ ! -d ollama/models ] || [ -z "$(ls -A ollama/models 2>/dev/null)" ]; then
+      echo "ERROR: Ollama mode needs the GGUF models in ./ollama/models."
+      echo "Build them once with: scripts/build_gguf.sh   (CREATE_OLLAMA=0 is fine)"
+      exit 1
+    fi
+    echo "Starting PrepAI with the local Qwen model via Ollama."
+    $COMPOSE --profile ollama up -d --build
+    ;;
+  gemini)
+    echo "Starting PrepAI in Gemini API mode (no local model services)."
+    $COMPOSE up -d --build
+    ;;
+esac
 
 # ── 5. Wait for the backend ──────────────────────────────────────────────────
 printf "Waiting for the backend"
@@ -124,8 +150,12 @@ echo
 echo "PrepAI is running:"
 echo "  App:  http://localhost:3000"
 echo "  API:  http://localhost:8080/docs"
-if [ "$MODE" = "qwen" ]; then
+if [ "$MODE" = "vllm" ]; then
   echo
   echo "Model: local Qwen2.5-7B via vLLM. The first interview may take 1-2 minutes"
   echo "to answer while the model loads; check progress with: $COMPOSE logs -f vllm"
+elif [ "$MODE" = "ollama" ]; then
+  echo
+  echo "Model: local Qwen2.5-7B via Ollama. The first interview may take a moment"
+  echo "while the model loads; check progress with: $COMPOSE logs -f ollama ollama-init"
 fi

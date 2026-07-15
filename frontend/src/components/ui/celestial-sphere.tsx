@@ -68,7 +68,7 @@ export const CelestialSphere: React.FC<CelestialSphereProps> = ({
       float fbm(vec2 st) {
         float value = 0.0;
         float amplitude = 0.5;
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 4; i++) {
           value += amplitude * noise(st);
           st *= 2.0;
           amplitude *= 0.5;
@@ -102,8 +102,10 @@ export const CelestialSphere: React.FC<CelestialSphereProps> = ({
 
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setPixelRatio(window.devicePixelRatio);
+    const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
+    // The nebula is soft/blurry, so capping the device-pixel-ratio to 1 cuts
+    // fragment-shader invocations up to 4x on HiDPI screens with no visible loss.
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1));
     currentMount.appendChild(renderer.domElement);
 
     const material = new THREE.ShaderMaterial({
@@ -137,11 +139,25 @@ export const CelestialSphere: React.FC<CelestialSphereProps> = ({
       material.uniforms.u_mouse.value.set(mouse.x, currentMount.clientHeight - mouse.y);
     };
 
+    // Pause all GPU work when the background is scrolled off-screen or the tab
+    // is backgrounded — otherwise the shader renders 60fps forever.
+    let visible = true;
+    const isRunning = () => visible && document.visibilityState === "visible";
+
     const animate = () => {
+      animationFrameId = requestAnimationFrame(animate);
+      if (!isRunning()) return;
       material.uniforms.u_time.value += 0.005 * speed;
       renderer.render(scene, camera);
-      animationFrameId = requestAnimationFrame(animate);
     };
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        visible = entry.isIntersecting;
+      },
+      { threshold: 0 }
+    );
+    io.observe(currentMount);
 
     window.addEventListener("resize", resize);
     window.addEventListener("mousemove", onMouseMove);
@@ -151,6 +167,7 @@ export const CelestialSphere: React.FC<CelestialSphereProps> = ({
     return () => {
       window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", onMouseMove);
+      io.disconnect();
       cancelAnimationFrame(animationFrameId);
       if (currentMount && renderer.domElement) {
         currentMount.removeChild(renderer.domElement);

@@ -1,0 +1,36 @@
+# PrepAI "interviewer" model for Ollama (conducts the interview).
+#
+# Qwen2.5-7B-Instruct base + the interviewer QLoRA adapter — a persona fine-tuned
+# to be warm and encouraging. Matches VLLM_MODEL=interviewer in the vLLM path
+# (docker-compose.local.yml:95). Built by scripts/build_gguf.sh, which fills in
+# both GGUF paths and runs `ollama create interviewer -f ollama/Modelfile.interviewer`.
+#
+# ADAPTER (vs. merging the LoRA into the base) is deliberate: it keeps ONE
+# resident base model shared with the grading model above, plus a small (~650 MB
+# fp16 / less when converted) adapter — no second full 7B in memory/on disk. This
+# is the "serve base + LoRA without a second GPU's worth of draw" property.
+#
+# FROM/ADAPTER are placeholders; build_gguf.sh rewrites them to the produced GGUFs.
+FROM ./models/qwen2.5-7b-instruct.Q4_K_M.gguf
+ADAPTER ./models/interviewer-lora.gguf
+
+# Same ChatML template the adapter was trained with (chat_template.jinja).
+TEMPLATE """{{- if .System }}<|im_start|>system
+{{ .System }}<|im_end|>
+{{ end }}
+{{- range .Messages }}
+{{- if eq .Role "user" }}<|im_start|>user
+{{ .Content }}<|im_end|>
+{{ else if eq .Role "assistant" }}<|im_start|>assistant
+{{ .Content }}<|im_end|>
+{{ end }}
+{{- end }}<|im_start|>assistant
+"""
+
+PARAMETER stop "<|im_start|>"
+PARAMETER stop "<|im_end|>"
+PARAMETER stop "<|endoftext|>"
+# Conversational warmth; mirror the vLLM serving defaults for the persona.
+PARAMETER temperature 0.7
+PARAMETER top_p 0.9
+PARAMETER num_ctx 8192
