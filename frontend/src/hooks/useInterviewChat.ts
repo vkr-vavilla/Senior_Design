@@ -19,9 +19,11 @@ interface UseInterviewChatReturn {
   sessionEnded: boolean;
   elapsedTime: number;
   sessionId: string | null;
+  inactivityWarning: boolean;
   startInterview: (config: InterviewConfig, token: string) => void;
   sendMessage: (text: string) => void;
   endInterview: () => void;
+  resetInactivity: () => void;
   messagesEndRef: React.RefObject<HTMLDivElement>;
 }
 
@@ -31,11 +33,13 @@ export function useInterviewChat(options?: UseInterviewChatOptions): UseIntervie
   const [isConnected, setIsConnected] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const [sessionEnded, setSessionEnded] = useState(false);
+  const [inactivityWarning, setInactivityWarning] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [sessionId, setSessionId] = useState<string | null>(null);
 
   const wsRef = useRef<WebSocket | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const lastActivityRef = useRef<number>(Date.now());
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const streamingIdRef = useRef<string | null>(null);
 
@@ -59,10 +63,9 @@ export function useInterviewChat(options?: UseInterviewChatOptions): UseIntervie
     };
   }, []);
 
-  const startTimer = useCallback(() => {
-    timerRef.current = setInterval(() => {
-      setElapsedTime((t) => t + 1);
-    }, 1000);
+  const resetInactivity = useCallback(() => {
+    lastActivityRef.current = Date.now();
+    setInactivityWarning(false);
   }, []);
 
   const stopTimer = useCallback(() => {
@@ -72,8 +75,36 @@ export function useInterviewChat(options?: UseInterviewChatOptions): UseIntervie
     }
   }, []);
 
+  const endInterview = useCallback(() => {
+    if (wsRef.current) {
+      wsRef.current.close();
+    }
+    stopTimer();
+    setSessionEnded(true);
+    setIsConnected(false);
+  }, [stopTimer]);
+
+  const startTimer = useCallback(() => {
+    lastActivityRef.current = Date.now();
+    timerRef.current = setInterval(() => {
+      setElapsedTime((t) => t + 1);
+
+      const now = Date.now();
+      const inactivityMs = now - lastActivityRef.current;
+      const fifteenMinutesMs = 15 * 60 * 1000;
+      const sixteenMinutesMs = 16 * 60 * 1000;
+
+      if (inactivityMs >= sixteenMinutesMs) {
+        endInterview();
+      } else if (inactivityMs >= fifteenMinutesMs) {
+        setInactivityWarning(true);
+      }
+    }, 1000);
+  }, [endInterview]);
+
   const startInterview = useCallback(
     (config: InterviewConfig, token: string) => {
+      startTimer(); // Start timer immediately upon request
       if (wsRef.current) {
         wsRef.current.close();
       }
@@ -100,7 +131,8 @@ export function useInterviewChat(options?: UseInterviewChatOptions): UseIntervie
         setActiveModelSource(config.modelSource);
         setElapsedTime(0);
         setSessionEnded(false);
-        startTimer();
+        setInactivityWarning(false);
+        // startTimer(); // Removed from here
 
         // The backend handles the initial greeting now to avoid double-priming
         // if (config.interviewId) {
@@ -192,6 +224,8 @@ export function useInterviewChat(options?: UseInterviewChatOptions): UseIntervie
       return;
     }
 
+    resetInactivity();
+
     // Add user message to UI
     const userMessage: Message = {
       id: generateId(),
@@ -203,16 +237,7 @@ export function useInterviewChat(options?: UseInterviewChatOptions): UseIntervie
     streamingIdRef.current = null;
 
     wsRef.current.send(JSON.stringify({ message: text }));
-  }, []);
-
-  const endInterview = useCallback(() => {
-    if (wsRef.current) {
-      wsRef.current.close();
-    }
-    stopTimer();
-    setSessionEnded(true);
-    setIsConnected(false);
-  }, [stopTimer]);
+  }, [resetInactivity]);
 
   return {
     messages,
@@ -220,11 +245,13 @@ export function useInterviewChat(options?: UseInterviewChatOptions): UseIntervie
     isConnected,
     isStreaming,
     sessionEnded,
+    inactivityWarning,
     elapsedTime,
     sessionId,
     startInterview,
     sendMessage,
     endInterview,
+    resetInactivity,
     messagesEndRef,
   };
 }
