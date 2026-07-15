@@ -15,12 +15,13 @@ export class ApiError extends Error {
   }
 }
 
-// Bearer header for raw fetch() calls (transcribe/synthesize) that bypass apiRequest.
-// Reads the same token AuthContext persists under 'prepai_token'.
-function authHeaders(): Record<string, string> {
-  if (typeof window === 'undefined') return {};
-  const token = localStorage.getItem('prepai_token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
+// Bearer header for the raw fetch() calls (transcribe/synthesize) that bypass
+// apiRequest. Prefers an explicitly passed token, falling back to the one
+// AuthContext persists under 'prepai_token' so a caller that omits it still
+// authenticates instead of getting a 401.
+function authHeaders(token?: string): Record<string, string> {
+  const t = token ?? (typeof window !== 'undefined' ? localStorage.getItem('prepai_token') : null);
+  return t ? { Authorization: `Bearer ${t}` } : {};
 }
 
 export async function apiRequest<T>(
@@ -96,13 +97,13 @@ export const chatApi = {
       token
     );
   },
-  async transcribe(audioBlob: Blob): Promise<{ text: string }> {
+  async transcribe(audioBlob: Blob, token?: string): Promise<{ text: string }> {
     const formData = new FormData();
     formData.append('file', audioBlob, 'recording.webm');
 
     const response = await fetch(`${API_URL}/chat/transcribe`, {
       method: 'POST',
-      headers: authHeaders(),
+      headers: authHeaders(token),
       body: formData,
     });
 
@@ -112,10 +113,10 @@ export const chatApi = {
 
     return response.json();
   },
-  async synthesize(text: string): Promise<Blob> {
+  async synthesize(text: string, token?: string): Promise<Blob> {
     const response = await fetch(`${API_URL}/chat/synthesize`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
       body: JSON.stringify({ text }),
     });
 
