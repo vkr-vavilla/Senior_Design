@@ -259,11 +259,6 @@ async def _stream_with_fallback(
     custom_gemini_client = None,
     local_model: str | None = None,
 ):
-    if source_used is not None:
-        source_used["value"] = "mock"
-    yield "Hello! I am in Mock Mode. You can now test your inactivity timer. Please wait 15 minutes without responding to see if the warning appears!"
-    return
-
     errors: list[str] = []
     for source in _ordered_sources(preferred_source):
         if source == "local":
