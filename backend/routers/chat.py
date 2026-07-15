@@ -859,8 +859,8 @@ async def get_feedback(session_id: str, x_gemini_key: str | None = Header(None, 
     if not session:
         session = await db.chat_sessions.find_one({"_id": ObjectId(session_id)})
 
-    if not session or not session.get("messages"):
-        raise HTTPException(status_code=404, detail="Session not found or no messages recorded")
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
 
     # Pull context
     resume_text = session.get("resume_text", "")
@@ -885,8 +885,42 @@ async def get_feedback(session_id: str, x_gemini_key: str | None = Header(None, 
             if msg["role"] == "model" and i + 1 < len(messages) and messages[i + 1]["role"] == "user":
                 qa_pairs.append({"question": msg["text"], "answer": messages[i + 1]["text"]})
 
-    if not qa_pairs:
-        raise HTTPException(status_code=400, detail="No candidate answers found to evaluate")
+    # Interview ended before the candidate answered anything (or before the
+    # session even connected) AND no coding round was submitted — there's
+    # nothing to grade. Return a real 0/10 report instead of an error, so the
+    # feedback page renders normally (score ring, empty radar, an explanatory
+    # note) rather than an error card. A session with coding submissions but
+    # no spoken answers still has real work to grade, so it falls through to
+    # full generation below instead of this stub.
+    if not qa_pairs and not session.get("coding_attempts"):
+        no_answer_ratings = {
+            "correctness": 0, "depth": 0, "clarity": 0, "examples": 0, "resume_knowledge": 0,
+        }
+        no_answer_report = (
+            "**Overall Score: 0/10**\n"
+            "No interview questions were answered in this session, so there's nothing to evaluate. "
+            "Start a new interview and answer at least one question to get real feedback.\n\n"
+            "**Skill Ratings**\n"
+            "- Correctness: 0/10\n"
+            "- Depth: 0/10\n"
+            "- Clarity: 0/10\n"
+            "- Examples: 0/10\n"
+            "- Resume Knowledge: 0/10\n\n"
+            "**Areas for Improvement**\n"
+            "- Complete an interview and answer the questions Alex asks to receive a detailed evaluation."
+        )
+        no_answer_metrics = {
+            "overall_score": 0,
+            "skill_ratings": no_answer_ratings,
+            "computed": {"questions_answered": 0, "total_answer_words": 0, "avg_answer_words": 0},
+        }
+        await db.interviews.update_one(
+            {"_id": ObjectId(session_id)},
+            {"$set": {"feedback": no_answer_report,
+                      "feedback_metrics": no_answer_metrics,
+                      "feedback_generated_at": datetime.now(timezone.utc)}},
+        )
+        return FeedbackResponse(feedback=no_answer_report, metrics=no_answer_metrics)
 
     # Return cached feedback unless a coding attempt was submitted after it was generated,
     # which would make the existing report stale (missing the new coding round results).
@@ -911,7 +945,19 @@ async def get_feedback(session_id: str, x_gemini_key: str | None = Header(None, 
     qa_text = "\n\n".join(
         f"Q{i + 1}: {qa['question']}\nA{i + 1}: {qa['answer']}"
         for i, qa in enumerate(qa_pairs)
-    )
+    ) or "(No spoken questions were answered in this session — grade the coding round on its own merits below.)"
+
+    # A session can reach here with zero spoken answers if it had a coding
+    # submission (see the early-return above, which only short-circuits when
+    # BOTH qa_pairs and coding_attempts are empty). Score and code feedback
+    # are different things: no interview happened, so the interview score is
+    # 0 — full stop, regardless of how good the code is. The code itself
+    # still gets real, descriptive feedback in the Coding Ability section
+    # below; it just carries no numeric score of its own in this case (see
+    # coding_output_section). `no_interview_occurred` is enforced in code
+    # after the judge responds (generate_feedback zeroes skill_ratings), not
+    # left to prompt compliance alone.
+    no_interview_occurred = not qa_pairs
 
     # Objective engagement signal computed in code (not the model's opinion), so
     # scoring has a numeric anchor instead of relying on the model to "eyeball"
@@ -922,7 +968,15 @@ async def get_feedback(session_id: str, x_gemini_key: str | None = Header(None, 
     avg_words = total_candidate_words / len(qa_pairs) if qa_pairs else 0
     MINIMAL_SIGNAL_WORD_THRESHOLD = 25
     validity_flag = ""
-    if total_candidate_words < MINIMAL_SIGNAL_WORD_THRESHOLD:
+    if no_interview_occurred:
+        validity_flag = (
+            "\n⚠️ NO INTERVIEW OCCURRED: the candidate answered zero spoken questions. The Overall Score and "
+            "EVERY Skill Rating (Correctness, Depth, Clarity, Examples, Resume Knowledge) MUST be exactly "
+            "0/10 — this is non-negotiable regardless of how good any submitted code is. Code quality is a "
+            "completely separate thing from the interview score and is evaluated ONLY in the Coding Ability "
+            "section below, as descriptive feedback with NO score attached to it."
+        )
+    elif total_candidate_words < MINIMAL_SIGNAL_WORD_THRESHOLD:
         validity_flag = (
             "\n⚠️ MINIMAL SIGNAL: this is far too little material to demonstrate real competence. "
             "Unless every word was exceptionally dense with substance, the Overall Score and most "
@@ -953,7 +1007,7 @@ async def get_feedback(session_id: str, x_gemini_key: str | None = Header(None, 
     breakdown_skeleton = "\n".join(
         f'- **Q{i + 1} — {qa["question"][:80].strip()}**: [how your answer landed — was it specific or vague? what worked, what fell short — then sketch how you could have answered it instead: the concrete points, example, or structure a strong answer to this exact question would hit]'
         for i, qa in enumerate(qa_pairs)
-    )
+    ) or "- No spoken questions were answered in this session — write exactly: \"Not assessed — no spoken Q&A in this session, see the Coding Ability section below instead.\""
 
     # Coding round (if the candidate solved live problems): feed the code + results
     # to the model and add a Coding Round section to the output. Both strings stay
@@ -988,23 +1042,33 @@ async def get_feedback(session_id: str, x_gemini_key: str | None = Header(None, 
             + "\n\nWeigh this coding round alongside the spoken answers in the overall "
             "score and the criteria below."
         )
-        coding_output_section = f"""
-
-**Coding Ability**
-- Correctness — [did their solution actually pass the example tests / produce the right output?]
-- Time Complexity — [is the time complexity appropriate for the problem?]
-- Space Complexity — [memory usage and any space/time tradeoffs they made.]
-- Code Readability — [naming, structure, and clarity of the code they wrote for a {role}.]
-- Edge Case Handling — [which edge cases they handled or missed.]
-If a solution failed its tests, say what likely went wrong and how to fix it.
-
-**System Design**
-[ONLY if this interview actually covered system design. Assess Scalability, Reliability, Tradeoff Analysis, and Architecture Decisions, citing what they said. If no system design came up, write exactly: "Not assessed — no system design questions in this interview." Do not invent.]
+        # When there was no spoken interview at all, this is pure code
+        # feedback with no score attached — drop the numeric "Coding & Design
+        # Scores" subsection entirely rather than leave the model to invent
+        # numbers for an interview that didn't happen.
+        scores_block = (
+            ""
+            if no_interview_occurred
+            else """
 
 **Coding & Design Scores**
 - Coding: [X]/10
 - Data Structures & Algorithms: [X]/10
 - System Design: [X]/10   [or write "N/A" if system design was not discussed]"""
+        )
+        coding_output_section = f"""
+
+**Coding Ability**
+- Correctness — [did their solution actually pass the example tests / produce the right output?]
+- Time Complexity — [state the Big-O of the solution THEY wrote (e.g. "O(n²) — nested loop over the array") and whether that's appropriate for the problem's constraints.]
+- Space Complexity — [state the Big-O space of their solution and any space/time tradeoffs they made, e.g. trading memory for speed with a hash map.]
+- Code Readability — [naming, structure, and clarity of the code they wrote for a {role}.]
+- Edge Case Handling — [which edge cases they handled or missed — empty input, duplicates, negative numbers, overflow, etc., whichever apply to this problem.]
+- More Efficient Approach — [name a CONCRETE better approach if one exists: the specific algorithm or data structure (e.g. "a hash map for O(1) lookups instead of the nested O(n²) scan", "two pointers instead of sorting first", "memoization to avoid recomputing overlapping subproblems"). State its resulting time/space complexity. If their solution is already optimal for the problem's constraints, say so explicitly instead of inventing a fake improvement — do not suggest a "better" approach that isn't actually better.]
+If a solution failed its tests, say what likely went wrong and how to fix it — cite the specific line or logic error, not a generic "check your logic."
+{"" if no_interview_occurred else '''
+**System Design**
+[ONLY if this interview actually covered system design. Assess Scalability, Reliability, Tradeoff Analysis, and Architecture Decisions, citing what they said. If no system design came up, write exactly: "Not assessed — no system design questions in this interview." Do not invent.]'''}{scores_block}"""
 
     prompt = f"""You are an expert technical interviewer and hiring manager who just finished a {difficulty} {interview_type} interview for a {role} role. You're writing honest, evidence-based feedback addressed directly to the candidate, whose first name is {candidate_name}. Judge them the way you actually would as the hiring manager for THIS role — measure every point against what the {role} position and its job description require.{context}
 
@@ -1136,6 +1200,22 @@ The numbers MUST match what the report says — they are the same scores, machin
         )
         return report.strip()
 
+    def _force_zero_skill_rating_lines(report: str) -> str:
+        """Rewrites every number in the **Skill Ratings** section to 0/10 in
+        the report TEXT itself — not just the returned metrics dict. The judge
+        is instructed to zero these when no spoken interview happened, but
+        prompt compliance isn't a guarantee; this makes it one, the same way
+        _ensure_report_newlines guarantees formatting rather than hoping for it."""
+        marker = "**Skill Ratings**"
+        start = report.find(marker)
+        if start == -1:
+            return report
+        section_start = start + len(marker)
+        next_bold = report.find("\n**", section_start)
+        end = next_bold if next_bold != -1 else len(report)
+        zeroed_section = re.sub(r"\d+(?:\.\d+)?(\s*/\s*10)", r"0\1", report[section_start:end])
+        return report[:section_start] + zeroed_section + report[end:]
+
     def _salvage_report(raw: str) -> str:
         """The judge's JSON was malformed — usually truncated at the token cap.
         Never surface raw JSON to the user: hand-extract the report_markdown
@@ -1213,6 +1293,12 @@ The numbers MUST match what the report says — they are the same scores, machin
             return _salvage_report(raw), None
         report = _ensure_report_newlines(judgment.report_markdown)
         ratings = judgment.skill_ratings.model_dump()
+        # Enforced in code, not left to prompt compliance: no spoken interview
+        # happened, so the interview score is 0 — no exceptions for good code.
+        # The Coding Ability section (added separately above, with no score of
+        # its own in this case) is where code quality actually gets judged.
+        if no_interview_occurred:
+            ratings = {k: 0 for k in ratings}
         # The hero score IS the rounded average of the radar's skill ratings —
         # derived, not the judge's own overall — so the two can never disagree.
         # Patch the report's headline line to the same number.
@@ -1223,6 +1309,8 @@ The numbers MUST match what the report says — they are the same scores, machin
             report,
             count=1,
         )
+        if no_interview_occurred:
+            report = _force_zero_skill_rating_lines(report)
         return report, {
             "overall_score": overall,
             "skill_ratings": ratings,

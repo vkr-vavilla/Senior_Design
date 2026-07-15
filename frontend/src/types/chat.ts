@@ -44,6 +44,21 @@ export interface FeedbackResult {
   metrics?: FeedbackMetrics | null;
 }
 
+// A saved coding-round submission — pushed onto the interview doc by
+// POST /coding/submit each time the candidate submits (not just runs) code.
+export interface CodingAttempt {
+  problem_id: string;
+  slug?: string;
+  title: string;
+  difficulty: string;
+  language: string;
+  code: string;
+  passed: number;
+  total: number;
+  all_passed: boolean;
+  submitted_at: string;
+}
+
 export interface Session {
   _id: string;
   role: string;
@@ -54,4 +69,5 @@ export interface Session {
   created_at: string;
   resume_filename?: string;
   job_description?: string;
+  coding_attempts?: CodingAttempt[];
 }

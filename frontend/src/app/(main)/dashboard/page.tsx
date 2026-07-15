@@ -127,53 +127,38 @@ export default function DashboardPage() {
     if (!role.trim() || !token) return;
     setUploadError('');
 
-    // If resume is provided, create an interview via API first
-    if (resumeFile && jobDescription.trim()) {
-      setIsUploading(true);
-      try {
-        const result = await interviewApi.createInterview(
-          {
-            resume: resumeFile,
-            jobDescription: jobDescription.trim(),
-            role: role.trim(),
-            interviewType,
-            difficulty,
-          },
-          token
-        );
+    // Resume is required — Alex's questions are grounded in it, so an
+    // interview with no resume has nothing to ask about. Job description is
+    // optional context on top of that.
+    if (!resumeFile) {
+      setUploadError('Please upload your resume (PDF) to start an interview.');
+      return;
+    }
 
-        const params = new URLSearchParams({
+    setIsUploading(true);
+    try {
+      const result = await interviewApi.createInterview(
+        {
+          resume: resumeFile,
+          jobDescription: jobDescription.trim(),
           role: role.trim(),
-          type: interviewType,
+          interviewType,
           difficulty,
-          interviewId: result.interview_id,
-        });
-        router.push(`/interview?${params.toString()}`);
-      } catch (err) {
-        if (handleAuthError(err)) return;
-        setUploadError(err instanceof Error ? err.message : 'Upload failed');
-        setIsUploading(false);
-      }
-    } else {
-      // No resume — create a lightweight session so it appears in history
-      setIsUploading(true);
-      try {
-        const result = await interviewApi.startInterview(
-          { role: role.trim(), interviewType, difficulty },
-          token
-        );
-        const params = new URLSearchParams({
-          role: role.trim(),
-          type: interviewType,
-          difficulty,
-          interviewId: result.interview_id,
-        });
-        router.push(`/interview?${params.toString()}`);
-      } catch (err) {
-        if (handleAuthError(err)) return;
-        setUploadError(err instanceof Error ? err.message : 'Failed to start session');
-        setIsUploading(false);
-      }
+        },
+        token
+      );
+
+      const params = new URLSearchParams({
+        role: role.trim(),
+        type: interviewType,
+        difficulty,
+        interviewId: result.interview_id,
+      });
+      router.push(`/interview?${params.toString()}`);
+    } catch (err) {
+      if (handleAuthError(err)) return;
+      setUploadError(err instanceof Error ? err.message : 'Upload failed');
+      setIsUploading(false);
     }
   };
 
@@ -327,7 +312,7 @@ export default function DashboardPage() {
                 {/* Resume Upload */}
                 <div>
                   <label className="text-sm font-medium text-slate-300 block mb-2">
-                    Resume (PDF) <span className="text-slate-500 font-normal"></span>
+                    Resume (PDF) <span className="text-red-400 font-normal">*required</span>
                   </label>
                   <input
                     ref={fileInputRef}
@@ -377,7 +362,7 @@ export default function DashboardPage() {
                 {/* Job Description */}
                 <div>
                   <label className="text-sm font-medium text-slate-300 block mb-2">
-                    Job Description <span className="text-slate-500 font-normal"></span>
+                    Job Description <span className="text-slate-500 font-normal">(optional)</span>
                   </label>
                   <textarea
                     value={jobDescription}
@@ -401,10 +386,10 @@ export default function DashboardPage() {
                   variant="primary"
                   size="lg"
                   className="w-full"
-                  disabled={!role.trim() || isUploading}
+                  disabled={!role.trim() || !resumeFile || isUploading}
                   rightIcon={isUploading ? undefined : <ChevronRight className="w-5 h-5" />}
                 >
-                  {isUploading ? 'Uploading Resume...' : 'Begin Interview'}
+                  {isUploading ? 'Uploading Resume...' : resumeFile ? 'Begin Interview' : 'Upload a Resume to Begin'}
                 </Button>
               </div>
             </div>

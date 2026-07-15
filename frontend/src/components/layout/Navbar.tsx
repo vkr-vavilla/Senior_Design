@@ -13,7 +13,11 @@ export function Navbar() {
 
   const navLinks = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/interview', label: 'New Interview', icon: Plus },
+    // Starting an interview requires a resume upload, which only the
+    // dashboard's setup form collects — point "New Interview" there instead
+    // of the standalone /interview page (which needs an interviewId to have
+    // any resume context at all).
+    { href: '/dashboard', label: 'New Interview', icon: Plus },
   ];
 
   const initials = user?.name
@@ -41,7 +45,7 @@ export function Navbar() {
               const isActive = pathname === link.href;
               return (
                 <Link
-                  key={link.href}
+                  key={link.label}
                   href={link.href}
                   className={cn(
                     'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors',

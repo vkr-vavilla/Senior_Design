@@ -1,25 +1,28 @@
 'use client';
 
 import { ChatInterface } from '@/components/chat/ChatInterface';
-import { FeedbackDisplay } from '@/components/feedback/FeedbackDisplay';
+import { FeedbackDisplay, renderInline } from '@/components/feedback/FeedbackDisplay';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/Button';
 import { LoadingPage, LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { interviewApi, chatApi } from '@/lib/api';
-import { type Message } from '@/types/chat';
+import { type CodingAttempt, type Message } from '@/types/chat';
 import {
   ArrowLeft,
   Bot,
   Brain,
   Briefcase,
   Calendar,
+  CheckCircle2,
+  Code2,
   Download,
   FileText,
   MessageSquare,
   Shuffle,
   Sparkles,
-  Star
+  Star,
+  XCircle
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -34,6 +37,39 @@ interface SessionDetail {
   job_description?: string;
   feedback?: string;
   messages: Array<{ role: string; text: string }>;
+  coding_attempts?: CodingAttempt[];
+}
+
+// Pulls the text of one "**Header**" section out of the feedback markdown,
+// up to (but not including) the next bold section header. Used to surface
+// just the code-review portion of the report on the Coding Round tab,
+// without re-implementing FeedbackDisplay's full card parser here.
+function extractSection(markdown: string, header: string): string | null {
+  const marker = `**${header}**`;
+  const start = markdown.indexOf(marker);
+  if (start === -1) return null;
+  const afterHeader = start + marker.length;
+  const nextBoldIdx = markdown.indexOf('\n**', afterHeader);
+  const raw = markdown.slice(afterHeader, nextBoldIdx === -1 ? markdown.length : nextBoldIdx);
+  return raw.trim() || null;
+}
+
+function MarkdownLines({ text }: { text: string }) {
+  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
+  return (
+    <div className="space-y-2">
+      {lines.map((line, i) => {
+        const isBullet = /^[-•*]\s+/.test(line);
+        const content = line.replace(/^[-•*]\s+/, '');
+        return (
+          <div key={i} className="flex gap-2.5">
+            {isBullet && <span className="mt-2 w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0" />}
+            <p className="text-sm text-slate-300 leading-relaxed">{renderInline(content)}</p>
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 const typeIcons: Record<string, React.ElementType> = {
@@ -57,7 +93,7 @@ export default function SessionDetailPage() {
   const [session, setSession] = useState<SessionDetail | null>(null);
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'feedback' | 'transcript' | 'details'>('feedback');
+  const [activeTab, setActiveTab] = useState<'feedback' | 'coding' | 'transcript' | 'details'>('feedback');
   const [isDownloading, setIsDownloading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateError, setGenerateError] = useState('');
@@ -78,7 +114,9 @@ export default function SessionDetailPage() {
         const s = data as unknown as SessionDetail;
         setSession(s);
         if (!s.feedback) {
-          setActiveTab(s.messages?.length > 0 ? 'transcript' : 'details');
+          setActiveTab(
+            s.messages?.length > 0 ? 'transcript' : s.coding_attempts?.length ? 'coding' : 'details'
+          );
         }
       } catch (err) {
         setError('Failed to load session details');
@@ -147,8 +185,13 @@ export default function SessionDetailPage() {
     content: msg.text,
   }));
 
+  const codingAttempts = session.coding_attempts ?? [];
+  const codingAbility = session.feedback ? extractSection(session.feedback, 'Coding Ability') : null;
+  const codingScores = session.feedback ? extractSection(session.feedback, 'Coding & Design Scores') : null;
+
   const tabs = [
     { id: 'feedback', label: 'AI Feedback', icon: Star, show: true },
+    { id: 'coding', label: 'Coding Round', icon: Code2, show: codingAttempts.length > 0 },
     { id: 'transcript', label: 'Chat Transcript', icon: MessageSquare, show: chatMessages.length > 0 },
     { id: 'details', label: 'Interview Details', icon: FileText, show: true },
   ].filter(t => t.show);
@@ -304,6 +347,111 @@ export default function SessionDetailPage() {
                       {!session.messages?.length && (
                         <p className="text-slate-500 text-xs">No conversation recorded for this session.</p>
                       )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'coding' && (
+                <div className="space-y-6 pb-10">
+                  {codingAttempts.map((attempt, i) => (
+                    <div
+                      key={`${attempt.problem_id}-${i}`}
+                      className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden"
+                    >
+                      <div className="px-6 py-4 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <span className="text-white font-semibold truncate">{attempt.title}</span>
+                          <span
+                            className={`text-xs px-2.5 py-1 rounded-full border capitalize font-medium shrink-0 ${
+                              difficultyColors[(attempt.difficulty || 'medium').toLowerCase()] || difficultyColors.medium
+                            }`}
+                          >
+                            {attempt.difficulty}
+                          </span>
+                          <span className="text-xs text-slate-500 uppercase shrink-0">{attempt.language}</span>
+                        </div>
+                        <div className="flex items-center gap-3 shrink-0">
+                          <span
+                            className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border ${
+                              attempt.all_passed
+                                ? 'text-emerald-300 bg-emerald-500/10 border-emerald-500/20'
+                                : 'text-amber-300 bg-amber-500/10 border-amber-500/20'
+                            }`}
+                          >
+                            {attempt.all_passed ? (
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                            ) : (
+                              <XCircle className="w-3.5 h-3.5" />
+                            )}
+                            {attempt.passed}/{attempt.total} passed
+                          </span>
+                          <span className="text-xs text-slate-500">
+                            {new Date(attempt.submitted_at).toLocaleString(undefined, {
+                              month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
+                            })}
+                          </span>
+                        </div>
+                      </div>
+                      <pre className="text-xs text-slate-300 bg-slate-950 p-4 overflow-x-auto font-mono leading-relaxed">
+                        <code>{attempt.code}</code>
+                      </pre>
+                    </div>
+                  ))}
+
+                  {codingAbility || codingScores ? (
+                    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8">
+                      <div className="flex items-center gap-2 mb-5">
+                        <div className="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+                          <Code2 className="w-4 h-4 text-cyan-400" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-white">AI Code Review</h3>
+                          <p className="text-xs text-slate-500">
+                            Time/space complexity, edge cases, and a more efficient approach if one exists
+                          </p>
+                        </div>
+                      </div>
+                      {codingAbility && (
+                        <div className="mb-6">
+                          <MarkdownLines text={codingAbility} />
+                        </div>
+                      )}
+                      {codingScores && (
+                        <div className="pt-4 border-t border-slate-800/60">
+                          <MarkdownLines text={codingScores} />
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-16 gap-4 text-center bg-slate-900 border border-slate-800 rounded-2xl">
+                      <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+                        <Sparkles className="w-7 h-7 text-cyan-400" />
+                      </div>
+                      <div>
+                        <h3 className="text-white font-semibold mb-1">No code review yet</h3>
+                        <p className="text-slate-400 text-sm max-w-sm">
+                          Generate AI feedback to get a written review of this code — time/space complexity,
+                          edge cases, and a more efficient approach if one exists.
+                        </p>
+                      </div>
+                      <Button
+                        onClick={handleGenerateFeedback}
+                        variant="primary"
+                        disabled={isGenerating}
+                      >
+                        {isGenerating ? (
+                          <span className="flex items-center gap-2">
+                            <LoadingSpinner size="sm" />
+                            Generating...
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-2">
+                            <Sparkles className="w-4 h-4" />
+                            Generate Feedback
+                          </span>
+                        )}
+                      </Button>
                     </div>
                   )}
                 </div>

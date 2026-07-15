@@ -125,7 +125,12 @@ export default function LandingPage() {
                 {/* Top blend */}
                 <div className="absolute top-0 inset-x-0 h-16 pointer-events-none z-10 bg-gradient-to-b from-slate-950/40 to-transparent" />
 
-                <InteractiveRobotSpline scene={ROBOT_SCENE} className="w-full h-full" />
+                {/* pointer-events-none: show the scene without its baked-in
+                    mouse-follow/orbit/click interactivity */}
+                <InteractiveRobotSpline
+                  scene={ROBOT_SCENE}
+                  className="w-full h-full pointer-events-none"
+                />
               </div>
 
               <AISessionCard />
