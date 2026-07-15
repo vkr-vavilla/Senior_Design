@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { ArrowLeft, Bot, AlertCircle } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { chatApi, ApiError } from '@/lib/api';
+import type { FeedbackMetrics } from '@/types/chat';
 import { Navbar } from '@/components/layout/Navbar';
 import { FeedbackDisplay } from '@/components/feedback/FeedbackDisplay';
 import { LoadingPage, LoadingSpinner } from '@/components/ui/LoadingSpinner';
@@ -28,6 +29,7 @@ export default function FeedbackPage() {
   const sessionId = params.sessionId as string;
 
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [metrics, setMetrics] = useState<FeedbackMetrics | null>(null);
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -45,7 +47,8 @@ export default function FeedbackPage() {
       setError(null);
       try {
         const result = await chatApi.getFeedback(sessionId, token);
-        setFeedback(result);
+        setFeedback(result.feedback);
+        setMetrics(result.metrics ?? null);
       } catch (err) {
         if (err instanceof ApiError) {
           if (err.status === 404) {
@@ -118,7 +121,10 @@ export default function FeedbackPage() {
                   setIsFetching(true);
                   chatApi
                     .getFeedback(sessionId, token ?? undefined)
-                    .then(setFeedback)
+                    .then((result) => {
+                      setFeedback(result.feedback);
+                      setMetrics(result.metrics ?? null);
+                    })
                     .catch((err) =>
                       setError(
                         err instanceof ApiError
@@ -138,7 +144,7 @@ export default function FeedbackPage() {
             </div>
           </div>
         ) : feedback ? (
-          <FeedbackDisplay feedback={feedback} sessionId={sessionId} />
+          <FeedbackDisplay feedback={feedback} sessionId={sessionId} metrics={metrics} />
         ) : null}
       </main>
     </div>

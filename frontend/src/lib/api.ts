@@ -1,5 +1,5 @@
 import type { LoginCredentials, RegisterData, User } from '@/types/auth';
-import type { Session } from '@/types/chat';
+import type { FeedbackResult, Session } from '@/types/chat';
 import type { CodingProblem, RunResult } from '@/types/coding';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -88,14 +88,13 @@ export const authApi = {
 };
 
 export const chatApi = {
-  async getFeedback(sessionId: string, token?: string): Promise<string> {
-    const response = await apiRequest<{ feedback: string }>(
+  async getFeedback(sessionId: string, token?: string): Promise<FeedbackResult> {
+    return apiRequest<FeedbackResult>(
       'POST',
       `/chat/${sessionId}/feedback`,
       {},
       token
     );
-    return response.feedback;
   },
   async transcribe(audioBlob: Blob): Promise<{ text: string }> {
     const formData = new FormData();

@@ -28,6 +28,12 @@ STT_BACKEND = os.getenv("STT_BACKEND", "groq" if GROQ_API_KEY else "local").lowe
 WHISPER_MODEL = os.getenv("WHISPER_MODEL", "small")
 VLLM_BASE_URL = os.getenv("VLLM_BASE_URL", "http://localhost:8080/v1")
 VLLM_MODEL = os.getenv("VLLM_MODEL", "Qwen/Qwen2.5-7B-Instruct")
+# Base (non-LoRA) model id, used ONLY for grading feedback. VLLM_MODEL points at
+# the "interviewer" LoRA — a persona fine-tuned to be warm and encouraging — so
+# using it to also grade the interview biases scores upward. vLLM serves the base
+# checkpoint under this id alongside the LoRA adapter, so no extra deployment or
+# model download is needed; just a different `model=` on the same server.
+VLLM_BASE_MODEL = os.getenv("VLLM_BASE_MODEL", "Qwen/Qwen2.5-7B-Instruct-AWQ")
 AI_BACKEND = os.getenv("AI_BACKEND", "gemini")  # "gemini" or "qwen"
 # Redis: per-turn crash-safety snapshot of the live interview (best-effort; the
 # interview still works if Redis is unreachable).

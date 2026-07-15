@@ -8,17 +8,26 @@ import {
   ChevronLeft,
   ChevronRight,
   Code2,
+  FileText,
   Lightbulb,
+  ListChecks,
   MessageSquare,
+  Puzzle,
+  ShieldCheck,
   Sparkles,
   Star,
   Target,
   TrendingUp,
 } from 'lucide-react';
+import type { FeedbackMetrics } from '@/types/chat';
 
 interface FeedbackDisplayProps {
   feedback: string;
   sessionId: string;
+  // Structured scores from the backend judge. When present they drive the
+  // score ring and radar directly; markdown parsing remains as the fallback
+  // for feedback generated before metrics existed.
+  metrics?: FeedbackMetrics | null;
 }
 
 type SectionCategory =
@@ -30,6 +39,10 @@ type SectionCategory =
   | 'coding'
   | 'takeaways'
   | 'overall'
+  | 'problemsolving'
+  | 'resume'
+  | 'confidence'
+  | 'breakdown'
   | 'general';
 
 interface FeedbackItem {
@@ -61,10 +74,20 @@ function parseScore(text: string): number | null {
   return null;
 }
 
-// ----- Skill ratings (hexagon radar) -----
+// ----- Skill ratings radar -----
 
-// Fixed order — the six axes the backend emits, drawn clockwise from the top.
+// Fixed order — the axes the backend emits, drawn clockwise from the top.
 const SKILL_AXES = [
+  'Correctness',
+  'Depth',
+  'Clarity',
+  'Examples',
+  'Resume Knowledge',
+] as const;
+
+// Axes of feedback generated before the SWE-focused set — still rendered for
+// old sessions.
+const LEGACY_SKILL_AXES = [
   'Clarity',
   'Depth',
   'Structure',
@@ -73,19 +96,26 @@ const SKILL_AXES = [
   'Conciseness',
 ] as const;
 
+// metrics.skill_ratings key -> radar label, in display order (covers both eras).
+const AXIS_LABELS: Array<[string, string]> = [
+  ['correctness', 'Correctness'],
+  ['depth', 'Depth'],
+  ['clarity', 'Clarity'],
+  ['examples', 'Examples'],
+  ['resume_knowledge', 'Resume Knowledge'],
+  ['structure', 'Structure'],
+  ['confidence', 'Confidence'],
+  ['conciseness', 'Conciseness'],
+];
+
 interface SkillRating {
   axis: string;
   value: number; // 0–10
 }
 
-/**
- * Pulls the six "Name: X/10" skill scores out of the feedback markdown.
- * Returns null unless all six are present, so the radar only shows when the
- * model actually produced a complete set (older feedback has none).
- */
-function parseSkillRatings(text: string): SkillRating[] | null {
+function parseAxes(text: string, axes: readonly string[]): SkillRating[] | null {
   const ratings: SkillRating[] = [];
-  for (const axis of SKILL_AXES) {
+  for (const axis of axes) {
     // Tolerate markdown/punctuation between the label and the number
     // (e.g. "**Clarity:** 8/10", "Clarity - 8/10"). The "/10" anchor keeps it tight.
     const re = new RegExp(`${axis}[\\s:*\\-–—]*(\\d+(?:\\.\\d+)?)\\s*/\\s*10`, 'i');
@@ -94,7 +124,17 @@ function parseSkillRatings(text: string): SkillRating[] | null {
     const value = parseFloat(match[1]);
     if (value >= 0 && value <= 10) ratings.push({ axis, value });
   }
-  return ratings.length === SKILL_AXES.length ? ratings : null;
+  return ratings.length === axes.length ? ratings : null;
+}
+
+/**
+ * Pulls the "Name: X/10" skill scores out of the feedback markdown — current
+ * axes first, then the legacy set for older feedback. Returns null unless a
+ * complete set is found, so the radar only shows when the model actually
+ * produced one.
+ */
+function parseSkillRatings(text: string): SkillRating[] | null {
+  return parseAxes(text, SKILL_AXES) ?? parseAxes(text, LEGACY_SKILL_AXES);
 }
 
 function getScoreLabel(score: number): string {
@@ -152,7 +192,12 @@ function categorize(title: string): SectionCategory {
   if (lower.includes('weakness')) return 'weaknesses';
   if (lower.includes('improve') || lower.includes('areas')) return 'improvements';
   if (lower.includes('communicat') || lower.includes('clarity')) return 'communication';
-  if (lower.includes('technical') || lower.includes('accuracy')) return 'technical';
+  if (lower.includes('resume')) return 'resume';
+  if (lower.includes('problem')) return 'problemsolving';
+  if (lower.includes('confidence')) return 'confidence';
+  if (lower.includes('answer-by-answer') || lower.includes('breakdown')) return 'breakdown';
+  if (lower.includes('technical') || lower.includes('accuracy') || lower.includes('system design'))
+    return 'technical';
   if (lower.includes('takeaway') || lower.includes('key') || lower.includes('focus'))
     return 'takeaways';
   if (lower.includes('overall') || lower.includes('summary') || lower.includes('score'))
@@ -234,6 +279,38 @@ const CATEGORY_STYLE: Record<
     accent: 'from-indigo-500/20 to-transparent',
     pill: 'bg-indigo-500/10 text-indigo-300 border-indigo-500/20',
     label: 'Overall',
+  },
+  problemsolving: {
+    icon: Puzzle,
+    iconColor: 'text-fuchsia-400',
+    iconBg: 'bg-fuchsia-500/10 border-fuchsia-500/20',
+    accent: 'from-fuchsia-500/20 to-transparent',
+    pill: 'bg-fuchsia-500/10 text-fuchsia-300 border-fuchsia-500/20',
+    label: 'Problem Solving',
+  },
+  resume: {
+    icon: FileText,
+    iconColor: 'text-teal-400',
+    iconBg: 'bg-teal-500/10 border-teal-500/20',
+    accent: 'from-teal-500/20 to-transparent',
+    pill: 'bg-teal-500/10 text-teal-300 border-teal-500/20',
+    label: 'Resume',
+  },
+  confidence: {
+    icon: ShieldCheck,
+    iconColor: 'text-orange-400',
+    iconBg: 'bg-orange-500/10 border-orange-500/20',
+    accent: 'from-orange-500/20 to-transparent',
+    pill: 'bg-orange-500/10 text-orange-300 border-orange-500/20',
+    label: 'Confidence',
+  },
+  breakdown: {
+    icon: ListChecks,
+    iconColor: 'text-blue-400',
+    iconBg: 'bg-blue-500/10 border-blue-500/20',
+    accent: 'from-blue-500/20 to-transparent',
+    pill: 'bg-blue-500/10 text-blue-300 border-blue-500/20',
+    label: 'Per Question',
   },
   general: {
     icon: Award,
@@ -475,8 +552,6 @@ function SkillRadar({ ratings }: { ratings: SkillRating[] }) {
     .map((r, i) => { const p = at(i, maxR * (r.value / 10)); return `${p.x},${p.y}`; })
     .join(' ');
 
-  const avg = ratings.reduce((s, r) => s + r.value, 0) / n;
-
   return (
     <div className="relative overflow-hidden bg-slate-900/60 backdrop-blur-sm border border-slate-800 rounded-3xl p-6 sm:p-8">
       <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-indigo-500/10 to-transparent pointer-events-none" />
@@ -570,13 +645,10 @@ function SkillRadar({ ratings }: { ratings: SkillRating[] }) {
 
         {/* Per-axis breakdown */}
         <div className="flex-1 w-full min-w-0">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center mb-4">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-indigo-300 text-xs font-medium">
               <TrendingUp className="w-3 h-3" />
               Skill Profile
-            </span>
-            <span className="text-xs text-slate-500">
-              avg <span className="text-slate-300 font-semibold">{avg.toFixed(1)}</span>/10
             </span>
           </div>
           <div className="space-y-2.5">
@@ -664,7 +736,7 @@ function ScoreHero({ score }: { score: number }) {
             {getScoreLabel(score)}
           </h2>
           <p className="text-slate-400 text-sm mt-2 max-w-md leading-relaxed">
-            Step through each piece of feedback at your own pace using the arrows below.
+            Each part of your evaluation is its own card — step through them with the arrows below.
           </p>
         </div>
       </div>
@@ -672,7 +744,7 @@ function ScoreHero({ score }: { score: number }) {
   );
 }
 
-// ----- Card View (one bullet at a time) -----
+// ----- Card View (one section at a time, stepped with the arrows) -----
 
 function CardView({
   card,
@@ -720,13 +792,50 @@ function CardView({
       {/* Body — list of items */}
       <div className="relative flex-1 px-8 sm:px-10 py-7 space-y-5 overflow-y-auto">
         {card.items.map((item, i) => {
+          // "Label: X/10" items (Coding & Design Scores, skill lines when the
+          // radar is unavailable) render as a score bar instead of plain text.
+          const combined = item.title ? `${item.title}: ${item.body}` : item.body;
+          const rating = combined.match(
+            /^\**([A-Za-z][A-Za-z &/']*?)\**\s*[:\-–—]\s*(\d+(?:\.\d+)?)\s*\/\s*10\s*\**$/
+          );
+          if (rating) {
+            const v = parseFloat(rating[2]);
+            const c = valueColor(v);
+            return (
+              <div key={i} className="flex items-center gap-3">
+                <span className="text-[14px] text-slate-300 w-44 shrink-0 truncate">
+                  {rating[1].trim()}
+                </span>
+                <div className="flex-1 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full ${c.bar}`}
+                    style={{ width: `${(v / 10) * 100}%` }}
+                  />
+                </div>
+                <span className={`text-[14px] font-semibold tabular-nums w-12 text-right ${c.text}`}>
+                  {v}/10
+                </span>
+              </div>
+            );
+          }
+
+          // "Qn — question" items (the per-question breakdown) get a numbered badge.
+          const qMatch = item.title?.match(/^Q(\d+)\s*[—–:-]?\s*(.*)$/);
           const bodyIsRedundant = item.title ? bodyRestatesTitle(item.title, item.body) : false;
           return (
             <div key={i} className="flex gap-3">
-              <span className={`mt-2.5 w-1.5 h-1.5 rounded-full shrink-0 ${style.iconColor.replace('text-', 'bg-')}`} />
+              {qMatch ? (
+                <span className="mt-0.5 inline-flex items-center justify-center w-6 h-6 rounded-lg bg-slate-800 border border-slate-700 text-[11px] font-bold text-slate-300 shrink-0">
+                  {qMatch[1]}
+                </span>
+              ) : (
+                <span className={`mt-2.5 w-1.5 h-1.5 rounded-full shrink-0 ${style.iconColor.replace('text-', 'bg-')}`} />
+              )}
               <div className="flex-1 min-w-0">
                 {item.title && (
-                  <p className="text-white font-semibold text-[15px] mb-1">{item.title}</p>
+                  <p className="text-white font-semibold text-[15px] mb-1">
+                    {qMatch ? qMatch[2] || item.title : item.title}
+                  </p>
                 )}
                 {!bodyIsRedundant && (
                   <p className="text-slate-300 text-[15px] leading-relaxed">
@@ -798,9 +907,20 @@ function PaginationControls({
 
 // ----- Main Display -----
 
-export function FeedbackDisplay({ feedback, sessionId }: FeedbackDisplayProps) {
-  const score = parseScore(feedback);
-  const ratings = useMemo(() => parseSkillRatings(feedback), [feedback]);
+export function FeedbackDisplay({ feedback, sessionId, metrics }: FeedbackDisplayProps) {
+  const score = metrics?.overall_score ?? parseScore(feedback);
+  const ratings = useMemo(() => {
+    const sr = metrics?.skill_ratings;
+    if (sr) {
+      // Render whichever known axes this feedback was stored with (current
+      // 5-axis SWE set, or the legacy 6-axis set for older sessions).
+      const fromMetrics = AXIS_LABELS.filter(
+        ([key]) => typeof sr[key] === 'number' && sr[key] >= 0 && sr[key] <= 10
+      ).map(([key, label]) => ({ axis: label, value: sr[key] }));
+      if (fromMetrics.length >= 5) return fromMetrics;
+    }
+    return parseSkillRatings(feedback);
+  }, [feedback, metrics]);
   const cards = useMemo(() => {
     const all = parseCards(feedback);
     // The radar already shows the skill scores — drop the redundant text card,
