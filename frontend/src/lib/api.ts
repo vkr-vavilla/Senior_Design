@@ -51,27 +51,72 @@ export async function apiRequest<T>(
     body: body ? JSON.stringify(body) : undefined,
   });
 
-  if (!response.ok) {
-    let detail: unknown;
-    try {
-      detail = await response.json();
-    } catch {
-      detail = await response.text();
+  // Intercept 401 for silent refresh
+  if (response.status === 401 && path !== '/auth/refresh' && path !== '/auth/login') {
+    if (typeof window !== 'undefined') {
+      try {
+        // Attempt to refresh the token
+        const refreshResponse = await fetch(`${API_URL}/auth/refresh`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (refreshResponse.ok) {
+          const { access_token } = await refreshResponse.json();
+          
+          // Update local storage
+          localStorage.setItem('prepai_token', access_token);
+
+          // Notify AuthContext to update state
+          window.dispatchEvent(new CustomEvent('token-refreshed', { detail: access_token }));
+
+          // Retry the original request with the new token
+          const retryHeaders = { ...headers };
+          retryHeaders['Authorization'] = `Bearer ${access_token}`;
+
+          const retryResponse = await fetch(`${API_URL}${path}`, {
+            method,
+            headers: retryHeaders,
+            body: body ? JSON.stringify(body) : undefined,
+          });
+
+          if (retryResponse.ok) {
+            const text = await retryResponse.text();
+            return text ? JSON.parse(text) : (undefined as T);
+          }
+          
+          // If retry fails, handle it as a normal error
+          return handleResponseError(retryResponse);
+        }
+      } catch (err) {
+        // Refresh failed or network error, proceed to original 401 handling
+      }
     }
-
-    const message =
-      typeof detail === 'object' && detail !== null && 'detail' in detail
-        ? String((detail as { detail: unknown }).detail)
-        : `Request failed with status ${response.status}`;
-
-    throw new ApiError(response.status, message, detail);
   }
 
-  // Handle empty responses
-  const text = await response.text();
-  if (!text) return undefined as T;
+  return handleResponseError(response);
+}
 
-  return JSON.parse(text) as T;
+async function handleResponseError(response: Response) {
+  const text = await response.text();
+
+  if (response.ok) {
+    return text ? JSON.parse(text) : undefined;
+  }
+
+  let detail: unknown;
+  try {
+    detail = JSON.parse(text);
+  } catch {
+    detail = text;
+  }
+
+  const message =
+    typeof detail === 'object' && detail !== null && 'detail' in detail
+      ? String((detail as { detail: unknown }).detail)
+      : `Request failed with status ${response.status}`;
+
+  throw new ApiError(response.status, message, detail);
 }
 
 export const authApi = {
@@ -85,6 +130,10 @@ export const authApi = {
 
   async me(token: string): Promise<User> {
     return apiRequest('GET', '/auth/me', undefined, token);
+  },
+
+  async logout(): Promise<void> {
+    return apiRequest('POST', '/auth/logout');
   },
 };
 
