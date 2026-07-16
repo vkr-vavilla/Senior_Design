@@ -10,6 +10,7 @@ It can run entirely on a **cloud LLM (Google Gemini)** with zero GPU, or fully *
 
 - **Conversational, voice-first interviews** over a WebSocket — speak your answers, hear the interviewer reply.
   - **Speech-to-text** via Groq Whisper.
+    
   - **Text-to-speech** via Kokoro (ONNX, runs locally).
 - **Resume- and job-description-aware questioning.** Upload a PDF résumé + paste a JD; the interviewer tailors questions to *your* background and the role.
 - **Three interview modes:** behavioral, technical, and mixed, each at easy / medium / hard difficulty.
