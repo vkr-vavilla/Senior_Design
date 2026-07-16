@@ -91,8 +91,8 @@ export function useInterviewChat(options?: UseInterviewChatOptions): UseIntervie
 
       const now = Date.now();
       const inactivityMs = now - lastActivityRef.current;
-      const fifteenMinutesMs = 15 * 60 * 1000;
-      const sixteenMinutesMs = 16 * 60 * 1000;
+      const fifteenMinutesMs = 5 * 60 * 1000;
+      const sixteenMinutesMs = 6 * 60 * 1000;
 
       if (inactivityMs >= sixteenMinutesMs) {
         endInterview();

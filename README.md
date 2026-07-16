@@ -109,6 +109,9 @@ It can run entirely on a **cloud LLM (Google Gemini)** with zero GPU, or fully *
 > **Want everything on your own machine?** The self-contained local package
 > (bundled MongoDB, offline speech-to-text, no API keys in GPU mode) is a single
 > script: `./setup_local.sh` — see [docs/LOCAL_SETUP.md](docs/LOCAL_SETUP.md).
+> That doc also covers the **native desktop app** (`desktop/`, Tauri) and how to
+> **update** an existing install (`git pull` — the source is bind-mounted and
+> hot-reloads, so there is nothing to re-download).
 
 ### Prerequisites
 

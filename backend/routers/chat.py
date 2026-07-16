@@ -1185,9 +1185,16 @@ The numbers MUST match what the report says — they are the same scores, machin
         # Grading is a judge call, not a conversation: low temperature so the SAME
         # transcript scores consistently across regenerations, instead of drifting
         # each time on Gemini's much higher conversational default (~1.0).
-        client = gemini_client
+        # Match the judge to the configured engine. Any GEMINI_API_KEY present in
+        # the environment used to route grading to Gemini even when AI_BACKEND is
+        # local, so a dead/denied key broke feedback on a box that never needed
+        # the cloud. Only use Gemini in API mode, or when the caller supplies
+        # their own key (an explicit request for it).
+        client = None
         if x_gemini_key:
             client = genai.Client(api_key=x_gemini_key)
+        elif AI_BACKEND == "gemini":
+            client = gemini_client
         if client:
             resp = await client.aio.models.generate_content(
                 model=GEMINI_JUDGE_MODEL,

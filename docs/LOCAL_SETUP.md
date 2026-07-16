@@ -26,7 +26,11 @@ all run on your computer. Nothing is metered and no cloud account is required
 
 ## Quick start
 
+On a machine that doesn't have the code yet, clone it first:
+
 ```bash
+git clone https://github.com/vkr-vavilla/Senior_Design.git
+cd Senior_Design
 ./setup_local.sh
 ```
 
@@ -44,6 +48,54 @@ Force a mode explicitly:
 
 The script is idempotent — re-run it after a reboot or a `git pull` and it
 will reuse the existing `.env`, volumes, and problem bank.
+
+## Desktop app (native window)
+
+The stack above serves the app at http://localhost:3000 in any browser. The
+`desktop/` Tauri shell wraps that in a native window and brings the compose
+stack up for you. It needs **Rust** and **Node** on top of the requirements
+above (plus WebKitGTK on Linux):
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+. "$HOME/.cargo/env"
+
+cd desktop
+npm install
+npm run dev      # native window
+npm run build    # installers instead: .deb + .AppImage
+```
+
+The icon set is committed under `desktop/src-tauri/icons/`, so there is no
+icon-generation step. The first `npm run dev` compiles the Rust shell once
+(a few minutes, ~3 GB in `src-tauri/target/`); every run after that is quick.
+
+The Linux webview (WebKitGTK) ships no Web Speech API, so voice **input** is
+unavailable in the native window — it degrades quietly, and spoken answers
+still work in a browser. Voice output (Kokoro TTS) works in both.
+
+## Updating to the latest code
+
+`git pull` is the whole update path — there is no bundle to re-download.
+`docker-compose.local.yml` bind-mounts the source (`./backend:/app`,
+`./frontend:/app`) and both services run dev servers with hot reload, so pulled
+changes hit the running stack immediately.
+
+```bash
+git pull
+```
+
+Only these cases need more than a pull:
+
+| What changed | What to run |
+|---|---|
+| `.py` / `.ts` / `.tsx` code | nothing — backend (`WatchFiles`) and frontend (`next dev`) reload themselves |
+| `requirements.txt` or `package.json` (new dependency) | `docker compose -f docker-compose.local.yml --profile gpu up -d --build` |
+| `docker-compose.local.yml` | `docker compose -f docker-compose.local.yml --profile gpu up -d` |
+| `desktop/src-tauri/**.rs` | restart `npm run dev` (recompiles the shell) |
+
+Drop `--profile gpu` in API mode. `./setup_local.sh` is idempotent, so
+re-running it after a pull is always safe.
 
 ## Day-to-day commands
 
@@ -93,6 +145,9 @@ docker compose -f docker-compose.local.yml --profile gpu down -v   # -v deletes 
 - **First spoken answer is slow** — the Whisper model downloads on first backend
   boot; watch `docker compose -f docker-compose.local.yml logs -f backend` for
   `[Whisper] Pre-warmed.`
+- **Coding round never appears** — only **technical** and **mixed** interviews get
+  one; a behavioral interview never does. The difficulty rule is: `easy` → 1 easy
+  problem, `medium` → 1 medium, `hard` → 1 easy + 1 medium (never a LeetCode "hard").
 - **Coding round empty** — re-run `./setup_local.sh` (it seeds only when the
   problem bank is empty), or seed manually:
   `docker compose -f docker-compose.local.yml exec backend python -m scripts.scrape_leetcode --per-difficulty 25 --sleep 1.0`

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 from auth.jwt import get_current_user
 from database import get_db
 from bson import ObjectId, Binary
@@ -11,8 +11,14 @@ router = APIRouter(prefix="/interview", tags=["interview"])
 
 
 class StartInterviewRequest(BaseModel):
+    # The client posts snake_case ("interview_type"), matching /interview/create.
+    # Accept the camelCase spelling too: this field was previously named
+    # interviewType only, so a snake_case body silently fell back to the default
+    # and every quick-start interview came out behavioral regardless of choice.
+    model_config = ConfigDict(populate_by_name=True)
+
     role: str
-    interviewType: str = "behavioral"
+    interview_type: str = Field("technical", alias="interviewType")
     difficulty: str = "medium"
 
 
@@ -26,7 +32,7 @@ async def start_interview(
     doc = {
         "user_id": user_id,
         "role": body.role,
-        "interview_type": body.interviewType,
+        "interview_type": body.interview_type,
         "difficulty": body.difficulty,
         "resume_pdf": None,
         "resume_filename": None,
