@@ -13,7 +13,11 @@ export function Navbar() {
 
   const navLinks = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/interview', label: 'New Interview', icon: Plus },
+    // Starting an interview requires a resume upload, which only the
+    // dashboard's setup form collects — point "New Interview" there instead
+    // of the standalone /interview page (which needs an interviewId to have
+    // any resume context at all).
+    { href: '/dashboard', label: 'New Interview', icon: Plus },
   ];
 
   const initials = user?.name
@@ -29,8 +33,12 @@ export function Navbar() {
     <nav className="z-40 border-b border-slate-800/50 bg-slate-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/dashboard">
+          {/* Logo — goes to the marketing landing page, not the dashboard.
+              Auth state lives in the root layout's AuthProvider, so this
+              never signs anyone out; the landing page's own nav is
+              auth-aware too and shows "Dashboard" instead of "Sign In" for
+              a logged-in visitor. */}
+          <Link href="/">
             <Logo size="md" />
           </Link>
 
@@ -41,7 +49,7 @@ export function Navbar() {
               const isActive = pathname === link.href;
               return (
                 <Link
-                  key={link.href}
+                  key={link.label}
                   href={link.href}
                   className={cn(
                     'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors',

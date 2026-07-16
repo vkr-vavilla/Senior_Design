@@ -19,6 +19,15 @@ export function useTextToSpeech(token?: string) {
   const sentenceBufferRef = useRef<string>('');
   const playSessionIdRef = useRef<number>(0);
 
+  // Live voice-amplitude analysis (drives the SiriWave avatar). Each premium
+  // Audio element gets its own AnalyserNode tapped into the playback graph —
+  // MediaElementSource redirects output through the graph, so the analyser
+  // must stay connected to destination or audio would go silent.
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const levelDataRef = useRef<Uint8Array | null>(null);
+  const smoothedLevelRef = useRef<number>(0);
+
   // Queue stores items to play
   const playQueueRef = useRef<{ type: 'url' | 'text', value: string }[]>([]);
   const isPlayingRef = useRef<boolean>(false);
@@ -30,6 +39,70 @@ export function useTextToSpeech(token?: string) {
   tokenRef.current = token;
 
   const canUsePremium = useCallback(() => Date.now() >= premiumDisabledUntilRef.current, []);
+
+  const ensureAudioContext = useCallback((): AudioContext | null => {
+    if (typeof window === 'undefined') return null;
+    const Ctx = window.AudioContext || (window as any).webkitAudioContext;
+    if (!Ctx) return null;
+    if (!audioCtxRef.current) {
+      audioCtxRef.current = new Ctx();
+    }
+    if (audioCtxRef.current.state === 'suspended') {
+      audioCtxRef.current.resume().catch(() => {});
+    }
+    return audioCtxRef.current;
+  }, []);
+
+  // Taps an analyser onto a freshly-created Audio element. Same-origin blob
+  // URLs (from chatApi.synthesize) never taint the WebAudio graph, so this is
+  // safe; wrapped defensively anyway since a failure here must never break
+  // playback, only wave reactivity.
+  const attachAnalyser = useCallback((audio: HTMLAudioElement) => {
+    try {
+      const ctx = ensureAudioContext();
+      if (!ctx) return;
+      const source = ctx.createMediaElementSource(audio);
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 256;
+      analyser.smoothingTimeConstant = 0.6;
+      source.connect(analyser);
+      analyser.connect(ctx.destination);
+      analyserRef.current = analyser;
+      levelDataRef.current = new Uint8Array(analyser.frequencyBinCount);
+    } catch (err) {
+      console.warn('[TTS] amplitude analyser attach failed (playback unaffected):', err);
+    }
+  }, [ensureAudioContext]);
+
+  // Polled every animation frame by SiriWave via getAmplitude — not React
+  // state, since audio level changes far faster than a re-render should.
+  const getAudioLevel = useCallback((): number => {
+    const analyser = analyserRef.current;
+    const data = levelDataRef.current;
+    const audio = audioRef.current;
+    let target = 0;
+    if (analyser && data && audio && !audio.paused) {
+      // TS's lib.dom types getByteTimeDomainData as Uint8Array<ArrayBuffer>,
+      // stricter than the Uint8Array<ArrayBufferLike> `new Uint8Array(n)`
+      // actually returns — functionally identical, cast to satisfy the checker.
+      analyser.getByteTimeDomainData(data as Uint8Array<ArrayBuffer>);
+      let sumSq = 0;
+      for (let i = 0; i < data.length; i++) {
+        const v = (data[i] - 128) / 128;
+        sumSq += v * v;
+      }
+      const rms = Math.sqrt(sumSq / data.length);
+      // Speech RMS on this waveform data is quiet; boost for a visibly alive wave.
+      target = Math.min(1, rms * 4);
+    } else if (engine === 'browser' && isSpeaking) {
+      // Web Speech API exposes no waveform data — fake a gentle pulse so the
+      // wave still visibly reacts instead of going flat during fallback playback.
+      target = 0.35 + 0.2 * Math.sin(Date.now() / 140);
+    }
+    // Attack/release smoothing so the wave doesn't jitter frame to frame.
+    smoothedLevelRef.current += (target - smoothedLevelRef.current) * 0.35;
+    return smoothedLevelRef.current;
+  }, [engine, isSpeaking]);
 
   const handlePremiumFailure = useCallback(() => {
     premiumFailureCountRef.current += 1;
@@ -56,6 +129,7 @@ export function useTextToSpeech(token?: string) {
     if (item.type === 'url') {
       const audio = new Audio(item.value);
       audioRef.current = audio;
+      attachAnalyser(audio);
 
       audio.onended = () => {
         setIsSpeaking(false);
@@ -107,10 +181,11 @@ export function useTextToSpeech(token?: string) {
 
       synth.speak(utterance);
     }
-  }, []);
+  }, [attachAnalyser]);
 
   const stop = useCallback(() => {
     playSessionIdRef.current += 1;
+    smoothedLevelRef.current = 0;
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
@@ -240,5 +315,6 @@ export function useTextToSpeech(token?: string) {
     speakStream,
     stop,
     flush,
+    getAudioLevel,
   };
 }

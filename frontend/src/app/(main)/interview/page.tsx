@@ -6,6 +6,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/Button';
 import { Input, Select } from '@/components/ui/Input';
 import { LoadingPage } from '@/components/ui/LoadingSpinner';
+import { SiriWave } from '@/components/ui/siri-wave';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useInterviewChat } from '@/hooks/useInterviewChat';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
@@ -70,7 +71,6 @@ function InterviewPageContent() {
 
   const {
     messages,
-    activeModelSource,
     isConnected,
     isStreaming,
     sessionEnded,
@@ -123,7 +123,7 @@ function InterviewPageContent() {
     return () => clearInterval(interval);
   }, [isRecording]);
 
-  const { speakStream, stop: stopSpeaking, engine, setEngine, flush } = useTextToSpeech(token ?? undefined);
+  const { speakStream, stop: stopSpeaking, engine, setEngine, flush, getAudioLevel } = useTextToSpeech(token ?? undefined);
 
   // Pre-fill from query params
   const [config, setConfig] = useState<InterviewConfig>({
@@ -139,6 +139,16 @@ function InterviewPageContent() {
       router.push('/login');
     }
   }, [user, isLoading, router]);
+
+  // A resume is required to start an interview — the dashboard's setup form
+  // is the only place that collects one and creates an interviewId. Direct
+  // navigation here without one (old bookmark, typed URL) has no resume
+  // context to ground questions in, so send the user to set one up first.
+  useEffect(() => {
+    if (!isLoading && user && !hasStarted && !searchParams.get('interviewId')) {
+      router.push('/dashboard');
+    }
+  }, [isLoading, user, hasStarted, searchParams, router]);
 
   if (isLoading) return <LoadingPage />;
   if (!user) return null;
@@ -373,10 +383,6 @@ function InterviewPageContent() {
                 </span>
                 <span className="text-xs text-slate-500 capitalize">{config.type}</span>
                 <span className="text-xs text-slate-600">·</span>
-                <span className="text-xs text-slate-500 uppercase">{config.modelSource}</span>
-                <span className="text-xs text-slate-600">·</span>
-                <span className="text-xs text-slate-500 uppercase">active: {activeModelSource}</span>
-                <span className="text-xs text-slate-600">·</span>
                 <span className="text-xs text-slate-500 truncate">{config.role}</span>
               </div>
             </div>
@@ -464,9 +470,24 @@ function InterviewPageContent() {
         </div>
       </div>
 
+      {/* Interviewer Avatar — dominant, on the app's own background (no card),
+          waves react to Alex's live voice. Transcript is squeezed below and
+          fades into this zone as it scrolls (see ChatInterface's mask). */}
+      <div className="flex-[3] min-h-0 flex justify-center items-center overflow-hidden">
+        <SiriWave
+          size={380}
+          renderScale={0.9}
+          getAmplitude={getAudioLevel}
+          className={cn(
+            'transition-opacity duration-300 max-w-full max-h-full',
+            isVoiceMode ? 'opacity-100' : 'opacity-40'
+          )}
+        />
+      </div>
+
       {/* Chat Interface */}
-      {/* Chat Interface */}
-      <div className="flex-1 overflow-hidden flex flex-col">
+      <div className="flex-[2] min-h-0 overflow-hidden flex flex-col">
+
         <ChatInterface
           messages={messages}
           isStreaming={isStreaming}

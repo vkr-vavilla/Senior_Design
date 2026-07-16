@@ -51,7 +51,7 @@ async def start_interview(
 @router.post("/create")
 async def create_interview(
     resume: UploadFile = File(...),
-    job_description: str = Form(...),
+    job_description: str = Form(""),
     role: str = Form(...),
     interview_type: str = Form("technical"),
     difficulty: str = Form("medium"),

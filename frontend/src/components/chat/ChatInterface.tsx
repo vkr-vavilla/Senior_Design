@@ -9,8 +9,23 @@ interface ChatInterfaceProps {
 }
 
 export function ChatInterface({ messages, isStreaming, messagesEndRef }: ChatInterfaceProps) {
+  // Soft top fade so messages appear to dissolve into the avatar band above
+  // as they scroll up, rather than being hard-clipped at the boundary. Top
+  // padding is deliberately taller than the fade zone so the first message
+  // (nothing scrolled above it yet) renders fully opaque instead of sitting
+  // inside the fade with nothing to visually justify it.
+  const FADE_HEIGHT = 56;
+  const topFadeMask = `linear-gradient(to bottom, transparent, black ${FADE_HEIGHT}px)`;
+
   return (
-    <div className="flex-1 overflow-y-auto px-4 py-6">
+    <div
+      className="flex-1 overflow-y-auto px-4 pb-6"
+      style={{
+        paddingTop: FADE_HEIGHT + 16,
+        maskImage: topFadeMask,
+        WebkitMaskImage: topFadeMask,
+      }}
+    >
       <div className="max-w-3xl mx-auto space-y-6">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full min-h-[300px] gap-4 text-center">

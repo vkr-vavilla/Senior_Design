@@ -481,7 +481,7 @@ function parseCards(text: string): FeedbackCard[] {
 
 // ----- Inline markdown (bold) renderer -----
 
-function renderInline(text: string): React.ReactNode {
+export function renderInline(text: string): React.ReactNode {
   const parts = text.split(/(\*\*[^*]+\*\*)/g);
   return parts.map((part, i) => {
     if (part.startsWith('**') && part.endsWith('**')) {
