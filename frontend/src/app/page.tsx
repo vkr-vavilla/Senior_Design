@@ -3,6 +3,7 @@ import CelestialSphere from '@/components/ui/celestial-sphere';
 import { ContainerScroll } from '@/components/ui/container-scroll-animation';
 import { FeatureCards } from '@/components/ui/FeatureCards';
 import { InteractiveRobotSpline } from '@/components/ui/interactive-3d-robot';
+import { LandingNavActions } from '@/components/ui/LandingNavActions';
 import { Logo } from '@/components/ui/Logo';
 import { AISessionCard } from '@/components/ui/RobotHUD';
 import { RotatingText } from '@/components/ui/RotatingText';
@@ -47,29 +48,7 @@ export default function LandingPage() {
           </Link>
 
           {/* ── Nav actions ── */}
-          <div className="flex items-center gap-1">
-            <Link
-              href="/login"
-              className="text-sm text-slate-400 hover:text-white transition-colors duration-200 px-4 py-2 rounded-xl hover:bg-white/[0.05] cursor-pointer"
-            >
-              Sign In
-            </Link>
-
-            {/* Divider */}
-            <div className="h-4 w-px bg-slate-700/60 mx-1" />
-
-            <Link
-              href="/register"
-              className="group/btn relative inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold text-white cursor-pointer overflow-hidden transition-all duration-200"
-            >
-              {/* Button gradient bg */}
-              <span className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-violet-600 group-hover/btn:from-indigo-500 group-hover/btn:to-violet-500 transition-all duration-200" />
-              {/* Bottom glow */}
-              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-              <span className="relative">Get Started</span>
-              <ArrowRight className="relative w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform duration-200" />
-            </Link>
-          </div>
+          <LandingNavActions />
         </div>
       </nav>
 

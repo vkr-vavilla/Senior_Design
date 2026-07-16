@@ -33,8 +33,12 @@ export function Navbar() {
     <nav className="z-40 border-b border-slate-800/50 bg-slate-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/dashboard">
+          {/* Logo — goes to the marketing landing page, not the dashboard.
+              Auth state lives in the root layout's AuthProvider, so this
+              never signs anyone out; the landing page's own nav is
+              auth-aware too and shows "Dashboard" instead of "Sign In" for
+              a logged-in visitor. */}
+          <Link href="/">
             <Logo size="md" />
           </Link>
 

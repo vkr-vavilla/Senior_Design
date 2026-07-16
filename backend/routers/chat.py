@@ -942,23 +942,6 @@ async def get_feedback(session_id: str, x_gemini_key: str | None = Header(None, 
             {"$set": {"user_answers": user_answers, "qa_pairs": qa_pairs}},
         )
 
-    qa_text = "\n\n".join(
-        f"Q{i + 1}: {qa['question']}\nA{i + 1}: {qa['answer']}"
-        for i, qa in enumerate(qa_pairs)
-    ) or "(No spoken questions were answered in this session — grade the coding round on its own merits below.)"
-
-    # A session can reach here with zero spoken answers if it had a coding
-    # submission (see the early-return above, which only short-circuits when
-    # BOTH qa_pairs and coding_attempts are empty). Score and code feedback
-    # are different things: no interview happened, so the interview score is
-    # 0 — full stop, regardless of how good the code is. The code itself
-    # still gets real, descriptive feedback in the Coding Ability section
-    # below; it just carries no numeric score of its own in this case (see
-    # coding_output_section). `no_interview_occurred` is enforced in code
-    # after the judge responds (generate_feedback zeroes skill_ratings), not
-    # left to prompt compliance alone.
-    no_interview_occurred = not qa_pairs
-
     # Objective engagement signal computed in code (not the model's opinion), so
     # scoring has a numeric anchor instead of relying on the model to "eyeball"
     # whether this was a real interview or a two-message joke. This is what lets
@@ -967,21 +950,43 @@ async def get_feedback(session_id: str, x_gemini_key: str | None = Header(None, 
     total_candidate_words = sum(len((qa.get("answer") or "").split()) for qa in qa_pairs)
     avg_words = total_candidate_words / len(qa_pairs) if qa_pairs else 0
     MINIMAL_SIGNAL_WORD_THRESHOLD = 25
+
+    # A session can reach here with little or no spoken engagement if it had a
+    # coding submission (see the early-return above, which only short-circuits
+    # when BOTH qa_pairs and coding_attempts are empty). Score and code
+    # feedback are different things: below the minimal-signal bar, there
+    # wasn't a real interview, so the interview score is 0 — full stop,
+    # regardless of how good the code is, and regardless of whether qa_pairs
+    # has a token entry or none at all (a one-word answer isn't "doing the
+    # interview" either). The code itself still gets real, descriptive
+    # feedback in the Coding Ability section below; it just carries no
+    # numeric score of its own in this case (see coding_output_section).
+    # `no_interview_occurred` is enforced in code after the judge responds
+    # (generate_feedback zeroes skill_ratings), not left to prompt compliance
+    # alone — that's what closed the gap where an earlier version of this
+    # prompt still let the model credit "correct and efficient" code inside
+    # the Overall Score paragraph of an otherwise near-empty session.
+    no_interview_occurred = total_candidate_words < MINIMAL_SIGNAL_WORD_THRESHOLD
+
     validity_flag = ""
     if no_interview_occurred:
         validity_flag = (
-            "\n⚠️ NO INTERVIEW OCCURRED: the candidate answered zero spoken questions. The Overall Score and "
-            "EVERY Skill Rating (Correctness, Depth, Clarity, Examples, Resume Knowledge) MUST be exactly "
-            "0/10 — this is non-negotiable regardless of how good any submitted code is. Code quality is a "
+            "\n⚠️ NO INTERVIEW OCCURRED: the candidate did not meaningfully answer spoken questions in this "
+            "session. The Overall Score and EVERY Skill Rating (Correctness, Depth, Clarity, Examples, Resume "
+            "Knowledge) MUST be exactly 0/10 — this is non-negotiable regardless of how good any submitted "
+            "code is. The Overall Score summary paragraph must NOT mention, credit, or even reference code "
+            "quality, correctness, or efficiency — it is about the missing interview only. Code quality is a "
             "completely separate thing from the interview score and is evaluated ONLY in the Coding Ability "
             "section below, as descriptive feedback with NO score attached to it."
         )
-    elif total_candidate_words < MINIMAL_SIGNAL_WORD_THRESHOLD:
-        validity_flag = (
-            "\n⚠️ MINIMAL SIGNAL: this is far too little material to demonstrate real competence. "
-            "Unless every word was exceptionally dense with substance, the Overall Score and most "
-            "Skill Ratings must land in the 0-2 range — do not round up out of politeness."
-        )
+
+    qa_text = "\n\n".join(
+        f"Q{i + 1}: {qa['question']}\nA{i + 1}: {qa['answer']}"
+        for i, qa in enumerate(qa_pairs)
+    )
+    if no_interview_occurred:
+        qa_text = qa_text or "(No meaningful spoken engagement in this session — grade the coding round on its own merits below, with no score attached.)"
+
     engagement_stats = (
         f"\n\n=== INTERVIEW ENGAGEMENT STATS (objective — weigh this, it is not your opinion) ===\n"
         f"- Candidate answered {len(qa_pairs)} question(s).\n"
