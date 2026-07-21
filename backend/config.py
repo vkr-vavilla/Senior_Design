@@ -17,6 +17,13 @@ JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 # Access tokens are short-lived (15 min), refresh tokens are long-lived (30 days).
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 15))
 REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", 30))
+# The refresh-token cookie needs SameSite=None + Secure to survive a cross-origin
+# deployment (Vercel frontend + Cloud Run backend are different sites as far as
+# the browser is concerned) — SameSite=None requires Secure, which requires HTTPS,
+# which plain http://localhost dev doesn't have. Default to the production-safe
+# setting; set COOKIE_SECURE=false for local HTTP development.
+COOKIE_SECURE = os.getenv("COOKIE_SECURE", "true").lower() == "true"
+COOKIE_SAMESITE = "none" if COOKIE_SECURE else "lax"
 # Gemini API Key (Optional: can be supplied dynamically by the user on the frontend)
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 # Groq API Key (Optional: browser Web Speech API replaces backend speech-to-text)
