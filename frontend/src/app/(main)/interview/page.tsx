@@ -8,8 +8,8 @@ import { Input, Select } from '@/components/ui/Input';
 import { LoadingPage } from '@/components/ui/LoadingSpinner';
 import { SiriWave } from '@/components/ui/siri-wave';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { useInterviewChat } from '@/hooks/useInterviewChat';
-import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import { useTextToSpeech } from '@/hooks/useTextToSpeech';
 import { chatApi } from '@/lib/api';
 import { cn, formatTime } from '@/lib/utils';
@@ -103,25 +103,7 @@ function InterviewPageContent() {
     }
   }, []);
 
-  const {
-    isListening: isRecording,
-    isSupported: isSpeechSupported,
-    startListening,
-    stopListening,
-  } = useSpeechRecognition();
-
-  const [recordingTime, setRecordingTime] = useState(0);
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isRecording) {
-      setRecordingTime(0);
-      interval = setInterval(() => {
-        setRecordingTime((t) => t + 1);
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [isRecording]);
+  const { isRecording, recordingTime, startRecording, stopRecording } = useAudioRecorder();
 
   const { speakStream, stop: stopSpeaking, engine, setEngine, flush, getAudioLevel } = useTextToSpeech(token ?? undefined);
 
@@ -159,14 +141,19 @@ function InterviewPageContent() {
     setHasStarted(true);
   };
 
-  const handleStartRecording = () => {
-    startListening();
+  const handleStartRecording = async () => {
+    try {
+      await startRecording();
+    } catch (err) {
+      console.error('Could not start recording:', err);
+    }
   };
 
   const handleTranscribeAndSend = async () => {
     try {
       setIsTranscribing(true);
-      const text = await stopListening();
+      const audioBlob = await stopRecording();
+      const { text } = await chatApi.transcribe(audioBlob, token ?? undefined);
       if (text.trim()) {
         sendMessage(text);
       }
@@ -499,7 +486,7 @@ function InterviewPageContent() {
           isStreaming={isStreaming || isTranscribing}
           isRecording={isRecording}
           recordingTime={recordingTime}
-          onStartRecording={isSpeechSupported ? handleStartRecording : undefined}
+          onStartRecording={handleStartRecording}
           onStopRecording={handleTranscribeAndSend}
           placeholder={isTranscribing ? 'Transcribing your voice...' : 'Type or record your response...'}
         />
