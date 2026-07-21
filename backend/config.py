@@ -28,12 +28,12 @@ COOKIE_SAMESITE = "none" if COOKIE_SECURE else "lax"
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 # Groq API Key (Optional: browser Web Speech API replaces backend speech-to-text)
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-# Speech-to-text backend: "groq" (cloud API, needs GROQ_API_KEY) or "local"
-# (faster-whisper on CPU, no key, works offline). Defaults to groq when a key
-# is configured, local otherwise — the downloadable package sets local explicitly.
-STT_BACKEND = os.getenv("STT_BACKEND", "groq" if GROQ_API_KEY else "local").lower()
+# Speech-to-text backend: "local" (faster-whisper on CPU, free/unlimited, no
+# rate limit) or "groq" (cloud API, needs GROQ_API_KEY, subject to Groq's rate
+# limits). Defaults to local so usage is never gated by an external quota.
+STT_BACKEND = os.getenv("STT_BACKEND", "local").lower()
 # Whisper size for STT_BACKEND=local: tiny/base/small/medium (bigger = better, slower).
-WHISPER_MODEL = os.getenv("WHISPER_MODEL", "small")
+WHISPER_MODEL = os.getenv("WHISPER_MODEL", "small").lower()
 VLLM_BASE_URL = os.getenv("VLLM_BASE_URL", "http://localhost:8080/v1")
 VLLM_MODEL = os.getenv("VLLM_MODEL", "Qwen/Qwen2.5-7B-Instruct")
 # Base (non-LoRA) model id, used ONLY for grading feedback. VLLM_MODEL points at

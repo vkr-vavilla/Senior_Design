@@ -15,7 +15,6 @@ import asyncio
 import re
 import tempfile
 import os
-from concurrent.futures import ThreadPoolExecutor
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -28,8 +27,6 @@ GEMINI_JUDGE_MODEL = os.getenv("GEMINI_JUDGE_MODEL", GEMINI_MODEL)
 
 vllm_client = AsyncOpenAI(base_url=VLLM_BASE_URL, api_key="not-needed")
 gemini_client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
-
-_kokoro_executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="kokoro-tts")
 
 # ── Redis: best-effort per-turn crash-safety snapshot of the live interview ────
 # If the backend process dies mid-interview (hard crash, OOM, container kill) the
@@ -425,40 +422,6 @@ async def transcribe_audio(file: UploadFile = File(...), user_id: str = Depends(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-def _get_kokoro():
-    """Lazy-load Kokoro so it doesn't block startup. Auto-downloads model on first use."""
-    from kokoro_onnx import Kokoro
-    import os
-    import urllib.request
-    model_dir = os.path.join(os.path.dirname(__file__), "../kokoro_models")
-    os.makedirs(model_dir, exist_ok=True)
-    model_path = os.path.join(model_dir, "kokoro-v1.0.onnx")
-    voices_path = os.path.join(model_dir, "voices-v1.0.bin")
-    if not os.path.exists(model_path):
-        print(f"[Kokoro] Downloading model to {model_path}...")
-        urllib.request.urlretrieve(
-            "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.onnx",
-            model_path,
-        )
-    if not os.path.exists(voices_path):
-        print(f"[Kokoro] Downloading voices to {voices_path}...")
-        urllib.request.urlretrieve(
-            "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin",
-            voices_path,
-        )
-    return Kokoro(model_path, voices_path)
-
-_kokoro_instance = None
-_kokoro_lock = asyncio.Lock()
-
-async def get_kokoro_instance():
-    global _kokoro_instance
-    if _kokoro_instance is None:
-        async with _kokoro_lock:
-            if _kokoro_instance is None:
-                _kokoro_instance = await asyncio.to_thread(_get_kokoro)
-    return _kokoro_instance
-
 @router.post("/synthesize")
 async def synthesize_speech(request: dict, user_id: str = Depends(get_current_user)):
     try:
@@ -475,28 +438,11 @@ async def synthesize_speech(request: dict, user_id: str = Depends(get_current_us
         natural_text = re.sub(r"\s+", " ", text.strip())
         natural_text = natural_text.replace("—", ", ").replace(" - ", ", ")
 
-        kokoro = await get_kokoro_instance()
-        loop = asyncio.get_running_loop()
-        samples, sample_rate = await loop.run_in_executor(
-            _kokoro_executor,
-            kokoro.create,
-            natural_text,
-            voice,
-            speed,
-            "en-us"
-        )
-
-        import io, wave, numpy as np
-        buf = io.BytesIO()
-        pcm = (samples * 32767).astype(np.int16).tobytes()
-        with wave.open(buf, "wb") as wf:
-            wf.setnchannels(1)
-            wf.setsampwidth(2)
-            wf.setframerate(sample_rate)
-            wf.writeframes(pcm)
+        from tts_google import synthesize as google_synthesize
+        wav_bytes = await google_synthesize(natural_text, voice, speed)
 
         from fastapi.responses import Response
-        return Response(content=buf.getvalue(), media_type="audio/wav")
+        return Response(content=wav_bytes, media_type="audio/wav")
 
     except Exception as e:
         print(f"Synthesis error: {e}")

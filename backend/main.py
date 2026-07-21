@@ -130,14 +130,6 @@ async def lifespan(app: FastAPI):
     # Automatically install Python on Piston sandbox if running with Piston executor
     asyncio.create_task(ensure_piston_python())
 
-    # Pre-warm Kokoro TTS so the first synthesize request doesn't pay the load cost
-    try:
-        from routers.chat import get_kokoro_instance
-        await get_kokoro_instance()
-        print("[Kokoro] Pre-warmed.")
-    except Exception as e:
-        print(f"[Kokoro] Pre-warm skipped: {e}")
-
     # Pre-warm local Whisper STT (downloads the model on first run) so the first
     # spoken answer isn't stuck behind a model download mid-interview.
     if STT_BACKEND == "local":
