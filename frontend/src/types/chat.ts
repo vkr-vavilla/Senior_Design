@@ -10,6 +10,7 @@ export interface InterviewConfig {
   type: 'technical' | 'behavioral' | 'mixed';
   difficulty: 'easy' | 'medium' | 'hard';
   modelSource: 'local' | 'api';
+  sttEngine: 'groq' | 'local';
   interviewId?: string;
 }
 

@@ -52,6 +52,11 @@ const MODEL_SOURCES = [
   { value: 'api', label: 'API (Gemini)' },
 ];
 
+const STT_ENGINES = [
+  { value: 'groq', label: 'Groq (Premium — fast)' },
+  { value: 'local', label: 'Faster-Whisper (Standard — unlimited)' },
+];
+
 const typeIcons = {
   technical: Brain,
   behavioral: Briefcase,
@@ -113,6 +118,7 @@ function InterviewPageContent() {
     type: (searchParams.get('type') as InterviewConfig['type']) || 'technical',
     difficulty: (searchParams.get('difficulty') as InterviewConfig['difficulty']) || 'medium',
     modelSource: (searchParams.get('modelSource') as InterviewConfig['modelSource']) || 'local',
+    sttEngine: (searchParams.get('sttEngine') as InterviewConfig['sttEngine']) || 'groq',
     interviewId: searchParams.get('interviewId') || undefined,
   });
 
@@ -153,7 +159,7 @@ function InterviewPageContent() {
     try {
       setIsTranscribing(true);
       const audioBlob = await stopRecording();
-      const { text } = await chatApi.transcribe(audioBlob, token ?? undefined);
+      const { text } = await chatApi.transcribe(audioBlob, token ?? undefined, config.sttEngine);
       if (text.trim()) {
         sendMessage(text);
       }
@@ -233,6 +239,18 @@ function InterviewPageContent() {
                 setConfig((c) => ({
                   ...c,
                   modelSource: e.target.value as InterviewConfig['modelSource'],
+                }))
+              }
+            />
+
+            <Select
+              label="Voice Input (Speech-to-Text)"
+              options={STT_ENGINES}
+              value={config.sttEngine}
+              onChange={(e) =>
+                setConfig((c) => ({
+                  ...c,
+                  sttEngine: e.target.value as InterviewConfig['sttEngine'],
                 }))
               }
             />

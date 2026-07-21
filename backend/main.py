@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from database import connect_db, close_db
 from routers import auth, chat, interview, coding
-from config import AI_BACKEND, STT_BACKEND
+from config import AI_BACKEND
 import asyncio
 import os
 import subprocess
@@ -130,15 +130,12 @@ async def lifespan(app: FastAPI):
     # Automatically install Python on Piston sandbox if running with Piston executor
     asyncio.create_task(ensure_piston_python())
 
-    # Pre-warm local Whisper STT (downloads the model on first run) so the first
-    # spoken answer isn't stuck behind a model download mid-interview.
-    if STT_BACKEND == "local":
-        try:
-            from stt_local import get_whisper_instance
-            await get_whisper_instance()
-            print("[Whisper] Pre-warmed.")
-        except Exception as e:
-            print(f"[Whisper] Pre-warm skipped: {e}")
+    # Local Whisper STT is no longer pre-warmed here: the STT engine is now a
+    # per-interview user choice (Groq "premium" vs faster-whisper "standard",
+    # see routers/chat.py transcribe_audio), so most containers may never see a
+    # "local" request. Pre-warming unconditionally would keep the model
+    # resident in memory for every instance regardless of use — stt_local.py
+    # already lazy-loads it on first actual "local" request instead.
 
     yield
     await close_db()

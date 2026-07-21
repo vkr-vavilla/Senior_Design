@@ -149,9 +149,10 @@ export const chatApi = {
       token
     );
   },
-  async transcribe(audioBlob: Blob, token?: string): Promise<{ text: string }> {
+  async transcribe(audioBlob: Blob, token?: string, engine: 'groq' | 'local' = 'groq'): Promise<{ text: string }> {
     const formData = new FormData();
     formData.append('file', audioBlob, 'recording.webm');
+    formData.append('engine', engine);
 
     const response = await fetch(`${API_URL}/chat/transcribe`, {
       method: 'POST',

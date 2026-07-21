@@ -1,4 +1,4 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException, File, UploadFile, Header
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException, File, UploadFile, Form, Header
 from auth.jwt import get_current_user
 from jose import JWTError, jwt
 from groq import Groq
@@ -6,7 +6,7 @@ from openai import AsyncOpenAI
 from google import genai
 from datetime import datetime, timezone
 from database import get_db
-from config import GEMINI_API_KEY, VLLM_BASE_URL, VLLM_MODEL, VLLM_BASE_MODEL, AI_BACKEND, JWT_SECRET, JWT_ALGORITHM, GROQ_API_KEY, REDIS_URL, STT_BACKEND
+from config import GEMINI_API_KEY, VLLM_BASE_URL, VLLM_MODEL, VLLM_BASE_MODEL, AI_BACKEND, JWT_SECRET, JWT_ALGORITHM, GROQ_API_KEY, REDIS_URL
 from models.chat import ChatMessage, FeedbackResponse, FeedbackJudgment
 from safety_classifier import classify_prompt
 from bson import ObjectId
@@ -383,7 +383,11 @@ def verify_token(token: str) -> str:
 
 
 @router.post("/transcribe")
-async def transcribe_audio(file: UploadFile = File(...), user_id: str = Depends(get_current_user)):
+async def transcribe_audio(
+    file: UploadFile = File(...),
+    engine: str = Form("groq"),
+    user_id: str = Depends(get_current_user),
+):
     try:
         with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1]) as tmp:
             content = await file.read()
@@ -391,15 +395,17 @@ async def transcribe_audio(file: UploadFile = File(...), user_id: str = Depends(
             tmp_path = tmp.name
 
         try:
-            # Local mode (downloadable package): faster-whisper on CPU, no API key.
-            if STT_BACKEND == "local":
+            # User picks the STT engine at interview setup ("Groq" premium vs
+            # "Faster-Whisper" standard); Groq is the default. "local" runs
+            # faster-whisper on CPU, no API key needed, unlimited but slower.
+            if engine == "local":
                 from stt_local import transcribe_file
                 return {"text": await transcribe_file(tmp_path)}
 
             if not groq_client:
                 raise HTTPException(
                     status_code=400,
-                    detail="No STT configured: set GROQ_API_KEY or STT_BACKEND=local on the server.",
+                    detail="Groq speech-to-text isn't configured on the server (missing GROQ_API_KEY). Choose the standard voice engine instead.",
                 )
 
             with open(tmp_path, "rb") as audio_file:
