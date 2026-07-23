@@ -1,9 +1,10 @@
 """Local speech-to-text via faster-whisper (Whisper on CTranslate2, CPU).
 
-Used when STT_BACKEND=local so the packaged app transcribes with no API key
-and no network. Mirrors the Kokoro lazy-load pattern in routers/chat.py: the
-model downloads to the Hugging Face cache on first use and loads once per
-process (main.py pre-warms it at startup).
+Used when the user picks the "standard" STT engine at interview setup
+(routers/chat.py transcribe_audio, engine="local") so transcription works with
+no API key and no network. The model downloads to the Hugging Face cache and
+loads once per process, lazily on first "local" request — not pre-warmed at
+startup, since most containers may never see one (Groq is the default engine).
 """
 import asyncio
 from concurrent.futures import ThreadPoolExecutor

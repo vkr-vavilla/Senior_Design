@@ -1,4 +1,4 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException, File, UploadFile, Header
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException, File, UploadFile, Form, Header
 from auth.jwt import get_current_user
 from jose import JWTError, jwt
 from groq import Groq
@@ -6,7 +6,7 @@ from openai import AsyncOpenAI
 from google import genai
 from datetime import datetime, timezone
 from database import get_db
-from config import GEMINI_API_KEY, VLLM_BASE_URL, VLLM_MODEL, VLLM_BASE_MODEL, AI_BACKEND, JWT_SECRET, JWT_ALGORITHM, GROQ_API_KEY, REDIS_URL, STT_BACKEND
+from config import GEMINI_API_KEY, VLLM_BASE_URL, VLLM_MODEL, VLLM_BASE_MODEL, AI_BACKEND, JWT_SECRET, JWT_ALGORITHM, GROQ_API_KEY, REDIS_URL
 from models.chat import ChatMessage, FeedbackResponse, FeedbackJudgment
 from safety_classifier import classify_prompt
 from bson import ObjectId
@@ -15,7 +15,6 @@ import asyncio
 import re
 import tempfile
 import os
-from concurrent.futures import ThreadPoolExecutor
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -33,8 +32,6 @@ GEMINI_JUDGE_MODEL = os.getenv("GEMINI_JUDGE_MODEL", GEMINI_MODEL)
 
 vllm_client = AsyncOpenAI(base_url=VLLM_BASE_URL, api_key="not-needed")
 gemini_client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
-
-_kokoro_executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="kokoro-tts")
 
 # ── Redis: best-effort per-turn crash-safety snapshot of the live interview ────
 # If the backend process dies mid-interview (hard crash, OOM, container kill) the
@@ -391,7 +388,11 @@ def verify_token(token: str) -> str:
 
 
 @router.post("/transcribe")
-async def transcribe_audio(file: UploadFile = File(...), user_id: str = Depends(get_current_user)):
+async def transcribe_audio(
+    file: UploadFile = File(...),
+    engine: str = Form("groq"),
+    user_id: str = Depends(get_current_user),
+):
     try:
         with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1]) as tmp:
             content = await file.read()
@@ -399,15 +400,17 @@ async def transcribe_audio(file: UploadFile = File(...), user_id: str = Depends(
             tmp_path = tmp.name
 
         try:
-            # Local mode (downloadable package): faster-whisper on CPU, no API key.
-            if STT_BACKEND == "local":
+            # User picks the STT engine at interview setup ("Groq" premium vs
+            # "Faster-Whisper" standard); Groq is the default. "local" runs
+            # faster-whisper on CPU, no API key needed, unlimited but slower.
+            if engine == "local":
                 from stt_local import transcribe_file
                 return {"text": await transcribe_file(tmp_path)}
 
             if not groq_client:
                 raise HTTPException(
                     status_code=400,
-                    detail="No STT configured: set GROQ_API_KEY or STT_BACKEND=local on the server.",
+                    detail="Groq speech-to-text isn't configured on the server (missing GROQ_API_KEY). Choose the standard voice engine instead.",
                 )
 
             with open(tmp_path, "rb") as audio_file:
@@ -429,40 +432,6 @@ async def transcribe_audio(file: UploadFile = File(...), user_id: str = Depends(
         print(f"Transcription error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
-def _get_kokoro():
-    """Lazy-load Kokoro so it doesn't block startup. Auto-downloads model on first use."""
-    from kokoro_onnx import Kokoro
-    import os
-    import urllib.request
-    model_dir = os.path.join(os.path.dirname(__file__), "../kokoro_models")
-    os.makedirs(model_dir, exist_ok=True)
-    model_path = os.path.join(model_dir, "kokoro-v1.0.onnx")
-    voices_path = os.path.join(model_dir, "voices-v1.0.bin")
-    if not os.path.exists(model_path):
-        print(f"[Kokoro] Downloading model to {model_path}...")
-        urllib.request.urlretrieve(
-            "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.onnx",
-            model_path,
-        )
-    if not os.path.exists(voices_path):
-        print(f"[Kokoro] Downloading voices to {voices_path}...")
-        urllib.request.urlretrieve(
-            "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin",
-            voices_path,
-        )
-    return Kokoro(model_path, voices_path)
-
-_kokoro_instance = None
-_kokoro_lock = asyncio.Lock()
-
-async def get_kokoro_instance():
-    global _kokoro_instance
-    if _kokoro_instance is None:
-        async with _kokoro_lock:
-            if _kokoro_instance is None:
-                _kokoro_instance = await asyncio.to_thread(_get_kokoro)
-    return _kokoro_instance
 
 @router.post("/synthesize")
 async def synthesize_speech(request: dict, user_id: str = Depends(get_current_user)):
@@ -486,28 +455,11 @@ async def synthesize_speech(request: dict, user_id: str = Depends(get_current_us
         natural_text = natural_text.replace("‘", "'").replace("’", "'")
         natural_text = re.sub(r"[\"“”]", "", natural_text)
 
-        kokoro = await get_kokoro_instance()
-        loop = asyncio.get_running_loop()
-        samples, sample_rate = await loop.run_in_executor(
-            _kokoro_executor,
-            kokoro.create,
-            natural_text,
-            voice,
-            speed,
-            "en-us"
-        )
-
-        import io, wave, numpy as np
-        buf = io.BytesIO()
-        pcm = (samples * 32767).astype(np.int16).tobytes()
-        with wave.open(buf, "wb") as wf:
-            wf.setnchannels(1)
-            wf.setsampwidth(2)
-            wf.setframerate(sample_rate)
-            wf.writeframes(pcm)
+        from tts_google import synthesize as google_synthesize
+        wav_bytes = await google_synthesize(natural_text, voice, speed)
 
         from fastapi.responses import Response
-        return Response(content=buf.getvalue(), media_type="audio/wav")
+        return Response(content=wav_bytes, media_type="audio/wav")
 
     except Exception as e:
         print(f"Synthesis error: {e}")

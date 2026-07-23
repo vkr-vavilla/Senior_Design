@@ -48,6 +48,7 @@ export async function apiRequest<T>(
   const response = await fetch(`${API_URL}${path}`, {
     method,
     headers,
+    credentials: 'include',
     body: body ? JSON.stringify(body) : undefined,
   });
 
@@ -59,6 +60,7 @@ export async function apiRequest<T>(
         const refreshResponse = await fetch(`${API_URL}/auth/refresh`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
         });
 
         if (refreshResponse.ok) {
@@ -77,6 +79,7 @@ export async function apiRequest<T>(
           const retryResponse = await fetch(`${API_URL}${path}`, {
             method,
             headers: retryHeaders,
+            credentials: 'include',
             body: body ? JSON.stringify(body) : undefined,
           });
 
@@ -146,9 +149,10 @@ export const chatApi = {
       token
     );
   },
-  async transcribe(audioBlob: Blob, token?: string): Promise<{ text: string }> {
+  async transcribe(audioBlob: Blob, token?: string, engine: 'groq' | 'local' = 'groq'): Promise<{ text: string }> {
     const formData = new FormData();
     formData.append('file', audioBlob, 'recording.webm');
+    formData.append('engine', engine);
 
     const response = await fetch(`${API_URL}/chat/transcribe`, {
       method: 'POST',
