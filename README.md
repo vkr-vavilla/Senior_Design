@@ -113,6 +113,10 @@ It can run entirely on a **cloud LLM (Google Gemini)** with zero GPU, or fully *
 > **update** an existing install (`git pull` — the source is bind-mounted and
 > hot-reloads, so there is nothing to re-download).
 
+> **Want to share your locally-running instance with someone else** (no
+> deployment, just a temporary public link)? See
+> [docs/TUNNEL_SHARING.md](docs/TUNNEL_SHARING.md).
+
 ### Prerequisites
 
 - **Docker** & **Docker Compose** (recommended path)

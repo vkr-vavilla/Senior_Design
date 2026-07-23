@@ -21,7 +21,12 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 
 groq_client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+# "gemini-2.5-flash" was the default here, but Google has since restricted it
+# ("no longer available to new users" — 404 on generateContent even though it
+# still appears in ListModels for that key). gemini-2.5-flash-lite is the
+# closest same-generation replacement (same JSON-schema / thinking-token
+# behavior this file is tuned around) and is still available to new keys.
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
 # Feedback grading is a separate "judge" call from the live interview — override
 # independently (e.g. to a cheaper tier) without touching interview-time behavior.
 GEMINI_JUDGE_MODEL = os.getenv("GEMINI_JUDGE_MODEL", GEMINI_MODEL)
@@ -474,6 +479,12 @@ async def synthesize_speech(request: dict, user_id: str = Depends(get_current_us
         import re
         natural_text = re.sub(r"\s+", " ", text.strip())
         natural_text = natural_text.replace("—", ", ").replace(" - ", ", ")
+        # Double-quote glyphs have no pronunciation in Kokoro's phonemizer and make
+        # it stumble/pause wherever one sits — strip straight and curly variants.
+        # Apostrophes are kept (normalized to straight '): stripping them breaks
+        # contractions/possessives ("don't" -> "dont") and mispronounces the word.
+        natural_text = natural_text.replace("‘", "'").replace("’", "'")
+        natural_text = re.sub(r"[\"“”]", "", natural_text)
 
         kokoro = await get_kokoro_instance()
         loop = asyncio.get_running_loop()
