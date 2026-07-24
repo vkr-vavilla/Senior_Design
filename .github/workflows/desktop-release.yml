@@ -31,7 +31,21 @@ jobs:
 
     runs-on: ${{ matrix.platform }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+
+      # tauri-action runs `npm run tauri build`, which resolves the `tauri`
+      # binary from node_modules/.bin. Without an install that lookup fails with
+      # exit 127 (command not found), so the dependency has to be present first.
+      - name: Install desktop dependencies
+        working-directory: desktop
+        run: npm ci
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
