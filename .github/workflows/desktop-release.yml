@@ -10,6 +10,12 @@ on:
       - "desktop-v*"
   workflow_dispatch: {}
 
+# tauri-action creates the release and uploads the bundles through the Releases
+# API. GITHUB_TOKEN is read-only by default, which makes that call 403 and fails
+# the job before any compilation starts.
+permissions:
+  contents: write
+
 jobs:
   build:
     strategy:
