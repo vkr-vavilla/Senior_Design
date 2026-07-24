@@ -7,11 +7,19 @@
 # only reads VLLM_BASE_URL / VLLM_MODEL / VLLM_BASE_MODEL / AI_BACKEND (see
 # backend/routers/chat.py:28) — so "add an engine" lives entirely here.
 #
-# Engine matrix:
+# Engine matrix — local inference is GPU-only by policy. A 7B model decoded on
+# CPU runs at single-digit tokens/s, which turns a spoken interview into dead
+# air between turns, so there is deliberately NO CPU fallback: a machine that
+# can't accelerate the model uses the cloud API instead of running it badly.
+#
 #   NVIDIA GPU + Linux, >=10 GB VRAM  -> vllm   (AWQ base + interviewer LoRA)
-#   Apple Silicon / AMD / other GPU   -> ollama (GGUF; Metal/ROCm/Vulkan)
-#   CPU-only with enough RAM          -> ollama (GGUF q4, slow)
-#   not enough local capacity         -> gemini (cloud, BYO key)
+#   Apple Silicon                     -> ollama (native on the host, Metal)
+#   anything else                     -> gemini (cloud, BYO key)
+#
+# Apple Silicon note: Ollama must run natively on macOS, NOT in Docker. Docker
+# Desktop's Linux VM has no Metal passthrough, so a containerised Ollama on a
+# Mac silently decodes on CPU inside the VM — the exact failure this matrix
+# exists to prevent. Hence the host URL below rather than a compose service.
 #
 # Usage:
 #   eval "$(scripts/detect_engine.sh)"     # export the chosen env into the shell
@@ -23,13 +31,17 @@
 set -euo pipefail
 
 # ── Tunables (override from the environment) ─────────────────────────────────
-# Min VRAM (GiB) to prefer vLLM over Ollama on an NVIDIA box.
+# Min VRAM (GiB) required to run the model locally at all. Below this we go to
+# the cloud rather than thrash between VRAM and system RAM.
 MIN_VLLM_VRAM_GB="${PREPAI_MIN_VLLM_VRAM_GB:-10}"
-# Min system RAM (GiB) to run the 7B GGUF on CPU before falling back to Gemini.
-MIN_CPU_RAM_GB="${PREPAI_MIN_CPU_RAM_GB:-12}"
+# Min unified memory (GiB) on Apple Silicon before the 7B GGUF stops fitting
+# comfortably alongside the OS and we fall back to the cloud.
+MIN_APPLE_RAM_GB="${PREPAI_MIN_APPLE_RAM_GB:-16}"
 # Where each engine listens. Overridable so the same detection works whether the
 # engine runs as a native sidecar (localhost) or a compose service (service name).
-OLLAMA_URL="${PREPAI_OLLAMA_URL:-http://localhost:11434/v1}"
+# Ollama is always native-on-host, so the backend (in a container) reaches it
+# through host.docker.internal rather than a compose service name.
+OLLAMA_URL="${PREPAI_OLLAMA_HOST_URL:-http://host.docker.internal:11434/v1}"
 VLLM_URL="${PREPAI_VLLM_URL:-http://localhost:8001/v1}"
 # Model names/tags. These MUST match what the engines actually serve:
 #   - vLLM: --lora-modules interviewer=... (docker-compose.local.yml) and the
@@ -72,13 +84,6 @@ nvidia_vram_gb() {
   [ -n "$mib" ] && echo $(( mib / 1024 )) || true
 }
 
-has_amd_gpu() {
-  command -v rocminfo >/dev/null 2>&1 && rocminfo >/dev/null 2>&1 && return 0
-  # Vulkan can drive AMD (and Intel) GPUs via Ollama too.
-  command -v vulkaninfo >/dev/null 2>&1 && vulkaninfo >/dev/null 2>&1 && return 0
-  return 1
-}
-
 # Total system RAM in GiB (Linux + macOS).
 total_ram_gb() {
   if [ "$OS" = "Darwin" ]; then
@@ -103,22 +108,15 @@ else
   if [ "$OS" = "Linux" ] && [ -n "${VRAM_GB:-}" ] && [ "${VRAM_GB:-0}" -ge "$MIN_VLLM_VRAM_GB" ]; then
     ENGINE="vllm"
     log "NVIDIA GPU with ${VRAM_GB} GiB VRAM on Linux -> vllm"
-  elif is_apple_silicon; then
+  elif is_apple_silicon && [ "${RAM_GB:-0}" -ge "$MIN_APPLE_RAM_GB" ]; then
     ENGINE="ollama"
-    log "Apple Silicon -> ollama (Metal)"
-  elif [ -n "${VRAM_GB:-}" ]; then
-    # NVIDIA present but under the vLLM VRAM bar, or non-Linux NVIDIA (Windows).
-    ENGINE="ollama"
-    log "NVIDIA GPU (${VRAM_GB} GiB / non-Linux) -> ollama"
-  elif has_amd_gpu; then
-    ENGINE="ollama"
-    log "AMD/Vulkan GPU -> ollama (ROCm/Vulkan)"
-  elif [ "${RAM_GB:-0}" -ge "$MIN_CPU_RAM_GB" ]; then
-    ENGINE="ollama"
-    log "no supported GPU but ${RAM_GB} GiB RAM -> ollama (CPU, slow)"
+    log "Apple Silicon with ${RAM_GB} GiB unified memory -> ollama on the host (Metal)"
   else
+    # Everything else — CPU-only, AMD, low-VRAM NVIDIA, Intel Macs, Windows
+    # without WSL2+CUDA — would decode on CPU. Too slow for a live conversation,
+    # so use the cloud instead of shipping a bad local experience.
     ENGINE="gemini"
-    log "no GPU and only ${RAM_GB} GiB RAM -> gemini (cloud fallback)"
+    log "no supported local accelerator (need NVIDIA >=${MIN_VLLM_VRAM_GB} GiB VRAM on Linux, or Apple Silicon with >=${MIN_APPLE_RAM_GB} GiB) -> gemini"
   fi
 fi
 
@@ -138,7 +136,9 @@ case "$ENGINE" in
     echo "VLLM_BASE_URL=$OLLAMA_URL"
     echo "VLLM_MODEL=$INTERVIEWER_TAG"
     echo "VLLM_BASE_MODEL=$OLLAMA_BASE_TAG"
-    echo "COMPOSE_PROFILES=ollama"
+    # No profile: Ollama runs natively on macOS for Metal access, so compose
+    # starts only the supporting services (see the note at the top of this file).
+    echo "COMPOSE_PROFILES="
     ;;
   gemini)
     echo "INFERENCE_ENGINE=gemini"

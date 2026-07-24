@@ -10,6 +10,7 @@ import { RotatingText } from '@/components/ui/RotatingText';
 import {
   ArrowRight,
   Bot,
+  Download,
   MessageSquare,
   Star,
   Target,
@@ -48,7 +49,16 @@ export default function LandingPage() {
           </Link>
 
           {/* ── Nav actions ── */}
-          <LandingNavActions />
+          <div className="flex items-center gap-1">
+            <Link
+              href="/download"
+              className="hidden sm:inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-white transition-colors duration-200 px-3 py-2 rounded-xl hover:bg-white/[0.05] cursor-pointer"
+            >
+              <Download className="w-3.5 h-3.5" />
+              Download
+            </Link>
+            <LandingNavActions />
+          </div>
         </div>
       </nav>
 
@@ -389,6 +399,9 @@ export default function LandingPage() {
               &copy; {new Date().getFullYear()} FinalRound. Built with AI to help you succeed.
             </p>
             <div className="flex items-center gap-6 text-sm text-slate-500">
+              <Link href="/download" className="hover:text-slate-300 transition-colors duration-200 cursor-pointer">
+                Download
+              </Link>
               <Link href="/login" className="hover:text-slate-300 transition-colors duration-200 cursor-pointer">
                 Sign In
               </Link>

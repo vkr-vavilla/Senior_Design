@@ -10,8 +10,10 @@
 # fp16 / less when converted) adapter — no second full 7B in memory/on disk. This
 # is the "serve base + LoRA without a second GPU's worth of draw" property.
 #
-# FROM/ADAPTER are placeholders; build_gguf.sh rewrites them to the produced GGUFs.
-FROM ./models/qwen2.5-7b-instruct.Q4_K_M.gguf
+# FROM is the stock public base (shared with Modelfile.base, so Ollama keeps ONE
+# resident base). ADAPTER is our published fine-tune, fetched from the Hub by
+# setup_local.sh into ./models/. build_gguf.sh can rewrite both for a local build.
+FROM qwen2.5:7b-instruct
 ADAPTER ./models/interviewer-lora.gguf
 
 # Same ChatML template the adapter was trained with (chat_template.jinja).

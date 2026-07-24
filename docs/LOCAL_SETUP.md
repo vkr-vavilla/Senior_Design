@@ -42,12 +42,27 @@ coding-problem bank. Then open **http://localhost:3000**.
 Force a mode explicitly:
 
 ```bash
-./setup_local.sh --gpu    # local Qwen model (NVIDIA GPU required)
-./setup_local.sh --api    # Gemini API mode (add your key to backend/.env)
+./setup_local.sh --gpu     # local Qwen model via vLLM (NVIDIA GPU required)
+./setup_local.sh --ollama  # local Qwen model via Ollama (Mac/AMD/CPU; needs ./ollama/models GGUFs — see below)
+./setup_local.sh --api     # Gemini API mode (add your key to backend/.env)
 ```
 
 The script is idempotent — re-run it after a reboot or a `git pull` and it
 will reuse the existing `.env`, volumes, and problem bank.
+
+### Ollama mode: getting the GGUF models
+
+`--ollama` needs two GGUF files in `./ollama/models/` that are **not** in git
+(model weights don't belong in a git repo): the quantized Qwen2.5-7B-Instruct
+base and the small `interviewer-lora.gguf` adapter. Build them once with:
+
+```bash
+scripts/build_gguf.sh   # needs a llama.cpp checkout; see the script header
+```
+
+This converts+quantizes the base (~15 GB peak, reclaimed after quantizing) and
+converts the LoRA adapter already in `training/artifacts/`. It's a one-time,
+several-GB, several-minute step per machine.
 
 ## Desktop app (native window)
 

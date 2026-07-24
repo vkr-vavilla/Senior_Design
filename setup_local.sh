@@ -6,10 +6,13 @@
 # problem bank. Idempotent: safe to re-run any time.
 #
 # Usage:
-#   ./setup_local.sh           # auto-detect engine (NVIDIA->vLLM, Mac/AMD/CPU->Ollama, else Gemini)
+#   ./setup_local.sh           # auto-detect engine (NVIDIA->vLLM, Apple Silicon->Ollama, else Gemini)
 #   ./setup_local.sh --gpu     # force local Qwen via vLLM (needs NVIDIA GPU, ~10 GB VRAM)
-#   ./setup_local.sh --ollama  # force local Qwen via Ollama (Mac/AMD/CPU; needs ./ollama/models GGUFs)
+#   ./setup_local.sh --ollama  # force local Qwen via native Ollama on macOS (Metal)
 #   ./setup_local.sh --api     # force Gemini API mode (no GPU; bring your own key)
+#
+# Local inference is GPU-only: NVIDIA via vLLM, or Apple Silicon via Metal.
+# There is no CPU path — see scripts/detect_engine.sh for why.
 set -euo pipefail
 
 cd "$(dirname "$0")"
@@ -47,8 +50,7 @@ fi
 DETECT="scripts/detect_engine.sh"
 DETECT_ARGS=(--explain)
 [ -n "$MODE" ] && DETECT_ARGS=(--engine "$MODE" --explain)
-ENGINE_ENV="$(PREPAI_OLLAMA_URL=http://ollama:11434/v1 \
-              PREPAI_VLLM_URL=http://vllm:8001/v1 \
+ENGINE_ENV="$(PREPAI_VLLM_URL=http://vllm:8001/v1 \
               "$DETECT" "${DETECT_ARGS[@]}" 2>/dev/null)"
 # shellcheck disable=SC2046
 export $(echo "$ENGINE_ENV" | xargs)
@@ -92,18 +94,63 @@ fi
 # VLLM_BASE_MODEL — compose interpolates them into the backend service.
 case "$MODE" in
   vllm)
+    # Prefer an adapter already on disk (the training box) over re-downloading
+    # the identical weights from the Hub. Falls through to the compose default
+    # (FinalRound/prepai-interviewer) on a fresh clone, where this dir is absent
+    # because training/artifacts/ is gitignored.
+    LOCAL_ADAPTER="training/artifacts/qwen2.5-7b-chatml-qlora-v2"
+    if [ -f "$LOCAL_ADAPTER/adapter_model.safetensors" ]; then
+      export INTERVIEWER_ADAPTER="/adapters/qwen2.5-7b-chatml-qlora-v2"
+      export HF_HUB_OFFLINE="${HF_HUB_OFFLINE:-1}"
+      echo "Interviewer adapter: local ($LOCAL_ADAPTER)"
+    else
+      echo "Interviewer adapter: FinalRound/prepai-interviewer (downloads once, ~646 MB)"
+    fi
     echo "Starting PrepAI with the local Qwen model via vLLM."
     echo "(first run downloads ~5.5 GB of model weights into the hf-cache volume)"
     $COMPOSE --profile gpu up -d --build
     ;;
   ollama)
-    if [ ! -d ollama/models ] || [ -z "$(ls -A ollama/models 2>/dev/null)" ]; then
-      echo "ERROR: Ollama mode needs the GGUF models in ./ollama/models."
-      echo "Build them once with: scripts/build_gguf.sh   (CREATE_OLLAMA=0 is fine)"
+    # Ollama runs natively on the host so it can reach Metal — inside Docker on
+    # a Mac it would silently decode on CPU. So we require the host daemon here
+    # instead of starting the (GPU-less) ollama compose profile.
+    if ! command -v ollama >/dev/null 2>&1; then
+      echo "ERROR: Ollama must be installed natively on macOS (not in Docker)."
+      echo "  brew install ollama   (or download from https://ollama.com/download)"
+      echo "Then start it with:  ollama serve"
       exit 1
     fi
-    echo "Starting PrepAI with the local Qwen model via Ollama."
-    $COMPOSE --profile ollama up -d --build
+    if ! curl -sf http://localhost:11434/api/tags >/dev/null 2>&1; then
+      echo "ERROR: Ollama is installed but not running. Start it with: ollama serve"
+      exit 1
+    fi
+    # Fetch the published interviewer adapter (~323 MB) unless it's already here.
+    # The base is the stock public qwen2.5:7b-instruct tag, which `ollama create`
+    # pulls on demand — we never host a copy of an unmodified public model.
+    ADAPTER_GGUF="ollama/models/interviewer-lora.gguf"
+    if [ ! -f "$ADAPTER_GGUF" ]; then
+      echo "Downloading the interviewer adapter (~323 MB)..."
+      mkdir -p ollama/models
+      curl -fL --progress-bar -o "$ADAPTER_GGUF" \
+        "https://huggingface.co/FinalRound/prepai-interviewer/resolve/main/interviewer-lora.gguf" \
+        || { echo "ERROR: adapter download failed."; rm -f "$ADAPTER_GGUF"; exit 1; }
+    fi
+
+    # Register both tags. Paths are absolutised so `ollama create` resolves them
+    # regardless of where it's invoked from.
+    for spec in "$VLLM_BASE_MODEL:Modelfile.base" "$VLLM_MODEL:Modelfile.interviewer"; do
+      tag="${spec%%:*}"; mf="ollama/${spec##*:}"
+      if ollama list 2>/dev/null | grep -q "^${tag}[[:space:]]"; then
+        echo "Ollama model '$tag' already registered — skipping."
+      else
+        echo "Registering Ollama model '$tag'..."
+        sed "s|^ADAPTER \./models/|ADAPTER $(pwd)/ollama/models/|" "$mf" \
+          | ollama create "$tag" -f - || { echo "ERROR: ollama create $tag failed."; exit 1; }
+      fi
+    done
+
+    echo "Starting PrepAI with the local Qwen model via native Ollama (Metal)."
+    $COMPOSE up -d --build
     ;;
   gemini)
     echo "Starting PrepAI in Gemini API mode (no local model services)."
@@ -156,6 +203,6 @@ if [ "$MODE" = "vllm" ]; then
   echo "to answer while the model loads; check progress with: $COMPOSE logs -f vllm"
 elif [ "$MODE" = "ollama" ]; then
   echo
-  echo "Model: local Qwen2.5-7B via Ollama. The first interview may take a moment"
-  echo "while the model loads; check progress with: $COMPOSE logs -f ollama ollama-init"
+  echo "Model: local Qwen2.5-7B via native Ollama on Metal. The first interview"
+  echo "may take a moment while the model loads into unified memory."
 fi

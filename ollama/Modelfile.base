@@ -5,9 +5,11 @@
 # backend/routers/chat.py:1058). Built by scripts/build_gguf.sh, which fills in
 # the GGUF path and runs `ollama create qwen2.5-7b-instruct -f ollama/Modelfile.base`.
 #
-# FROM is a placeholder; build_gguf.sh rewrites it to the produced GGUF (or you
-# can point it at an existing Ollama tag like `qwen2.5:7b-instruct`).
-FROM ./models/qwen2.5-7b-instruct.Q4_K_M.gguf
+# Pulls the stock public base from Ollama's registry rather than shipping our
+# own 4.5 GB copy of an unmodified public model — same Q4_K_M quantization we
+# would have built. build_gguf.sh can still rewrite this to a locally produced
+# GGUF if you need an exact pinned build.
+FROM qwen2.5:7b-instruct
 
 # Qwen2.5 ChatML. Ollama also reads the template embedded in the GGUF metadata,
 # but we pin it here so grading prompts render identically to the vLLM path.

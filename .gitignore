@@ -68,6 +68,12 @@ wandb/
 *.bin
 *.onnx
 *.safetensors
+# GGUF build outputs (multi-GB) and the base-model/toolchain download cache.
+# These are produced by scripts/build_gguf.sh and published to a model registry,
+# never committed — a single quantized base is ~4.5 GB, well over GitHub's limit.
+*.gguf
+ollama/models/
+.cache/
 data/raw/leetcode/
 *.swp
 

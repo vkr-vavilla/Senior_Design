@@ -77,11 +77,12 @@ fn detect_engine(repo: &Path) -> Result<HashMap<String, String>, String> {
     if !script.is_file() {
         return Err(format!("detect_engine.sh not found at {}", script.display()));
     }
-    // Point detection at the compose service names (URLs on the compose network).
+    // Point vLLM detection at the compose service name (URL on the compose
+    // network). Ollama is deliberately left alone: it runs natively on the host
+    // for Metal access, so detect_engine.sh resolves it via host.docker.internal.
     let out = Command::new("bash")
         .arg(&script)
         .current_dir(repo)
-        .env("PREPAI_OLLAMA_URL", "http://ollama:11434/v1")
         .env("PREPAI_VLLM_URL", "http://vllm:8001/v1")
         .output()
         .map_err(|e| format!("failed to run detect_engine.sh: {e}"))?;

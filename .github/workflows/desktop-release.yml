@@ -1,0 +1,62 @@
+name: Desktop release
+
+# Builds the Tauri desktop shell for Windows (nsis), macOS (universal dmg,
+# Intel + Apple Silicon), and Linux (AppImage + deb), then attaches them to a
+# GitHub Release. Triggered by pushing a tag like `desktop-v0.1.0`, or
+# manually via workflow_dispatch for a test build.
+on:
+  push:
+    tags:
+      - "desktop-v*"
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: ubuntu-22.04
+            args: ""
+          - platform: windows-latest
+            args: ""
+          - platform: macos-latest
+            args: "--target universal-apple-darwin"
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: Install Linux system dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            build-essential
+
+      - name: Rust build cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: desktop/src-tauri
+
+      - name: Build and release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: desktop
+          tagName: ${{ github.ref_name }}
+          releaseName: "PrepAI Desktop ${{ github.ref_name }}"
+          releaseBody: "Auto-built by CI. Auto-detects the best local inference engine (vLLM on NVIDIA, Ollama on Mac/AMD/CPU) or falls back to the Gemini API."
+          releaseDraft: false
+          prerelease: false
+          args: ${{ matrix.args }}
