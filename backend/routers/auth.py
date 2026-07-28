@@ -4,6 +4,7 @@ from bson import ObjectId
 from database import get_db
 from models.user import UserRegister, UserLogin, UserOut, TokenResponse
 from auth.jwt import hash_password, verify_password, create_access_token, create_refresh_token, verify_refresh_token, get_current_user
+from config import COOKIE_SECURE, COOKIE_SAMESITE
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -47,8 +48,8 @@ async def login(credentials: UserLogin, response: Response):
         key="refresh_token",
         value=refresh_token,
         httponly=True,
-        secure=False, # Set to True in production with HTTPS
-        samesite="lax",
+        secure=COOKIE_SECURE,
+        samesite=COOKIE_SAMESITE,
         max_age=30 * 24 * 60 * 60 # 30 days
     )
     
@@ -91,8 +92,8 @@ async def refresh(response: Response, refresh_token: Optional[str] = Cookie(None
         key="refresh_token",
         value=new_refresh_token,
         httponly=True,
-        secure=False, # Set to True in production
-        samesite="lax",
+        secure=COOKIE_SECURE,
+        samesite=COOKIE_SAMESITE,
         max_age=30 * 24 * 60 * 60
     )
     
@@ -105,7 +106,7 @@ async def logout(response: Response, refresh_token: Optional[str] = Cookie(None)
         db = get_db()
         await db.refresh_tokens.delete_one({"token": refresh_token})
     
-    response.delete_cookie("refresh_token")
+    response.delete_cookie("refresh_token", secure=COOKIE_SECURE, samesite=COOKIE_SAMESITE)
     return None
 
 

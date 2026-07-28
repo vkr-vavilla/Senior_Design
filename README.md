@@ -11,6 +11,7 @@ It can run entirely on a **cloud LLM (Google Gemini)** with zero GPU, or fully *
 - **Conversational, voice-first interviews** over a WebSocket — speak your answers, hear the interviewer reply.
   - **Speech-to-text** via Groq Whisper.
   - **Text-to-speech** via Kokoro (ONNX, runs locally).
+    
 - **Resume- and job-description-aware questioning.** Upload a PDF résumé + paste a JD; the interviewer tailors questions to *your* background and the role.
 - **Three interview modes:** behavioral, technical, and mixed, each at easy / medium / hard difficulty.
 - **Live coding round** (technical/mixed interviews):
@@ -112,6 +113,10 @@ It can run entirely on a **cloud LLM (Google Gemini)** with zero GPU, or fully *
 > That doc also covers the **native desktop app** (`desktop/`, Tauri) and how to
 > **update** an existing install (`git pull` — the source is bind-mounted and
 > hot-reloads, so there is nothing to re-download).
+
+> **Want to share your locally-running instance with someone else** (no
+> deployment, just a temporary public link)? See
+> [docs/TUNNEL_SHARING.md](docs/TUNNEL_SHARING.md).
 
 ### Prerequisites
 

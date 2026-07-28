@@ -1,0 +1,26 @@
+{$SITE_DOMAIN} {
+    encode gzip
+
+    handle /auth/* {
+        reverse_proxy backend:8080
+    }
+    handle /chat/* {
+        reverse_proxy backend:8080
+    }
+    handle /interview/* {
+        reverse_proxy backend:8080
+    }
+    handle /coding/* {
+        reverse_proxy backend:8080
+    }
+    handle /docs* {
+        reverse_proxy backend:8080
+    }
+    handle /openapi.json {
+        reverse_proxy backend:8080
+    }
+
+    handle {
+        reverse_proxy frontend:3000
+    }
+}

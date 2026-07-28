@@ -226,16 +226,19 @@ export function useTextToSpeech(token?: string) {
   const speakStream = useCallback(async (chunk: string) => {
     sentenceBufferRef.current += chunk;
 
-    // Flush at the first natural pause: sentence end, comma, semicolon, colon, or dash.
+    // Flush at the first natural pause: sentence end, comma, semicolon, or colon.
     // This lets the voice start within ~1 sec instead of waiting for a full sentence.
+    // Dashes are deliberately NOT a cut point: each cut fires a separate network
+    // round-trip + Kokoro inference before the next clip can play, so splitting on
+    // every " - "/" — " (common in LLM output) inserted an audible gap right where
+    // a dash appeared, misread as Kokoro "stumbling" on the punctuation itself.
     const buf = sentenceBufferRef.current;
     const minChars = 18;
     let cutIndex = -1;
     if (buf.length >= minChars) {
       const strong = /[.!?](\s|$)/.exec(buf);
       const soft = /[,;:](\s|$)/.exec(buf);
-      const dash = / [—-] /.exec(buf);
-      const candidates = [strong, soft, dash].filter(Boolean) as RegExpExecArray[];
+      const candidates = [strong, soft].filter(Boolean) as RegExpExecArray[];
       if (candidates.length) {
         cutIndex = Math.min(...candidates.map(m => m.index + 1));
       } else if (buf.length > 80) {

@@ -45,6 +45,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [fetchUser]);
 
+  // apiRequest() silently refreshes an expired access token via the refresh_token
+  // cookie and dispatches this event with the new token — keep context state in
+  // sync so callers reading `token` directly (not through apiRequest) don't keep
+  // using the stale, now-expired one.
+  useEffect(() => {
+    const onTokenRefreshed = (e: Event) => {
+      const newToken = (e as CustomEvent<string>).detail;
+      if (newToken) setToken(newToken);
+    };
+    window.addEventListener('token-refreshed', onTokenRefreshed);
+    return () => window.removeEventListener('token-refreshed', onTokenRefreshed);
+  }, []);
+
   const login = useCallback(async (tkn: string) => {
     localStorage.setItem(TOKEN_KEY, tkn);
     await fetchUser(tkn);

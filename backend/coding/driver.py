@@ -154,7 +154,7 @@ def _run():
             result = getattr(Solution(), name)(*args)
             results.append(json.dumps(_serialize(result, ret_type), separators=(',', ':')))
         except Exception as exc:
-            results.append('__RUNTIME_ERROR__ ' + repr(exc))
+            results.append('__RUNTIME_ERROR__ {}: {}'.format(type(exc).__name__, str(exc).replace('\\n', ' ')))
     sys.stdout.write('\\n'.join(results))
 
 
@@ -166,7 +166,11 @@ def build_program(user_code: str, meta_data: dict) -> str:
     """Assemble the full program: header + user Solution + driver footer."""
     meta_json = json.dumps(meta_data or {})
     footer = _FOOTER.replace("__META_JSON_LITERAL__", repr(meta_json))
-    return _HEADER + "\n" + (user_code or "").strip() + "\n" + footer
+    code = (user_code or "").strip()
+    non_empty_lines = [l for l in code.split("\n") if l.strip()]
+    if non_empty_lines and non_empty_lines[-1].strip().endswith(":"):
+        code += "\n        pass"
+    return _HEADER + "\n" + code + "\n" + footer
 
 
 def normalize_output(value: str) -> str:
