@@ -103,9 +103,10 @@ export const CelestialSphere: React.FC<CelestialSphereProps> = ({
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
     const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
-    // The nebula is soft/blurry, so capping the device-pixel-ratio to 1 cuts
-    // fragment-shader invocations up to 4x on HiDPI screens with no visible loss.
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1));
+    // The nebula is soft/blurry, so it can render at half resolution and let
+    // the browser upscale — 4x fewer fragment-shader invocations with no
+    // visible loss, on top of whatever the screen's DPR is.
+    renderer.setPixelRatio(0.5);
     currentMount.appendChild(renderer.domElement);
 
     const material = new THREE.ShaderMaterial({
@@ -144,10 +145,18 @@ export const CelestialSphere: React.FC<CelestialSphereProps> = ({
     let visible = true;
     const isRunning = () => visible && document.visibilityState === "visible";
 
-    const animate = () => {
+    // 30fps is indistinguishable for a slow-drifting nebula and halves the
+    // GPU load — which matters when the page also runs the Spline engine and,
+    // in the desktop app, shares the GPU with local inference.
+    const FRAME_MS = 1000 / 30;
+    let lastFrame = 0;
+    const animate = (now: number) => {
       animationFrameId = requestAnimationFrame(animate);
       if (!isRunning()) return;
-      material.uniforms.u_time.value += 0.005 * speed;
+      if (now - lastFrame < FRAME_MS) return;
+      lastFrame = now;
+      // 2x the old per-frame step: half the frames, same drift speed.
+      material.uniforms.u_time.value += 0.01 * speed;
       renderer.render(scene, camera);
     };
 
@@ -162,7 +171,7 @@ export const CelestialSphere: React.FC<CelestialSphereProps> = ({
     window.addEventListener("resize", resize);
     window.addEventListener("mousemove", onMouseMove);
     resize();
-    animate();
+    animationFrameId = requestAnimationFrame(animate);
 
     return () => {
       window.removeEventListener("resize", resize);

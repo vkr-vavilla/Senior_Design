@@ -197,13 +197,13 @@ export default function DownloadPage() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-slate-950">
       {/* Ambient orbs — static, matching the landing page's toned-down set */}
-      <div className="fixed top-0 -left-40 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[130px] pointer-events-none -z-10" />
-      <div className="fixed top-1/3 -right-40 w-[500px] h-[500px] bg-violet-600/10 rounded-full blur-[120px] pointer-events-none -z-10" />
+      <div className="fixed top-0 -left-40 w-[600px] h-[600px] bg-[radial-gradient(circle,rgba(79,70,229,0.10)_0%,transparent_65%)] pointer-events-none -z-10" />
+      <div className="fixed top-1/3 -right-40 w-[500px] h-[500px] bg-[radial-gradient(circle,rgba(124,58,237,0.10)_0%,transparent_65%)] pointer-events-none -z-10" />
 
       {/* ── Navbar ────────────────────────────────────────────── */}
       <nav className="absolute top-4 inset-x-4 z-50 max-w-6xl mx-auto">
         <div className="absolute -inset-px rounded-[18px] bg-gradient-to-r from-indigo-500/15 via-violet-500/10 to-indigo-500/15 blur-sm pointer-events-none" />
-        <div className="relative flex items-center justify-between px-4 py-2.5 rounded-2xl bg-slate-950/80 backdrop-blur-2xl border border-white/[0.07] shadow-2xl shadow-black/50">
+        <div className="relative flex items-center justify-between px-4 py-2.5 rounded-2xl bg-slate-950/95 border border-white/[0.07] shadow-2xl shadow-black/50">
           <Link href="/" className="cursor-pointer">
             <Logo size="md" />
           </Link>
@@ -251,7 +251,7 @@ export default function DownloadPage() {
       </section>
 
       {/* ── Platforms ─────────────────────────────────────────── */}
-      <section id="platforms" className="relative py-16 border-y border-slate-800/40 bg-slate-950/50 backdrop-blur-sm">
+      <section id="platforms" className="relative py-16 border-y border-slate-800/40 bg-slate-950/70">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {(Object.keys(ASSETS) as OSKey[]).map((key) => {
@@ -441,7 +441,7 @@ export default function DownloadPage() {
       </section>
 
       {/* ── What's included ───────────────────────────────────── */}
-      <section className="relative py-24 border-y border-slate-800/40 bg-slate-950/50 backdrop-blur-sm">
+      <section className="relative py-24 border-y border-slate-800/40 bg-slate-950/70">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700/80 text-slate-400 text-xs font-medium mb-4">
@@ -522,7 +522,7 @@ export default function DownloadPage() {
       </section>
 
       {/* ── Footer ────────────────────────────────────────────── */}
-      <footer className="py-10 border-t border-slate-800/40 bg-slate-950/70 backdrop-blur-sm">
+      <footer className="py-10 border-t border-slate-800/40 bg-slate-950/85">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <Logo size="sm" showTagline={false} showStatus={false} />

@@ -43,7 +43,7 @@ export function AISessionCard() {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ delay: 1.2, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className="bg-slate-950/90 backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden">
+      <div className="bg-slate-950/95 border border-slate-700/50 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden">
         {/* Top accent bar */}
         <div className="h-[2px] bg-gradient-to-r from-indigo-500 via-violet-500 to-indigo-500" />
 
@@ -112,7 +112,7 @@ export function LiveScoreHUD() {
       animate={{ opacity: 1, x: 0, scale: 1 }}
       transition={{ delay: 1.6, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className="bg-slate-950/90 backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden min-w-[196px]">
+      <div className="bg-slate-950/95 border border-slate-700/50 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden min-w-[196px]">
         {/* Top accent */}
         <div className="h-[2px] bg-gradient-to-r from-emerald-500 via-indigo-500 to-violet-500" />
 

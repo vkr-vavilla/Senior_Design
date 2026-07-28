@@ -383,7 +383,7 @@ export function FeatureCards() {
       <SvgDefs />
 
       {/* ── Card 1: Real-time AI Feedback (2-col) ─────────────── */}
-      <TiltCard className="md:col-span-2 p-6 bg-slate-900/80 backdrop-blur-sm border border-slate-800 hover:border-indigo-500/40 rounded-2xl transition-colors duration-500 overflow-hidden cursor-default">
+      <TiltCard className="md:col-span-2 p-6 bg-slate-900/90 border border-slate-800 hover:border-indigo-500/40 rounded-2xl transition-colors duration-500 overflow-hidden cursor-default">
         <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
@@ -422,7 +422,7 @@ export function FeatureCards() {
       </TiltCard>
 
       {/* ── Card 2: Smart Questions (1-col) ──────────────────── */}
-      <TiltCard className="p-6 bg-slate-900/80 backdrop-blur-sm border border-slate-800 hover:border-violet-500/40 rounded-2xl transition-colors duration-500 overflow-hidden cursor-default">
+      <TiltCard className="p-6 bg-slate-900/90 border border-slate-800 hover:border-violet-500/40 rounded-2xl transition-colors duration-500 overflow-hidden cursor-default">
         <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-violet-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
         <div className="flex items-center gap-3 mb-5">
@@ -439,7 +439,7 @@ export function FeatureCards() {
       </TiltCard>
 
       {/* ── Card 3: Any Role (1-col) ──────────────────────────── */}
-      <TiltCard className="p-6 bg-slate-900/80 backdrop-blur-sm border border-slate-800 hover:border-emerald-500/40 rounded-2xl transition-colors duration-500 overflow-hidden cursor-default">
+      <TiltCard className="p-6 bg-slate-900/90 border border-slate-800 hover:border-emerald-500/40 rounded-2xl transition-colors duration-500 overflow-hidden cursor-default">
         <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-emerald-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
         <div className="flex items-center justify-between mb-5">
@@ -459,7 +459,7 @@ export function FeatureCards() {
       </TiltCard>
 
       {/* ── Card 4: Performance Analytics (2-col) ────────────── */}
-      <TiltCard className="md:col-span-2 p-6 bg-slate-900/80 backdrop-blur-sm border border-slate-800 hover:border-rose-500/30 rounded-2xl transition-colors duration-500 overflow-hidden cursor-default">
+      <TiltCard className="md:col-span-2 p-6 bg-slate-900/90 border border-slate-800 hover:border-rose-500/30 rounded-2xl transition-colors duration-500 overflow-hidden cursor-default">
         <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-rose-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         <div className="absolute inset-0 bg-gradient-to-br from-violet-600/4 via-transparent to-indigo-600/4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
@@ -496,7 +496,7 @@ export function FeatureCards() {
 
       {/* ── Bottom CTA (full width) ───────────────────────────── */}
       <motion.div
-        className="md:col-span-3 group relative flex flex-col sm:flex-row items-center gap-6 p-7 bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-2xl overflow-hidden"
+        className="md:col-span-3 group relative flex flex-col sm:flex-row items-center gap-6 p-7 bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-40px' }}

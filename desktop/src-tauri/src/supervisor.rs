@@ -223,7 +223,11 @@ pub async fn start_stack(app: AppHandle) -> Result<String, StartupError> {
             // serves anything, so this leg of the wait is the long one.
             emit(&app, 70, "Backend ready. Building the app (takes a minute on first launch)…");
         }
-        if backend_ready && !frontend_ready && port_open(BACKEND_HOST, FRONTEND_PORT) {
+        // A real 200, not just an open port: Docker publishes the port the
+        // moment the container starts, long before `next build` finishes and
+        // the server inside actually listens — navigating then shows the user
+        // a "connection reset" page.
+        if backend_ready && !frontend_ready && http_ok(BACKEND_HOST, FRONTEND_PORT, "/") {
             frontend_ready = true;
         }
         if backend_ready && frontend_ready {

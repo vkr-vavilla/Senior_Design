@@ -1,5 +1,5 @@
 import { AnimateIn } from '@/components/ui/AnimateIn';
-import CelestialSphere from '@/components/ui/celestial-sphere';
+import CelestialSphere from '@/components/ui/celestial-sphere-lazy';
 import { ContainerScroll } from '@/components/ui/container-scroll-animation';
 import { FeatureCards } from '@/components/ui/FeatureCards';
 import { InteractiveRobotSpline } from '@/components/ui/interactive-3d-robot';
@@ -41,7 +41,7 @@ export default function LandingPage() {
         {/* Outer glow halo */}
         <div className="absolute -inset-px rounded-[18px] bg-gradient-to-r from-indigo-500/15 via-violet-500/10 to-indigo-500/15 blur-sm pointer-events-none" />
 
-        <div className="relative flex items-center justify-between px-4 py-2.5 rounded-2xl bg-slate-950/80 backdrop-blur-2xl border border-white/[0.07] shadow-2xl shadow-black/50">
+        <div className="relative flex items-center justify-between px-4 py-2.5 rounded-2xl bg-slate-950/95 border border-white/[0.07] shadow-2xl shadow-black/50">
 
           {/* ── Brand ── */}
           <Link href="/" className="cursor-pointer">
@@ -65,9 +65,9 @@ export default function LandingPage() {
       {/* ── Hero — split layout ───────────────────────────────── */}
       <section className="relative min-h-screen flex items-center pt-20 pb-8 overflow-hidden">
         {/* Ambient orb — left side behind text */}
-        <div className="absolute top-1/3 -left-32 w-[600px] h-[600px] bg-indigo-600/12 rounded-full blur-[130px] pointer-events-none" />
+        <div className="absolute top-1/3 -left-32 w-[600px] h-[600px] bg-[radial-gradient(circle,rgba(79,70,229,0.12)_0%,transparent_65%)] pointer-events-none" />
         {/* Ambient orb — right top */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-violet-500/8 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[radial-gradient(circle,rgba(139,92,246,0.08)_0%,transparent_65%)] pointer-events-none" />
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-16">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
@@ -127,7 +127,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Stats bar ─────────────────────────────────────────── */}
-      <section className="relative border-y border-slate-800/40 py-14 bg-slate-950/50 backdrop-blur-sm">
+      <section className="relative border-y border-slate-800/40 py-14 bg-slate-950/70">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
             {[
@@ -146,7 +146,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Product Showcase — ContainerScroll ───────────────── */}
-      <section className="relative overflow-hidden bg-slate-950/30 backdrop-blur-sm">
+      <section className="relative overflow-hidden bg-slate-950/50">
         <ContainerScroll
           titleComponent={
             <div className="mb-6">
@@ -268,7 +268,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Features ─────────────────────────────────────────── */}
-      <section className="py-28 relative bg-slate-950/60 backdrop-blur-sm">
+      <section className="py-28 relative bg-slate-950/75">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AnimateIn className="text-center mb-14">
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700/80 text-slate-400 text-xs font-medium mb-4">
@@ -288,8 +288,8 @@ export default function LandingPage() {
       </section>
 
       {/* ── How it works ──────────────────────────────────────── */}
-      <section className="py-28 border-y border-slate-800/40 bg-slate-950/50 backdrop-blur-sm relative overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-indigo-600/7 rounded-full blur-[120px] pointer-events-none" />
+      <section className="py-28 border-y border-slate-800/40 bg-slate-950/70 relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-[radial-gradient(ellipse,rgba(79,70,229,0.07)_0%,transparent_65%)] pointer-events-none" />
 
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <AnimateIn className="text-center mb-20">
@@ -347,12 +347,12 @@ export default function LandingPage() {
       </section>
 
       {/* ── Final CTA ─────────────────────────────────────────── */}
-      <section className="py-28 relative overflow-hidden bg-slate-950/40 backdrop-blur-sm">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-indigo-600/18 rounded-full blur-[140px] pointer-events-none" />
+      <section className="py-28 relative overflow-hidden bg-slate-950/60">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-[radial-gradient(ellipse,rgba(79,70,229,0.18)_0%,transparent_65%)] pointer-events-none" />
 
         <div className="relative max-w-4xl mx-auto px-4">
           <AnimateIn>
-            <div className="relative p-10 sm:p-14 bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl overflow-hidden text-center">
+            <div className="relative p-10 sm:p-14 bg-slate-900/95 border border-slate-800 rounded-3xl overflow-hidden text-center">
               <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/8 via-transparent to-violet-600/8 rounded-3xl" />
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-px bg-gradient-to-r from-transparent via-indigo-500/60 to-transparent" />
 
@@ -391,7 +391,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Footer ────────────────────────────────────────────── */}
-      <footer className="py-10 border-t border-slate-800/40 bg-slate-950/70 backdrop-blur-sm">
+      <footer className="py-10 border-t border-slate-800/40 bg-slate-950/85">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <Logo size="sm" showTagline={false} showStatus={false} />
