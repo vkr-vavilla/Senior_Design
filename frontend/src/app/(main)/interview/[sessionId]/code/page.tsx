@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { LoadingPage, LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { codingApi } from '@/lib/api';
-import type { CodingProblem, RunResult } from '@/types/coding';
+import type { CaseResult, CodingProblem, RunResult } from '@/types/coding';
 import { ArrowLeft, CheckCircle2, Flag, Play, Send, XCircle } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
