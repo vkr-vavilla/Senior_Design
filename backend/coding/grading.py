@@ -49,6 +49,11 @@ def compare_results(actual_lines: list, expected_lines: list) -> list:
         actual = actual_lines[i] if i < len(actual_lines) else ""
         expected = expected_lines[i] if i < len(expected_lines) else ""
         runtime_error = actual.startswith(RUNTIME_ERROR_PREFIX)
+        
+        actual_display = actual
+        if runtime_error:
+            actual_display = actual[len(RUNTIME_ERROR_PREFIX):].strip()
+
         passed = (
             not runtime_error
             and bool(expected)
@@ -58,7 +63,7 @@ def compare_results(actual_lines: list, expected_lines: list) -> list:
             "index": i,
             "passed": passed,
             "expected": expected,
-            "actual": actual,
+            "actual": actual_display,
             "runtime_error": runtime_error,
         })
     return cases

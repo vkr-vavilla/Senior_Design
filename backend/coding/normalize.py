@@ -143,7 +143,7 @@ def normalize_problem(doc: dict) -> dict:
             stdin_lines.append(_json_line(value))
 
     arg_list = ", ".join(n for n, _ in first_pairs) or "*args"
-    starter = f"class Solution:\n    def {name}(self, {arg_list}):\n        "
+    starter = f"class Solution:\n    def {name}(self, {arg_list}):\n        pass"
 
     return {
         **doc,

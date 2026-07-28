@@ -255,6 +255,65 @@ export default function CodingPage() {
   );
 }
 
+function CaseErrorInfo({
+  c,
+  status,
+  stderr,
+}: {
+  c: CaseResult;
+  status: string | null;
+  stderr?: string;
+}) {
+  // Scenario 1: Runtime Error inside candidate solution (e.g., IndexError, ZeroDivisionError)
+  if (c.runtime_error && c.actual) {
+    return (
+      <div className="flex flex-col sm:flex-row sm:items-start gap-1">
+        <span className="text-red-400 font-semibold">error feedback:</span>
+        <span className="text-red-300 bg-red-950/40 border border-red-500/30 px-1.5 py-0.5 rounded font-mono break-all">{c.actual}</span>
+      </div>
+    );
+  }
+
+  // Scenario 2: Code ran and returned an actual value (or null), but it did not match expected
+  if (c.actual !== undefined && c.actual !== null && c.actual.trim() !== '') {
+    if (c.actual === 'null') {
+      return (
+        <div className="flex flex-col sm:flex-row sm:items-start gap-1">
+          <span className="text-amber-400 font-semibold">actual output:</span>
+          <span className="text-amber-300 font-mono">null <span className="text-slate-500 font-sans text-[11px]">(No value returned from solution)</span></span>
+        </div>
+      );
+    }
+    return (
+      <div className="flex flex-col sm:flex-row sm:items-start gap-1">
+        <span className="text-amber-400 font-semibold">actual output:</span>
+        <span className="text-slate-200 font-mono font-semibold">{c.actual}</span>
+      </div>
+    );
+  }
+
+  // Scenario 3: Execution/Compilation Error (c.actual is empty because script failed to execute)
+  if (stderr && stderr.trim().length > 0) {
+    const lines = stderr.trim().split('\n').filter((l) => l.trim().length > 0);
+    const lastError = lines[lines.length - 1] || 'Compilation or Syntax Error';
+    return (
+      <div className="flex flex-col sm:flex-row sm:items-start gap-1">
+        <span className="text-red-400 font-semibold">error feedback:</span>
+        <span className="text-red-300 bg-red-950/40 border border-red-500/30 px-1.5 py-0.5 rounded font-mono break-all">{lastError}</span>
+      </div>
+    );
+  }
+
+  // Scenario 4: General status failure or timeout
+  const feedback = status || 'No output produced for this test case';
+  return (
+    <div className="flex flex-col sm:flex-row sm:items-start gap-1">
+      <span className="text-red-400 font-semibold">error feedback:</span>
+      <span className="text-red-300">{feedback}</span>
+    </div>
+  );
+}
+
 function ResultsView({ result, submitted }: { result: RunResult; submitted: boolean }) {
   const allPassed = result.all_passed;
   return (
@@ -277,7 +336,7 @@ function ResultsView({ result, submitted }: { result: RunResult; submitted: bool
       </div>
 
       {(result.compile_output || result.stderr) && (
-        <pre className="text-xs text-red-300 bg-red-500/5 border border-red-500/20 rounded-lg p-3 overflow-x-auto whitespace-pre-wrap">
+        <pre className="text-xs text-red-300 bg-red-500/5 border border-red-500/20 rounded-lg p-3 overflow-x-auto whitespace-pre-wrap font-mono">
           {result.compile_output || result.stderr}
         </pre>
       )}
@@ -297,12 +356,14 @@ function ResultsView({ result, submitted }: { result: RunResult; submitted: bool
                 <XCircle className="w-3.5 h-3.5 text-red-400" />
               )}
               <span className="font-medium text-slate-200">Case {c.index + 1}</span>
-              {c.runtime_error && <span className="text-red-400">runtime error</span>}
             </div>
             {!c.passed && (
-              <div className="pl-5 space-y-0.5 font-mono text-slate-400">
-                <div>expected: <span className="text-slate-300">{c.expected}</span></div>
-                <div>got: <span className="text-slate-300">{c.actual}</span></div>
+              <div className="pl-5 space-y-1.5 font-mono text-slate-400">
+                <div>
+                  <span className="text-slate-400 font-semibold">expected:</span>{' '}
+                  <span className="text-emerald-300 font-semibold">{c.expected}</span>
+                </div>
+                <CaseErrorInfo c={c} status={result.status} stderr={result.stderr || result.compile_output} />
               </div>
             )}
           </div>
@@ -311,3 +372,4 @@ function ResultsView({ result, submitted }: { result: RunResult; submitted: bool
     </div>
   );
 }
+
