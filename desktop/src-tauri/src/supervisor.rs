@@ -88,6 +88,63 @@ fn find_repo() -> Result<PathBuf, String> {
     Err("Could not find docker-compose.local.yml. Set PREPAI_HOME to the repo.".into())
 }
 
+/// Source tarball of the default branch — what an installed app runs against
+/// when there is no local checkout. Kept as a tarball download (curl + tar,
+/// both present on Linux, macOS, and Windows 10+) so end users don't need git.
+const REPO_TARBALL: &str =
+    "https://github.com/vkr-vavilla/Senior_Design/archive/refs/heads/main.tar.gz";
+
+fn home_dir() -> Result<PathBuf, String> {
+    std::env::var("HOME")
+        .or_else(|_| std::env::var("USERPROFILE"))
+        .map(PathBuf::from)
+        .map_err(|_| "Could not determine your home directory.".into())
+}
+
+/// End-user path: the installed app has no repo next to it, so fetch the
+/// source tree into ~/.prepai on first launch. Idempotent — if a previous
+/// download is already there, reuse it.
+fn bootstrap_repo(app: &AppHandle) -> Result<PathBuf, String> {
+    let base = home_dir()?.join(".prepai");
+    let repo = base.join("Senior_Design-main");
+    if repo.join("docker-compose.local.yml").is_file() {
+        return Ok(repo);
+    }
+    std::fs::create_dir_all(&base).map_err(|e| format!("could not create {}: {e}", base.display()))?;
+
+    emit(app, 8, "First launch: downloading the PrepAI runtime…");
+    let tarball = base.join("prepai-src.tar.gz");
+    let tarball_str = tarball.to_string_lossy().to_string();
+    let out = Command::new("curl")
+        .args(["-fL", "--retry", "2", "-o", &tarball_str, REPO_TARBALL])
+        .output()
+        .map_err(|e| format!("failed to run curl: {e}"))?;
+    if !out.status.success() {
+        return Err(format!(
+            "Could not download the PrepAI runtime. Check your internet connection.\n{}",
+            String::from_utf8_lossy(&out.stderr).lines().last().unwrap_or("")
+        ));
+    }
+
+    emit(app, 12, "Unpacking the PrepAI runtime…");
+    let base_str = base.to_string_lossy().to_string();
+    let out = Command::new("tar")
+        .args(["-xzf", &tarball_str, "-C", &base_str])
+        .output()
+        .map_err(|e| format!("failed to run tar: {e}"))?;
+    let _ = std::fs::remove_file(&tarball);
+    if !out.status.success() {
+        return Err(format!(
+            "Could not unpack the PrepAI runtime: {}",
+            String::from_utf8_lossy(&out.stderr).lines().last().unwrap_or("")
+        ));
+    }
+    if !repo.join("docker-compose.local.yml").is_file() {
+        return Err("Downloaded runtime is missing docker-compose.local.yml.".into());
+    }
+    Ok(repo)
+}
+
 /// Run scripts/detect_engine.sh and parse its KEY=value env block.
 fn detect_engine(repo: &Path) -> Result<HashMap<String, String>, String> {
     let script = repo.join("scripts/detect_engine.sh");
@@ -191,7 +248,12 @@ pub(crate) fn port_open(host: &str, port: u16) -> bool {
 #[tauri::command]
 pub async fn start_stack(app: AppHandle) -> Result<String, StartupError> {
     emit(&app, 5, "Locating PrepAI…");
-    let repo = find_repo()?;
+    // Developer checkout first; otherwise this is an installed app — fetch the
+    // runtime into ~/.prepai on first launch instead of erroring out.
+    let repo = match find_repo() {
+        Ok(repo) => repo,
+        Err(_) => bootstrap_repo(&app)?,
+    };
 
     emit(&app, 15, "Detecting hardware and inference engine…");
     let env = detect_engine(&repo)?;
@@ -247,7 +309,11 @@ pub async fn start_stack(app: AppHandle) -> Result<String, StartupError> {
 /// Best-effort shutdown of the stack (leaves volumes intact).
 #[tauri::command]
 pub async fn stop_stack() -> Result<(), String> {
-    let repo = find_repo()?;
+    let repo = match find_repo() {
+        Ok(repo) => repo,
+        // Installed app: the runtime lives in ~/.prepai (see bootstrap_repo).
+        Err(_) => home_dir()?.join(".prepai").join("Senior_Design-main"),
+    };
     let _ = Command::new("docker")
         .current_dir(&repo)
         .args(["compose", "-f", "docker-compose.local.yml", "stop"])
