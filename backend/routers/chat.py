@@ -20,15 +20,36 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 
 groq_client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
-# "gemini-2.5-flash" was the default here, but Google has since restricted it
-# ("no longer available to new users" — 404 on generateContent even though it
-# still appears in ListModels for that key). gemini-2.5-flash-lite is the
-# closest same-generation replacement (same JSON-schema / thinking-token
-# behavior this file is tuned around) and is still available to new keys.
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
+# Each Gemini model has its own independent rate-limit bucket (per-model, not
+# per-key), so trying the best model first and falling back on a 429/503 costs
+# nothing against the fallback's own quota. Ordered best-quality-first:
+# 3.6 Flash -> 3.5 Flash -> 2.5 Flash-Lite -> 2.5 Flash.
+# NOTE: "gemini-2.5-flash" was previously the default here, but Google has
+# since restricted it ("no longer available to new users" — 404 on
+# generateContent even though it still appears in ListModels for that key) —
+# it's kept as the last-resort fallback (may still work for older keys) but
+# gemini-2.5-flash-lite (still available to new keys) is tried before it.
+GEMINI_MODEL_FALLBACKS = [
+    m.strip() for m in os.getenv(
+        "GEMINI_MODEL_FALLBACKS",
+        "gemini-3.5-flash,gemini-2.5-flash-lite,gemini-2.5-flash",
+    ).split(",") if m.strip()
+]
 # Feedback grading is a separate "judge" call from the live interview — override
 # independently (e.g. to a cheaper tier) without touching interview-time behavior.
 GEMINI_JUDGE_MODEL = os.getenv("GEMINI_JUDGE_MODEL", GEMINI_MODEL)
+GEMINI_JUDGE_MODEL_FALLBACKS = [
+    m.strip() for m in os.getenv(
+        "GEMINI_JUDGE_MODEL_FALLBACKS", ",".join(GEMINI_MODEL_FALLBACKS)
+    ).split(",") if m.strip()
+]
+
+
+def _gemini_model_chain(primary: str, fallbacks: list[str]) -> list[str]:
+    """`primary` first, then `fallbacks` in order, without repeating a model
+    that's already earlier in the chain."""
+    return [primary] + [m for m in fallbacks if m != primary]
 
 vllm_client = AsyncOpenAI(base_url=VLLM_BASE_URL, api_key="not-needed")
 gemini_client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
@@ -294,31 +315,36 @@ async def _stream_with_fallback(
                 errors.append("api(Gemini): GEMINI_API_KEY is not configured")
                 continue
 
-            try:
-                if source_used is not None:
-                    source_used["value"] = "api"
-                contents, system_instruction = _gemini_contents(messages)
-                config = {
-                    "temperature": temperature,
-                    "max_output_tokens": max_tokens,
-                }
-                if system_instruction:
-                    config["system_instruction"] = system_instruction
+            if source_used is not None:
+                source_used["value"] = "api"
+            contents, system_instruction = _gemini_contents(messages)
+            config = {
+                "temperature": temperature,
+                "max_output_tokens": max_tokens,
+            }
+            if system_instruction:
+                config["system_instruction"] = system_instruction
 
-                stream = await client.aio.models.generate_content_stream(
-                    model=GEMINI_MODEL,
-                    contents=contents,
-                    config=config,
-                )
-                async for chunk in stream:
-                    text = getattr(chunk, "text", None)
-                    if text:
-                        yield text
+            succeeded = False
+            for model in _gemini_model_chain(GEMINI_MODEL, GEMINI_MODEL_FALLBACKS):
+                try:
+                    stream = await client.aio.models.generate_content_stream(
+                        model=model,
+                        contents=contents,
+                        config=config,
+                    )
+                    async for chunk in stream:
+                        text = getattr(chunk, "text", None)
+                        if text:
+                            yield text
+                    succeeded = True
+                    break
+                except Exception as gemini_error:
+                    print(f"[ModelSelect] api(Gemini:{model}) failed: {gemini_error}")
+                    errors.append(f"api(Gemini:{model}): {gemini_error}")
+            if succeeded:
                 return
-            except Exception as gemini_error:
-                print(f"[ModelSelect] api(Gemini) failed: {gemini_error}")
-                errors.append(f"api(Gemini): {gemini_error}")
-                continue
+            continue
 
     raise RuntimeError("All model providers failed: " + " | ".join(errors))
 
@@ -353,25 +379,26 @@ async def _single_with_fallback(
                 errors.append("api(Gemini): GEMINI_API_KEY is not configured")
                 continue
 
-            try:
-                contents, system_instruction = _gemini_contents(messages)
-                config = {
-                    "temperature": temperature,
-                    "max_output_tokens": max_tokens,
-                }
-                if system_instruction:
-                    config["system_instruction"] = system_instruction
+            contents, system_instruction = _gemini_contents(messages)
+            config = {
+                "temperature": temperature,
+                "max_output_tokens": max_tokens,
+            }
+            if system_instruction:
+                config["system_instruction"] = system_instruction
 
-                response = await client.aio.models.generate_content(
-                    model=GEMINI_MODEL,
-                    contents=contents,
-                    config=config,
-                )
-                return (getattr(response, "text", "") or "").strip()
-            except Exception as gemini_error:
-                print(f"[ModelSelect] api(Gemini) failed: {gemini_error}")
-                errors.append(f"api(Gemini): {gemini_error}")
-                continue
+            for model in _gemini_model_chain(GEMINI_MODEL, GEMINI_MODEL_FALLBACKS):
+                try:
+                    response = await client.aio.models.generate_content(
+                        model=model,
+                        contents=contents,
+                        config=config,
+                    )
+                    return (getattr(response, "text", "") or "").strip()
+                except Exception as gemini_error:
+                    print(f"[ModelSelect] api(Gemini:{model}) failed: {gemini_error}")
+                    errors.append(f"api(Gemini:{model}): {gemini_error}")
+            continue
 
     raise RuntimeError("All model providers failed: " + " | ".join(errors))
 
@@ -442,14 +469,14 @@ async def synthesize_speech(request: dict, user_id: str = Depends(get_current_us
             return Response(content=b"", status_code=400)
 
         voice = request.get("voice", "am_michael")
-        speed = float(request.get("speed", 1.3))
+        speed = float(request.get("speed", 1.0))
 
         # Frontend now sends short clauses, so synthesize as one shot — no resplitting.
         import re
         natural_text = re.sub(r"\s+", " ", text.strip())
         natural_text = natural_text.replace("—", ", ").replace(" - ", ", ")
-        # Double-quote glyphs have no pronunciation in Kokoro's phonemizer and make
-        # it stumble/pause wherever one sits — strip straight and curly variants.
+        # Double-quote glyphs have no pronunciation in Google TTS's phonemizer and
+        # make it stumble/pause wherever one sits — strip straight and curly variants.
         # Apostrophes are kept (normalized to straight '): stripping them breaks
         # contractions/possessives ("don't" -> "dont") and mispronounces the word.
         natural_text = natural_text.replace("‘", "'").replace("’", "'")
@@ -1244,22 +1271,32 @@ The numbers MUST match what the report says — they are the same scores, machin
         elif AI_BACKEND == "gemini":
             client = gemini_client
         if client:
-            resp = await client.aio.models.generate_content(
-                model=GEMINI_JUDGE_MODEL,
-                contents=prompt,
-                config={
-                    "temperature": 0.2,
-                    # Gemini 2.5 models spend "thinking" tokens from this same
-                    # budget before emitting any JSON. A 12-question report is
-                    # ~3-4k visible tokens and thinking alone can eat several
-                    # k — at 4096 the JSON got truncated mid-string. Leave room
-                    # for both; capping thinking instead made the model stop
-                    # the report a few sentences in (~30% of runs).
-                    "max_output_tokens": 32768,
-                    "response_mime_type": "application/json",
-                    "response_schema": FeedbackJudgment,
-                },
-            )
+            resp = None
+            judge_errors: list[str] = []
+            for model in _gemini_model_chain(GEMINI_JUDGE_MODEL, GEMINI_JUDGE_MODEL_FALLBACKS):
+                try:
+                    resp = await client.aio.models.generate_content(
+                        model=model,
+                        contents=prompt,
+                        config={
+                            "temperature": 0.2,
+                            # Gemini 2.5 models spend "thinking" tokens from this same
+                            # budget before emitting any JSON. A 12-question report is
+                            # ~3-4k visible tokens and thinking alone can eat several
+                            # k — at 4096 the JSON got truncated mid-string. Leave room
+                            # for both; capping thinking instead made the model stop
+                            # the report a few sentences in (~30% of runs).
+                            "max_output_tokens": 32768,
+                            "response_mime_type": "application/json",
+                            "response_schema": FeedbackJudgment,
+                        },
+                    )
+                    break
+                except Exception as judge_error:
+                    print(f"[Feedback] judge model {model} failed: {judge_error}")
+                    judge_errors.append(f"{model}: {judge_error}")
+            if resp is None:
+                raise RuntimeError("All Gemini judge models failed: " + " | ".join(judge_errors))
             raw = resp.text
             finish = getattr(resp.candidates[0], "finish_reason", None) if resp.candidates else None
             if finish is not None and "STOP" not in str(finish):
