@@ -31,6 +31,23 @@ struct Progress {
     message: String,
 }
 
+/// Typed startup failure so the splash UI can offer the right recovery:
+/// "Install Docker" / "Install Ollama" buttons for the missing-prereq cases,
+/// plain retry for everything else.
+#[derive(Serialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum StartupError {
+    MissingDocker { message: String },
+    MissingOllama { message: String },
+    Other { message: String },
+}
+
+impl From<String> for StartupError {
+    fn from(message: String) -> Self {
+        StartupError::Other { message }
+    }
+}
+
 fn emit(app: &AppHandle, pct: u8, message: &str) {
     let _ = app.emit(
         "startup:progress",
@@ -162,7 +179,7 @@ fn http_ok(host: &str, port: u16, path: &str) -> bool {
 }
 
 /// TCP port open (frontend dev server is up before it serves a 200).
-fn port_open(host: &str, port: u16) -> bool {
+pub(crate) fn port_open(host: &str, port: u16) -> bool {
     format!("{host}:{port}")
         .parse()
         .ok()
@@ -172,13 +189,25 @@ fn port_open(host: &str, port: u16) -> bool {
 
 /// Bring the whole stack up; returns the URL to load when ready.
 #[tauri::command]
-pub async fn start_stack(app: AppHandle) -> Result<String, String> {
+pub async fn start_stack(app: AppHandle) -> Result<String, StartupError> {
     emit(&app, 5, "Locating PrepAI…");
     let repo = find_repo()?;
 
     emit(&app, 15, "Detecting hardware and inference engine…");
     let env = detect_engine(&repo)?;
     let engine = env.get("INFERENCE_ENGINE").cloned().unwrap_or_default();
+
+    emit(&app, 20, "Checking prerequisites…");
+    if !crate::installer::docker_ready() {
+        return Err(StartupError::MissingDocker {
+            message: "Docker isn't installed or isn't running.".into(),
+        });
+    }
+    if engine == "ollama" && !crate::installer::ollama_ready() {
+        return Err(StartupError::MissingOllama {
+            message: "Ollama isn't installed or isn't running.".into(),
+        });
+    }
 
     emit(&app, 30, &format!("Starting services (engine: {engine})…"));
     compose_up(&repo, &env)?;
@@ -190,7 +219,9 @@ pub async fn start_stack(app: AppHandle) -> Result<String, String> {
     while start.elapsed() < STARTUP_TIMEOUT {
         if !backend_ready && http_ok(BACKEND_HOST, BACKEND_PORT, "/health") {
             backend_ready = true;
-            emit(&app, 70, "Backend ready. Waiting for the app…");
+            // The frontend container compiles a production build before it
+            // serves anything, so this leg of the wait is the long one.
+            emit(&app, 70, "Backend ready. Building the app (takes a minute on first launch)…");
         }
         if backend_ready && !frontend_ready && port_open(BACKEND_HOST, FRONTEND_PORT) {
             frontend_ready = true;
@@ -201,10 +232,12 @@ pub async fn start_stack(app: AppHandle) -> Result<String, String> {
         }
         std::thread::sleep(Duration::from_millis(1500));
     }
-    Err(format!(
-        "Timed out after {}s waiting for the stack (engine: {engine}).",
-        STARTUP_TIMEOUT.as_secs()
-    ))
+    Err(StartupError::Other {
+        message: format!(
+            "Timed out after {}s waiting for the stack (engine: {engine}).",
+            STARTUP_TIMEOUT.as_secs()
+        ),
+    })
 }
 
 /// Best-effort shutdown of the stack (leaves volumes intact).

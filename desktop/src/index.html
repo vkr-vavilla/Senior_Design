@@ -69,6 +69,15 @@
         cursor: pointer;
       }
       .retry:hover { background: #334155; }
+      .row { display: flex; gap: 0.75rem; }
+      /* The install button is the primary action when a prerequisite is missing. */
+      #install {
+        border-color: #6366f1;
+        background: linear-gradient(90deg, #4f46e5, #7c3aed);
+      }
+      #install:hover { background: linear-gradient(90deg, #6366f1, #8b5cf6); }
+      /* An amber note (e.g. "restart PrepAI") rather than a red failure. */
+      .error.notice { color: #fcd34d; }
       .spinner {
         width: 18px; height: 18px;
         border: 2px solid rgba(148,163,184,0.3);
@@ -87,7 +96,10 @@
       <div class="spinner" id="spinner"></div>
       <div class="status" id="status">Preparing…</div>
       <div class="error" id="error"></div>
-      <button class="retry" id="retry">Retry</button>
+      <div class="row">
+        <button class="retry" id="install"></button>
+        <button class="retry" id="retry">Retry</button>
+      </div>
     </div>
     <script src="main.js"></script>
   </body>

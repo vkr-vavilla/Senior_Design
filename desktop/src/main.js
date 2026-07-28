@@ -1,6 +1,8 @@
 // Splash controller. Uses the Tauri global API (withGlobalTauri) so no bundler
 // is needed. Streams startup progress from the Rust supervisor, then navigates
-// the window to the running frontend once the stack is up.
+// the window to the running frontend once the stack is up. When a prerequisite
+// (Docker, Ollama) is missing, offers to install it in-app instead of just
+// showing an error.
 const { invoke } = window.__TAURI__.core;
 const { listen } = window.__TAURI__.event;
 
@@ -8,6 +10,7 @@ const fill = document.getElementById("fill");
 const status = document.getElementById("status");
 const errorEl = document.getElementById("error");
 const retryBtn = document.getElementById("retry");
+const installBtn = document.getElementById("install");
 const spinner = document.getElementById("spinner");
 
 listen("startup:progress", (event) => {
@@ -16,9 +19,49 @@ listen("startup:progress", (event) => {
   status.textContent = message;
 });
 
+function showError(text, { notice = false, retry = true } = {}) {
+  spinner.style.display = "none";
+  errorEl.textContent = text;
+  errorEl.classList.toggle("notice", notice);
+  errorEl.style.display = "block";
+  retryBtn.style.display = retry ? "inline-block" : "none";
+}
+
+function offerInstall(label, command, disclosure) {
+  showError(disclosure, { retry: true });
+  installBtn.textContent = label;
+  installBtn.style.display = "inline-block";
+  installBtn.onclick = () => runInstall(command);
+}
+
+async function runInstall(command) {
+  installBtn.style.display = "none";
+  retryBtn.style.display = "none";
+  errorEl.style.display = "none";
+  spinner.style.display = "block";
+  status.textContent = "Installing… you may be asked for your admin password.";
+  try {
+    const outcome = await invoke(command);
+    if (outcome.ready) {
+      // Prerequisite is usable right now — go straight back into startup.
+      boot();
+    } else {
+      // Installed, but this process can't use it yet (Linux: the new docker
+      // group only applies to processes started after it was granted).
+      status.textContent = "Almost there.";
+      showError(outcome.message, { notice: true, retry: false });
+    }
+  } catch (err) {
+    status.textContent = "Install failed.";
+    showError(String(err));
+  }
+}
+
 async function boot() {
   errorEl.style.display = "none";
+  errorEl.classList.remove("notice");
   retryBtn.style.display = "none";
+  installBtn.style.display = "none";
   spinner.style.display = "block";
   status.textContent = "Preparing…";
   fill.style.width = "0%";
@@ -29,10 +72,31 @@ async function boot() {
     window.location.replace(url);
   } catch (err) {
     spinner.style.display = "none";
-    status.textContent = "Couldn't start PrepAI.";
-    errorEl.textContent = String(err);
-    errorEl.style.display = "block";
-    retryBtn.style.display = "inline-block";
+    // start_stack rejects with a typed error: { kind, message }.
+    const kind = err && err.kind;
+    if (kind === "missing_docker") {
+      status.textContent = "Docker is required.";
+      offerInstall(
+        "Install Docker",
+        "install_docker",
+        "PrepAI runs its services in Docker, which isn't installed or running. " +
+          "PrepAI can install it for you using Docker's official installer " +
+          "(get.docker.com on Linux, Docker Desktop on macOS). " +
+          "You'll be asked for your admin password."
+      );
+    } else if (kind === "missing_ollama") {
+      status.textContent = "Ollama is required.";
+      offerInstall(
+        "Install Ollama",
+        "install_ollama",
+        "On Apple Silicon the interviewer model runs through Ollama, which " +
+          "isn't installed or running. PrepAI can download it from ollama.com " +
+          "and start it for you."
+      );
+    } else {
+      status.textContent = "Couldn't start PrepAI.";
+      showError((err && err.message) || String(err));
+    }
   }
 }
 

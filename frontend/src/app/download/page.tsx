@@ -23,7 +23,7 @@ import { useEffect, useState } from 'react';
 // these links don't need touching when the version bumps — only ASSETS does,
 // since Tauri stamps the version into each filename.
 const REPO = 'https://github.com/vkr-vavilla/Senior_Design';
-const VERSION = '0.1.0';
+const VERSION = '0.1.1';
 const DL = `${REPO}/releases/latest/download`;
 
 type OSKey = 'mac' | 'windows' | 'linux';
@@ -124,6 +124,42 @@ const STACK = [
   { icon: Terminal, title: 'Coding sandbox', desc: 'Runs your code in the live coding round, with 50 problems pre-seeded.' },
   { icon: RefreshCw, title: 'Crash recovery', desc: 'Redis snapshots every turn, so an interrupted interview resumes where it stopped.' },
 ];
+
+// Per-OS "you downloaded it, now what" steps. Kept as data so the section
+// below stays a dumb renderer. `code` lines render in a copyable mono block.
+const RUN_STEPS: Record<OSKey, { text: React.ReactNode; code?: string }[]> = {
+  linux: [
+    {
+      text: 'Make the AppImage executable, then run it:',
+      code: `chmod +x ${ASSETS.linux.file}\n./${ASSETS.linux.file}`,
+    },
+    {
+      text: 'Using the .deb instead? Install it, then launch "PrepAI" from your app menu:',
+      code: `sudo dpkg -i ${ASSETS.linux.alt!.file}`,
+    },
+    {
+      text: 'On first launch the app checks for Docker. If it’s missing, click "Install Docker" — it runs Docker’s official installer (get.docker.com) after asking for your admin password, then prompts you to restart PrepAI once so the new permissions apply.',
+    },
+  ],
+  mac: [
+    { text: 'Open the .dmg and drag PrepAI into Applications.' },
+    {
+      text: 'First launch only: right-click PrepAI in Applications and choose "Open", then confirm. macOS blocks the double-click because this build isn’t Apple-notarized yet — nothing is wrong with the app. Terminal alternative:',
+      code: 'xattr -cr /Applications/PrepAI.app',
+    },
+    {
+      text: 'The app then checks for Docker (and Ollama on Apple Silicon) and offers to install whichever is missing — no manual setup.',
+    },
+  ],
+  windows: [
+    {
+      text: `Run ${ASSETS.windows.file}. If SmartScreen shows "Windows protected your PC", click "More info" → "Run anyway" — the build isn’t code-signed yet.`,
+    },
+    {
+      text: 'Install Docker Desktop from docker.com if you don’t have it — on Windows the app checks for it but can’t install it for you yet.',
+    },
+  ],
+};
 
 function detectOS(): OSKey {
   if (typeof navigator === 'undefined') return 'mac';
@@ -271,6 +307,46 @@ export default function DownloadPage() {
               Browse all releases
             </a>
           </p>
+
+          {/* After downloading — per-OS run instructions */}
+          <div className="mt-12 rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden">
+            <div className="flex items-center justify-between gap-4 flex-wrap px-6 py-4 border-b border-slate-800 bg-slate-900">
+              <h3 className="font-bold text-white">After downloading</h3>
+              <div className="flex gap-1.5">
+                {(Object.keys(ASSETS) as OSKey[]).map((key) => (
+                  <button
+                    key={key}
+                    onClick={() => setOs(key)}
+                    aria-pressed={key === os}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+                      key === os
+                        ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40'
+                        : 'text-slate-400 border border-slate-700 hover:text-white hover:border-slate-600'
+                    }`}
+                  >
+                    {ASSETS[key].name}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <ol className="px-6 py-5 space-y-4">
+              {RUN_STEPS[os].map((step, i) => (
+                <li key={i} className="flex gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-slate-800 border border-slate-700 text-slate-300 text-xs font-medium flex items-center justify-center mt-0.5">
+                    {i + 1}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm text-slate-400 leading-relaxed">{step.text}</p>
+                    {step.code && (
+                      <pre className="mt-2 px-4 py-3 rounded-lg bg-slate-950 border border-slate-800 overflow-x-auto text-xs font-mono text-slate-300 leading-relaxed">
+                        <code>{step.code}</code>
+                      </pre>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
         </div>
       </section>
 
@@ -439,8 +515,8 @@ export default function DownloadPage() {
           </div>
 
           <p className="text-center text-slate-500 text-sm mt-6">
-            Updating later is just <code className="text-slate-400 font-mono">git pull</code> — the
-            running stack picks up code changes automatically.
+            Updating later is <code className="text-slate-400 font-mono">git pull</code>, then
+            restart PrepAI — the app rebuilds itself on the next launch.
           </p>
         </div>
       </section>

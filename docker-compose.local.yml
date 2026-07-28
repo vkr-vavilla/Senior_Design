@@ -177,6 +177,12 @@ services:
       - "3000:3000"
     stdin_open: true
     tty: true
+    # The image's default CMD is `npm run dev` (dev server with per-route
+    # on-demand compilation), which makes every page feel slow. This package is
+    # an end-user install, not a dev checkout, so serve a production build
+    # instead. The build re-runs on container start, which both picks up a
+    # `git pull` and is why the desktop splash shows a "building" phase.
+    command: sh -c "npm run build && npm run start"
     environment:
       # NEXT_PUBLIC vars are browser-side, so they use the host machine's address
       - NEXT_PUBLIC_API_URL=http://localhost:8080
