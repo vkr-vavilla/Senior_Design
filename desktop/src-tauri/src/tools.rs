@@ -29,6 +29,11 @@ const EXTRA_DIRS: &[&str] = &[
     // Docker Desktop's real binaries — present whenever Docker.app is
     // installed, even if the user declined the /usr/local/bin symlinks.
     "/Applications/Docker.app/Contents/Resources/bin",
+    // Ollama ships its CLI inside the bundle. /usr/local/bin/ollama only
+    // appears after the user clicks "Install command line" in Ollama's UI, so
+    // on a fresh install this is the only copy that exists.
+    "/Applications/Ollama.app/Contents/Resources",
+    "/Applications/Ollama.app/Contents/MacOS",
 ];
 
 #[cfg(not(target_os = "macos"))]
@@ -41,6 +46,22 @@ const EXTRA_DIRS: &[&str] = &[
     "/snap/bin", // Ubuntu snap-installed docker
     "/opt/homebrew/bin",
 ];
+
+/// Per-user install locations, which need $HOME expanded so they can't live in
+/// the const above. Docker Desktop 4.18+ puts its CLI in ~/.docker/bin and adds
+/// it to PATH from a shell profile — which a GUI app never sources, so without
+/// this a machine that plainly has Docker looks like it doesn't.
+fn home_dirs() -> Vec<PathBuf> {
+    let Some(home) = std::env::var_os("HOME").or_else(|| std::env::var_os("USERPROFILE")) else {
+        return Vec::new();
+    };
+    let home = PathBuf::from(home);
+    vec![
+        home.join(".docker").join("bin"),
+        home.join(".local").join("bin"),
+        home.join("bin"),
+    ]
+}
 
 /// Absolute path to `name`, or None if it isn't installed anywhere we look.
 pub fn find(name: &str) -> Option<PathBuf> {
@@ -58,13 +79,33 @@ pub fn find(name: &str) -> Option<PathBuf> {
             return Some(candidate);
         }
     }
+    for dir in home_dirs() {
+        let candidate = dir.join(name);
+        if is_executable(&candidate) {
+            return Some(candidate);
+        }
+    }
     None
 }
 
 fn is_executable(p: &Path) -> bool {
     // is_file() follows symlinks, which is what we want for /usr/local/bin
     // entries that point into an app bundle.
-    p.is_file()
+    if !p.is_file() {
+        return false;
+    }
+    // Also require the exec bit: a same-named data file (Ollama.app ships both
+    // `ollama` the binary and `ollama.png` beside it) or a partially-extracted
+    // download would otherwise be returned and then fail with EACCES at spawn.
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        return std::fs::metadata(p)
+            .map(|m| m.permissions().mode() & 0o111 != 0)
+            .unwrap_or(false);
+    }
+    #[cfg(not(unix))]
+    true
 }
 
 /// PATH for child processes: our own plus every well-known dir. Without this,
@@ -74,8 +115,7 @@ pub fn augmented_path() -> OsString {
     if let Some(path) = std::env::var_os("PATH") {
         dirs.extend(std::env::split_paths(&path));
     }
-    for dir in EXTRA_DIRS {
-        let p = PathBuf::from(dir);
+    for p in EXTRA_DIRS.iter().map(PathBuf::from).chain(home_dirs()) {
         if !dirs.contains(&p) {
             dirs.push(p);
         }
@@ -107,6 +147,10 @@ fn missing_message(name: &str) -> String {
              \u{2022} Fedora/RHEL:    sudo dnf install curl\n\
              (missing: {name})"
         ),
+        "ollama" => "Ollama is installed but its command line isn't available.\n\
+             Open Ollama and choose \"Install command line\" when prompted, \
+             then reopen FinalRound."
+            .to_string(),
         other => format!("Required tool '{other}' was not found on this machine."),
     }
 }

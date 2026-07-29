@@ -192,10 +192,13 @@ fn install_docker_macos() -> Result<InstallOutcome, String> {
             &mut tools::command("hdiutil")?.args(["attach", "-nobrowse", "-quiet", &dmg_str]),
             "mounting the Docker installer",
         )?;
-        // Copy + accept-license in a single elevated call so macOS shows one
-        // password dialog, not two. Volume name is fixed by Docker's dmg.
-        let elevated = "do shell script \"cp -R /Volumes/Docker/Docker.app /Applications/ && \
-                        /Applications/Docker.app/Contents/MacOS/Docker --accept-license\" \
+        // Copy only. Two earlier problems with doing more here: the documented
+        // license flag lives on .../MacOS/install, not .../MacOS/Docker, so the
+        // old call could fail outright; and running Docker itself as root leaves
+        // root-owned files in ~/.docker that break the user's later invocations.
+        // Docker Desktop presents its own license/privileges flow on first
+        // launch, which is what `open -a Docker` below triggers.
+        let elevated = "do shell script \"cp -R /Volumes/Docker/Docker.app /Applications/\" \
                         with administrator privileges";
         let install = run_ok(&mut tools::command("osascript")?.args(["-e", elevated]), "installing Docker Desktop");
         if let Ok(mut c) = tools::command("hdiutil") {
@@ -233,8 +236,22 @@ have() { command -v "$1" >/dev/null 2>&1; }
 PKG=""
 if have apt-get; then PKG=apt; elif have dnf; then PKG=dnf; elif have pacman; then PKG=pacman; fi
 
-# 0. Refresh the package index. A freshly imaged machine's index is stale or
-#    half-broken, which is enough to abort Docker's installer.
+# 0a. A half-configured package blocks EVERY later apt operation, so nothing
+#     below can succeed until it is cleared. The usual cause is a driver package
+#     whose kernel-module build failed (e.g. nvidia-dkms-*). Completing pending
+#     configuration is safe and often enough; if it isn't, stop and say so
+#     rather than emitting a confusing failure from an unrelated step.
+if [ "$PKG" = apt ]; then
+  dpkg --configure -a >/dev/null 2>&1 || true
+  AUDIT="$(dpkg --audit 2>/dev/null | grep -E '^ [a-z0-9]' | awk '{print $1}' | tr '\n' ' ')"
+  if [ -n "${AUDIT# }" ]; then
+    echo "BROKEN_PKGS: $AUDIT" >&2
+    fail dpkg-broken 19
+  fi
+fi
+
+# 0b. Refresh the package index. A freshly imaged machine's index is stale or
+#     half-broken, which is enough to abort Docker's installer.
 case "$PKG" in
   apt) apt-get update -qq || apt-get update -qq --allow-releaseinfo-change || true ;;
   dnf) dnf -y makecache || true ;;
