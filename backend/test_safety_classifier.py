@@ -94,6 +94,11 @@ TEST_CASES = [
         "That's a good question. I think I handled it well.",
         True,
     ),
+    (
+        "short greeting",
+        "yo",
+        True,
+    ),
 ]
 
 

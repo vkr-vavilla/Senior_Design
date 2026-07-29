@@ -121,6 +121,17 @@ _HEURISTIC_PATTERNS: list[tuple[re.Pattern, str]] = [
     ),
 ]
 
+_SAFE_GREETINGS = {
+    "yo",
+    "hi",
+    "hey",
+    "hello",
+}
+
+
+def _normalized_token(text: str) -> str:
+    return re.sub(r"[^a-z]", "", text.lower())
+
 
 def _heuristic_check(text: str) -> SafetyResult | None:
     """Return a SafetyResult only if the heuristic fires; None means clean."""
@@ -287,6 +298,15 @@ async def classify_prompt(text: str) -> SafetyResult:
 
     if not text or not text.strip():
         return _SAFE_RESULT
+
+    if _normalized_token(text) in _SAFE_GREETINGS:
+        return SafetyResult(
+            is_safe=True,
+            label="safe",
+            category="ok",
+            reason="",
+            stage="heuristic",
+        )
 
     # Stage 1 – instant heuristic (no I/O)
     heuristic_result = _heuristic_check(text)
