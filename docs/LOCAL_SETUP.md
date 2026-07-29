@@ -1,6 +1,6 @@
-# PrepAI Local Package — run everything on your own machine
+# FinalRound Local Package — run everything on your own machine
 
-The local package is a fully self-contained deployment of PrepAI: the AI
+The local package is a fully self-contained deployment of FinalRound: the AI
 interviewer model, speech-to-text, text-to-speech, database, and coding sandbox
 all run on your computer. Nothing is metered and no cloud account is required
 (except optionally Gemini, for machines without a GPU).

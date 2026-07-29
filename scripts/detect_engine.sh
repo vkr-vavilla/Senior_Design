@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PrepAI — inference-engine auto-detection.
+# FinalRound — inference-engine auto-detection.
 #
 # Inspects the host (OS, CPU arch, GPU vendor + VRAM, total RAM) and picks the
 # best local inference engine, then prints a shell-eval-able block of the env

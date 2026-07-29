@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PrepAI — publish the fine-tuned interviewer adapter to the Hugging Face Hub.
+# FinalRound — publish the fine-tuned interviewer adapter to the Hugging Face Hub.
 #
 # Run this ONCE per adapter version, on a build machine. It uploads BOTH formats
 # from a single repo so either engine can pull the same adapter:
@@ -16,14 +16,14 @@
 # and a Hugging Face token with write access.
 #
 # Usage:
-#   HF_TOKEN=hf_xxx scripts/publish_adapter.sh <namespace>/prepai-interviewer
+#   HF_TOKEN=hf_xxx scripts/publish_adapter.sh <namespace>/finalround-interviewer
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
 REPO_ROOT="$(pwd)"
 
 REPO_ID="${1:-}"
-[ -n "$REPO_ID" ] || { echo "usage: HF_TOKEN=hf_xxx $0 <namespace>/prepai-interviewer" >&2; exit 1; }
+[ -n "$REPO_ID" ] || { echo "usage: HF_TOKEN=hf_xxx $0 <namespace>/finalround-interviewer" >&2; exit 1; }
 [ -n "${HF_TOKEN:-}" ] || { echo "ERROR: set HF_TOKEN (https://huggingface.co/settings/tokens, 'write' scope)" >&2; exit 1; }
 
 ADAPTER="${ADAPTER_DIR:-training/artifacts/qwen2.5-7b-chatml-qlora-v2}"

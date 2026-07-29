@@ -1,3 +1,4 @@
+import { ChevronDown } from 'lucide-react';
 import React from 'react';
 import { cn } from '@/lib/utils';
 
@@ -75,12 +76,14 @@ Input.displayName = 'Input';
 interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
   error?: string;
+  /** Short helper line under the control — e.g. what the choice implies. */
+  hint?: React.ReactNode;
   wrapperClassName?: string;
   options: { value: string; label: string }[];
 }
 
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
-  ({ label, error, wrapperClassName, className, id, options, ...props }, ref) => {
+  ({ label, error, hint, wrapperClassName, className, id, options, ...props }, ref) => {
     const selectId = id || label?.toLowerCase().replace(/\s+/g, '-');
 
     return (
@@ -90,25 +93,37 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             {label}
           </label>
         )}
-        <select
-          ref={ref}
-          id={selectId}
-          className={cn(
-            'w-full bg-slate-900 border rounded-lg px-3.5 py-2.5 text-sm text-white transition-all duration-200 cursor-pointer appearance-none',
-            'focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50',
-            error
-              ? 'border-red-500/50'
-              : 'border-slate-700 hover:border-slate-600',
-            className
-          )}
-          {...props}
-        >
-          {options.map((opt) => (
-            <option key={opt.value} value={opt.value} className="bg-slate-900">
-              {opt.label}
-            </option>
-          ))}
-        </select>
+        {/* group/relative so the chevron can react to hover and focus. The
+            native control keeps appearance-none, so we draw the arrow. */}
+        <div className="relative group">
+          <select
+            ref={ref}
+            id={selectId}
+            className={cn(
+              'w-full appearance-none cursor-pointer rounded-xl border bg-slate-800/80 py-3 pl-4 pr-11',
+              'text-sm font-medium text-white shadow-sm transition-all duration-200',
+              'hover:bg-slate-800 hover:border-slate-600',
+              'focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/60 focus:bg-slate-800',
+              error ? 'border-red-500/50' : 'border-slate-700',
+              className
+            )}
+            {...props}
+          >
+            {options.map((opt) => (
+              <option key={opt.value} value={opt.value} className="bg-slate-900 text-white">
+                {opt.label}
+              </option>
+            ))}
+          </select>
+          <ChevronDown
+            className={cn(
+              'pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-200',
+              error ? 'text-red-400' : 'text-slate-500 group-hover:text-indigo-400'
+            )}
+            aria-hidden="true"
+          />
+        </div>
+        {hint && !error && <p className="text-xs text-slate-500 leading-relaxed">{hint}</p>}
         {error && <p className="text-xs text-red-400">{error}</p>}
       </div>
     );

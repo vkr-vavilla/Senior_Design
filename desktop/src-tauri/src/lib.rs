@@ -1,4 +1,5 @@
 mod installer;
+mod tools;
 mod supervisor;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -12,5 +13,5 @@ pub fn run() {
             installer::install_ollama,
         ])
         .run(tauri::generate_context!())
-        .expect("error while running the PrepAI desktop app");
+        .expect("error while running the FinalRound desktop app");
 }

@@ -114,7 +114,7 @@ async def run_tests():
     total  = len(TEST_CASES)
 
     print(f"\n{BOLD}{'─'*60}{RESET}")
-    print(f"{BOLD}  PrepAI Safety Classifier — Test Suite{RESET}")
+    print(f"{BOLD}  FinalRound Safety Classifier — Test Suite{RESET}")
     print(f"{BOLD}{'─'*60}{RESET}\n")
 
     for i, (description, prompt, expect_safe) in enumerate(TEST_CASES, 1):

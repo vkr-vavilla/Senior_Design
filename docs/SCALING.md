@@ -1,4 +1,4 @@
-# Scaling & Optimization Plan — PrepAI / FinalRound
+# Scaling & Optimization Plan — FinalRound / FinalRound
 
 How this app behaves under load, where the real bottlenecks are, and a prioritized
 plan to optimize each tier. Numbers below come from the live vLLM startup logs and

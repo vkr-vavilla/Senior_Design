@@ -1,4 +1,4 @@
-# PrepAI "interviewer" model for Ollama (conducts the interview).
+# FinalRound "interviewer" model for Ollama (conducts the interview).
 #
 # Qwen2.5-7B-Instruct base + the interviewer QLoRA adapter — a persona fine-tuned
 # to be warm and encouraging. Matches VLLM_MODEL=interviewer in the vLLM path

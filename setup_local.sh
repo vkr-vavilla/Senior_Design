@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PrepAI local package — first-run setup.
+# FinalRound local package — first-run setup.
 #
 # Checks prerequisites, generates backend/.env with a fresh JWT secret, starts
 # the self-contained stack (docker-compose.local.yml), and seeds the coding-
@@ -106,7 +106,7 @@ case "$MODE" in
     else
       echo "Interviewer adapter: FinalRound/prepai-interviewer (downloads once, ~646 MB)"
     fi
-    echo "Starting PrepAI with the local Qwen model via vLLM."
+    echo "Starting FinalRound with the local Qwen model via vLLM."
     echo "(first run downloads ~5.5 GB of model weights into the hf-cache volume)"
     $COMPOSE --profile gpu up -d --build
     ;;
@@ -149,11 +149,11 @@ case "$MODE" in
       fi
     done
 
-    echo "Starting PrepAI with the local Qwen model via native Ollama (Metal)."
+    echo "Starting FinalRound with the local Qwen model via native Ollama (Metal)."
     $COMPOSE up -d --build
     ;;
   gemini)
-    echo "Starting PrepAI in Gemini API mode (no local model services)."
+    echo "Starting FinalRound in Gemini API mode (no local model services)."
     $COMPOSE up -d --build
     ;;
 esac
@@ -194,7 +194,7 @@ fi
 
 # ── Done ─────────────────────────────────────────────────────────────────────
 echo
-echo "PrepAI is running:"
+echo "FinalRound is running:"
 echo "  App:  http://localhost:3000"
 echo "  API:  http://localhost:8080/docs"
 if [ "$MODE" = "vllm" ]; then

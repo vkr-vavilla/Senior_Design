@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PrepAI — produce the GGUF artifacts + Ollama models for the cross-platform
+# FinalRound — produce the GGUF artifacts + Ollama models for the cross-platform
 # (Ollama) inference path. Run this ONCE on a build machine; the outputs are what
 # the desktop bundle / `ollama create` consume. Not part of end-user first-run.
 #

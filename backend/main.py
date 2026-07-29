@@ -166,7 +166,7 @@ app.include_router(coding.router)
 
 @app.get("/")
 async def root():
-    return {"message": "PrepAI API is running"}
+    return {"message": "FinalRound API is running"}
 
 
 @app.get("/health")

@@ -1,6 +1,6 @@
-# PrepAI · FinalRound — AI-Powered Mock Interview Platform
+# FinalRound · FinalRound — AI-Powered Mock Interview Platform
 
-PrepAI (internally **FinalRound**) is a full-stack web app that runs realistic, voice-driven mock interviews end to end: it talks to you, listens to your answers, runs a live coding round, and then writes you honest, role-specific feedback — the way a real hiring manager would.
+FinalRound (internally **FinalRound**) is a full-stack web app that runs realistic, voice-driven mock interviews end to end: it talks to you, listens to your answers, runs a live coding round, and then writes you honest, role-specific feedback — the way a real hiring manager would.
 
 It can run entirely on a **cloud LLM (Google Gemini)** with zero GPU, or fully **self-hosted** on your own GPU using a fine-tuned **Qwen2.5-7B** interviewer model served by vLLM.
 
@@ -301,7 +301,7 @@ All protected routes expect an `Authorization: Bearer <token>` header.
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `MONGODB_URI` | `mongodb://localhost:27017` | MongoDB connection string |
-| `DB_NAME` | `prepai` / `FinalRound` | Database name |
+| `DB_NAME` | `finalround` / `FinalRound` | Database name |
 | `JWT_SECRET` | `changeme` | **Set a strong secret** — signs auth tokens |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | `10080` | Token lifetime (7 days; no refresh flow) |
 | `AI_BACKEND` | `gemini` | `gemini` (cloud) or `qwen` (local vLLM) |

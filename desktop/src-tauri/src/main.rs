@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    prepai_desktop_lib::run()
+    finalround_desktop_lib::run()
 }

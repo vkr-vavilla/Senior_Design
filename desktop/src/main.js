@@ -76,25 +76,37 @@ async function boot() {
     const kind = err && err.kind;
     if (kind === "missing_docker") {
       status.textContent = "Docker is required.";
-      offerInstall(
-        "Install Docker",
-        "install_docker",
-        "PrepAI runs its services in Docker, which isn't installed or running. " +
-          "PrepAI can install it for you using Docker's official installer " +
-          "(get.docker.com on Linux, Docker Desktop on macOS). " +
-          "You'll be asked for your admin password."
-      );
+      if (err.installed) {
+        // Present but not running: starting it is all that's needed, and
+        // labelling that "Install" made a 2-minute wait look like a hang.
+        offerInstall(
+          "Start Docker",
+          "install_docker",
+          "FinalRound runs its services in Docker, which is installed but not running. " +
+            "FinalRound will start Docker and wait for it to come up — on the first " +
+            "launch Docker itself may ask for permission, which can take a minute."
+        );
+      } else {
+        offerInstall(
+          "Install Docker",
+          "install_docker",
+          "FinalRound runs its services in Docker, which isn't installed. " +
+            "FinalRound can install it for you using Docker's official installer " +
+            "(get.docker.com on Linux, Docker Desktop on macOS). " +
+            "You'll be asked for your admin password."
+        );
+      }
     } else if (kind === "missing_ollama") {
       status.textContent = "Ollama is required.";
       offerInstall(
         "Install Ollama",
         "install_ollama",
         "On Apple Silicon the interviewer model runs through Ollama, which " +
-          "isn't installed or running. PrepAI can download it from ollama.com " +
+          "isn't installed or running. FinalRound can download it from ollama.com " +
           "and start it for you."
       );
     } else {
-      status.textContent = "Couldn't start PrepAI.";
+      status.textContent = "Couldn't start FinalRound.";
       showError((err && err.message) || String(err));
     }
   }

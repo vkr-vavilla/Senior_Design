@@ -1,4 +1,4 @@
-//! Supervises the local PrepAI stack for the desktop app (Option A: orchestrate
+//! Supervises the local FinalRound stack for the desktop app (Option A: orchestrate
 //! Docker Compose). On launch the splash UI invokes `start_stack`, which:
 //!   1. locates the repo (compose file + scripts),
 //!   2. runs scripts/detect_engine.sh to pick the inference engine + env,
@@ -13,11 +13,12 @@ use std::collections::HashMap;
 use std::io::{Read, Write};
 use std::net::TcpStream;
 use std::path::{Path, PathBuf};
-use std::process::Command;
 use std::time::{Duration, Instant};
 
 use serde::Serialize;
 use tauri::{AppHandle, Emitter};
+
+use crate::tools;
 
 const APP_URL: &str = "http://localhost:3000";
 const BACKEND_HOST: &str = "127.0.0.1";
@@ -37,7 +38,10 @@ struct Progress {
 #[derive(Serialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum StartupError {
-    MissingDocker { message: String },
+    // `installed` lets the UI offer "Start Docker" instead of "Install Docker"
+    // when the CLI is present but the daemon is down — the case that used to
+    // sit on "Installing…" until it timed out.
+    MissingDocker { message: String, installed: bool },
     MissingOllama { message: String },
     Other { message: String },
 }
@@ -61,10 +65,14 @@ fn emit(app: &AppHandle, pct: u8, message: &str) {
 /// Locate the repo root (holds docker-compose.local.yml). Honors $PREPAI_HOME,
 /// else walks up from the current dir, else up from the executable's dir.
 fn find_repo() -> Result<PathBuf, String> {
-    if let Ok(dir) = std::env::var("PREPAI_HOME") {
-        let p = PathBuf::from(dir);
-        if p.join("docker-compose.local.yml").is_file() {
-            return Ok(p);
+    // FINALROUND_HOME is the documented override; PREPAI_HOME stays supported
+    // so existing installs from the old branding keep working.
+    for var in ["FINALROUND_HOME", "PREPAI_HOME"] {
+        if let Ok(dir) = std::env::var(var) {
+            let p = PathBuf::from(dir);
+            if p.join("docker-compose.local.yml").is_file() {
+                return Ok(p);
+            }
         }
     }
     let mut roots: Vec<PathBuf> = Vec::new();
@@ -85,7 +93,7 @@ fn find_repo() -> Result<PathBuf, String> {
             cur = dir.parent();
         }
     }
-    Err("Could not find docker-compose.local.yml. Set PREPAI_HOME to the repo.".into())
+    Err("Could not find docker-compose.local.yml. Set FINALROUND_HOME to the repo.".into())
 }
 
 /// Source tarball of the default branch — what an installed app runs against
@@ -105,37 +113,35 @@ fn home_dir() -> Result<PathBuf, String> {
 /// source tree into ~/.prepai on first launch. Idempotent — if a previous
 /// download is already there, reuse it.
 fn bootstrap_repo(app: &AppHandle) -> Result<PathBuf, String> {
-    let base = home_dir()?.join(".prepai");
+    let home = home_dir()?;
+    let base = home.join(".finalround");
     let repo = base.join("Senior_Design-main");
     if repo.join("docker-compose.local.yml").is_file() {
         return Ok(repo);
     }
+    // Reuse a runtime downloaded under the old ~/.prepai name rather than
+    // making existing users re-download ~13 MB and regenerate their .env.
+    let legacy = home.join(".prepai").join("Senior_Design-main");
+    if legacy.join("docker-compose.local.yml").is_file() {
+        return Ok(legacy);
+    }
     std::fs::create_dir_all(&base).map_err(|e| format!("could not create {}: {e}", base.display()))?;
 
-    emit(app, 8, "First launch: downloading the PrepAI runtime…");
-    let tarball = base.join("prepai-src.tar.gz");
+    emit(app, 8, "First launch: downloading the FinalRound runtime…");
+    let tarball = base.join("finalround-src.tar.gz");
     let tarball_str = tarball.to_string_lossy().to_string();
-    let out = Command::new("curl")
-        .args(["-fL", "--retry", "2", "-o", &tarball_str, REPO_TARBALL])
-        .output()
-        .map_err(|e| format!("failed to run curl: {e}"))?;
-    if !out.status.success() {
-        return Err(format!(
-            "Could not download the PrepAI runtime. Check your internet connection.\n{}",
-            String::from_utf8_lossy(&out.stderr).lines().last().unwrap_or("")
-        ));
-    }
+    tools::download(REPO_TARBALL, &tarball)?;
 
-    emit(app, 12, "Unpacking the PrepAI runtime…");
+    emit(app, 12, "Unpacking the FinalRound runtime…");
     let base_str = base.to_string_lossy().to_string();
-    let out = Command::new("tar")
+    let out = tools::command("tar")?
         .args(["-xzf", &tarball_str, "-C", &base_str])
         .output()
         .map_err(|e| format!("failed to run tar: {e}"))?;
     let _ = std::fs::remove_file(&tarball);
     if !out.status.success() {
         return Err(format!(
-            "Could not unpack the PrepAI runtime: {}",
+            "Could not unpack the FinalRound runtime: {}",
             String::from_utf8_lossy(&out.stderr).lines().last().unwrap_or("")
         ));
     }
@@ -169,7 +175,7 @@ fn ensure_backend_env(repo: &Path) -> Result<(), String> {
     }
     let secret: String = buf.iter().map(|b| format!("{b:02x}")).collect();
     let contents = format!(
-        "# Generated by the PrepAI desktop app — per-machine settings, never commit this file.\n\
+        "# Generated by the FinalRound desktop app — per-machine settings, never commit this file.\n\
          DB_NAME=FinalRound\n\
          JWT_SECRET={secret}\n\n\
          # Only used in Gemini API mode (no GPU). Get a free key: https://aistudio.google.com\n\
@@ -188,7 +194,7 @@ fn detect_engine(repo: &Path) -> Result<HashMap<String, String>, String> {
     // Point vLLM detection at the compose service name (URL on the compose
     // network). Ollama is deliberately left alone: it runs natively on the host
     // for Metal access, so detect_engine.sh resolves it via host.docker.internal.
-    let out = Command::new("bash")
+    let out = tools::command("bash")?
         .arg(&script)
         .current_dir(repo)
         .env("PREPAI_VLLM_URL", "http://vllm:8001/v1")
@@ -215,7 +221,7 @@ fn detect_engine(repo: &Path) -> Result<HashMap<String, String>, String> {
 /// `docker compose -f docker-compose.local.yml [--profile P] up -d`, with the
 /// engine env from detect_engine injected so compose interpolates it.
 fn compose_up(repo: &Path, env: &HashMap<String, String>) -> Result<(), String> {
-    let mut cmd = Command::new("docker");
+    let mut cmd = tools::command("docker")?;
     cmd.current_dir(repo)
         .arg("compose")
         .arg("-f")
@@ -281,7 +287,7 @@ pub(crate) fn port_open(host: &str, port: u16) -> bool {
 /// Bring the whole stack up; returns the URL to load when ready.
 #[tauri::command]
 pub async fn start_stack(app: AppHandle) -> Result<String, StartupError> {
-    emit(&app, 5, "Locating PrepAI…");
+    emit(&app, 5, "Locating FinalRound…");
     // Developer checkout first; otherwise this is an installed app — fetch the
     // runtime into ~/.prepai on first launch instead of erroring out.
     let repo = match find_repo() {
@@ -296,9 +302,13 @@ pub async fn start_stack(app: AppHandle) -> Result<String, StartupError> {
 
     emit(&app, 20, "Checking prerequisites…");
     if !crate::installer::docker_ready() {
-        return Err(StartupError::MissingDocker {
-            message: "Docker isn't installed or isn't running.".into(),
-        });
+        let installed = crate::installer::docker_installed();
+        let message = if installed {
+            "Docker is installed but not running.".to_string()
+        } else {
+            "Docker isn't installed.".to_string()
+        };
+        return Err(StartupError::MissingDocker { message, installed });
     }
     if engine == "ollama" && !crate::installer::ollama_ready() {
         return Err(StartupError::MissingOllama {
@@ -341,18 +351,30 @@ pub async fn start_stack(app: AppHandle) -> Result<String, StartupError> {
     })
 }
 
+/// Where an installed app keeps its runtime (new name first, legacy second).
+fn bootstrap_dir() -> Result<PathBuf, String> {
+    let home = home_dir()?;
+    let new = home.join(".finalround").join("Senior_Design-main");
+    if new.join("docker-compose.local.yml").is_file() {
+        return Ok(new);
+    }
+    Ok(home.join(".prepai").join("Senior_Design-main"))
+}
+
 /// Best-effort shutdown of the stack (leaves volumes intact).
 #[tauri::command]
 pub async fn stop_stack() -> Result<(), String> {
     let repo = match find_repo() {
         Ok(repo) => repo,
         // Installed app: the runtime lives in ~/.prepai (see bootstrap_repo).
-        Err(_) => home_dir()?.join(".prepai").join("Senior_Design-main"),
+        Err(_) => bootstrap_dir()?,
     };
-    let _ = Command::new("docker")
-        .current_dir(&repo)
-        .args(["compose", "-f", "docker-compose.local.yml", "stop"])
-        .status();
+    if let Ok(mut cmd) = tools::command("docker") {
+        let _ = cmd
+            .current_dir(&repo)
+            .args(["compose", "-f", "docker-compose.local.yml", "stop"])
+            .status();
+    }
     Ok(())
 }
 

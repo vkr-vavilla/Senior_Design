@@ -1,4 +1,4 @@
-# PrepAI base model for Ollama (grading / judge).
+# FinalRound base model for Ollama (grading / judge).
 #
 # This is the plain Qwen2.5-7B-Instruct base — NO interviewer LoRA — used only to
 # grade feedback, matching VLLM_BASE_MODEL in the vLLM path (see

@@ -4,7 +4,7 @@ import os
 load_dotenv()
 
 MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
-DB_NAME = os.getenv("DB_NAME", "prepai")
+DB_NAME = os.getenv("DB_NAME", "finalround")
 # Collection holding the LeetCode problem bank (statement, starter code, tests, meta).
 PROBLEMS_COLLECTION = os.getenv("PROBLEMS_COLLECTION", "leetcode")
 # Code-execution backend: "piston" (sandboxed) or "local" (subprocess, no isolation).

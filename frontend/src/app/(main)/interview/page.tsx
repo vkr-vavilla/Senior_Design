@@ -12,6 +12,7 @@ import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { useInterviewChat } from '@/hooks/useInterviewChat';
 import { useTextToSpeech } from '@/hooks/useTextToSpeech';
 import { chatApi } from '@/lib/api';
+import { DEFAULT_MODEL_SOURCE, GEMINI_KEY_URL, IS_CLOUD } from '@/lib/deployment';
 import { cn, formatTime } from '@/lib/utils';
 import type { InterviewConfig } from '@/types/chat';
 import {
@@ -21,6 +22,7 @@ import {
     Briefcase,
     Code2,
     CheckCircle,
+    ExternalLink,
     ChevronRight,
     Clock,
     Play,
@@ -48,8 +50,8 @@ const DIFFICULTY_LEVELS = [
 ];
 
 const MODEL_SOURCES = [
-  { value: 'local', label: 'Local (vLLM)' },
-  { value: 'api', label: 'API (Gemini)' },
+  { value: 'local', label: 'Local (vLLM / Ollama)' },
+  { value: 'api', label: 'Cloud — Gemini API (your key)' },
 ];
 
 const STT_ENGINES = [
@@ -117,7 +119,8 @@ function InterviewPageContent() {
     role: searchParams.get('role') || 'Software Engineer',
     type: (searchParams.get('type') as InterviewConfig['type']) || 'technical',
     difficulty: (searchParams.get('difficulty') as InterviewConfig['difficulty']) || 'medium',
-    modelSource: (searchParams.get('modelSource') as InterviewConfig['modelSource']) || 'local',
+    modelSource:
+      (searchParams.get('modelSource') as InterviewConfig['modelSource']) || DEFAULT_MODEL_SOURCE,
     sttEngine: (searchParams.get('sttEngine') as InterviewConfig['sttEngine']) || 'groq',
     interviewId: searchParams.get('interviewId') || undefined,
   });
@@ -232,14 +235,19 @@ function InterviewPageContent() {
             />
 
             <Select
-              label="Model Source"
-              options={MODEL_SOURCES}
+              label="Interviewer Model"
+              options={IS_CLOUD ? MODEL_SOURCES.filter((m) => m.value === 'api') : MODEL_SOURCES}
               value={config.modelSource}
               onChange={(e) =>
                 setConfig((c) => ({
                   ...c,
                   modelSource: e.target.value as InterviewConfig['modelSource'],
                 }))
+              }
+              hint={
+                config.modelSource === 'api'
+                  ? 'Google Gemini, using your own API key. Free tier is plenty for practice.'
+                  : 'Our fine-tuned model on your machine — vLLM on NVIDIA, Ollama on Apple Silicon. No key needed.'
               }
             />
 
@@ -256,16 +264,27 @@ function InterviewPageContent() {
             />
 
             {config.modelSource === 'api' && (
-              <Input
-                label="Gemini API Key"
-                type="password"
-                placeholder="AIzaSy... (Optional if configured on server)"
-                value={geminiKey}
-                onChange={(e) => {
-                  setGeminiKey(e.target.value);
-                  localStorage.setItem('gemini_api_key', e.target.value);
-                }}
-              />
+              <div className="space-y-2">
+                <Input
+                  label="Gemini API Key"
+                  type="password"
+                  placeholder="AIzaSy… (optional if configured on the server)"
+                  value={geminiKey}
+                  onChange={(e) => {
+                    setGeminiKey(e.target.value);
+                    localStorage.setItem('gemini_api_key', e.target.value);
+                  }}
+                />
+                <a
+                  href={GEMINI_KEY_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
+                >
+                  Get a free key from Google AI Studio
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
             )}
 
             <Button

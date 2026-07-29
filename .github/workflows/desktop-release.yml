@@ -75,7 +75,7 @@ jobs:
         with:
           projectPath: desktop
           tagName: ${{ github.ref_name }}
-          releaseName: "PrepAI Desktop ${{ github.ref_name }}"
+          releaseName: "FinalRound Desktop ${{ github.ref_name }}"
           releaseBody: "Auto-built by CI. Auto-detects the best local inference engine (vLLM on NVIDIA, Ollama on Mac/AMD/CPU) or falls back to the Gemini API."
           releaseDraft: false
           prerelease: false

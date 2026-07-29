@@ -1,8 +1,8 @@
 {
-  "name": "prepai-desktop",
+  "name": "finalround-desktop",
   "version": "0.1.1",
   "private": true,
-  "description": "PrepAI desktop app — native shell that runs the local interview stack.",
+  "description": "FinalRound desktop app — native shell that runs the local interview stack.",
   "scripts": {
     "tauri": "tauri",
     "dev": "tauri dev",

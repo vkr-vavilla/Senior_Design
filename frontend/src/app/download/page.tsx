@@ -35,18 +35,18 @@ const ASSETS: Record<
   mac: {
     name: 'macOS',
     sub: 'Apple Silicon · universal',
-    file: `PrepAI_${VERSION}_universal.dmg`,
+    file: `FinalRound_${VERSION}_universal.dmg`,
   },
   windows: {
     name: 'Windows',
     sub: 'Windows 10/11 · 64-bit',
-    file: `PrepAI_${VERSION}_x64-setup.exe`,
+    file: `FinalRound_${VERSION}_x64-setup.exe`,
   },
   linux: {
     name: 'Linux',
     sub: 'AppImage · portable',
-    file: `PrepAI_${VERSION}_amd64.AppImage`,
-    alt: { label: 'Prefer .deb?', file: `PrepAI_${VERSION}_amd64.deb` },
+    file: `FinalRound_${VERSION}_amd64.AppImage`,
+    alt: { label: 'Prefer .deb?', file: `FinalRound_${VERSION}_amd64.deb` },
   },
 };
 
@@ -134,18 +134,18 @@ const RUN_STEPS: Record<OSKey, { text: React.ReactNode; code?: string }[]> = {
       code: `chmod +x ${ASSETS.linux.file}\n./${ASSETS.linux.file}`,
     },
     {
-      text: 'Using the .deb instead? Install it, then launch "PrepAI" from your app menu:',
+      text: 'Using the .deb instead? Install it, then launch "FinalRound" from your app menu:',
       code: `sudo dpkg -i ${ASSETS.linux.alt!.file}`,
     },
     {
-      text: 'On first launch the app checks for Docker. If it’s missing, click "Install Docker" — it runs Docker’s official installer (get.docker.com) after asking for your admin password, then prompts you to restart PrepAI once so the new permissions apply.',
+      text: 'On first launch the app checks for Docker. If it’s missing, click "Install Docker" — it runs Docker’s official installer (get.docker.com) after asking for your admin password, then prompts you to restart FinalRound once so the new permissions apply.',
     },
   ],
   mac: [
-    { text: 'Open the .dmg and drag PrepAI into Applications.' },
+    { text: 'Open the .dmg and drag FinalRound into Applications.' },
     {
-      text: 'First launch only: right-click PrepAI in Applications and choose "Open", then confirm. macOS blocks the double-click because this build isn’t Apple-notarized yet — nothing is wrong with the app. Terminal alternative:',
-      code: 'xattr -cr /Applications/PrepAI.app',
+      text: 'First launch only: right-click FinalRound in Applications and choose "Open", then confirm. macOS blocks the double-click because this build isn’t Apple-notarized yet — nothing is wrong with the app. Terminal alternative:',
+      code: 'xattr -cr /Applications/FinalRound.app',
     },
     {
       text: 'The app then checks for Docker (and Ollama on Apple Silicon) and offers to install whichever is missing — no manual setup.',
@@ -516,7 +516,7 @@ export default function DownloadPage() {
 
           <p className="text-center text-slate-500 text-sm mt-6">
             Updating later is <code className="text-slate-400 font-mono">git pull</code>, then
-            restart PrepAI — the app rebuilds itself on the next launch.
+            restart FinalRound — the app rebuilds itself on the next launch.
           </p>
         </div>
       </section>

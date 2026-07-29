@@ -45,7 +45,7 @@ from database import mongo_client_kwargs
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
-DB_NAME = os.getenv("DB_NAME", "prepai")
+DB_NAME = os.getenv("DB_NAME", "finalround")
 PROBLEMS_COLLECTION = os.getenv("PROBLEMS_COLLECTION", "leetcode")
 LEETCODE_SESSION = os.getenv("LEETCODE_SESSION", "")
 LEETCODE_CSRF = os.getenv("LEETCODE_CSRF", "")

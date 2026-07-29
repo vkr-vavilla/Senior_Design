@@ -12,6 +12,7 @@ use std::time::{Duration, Instant};
 use serde::Serialize;
 
 use crate::supervisor::port_open;
+use crate::tools;
 
 #[derive(Serialize)]
 pub struct InstallOutcome {
@@ -23,15 +24,25 @@ pub struct InstallOutcome {
     pub message: String,
 }
 
-/// `docker info` succeeding covers both "not installed" and "installed but
-/// the daemon isn't running" (the common Mac case: Docker Desktop present
-/// but not launched) in one probe.
+/// Is the docker CLI present anywhere we know to look? Distinct from
+/// docker_ready(): a GUI app's PATH omits /usr/local/bin, so "cannot spawn
+/// docker" must never be reported as "Docker isn't installed".
+pub fn docker_installed() -> bool {
+    tools::exists("docker")
+}
+
+/// Docker is usable: CLI resolvable AND the daemon answers. Re-resolves the
+/// binary on every call, so it picks up the CLI symlink Docker Desktop creates
+/// during its own first-launch setup.
 pub fn docker_ready() -> bool {
-    Command::new("docker")
-        .arg("info")
-        .output()
-        .map(|o| o.status.success())
-        .unwrap_or(false)
+    match tools::command("docker") {
+        Ok(mut cmd) => cmd
+            .arg("info")
+            .output()
+            .map(|o| o.status.success())
+            .unwrap_or(false),
+        Err(_) => false,
+    }
 }
 
 /// Ollama serves on 11434 when it's actually up; a TCP probe beats checking
@@ -75,7 +86,7 @@ pub async fn install_docker() -> Result<InstallOutcome, String> {
         install_docker_linux()
     } else {
         Err("Automatic Docker install isn't supported on this OS. \
-             Install Docker Desktop from https://docs.docker.com/get-docker/ and relaunch PrepAI."
+             Install Docker Desktop from https://docs.docker.com/get-docker/ and relaunch FinalRound."
             .into())
     }
 }
@@ -88,15 +99,12 @@ fn install_docker_macos() -> Result<InstallOutcome, String> {
         } else {
             "https://desktop.docker.com/mac/main/amd64/Docker.dmg"
         };
-        let dmg = std::env::temp_dir().join("PrepAI-Docker.dmg");
+        let dmg = std::env::temp_dir().join("FinalRound-Docker.dmg");
         let dmg_str = dmg.to_string_lossy().to_string();
 
+        tools::download(url, &dmg)?;
         run_ok(
-            Command::new("curl").args(["-fL", "--retry", "2", "-o", &dmg_str, url]),
-            "downloading Docker Desktop (~600 MB)",
-        )?;
-        run_ok(
-            Command::new("hdiutil").args(["attach", "-nobrowse", "-quiet", &dmg_str]),
+            &mut tools::command("hdiutil")?.args(["attach", "-nobrowse", "-quiet", &dmg_str]),
             "mounting the Docker installer",
         )?;
         // Copy + accept-license in a single elevated call so macOS shows one
@@ -104,26 +112,23 @@ fn install_docker_macos() -> Result<InstallOutcome, String> {
         let elevated = "do shell script \"cp -R /Volumes/Docker/Docker.app /Applications/ && \
                         /Applications/Docker.app/Contents/MacOS/Docker --accept-license\" \
                         with administrator privileges";
-        let install = run_ok(Command::new("osascript").args(["-e", elevated]), "installing Docker Desktop");
-        let _ = Command::new("hdiutil").args(["detach", "-quiet", "/Volumes/Docker"]).output();
+        let install = run_ok(&mut tools::command("osascript")?.args(["-e", elevated]), "installing Docker Desktop");
+        if let Ok(mut c) = tools::command("hdiutil") {
+            let _ = c.args(["detach", "-quiet", "/Volumes/Docker"]).output();
+        }
         let _ = std::fs::remove_file(&dmg);
         install?;
     }
 
     // First launch of Docker Desktop is slow (it installs its privileged
     // helper — that authorization dialog is Docker's own, not ours).
-    run_ok(Command::new("open").args(["-a", "Docker"]), "launching Docker Desktop")?;
+    run_ok(&mut tools::command("open")?.args(["-a", "Docker"]), "launching Docker Desktop")?;
     wait_until("Docker to start", Duration::from_secs(120), docker_ready)?;
     Ok(InstallOutcome { ready: true, message: "Docker is installed and running.".into() })
 }
 
 fn install_docker_linux() -> Result<InstallOutcome, String> {
-    let have_pkexec = Command::new("pkexec")
-        .arg("--version")
-        .output()
-        .map(|o| o.status.success())
-        .unwrap_or(false);
-    if !have_pkexec {
+    if !tools::exists("pkexec") {
         return Err("Couldn't request admin rights (pkexec is missing). \
                     Install Docker manually:  curl -fsSL https://get.docker.com | sh  \
                     then add yourself to the docker group:  sudo usermod -aG docker $USER"
@@ -133,7 +138,7 @@ fn install_docker_linux() -> Result<InstallOutcome, String> {
     // distro detection (apt/dnf/pacman/…) itself. logname resolves the login
     // user even though this shell runs as root under pkexec.
     run_ok(
-        Command::new("pkexec").args([
+        &mut tools::command("pkexec")?.args([
             "sh",
             "-c",
             "curl -fsSL https://get.docker.com | sh && \
@@ -147,7 +152,7 @@ fn install_docker_linux() -> Result<InstallOutcome, String> {
     // app (fresh process, fresh groups) is the honest fix — don't fake it.
     Ok(InstallOutcome {
         ready: false,
-        message: "Docker was installed and started. Restart PrepAI so your \
+        message: "Docker was installed and started. Restart FinalRound so your \
                   account's new Docker permissions take effect."
             .into(),
     })
@@ -166,30 +171,20 @@ pub async fn install_ollama() -> Result<InstallOutcome, String> {
     }
 
     if !std::path::Path::new("/Applications/Ollama.app").is_dir() {
-        let zip = std::env::temp_dir().join("PrepAI-Ollama.zip");
+        let zip = std::env::temp_dir().join("FinalRound-Ollama.zip");
         let zip_str = zip.to_string_lossy().to_string();
-        run_ok(
-            Command::new("curl").args([
-                "-fL",
-                "--retry",
-                "2",
-                "-o",
-                &zip_str,
-                "https://ollama.com/download/Ollama-darwin.zip",
-            ]),
-            "downloading Ollama",
-        )?;
+        tools::download("https://ollama.com/download/Ollama-darwin.zip", &zip)?;
         // Plain unzip into /Applications — same as a manual drag-install, no
         // elevation needed on a personal Mac.
         let extract = run_ok(
-            Command::new("ditto").args(["-x", "-k", &zip_str, "/Applications"]),
+            &mut tools::command("ditto")?.args(["-x", "-k", &zip_str, "/Applications"]),
             "extracting Ollama into /Applications",
         );
         let _ = std::fs::remove_file(&zip);
         extract?;
     }
 
-    run_ok(Command::new("open").args(["-a", "Ollama"]), "launching Ollama")?;
+    run_ok(&mut tools::command("open")?.args(["-a", "Ollama"]), "launching Ollama")?;
     wait_until("Ollama to start", Duration::from_secs(30), ollama_ready)?;
     Ok(InstallOutcome { ready: true, message: "Ollama is installed and running.".into() })
 }
