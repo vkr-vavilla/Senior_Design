@@ -72,13 +72,14 @@ const MODES = {
     accent: 'text-indigo-400',
     force: './setup_local.sh --gpu',
     rows: [
-      ['Operating system', 'Linux', 'Linux, recent NVIDIA driver'],
+      ['Operating system', 'Linux', 'Linux, kernel headers installed'],
       ['GPU', 'NVIDIA · 10 GB VRAM', 'NVIDIA · 12 GB+ VRAM'],
+      ['NVIDIA driver', '535+ (you install this)', '570'],
       ['System RAM', '16 GB', '32 GB'],
       ['Free disk', '20 GB', '25 GB SSD'],
-      ['Also needed', 'Docker + Compose v2, NVIDIA Container Toolkit', '—'],
+      ['Also needed', 'Docker, Compose, Container Toolkit — installed for you', '—'],
     ],
-    note: 'First launch downloads ~5.5 GB of model weights once, then never again.',
+    note: 'The app installs Docker, Compose and the NVIDIA Container Toolkit itself. The GPU driver is the one thing it will not touch — see the setup steps below. Without a working driver it falls back to Cloud mode automatically. First launch downloads ~5.5 GB of weights once.',
   },
   mac: {
     label: 'Apple Silicon',
@@ -435,6 +436,58 @@ export default function DownloadPage() {
             <div className="flex gap-3 px-6 py-4 bg-indigo-500/[0.07] border-t border-slate-800">
               <Zap className="w-4 h-4 text-indigo-400 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-slate-400">{spec.note}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── NVIDIA driver prerequisite ─────────────────────────── */}
+      <section id="nvidia" className="relative py-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-800 bg-slate-900">
+              <h3 className="font-bold text-white">Running the model on your own NVIDIA GPU</h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Only needed for local GPU inference — skip it entirely if you're using Cloud mode.
+              </p>
+            </div>
+            <div className="px-6 py-5 space-y-4 text-sm text-slate-400 leading-relaxed">
+              <p>
+                FinalRound installs Docker, Docker Compose and the NVIDIA Container Toolkit for
+                you. It deliberately does <span className="text-slate-300">not</span> install the
+                GPU driver: that builds a kernel module, needs a reboot, and a failed attempt
+                leaves your package manager wedged. Install it yourself first.
+              </p>
+              <div>
+                <p className="text-slate-300 font-medium mb-2">Ubuntu / Debian</p>
+                <pre className="px-4 py-3 rounded-lg bg-slate-950 border border-slate-800 overflow-x-auto text-xs font-mono text-slate-300 leading-relaxed">
+                  <code>{`sudo apt update
+sudo apt install linux-headers-$(uname -r)
+sudo ubuntu-drivers install          # picks the right driver for your card
+# or pin a version explicitly:
+sudo apt install nvidia-driver-570
+sudo reboot`}</code>
+                </pre>
+              </div>
+              <div>
+                <p className="text-slate-300 font-medium mb-2">Then confirm it works</p>
+                <pre className="px-4 py-3 rounded-lg bg-slate-950 border border-slate-800 overflow-x-auto text-xs font-mono text-slate-300 leading-relaxed">
+                  <code>{`nvidia-smi        # must list your GPU
+dpkg --audit      # must print nothing`}</code>
+                </pre>
+              </div>
+              <div className="flex gap-2.5 rounded-xl border border-amber-500/20 bg-amber-500/[0.07] px-3.5 py-3">
+                <Zap className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <p className="text-xs text-slate-400">
+                  <span className="text-amber-300 font-medium">If a driver install fails</span>{' '}
+                  (a broken <code className="font-mono">nvidia-dkms-*</code> build is the usual
+                  culprit), no further software can install until it's cleared. Run{' '}
+                  <code className="font-mono text-slate-300">sudo dpkg --configure -a</code>, then{' '}
+                  <code className="font-mono text-slate-300">sudo apt-get -f install</code>. The
+                  most common cause is kernel headers that don't match{' '}
+                  <code className="font-mono">uname -r</code>.
+                </p>
+              </div>
             </div>
           </div>
         </div>

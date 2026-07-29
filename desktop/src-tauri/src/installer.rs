@@ -162,8 +162,16 @@ fn wait_until(what: &str, timeout: Duration, mut probe: impl FnMut() -> bool) ->
 
 #[tauri::command]
 pub async fn install_docker() -> Result<InstallOutcome, String> {
-    if docker_ready() {
-        return Ok(InstallOutcome { ready: true, message: "Docker is already running.".into() });
+    // Both halves must be present, not just the engine. Checking only
+    // docker_ready() here meant a machine with Docker running but no Compose
+    // plugin short-circuited to "already running" — so the setup that installs
+    // Compose never ran, and the UI bounced between "Compose is missing" and a
+    // button that did nothing.
+    if docker_ready() && compose_prefix().is_some() {
+        return Ok(InstallOutcome {
+            ready: true,
+            message: "Docker and Compose are ready.".into(),
+        });
     }
     if cfg!(target_os = "macos") {
         install_docker_macos()
@@ -258,15 +266,26 @@ case "$PKG" in
   pacman) pacman -Sy --noconfirm || true ;;
 esac
 
-# 1. Guarantee a downloader. Nothing else in this script works without one.
-if ! have curl && ! have wget; then
+# 1. Guarantee the basics every later step assumes. A stock ubuntu:24.04 has
+#    NONE of these: no curl, no wget, no gnupg, and no CA bundle — without which
+#    every HTTPS fetch dies with "error setting certificate file" and the NVIDIA
+#    repo key can't be dearmored.
+NEED=""
+have curl || have wget || NEED="$NEED curl"
+[ -s /etc/ssl/certs/ca-certificates.crt ] || NEED="$NEED ca-certificates"
+have gpg || NEED="$NEED gnupg"
+if [ -n "$NEED" ]; then
   case "$PKG" in
-    apt) apt-get install -y curl >/dev/null 2>&1 || true ;;
-    dnf) dnf install -y curl >/dev/null 2>&1 || true ;;
-    pacman) pacman -S --noconfirm curl >/dev/null 2>&1 || true ;;
+    apt) apt-get install -y $NEED >/dev/null 2>&1 || true ;;
+    dnf) dnf install -y $NEED >/dev/null 2>&1 || true ;;
+    pacman) pacman -S --noconfirm $NEED >/dev/null 2>&1 || true ;;
   esac
+  # The ca-certificates postinst normally does this; force it in case the
+  # package was present but the bundle had never been generated.
+  have update-ca-certificates && update-ca-certificates >/dev/null 2>&1 || true
 fi
 have curl || have wget || fail no-downloader 12
+[ -s /etc/ssl/certs/ca-certificates.crt ] || fail no-ca-certs 20
 fetch() { # fetch <url> <dest>
   if have curl; then curl -fsSL "$1" -o "$2"; else wget -qO "$2" "$1"; fi
 }
@@ -368,6 +387,11 @@ fn install_docker_linux() -> Result<InstallOutcome, String> {
             .find_map(|l| l.strip_prefix("STEP_FAILED: "))
             .unwrap_or("");
         return Err(match step {
+            "no-ca-certs" => "This machine has no TLS certificate bundle, so nothing can be \
+                downloaded over HTTPS. Install it, then reopen FinalRound:\n\
+                \u{2022} Debian/Ubuntu:  sudo apt install ca-certificates\n\
+                \u{2022} Fedora/RHEL:    sudo dnf install ca-certificates"
+                .to_string(),
             "download" | "no-downloader" => "Couldn't download Docker's installer. \
                 Check your internet connection, or install Docker yourself from \
                 https://docs.docker.com/engine/install/ and reopen FinalRound."
@@ -392,9 +416,20 @@ fn install_docker_linux() -> Result<InstallOutcome, String> {
     // /etc/group at exec time, so the membership we just granted is usable
     // immediately. If that works, carry on without making anyone log out.
     match docker_access() {
+        DockerAccess::Ready | DockerAccess::ViaGroup if compose_prefix().is_some() => {
+            Ok(InstallOutcome {
+                ready: true,
+                message: "Docker and Compose are installed and running.".into(),
+            })
+        }
+        // Engine fine, Compose still absent — say so instead of reporting success
+        // and letting start_stack fail again with the same message.
         DockerAccess::Ready | DockerAccess::ViaGroup => Ok(InstallOutcome {
-            ready: true,
-            message: "Docker is installed and running.".into(),
+            ready: false,
+            message: "Docker is running, but Docker Compose could not be installed. \
+                      Install it manually and reopen FinalRound:  \
+                      sudo apt install docker-compose-plugin"
+                .into(),
         }),
         DockerAccess::DaemonDown => Ok(InstallOutcome {
             ready: false,

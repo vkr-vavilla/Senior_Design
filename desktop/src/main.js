@@ -75,35 +75,50 @@ async function boot() {
     // start_stack rejects with a typed error: { kind, message }.
     const kind = err && err.kind;
     if (kind === "missing_docker") {
-      status.textContent = "Docker is required.";
+      // Always lead with err.message, which names the piece that is actually
+      // missing. Hardcoding "Docker isn't installed" here once told a user with
+      // working Docker that Docker was absent, when Compose was the gap.
+      const detail = err.message || "Docker isn't available.";
       if (err.action === "start") {
+        status.textContent = "Docker isn't running.";
         offerInstall(
           "Start Docker",
           "install_docker",
-          "FinalRound runs its services in Docker, which is installed but not running. " +
-            "FinalRound will start Docker and wait for it to come up — on the first " +
-            "launch Docker itself may ask for permission, which can take a minute."
+          detail +
+            " FinalRound will start it and wait — on first launch Docker itself may " +
+            "ask for permission, which can take a minute."
+        );
+      } else if (err.action === "compose") {
+        status.textContent = "Docker Compose is missing.";
+        offerInstall(
+          "Install Compose",
+          "install_docker",
+          detail +
+            " Compose ships separately from the Docker engine, and some installs " +
+            "(`apt install docker.io`, for one) leave it out. FinalRound can install " +
+            "it for you — you'll be asked for your admin password."
         );
       } else if (err.action === "relogin") {
-        // Deliberately no action button: nothing this app can do from inside the
-        // current login session will grant the group, so offering a button here
-        // is what produced the install/restart loop.
+        // No action button on purpose: nothing this app can do from inside the
+        // current login session grants the group, and offering a button here is
+        // what produced the earlier install/restart loop.
         status.textContent = "One more step.";
         showError(
-          (err.message || "Docker isn't reachable.") +
+          detail +
             "\n\nYour account needs to be in the 'docker' group. If you just added it, " +
-            "log out and back in (or reboot) and reopen FinalRound.\n\n" +
+            "log out and back in (or reboot), then reopen FinalRound.\n\n" +
             "To add it manually:\n  sudo groupadd -f docker\n  sudo usermod -aG docker $USER",
           { notice: true, retry: true }
         );
       } else {
+        status.textContent = "Docker is required.";
         offerInstall(
           "Install Docker",
           "install_docker",
-          "FinalRound runs its services in Docker, which isn't installed. " +
-            "FinalRound can install it for you using Docker's official installer " +
-            "(get.docker.com on Linux, Docker Desktop on macOS). " +
-            "You'll be asked for your admin password."
+          detail +
+            " FinalRound can install it for you using Docker's official installer, " +
+            "along with Compose and the permissions it needs. You'll be asked for " +
+            "your admin password."
         );
       }
     } else if (kind === "missing_ollama") {

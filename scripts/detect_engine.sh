@@ -119,7 +119,8 @@ else
   elif [ "$OS" = "Linux" ] && [ -n "${VRAM_GB:-}" ] && [ "${VRAM_GB:-0}" -ge "$MIN_VLLM_VRAM_GB" ]; then
     # GPU present, but Docker can't use it. Falling back beats a hard failure.
     ENGINE="gemini"
-    log "NVIDIA GPU found but Docker lacks the NVIDIA Container Toolkit -> gemini"
+    log "NVIDIA GPU found but Docker cannot reach it (missing/!configured NVIDIA Container Toolkit)"
+    log "  -> falling back to the cloud engine; see the GPU setup steps on the download page"
   elif is_apple_silicon && [ "${RAM_GB:-0}" -ge "$MIN_APPLE_RAM_GB" ]; then
     ENGINE="ollama"
     log "Apple Silicon with ${RAM_GB} GiB unified memory -> ollama on the host (Metal)"

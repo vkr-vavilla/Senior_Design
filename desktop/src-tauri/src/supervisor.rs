@@ -493,7 +493,7 @@ pub async fn start_stack(app: AppHandle) -> Result<String, StartupError> {
     if crate::installer::compose_prefix().is_none() {
         return Err(StartupError::MissingDocker {
             message: "Docker is installed, but Docker Compose is missing.".into(),
-            action: "install".into(),
+            action: "compose".into(),
         });
     }
 
