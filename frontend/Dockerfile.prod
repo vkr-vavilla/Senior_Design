@@ -9,8 +9,12 @@ COPY . .
 
 ARG NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_WS_URL
+# Baked in because Next.js inlines NEXT_PUBLIC_* at build time. This is only the
+# initial render's guess — /config from the backend is authoritative once loaded.
+ARG NEXT_PUBLIC_DEPLOYMENT=cloud
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_WS_URL=$NEXT_PUBLIC_WS_URL
+ENV NEXT_PUBLIC_DEPLOYMENT=$NEXT_PUBLIC_DEPLOYMENT
 
 RUN npm run build
 

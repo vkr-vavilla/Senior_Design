@@ -7,7 +7,7 @@ import { LoadingPage } from '@/components/ui/LoadingSpinner';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { interviewApi, ApiError } from '@/lib/api';
 import { RecentSessions } from '@/components/dashboard/RecentSessions';
-import { DEFAULT_MODEL_SOURCE, GEMINI_KEY_URL, IS_CLOUD } from '@/lib/deployment';
+import { BUILD_TIME_DEPLOYMENT, DEFAULT_MODEL_SOURCE, GEMINI_KEY_URL, fetchDeploymentConfig } from '@/lib/deployment';
 import { Input as TextInput, Select } from '@/components/ui/Input';
 import { Brain, Briefcase, ChevronRight, Cloud, Cpu, ExternalLink, FileText, Play, Shuffle, Sparkles, Upload, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -134,9 +134,17 @@ export default function DashboardPage() {
   // the on-device engine. See lib/deployment.ts.
   const [modelSource, setModelSource] = useState<'local' | 'api'>(DEFAULT_MODEL_SOURCE);
   const [geminiKey, setGeminiKey] = useState('');
+  // Build-time guess first, then correct from the backend. See lib/deployment.ts.
+  const [isCloud, setIsCloud] = useState(BUILD_TIME_DEPLOYMENT === 'cloud');
 
   useEffect(() => {
     setGeminiKey(localStorage.getItem('gemini_api_key') || '');
+    fetchDeploymentConfig().then((cfg) => {
+      const cloud = cfg.deployment === 'cloud';
+      setIsCloud(cloud);
+      // No local engine behind this deployment — Gemini is the only option.
+      if (cloud) setModelSource('api');
+    });
   }, []);
 
   const handleBeginInterview = async () => {
@@ -396,7 +404,7 @@ export default function DashboardPage() {
                     Interviewer Model
                   </label>
                   <Select
-                    options={IS_CLOUD ? MODEL_SOURCES.slice(0, 1) : MODEL_SOURCES}
+                    options={isCloud ? MODEL_SOURCES.slice(0, 1) : MODEL_SOURCES}
                     value={modelSource}
                     onChange={(e) => setModelSource(e.target.value as 'local' | 'api')}
                     hint={
@@ -432,13 +440,13 @@ export default function DashboardPage() {
 
                   {/* Why the choice is constrained here, stated once. */}
                   <div className="mt-3 flex gap-2.5 rounded-xl border border-slate-800 bg-slate-800/40 px-3.5 py-3">
-                    {IS_CLOUD ? (
+                    {isCloud ? (
                       <Cloud className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
                     ) : (
                       <Cpu className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
                     )}
                     <p className="text-xs text-slate-400 leading-relaxed">
-                      {IS_CLOUD ? (
+                      {isCloud ? (
                         <>
                           <span className="text-slate-300 font-medium">You&apos;re on the cloud version</span>{' '}
                           — interviews run on Gemini with your own key. Want the fine-tuned model

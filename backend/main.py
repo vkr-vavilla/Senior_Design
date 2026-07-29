@@ -169,6 +169,27 @@ async def root():
     return {"message": "FinalRound API is running"}
 
 
+@app.get("/config")
+async def public_config():
+    """What this deployment can actually do — asked by the frontend on load.
+
+    The frontend used to infer this from NEXT_PUBLIC_DEPLOYMENT, which Next.js
+    inlines at *build* time. The cloud image is built without that var, so the
+    hosted site always rendered local mode and offered a local engine that
+    isn't there. Reporting capability from the server can't drift like that:
+    whatever engine this backend is configured for is the truth.
+    """
+    from config import AI_BACKEND, GEMINI_API_KEY
+    local_engine = AI_BACKEND != "gemini"
+    return {
+        # "local" only when a local engine really is wired up.
+        "deployment": "local" if local_engine else "cloud",
+        "local_engine": local_engine,
+        # Lets the UI say the key is optional instead of required.
+        "gemini_key_configured": bool(GEMINI_API_KEY),
+    }
+
+
 @app.get("/health")
 async def health():
     from database import client

@@ -12,7 +12,7 @@ import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { useInterviewChat } from '@/hooks/useInterviewChat';
 import { useTextToSpeech } from '@/hooks/useTextToSpeech';
 import { chatApi } from '@/lib/api';
-import { DEFAULT_MODEL_SOURCE, GEMINI_KEY_URL, IS_CLOUD } from '@/lib/deployment';
+import { BUILD_TIME_DEPLOYMENT, DEFAULT_MODEL_SOURCE, GEMINI_KEY_URL, fetchDeploymentConfig } from '@/lib/deployment';
 import { cn, formatTime } from '@/lib/utils';
 import type { InterviewConfig } from '@/types/chat';
 import {
@@ -125,6 +125,15 @@ function InterviewPageContent() {
     interviewId: searchParams.get('interviewId') || undefined,
   });
 
+  const [isCloud, setIsCloud] = useState(BUILD_TIME_DEPLOYMENT === 'cloud');
+  useEffect(() => {
+    fetchDeploymentConfig().then((cfg) => {
+      const cloud = cfg.deployment === 'cloud';
+      setIsCloud(cloud);
+      if (cloud) setConfig((c) => ({ ...c, modelSource: 'api' }));
+    });
+  }, []);
+
   useEffect(() => {
     if (!isLoading && !user) {
       router.push('/login');
@@ -236,7 +245,7 @@ function InterviewPageContent() {
 
             <Select
               label="Interviewer Model"
-              options={IS_CLOUD ? MODEL_SOURCES.filter((m) => m.value === 'api') : MODEL_SOURCES}
+              options={isCloud ? MODEL_SOURCES.filter((m) => m.value === 'api') : MODEL_SOURCES}
               value={config.modelSource}
               onChange={(e) =>
                 setConfig((c) => ({
