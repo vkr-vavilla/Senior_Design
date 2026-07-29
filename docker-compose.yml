@@ -22,6 +22,10 @@ services:
       - PISTON_URL=http://piston:2000
       # Redis: per-turn crash-safety snapshot of the live interview (best-effort)
       - REDIS_URL=redis://redis:6379/0
+      # Optional: voice (Google Cloud TTS). Absent on most local installs, in
+      # which case the backend returns 503 for /tts and the interview runs
+      # without spoken questions. Point this at a service-account key to enable.
+      - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS:-}
       - PYTHONUNBUFFERED=1
     volumes:
       - ./backend:/app

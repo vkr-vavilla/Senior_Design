@@ -122,10 +122,17 @@ fn bootstrap_repo(app: &AppHandle) -> Result<PathBuf, String> {
         return Ok(repo);
     }
     // Reuse a runtime downloaded under the old ~/.prepai name rather than
-    // making existing users re-download ~13 MB and regenerate their .env.
+    // making existing users re-download and regenerate their .env.
     let legacy = home.join(".prepai").join("Senior_Design-main");
     if legacy.join("docker-compose.local.yml").is_file() {
         return Ok(legacy);
+    }
+
+    // The installer ships the runtime as a bundled resource, so a fresh machine
+    // needs no network and no curl/wget (both absent on a stock ubuntu:24.04).
+    // Downloading is only the fallback when the resource is missing.
+    if let Some(extracted) = extract_bundled_runtime(app, &base) {
+        return Ok(extracted);
     }
     std::fs::create_dir_all(&base).map_err(|e| format!("could not create {}: {e}", base.display()))?;
 
@@ -151,6 +158,34 @@ fn bootstrap_repo(app: &AppHandle) -> Result<PathBuf, String> {
         return Err("Downloaded runtime is missing docker-compose.local.yml.".into());
     }
     Ok(repo)
+}
+
+/// Extract the runtime tarball bundled with the installer into `base`.
+/// Returns None when there is no bundled copy, or extraction failed — callers
+/// then fall back to downloading.
+fn extract_bundled_runtime(app: &AppHandle, base: &Path) -> Option<PathBuf> {
+    use tauri::Manager;
+    let bundled = app.path().resource_dir().ok()?.join("runtime.tar.gz");
+    if !bundled.is_file() {
+        return None;
+    }
+    emit(app, 10, "Unpacking the FinalRound runtime…");
+    std::fs::create_dir_all(base).ok()?;
+    let out = tools::command("tar")
+        .ok()?
+        .args([
+            "-xzf",
+            &bundled.to_string_lossy(),
+            "-C",
+            &base.to_string_lossy(),
+        ])
+        .output()
+        .ok()?;
+    if !out.status.success() {
+        return None;
+    }
+    let repo = base.join("Senior_Design-main");
+    repo.join("docker-compose.local.yml").is_file().then_some(repo)
 }
 
 /// First-run twin of setup_local.sh's env generation: compose hard-fails on a
@@ -188,7 +223,7 @@ fn ensure_backend_env(repo: &Path) -> Result<(), String> {
 }
 
 /// Run scripts/detect_engine.sh and parse its KEY=value env block.
-fn detect_engine(repo: &Path) -> Result<HashMap<String, String>, String> {
+fn detect_engine(repo: &Path, docker_gpu: bool) -> Result<HashMap<String, String>, String> {
     let script = repo.join("scripts/detect_engine.sh");
     if !script.is_file() {
         return Err(format!("detect_engine.sh not found at {}", script.display()));
@@ -200,6 +235,7 @@ fn detect_engine(repo: &Path) -> Result<HashMap<String, String>, String> {
         .arg(&script)
         .current_dir(repo)
         .env("PREPAI_VLLM_URL", "http://vllm:8001/v1")
+        .env("PREPAI_DOCKER_GPU", if docker_gpu { "1" } else { "0" })
         .output()
         .map_err(|e| format!("failed to run detect_engine.sh: {e}"))?;
     if !out.status.success() {
@@ -223,39 +259,27 @@ fn detect_engine(repo: &Path) -> Result<HashMap<String, String>, String> {
 /// `docker compose -f docker-compose.local.yml [--profile P] up -d`, with the
 /// engine env from detect_engine injected so compose interpolates it.
 fn compose_up(repo: &Path, env: &HashMap<String, String>) -> Result<(), String> {
-    let docker = tools::find("docker")
-        .ok_or_else(|| "Docker isn't installed.".to_string())?;
+    // Never assume `docker compose` exists — see installer::compose_prefix.
+    let compose = crate::installer::compose_prefix()
+        .ok_or_else(|| "Docker Compose isn't available.".to_string())?;
 
-    // Assembled as a shell line so the same string can run directly or through
-    // `sg docker` when this session hasn't picked up the docker group yet.
-    let mut parts = vec![
-        tools::shell_quote(&docker.to_string_lossy()),
-        "compose".into(),
-        "-f".into(),
-        tools::shell_quote("docker-compose.local.yml"),
-    ];
+    let mut cmdline = format!(
+        "{compose} -f {}",
+        tools::shell_quote("docker-compose.local.yml")
+    );
     if let Some(profile) = env.get("COMPOSE_PROFILES") {
         if !profile.is_empty() {
-            parts.push("--profile".into());
-            parts.push(tools::shell_quote(profile));
+            cmdline.push_str(&format!(" --profile {}", tools::shell_quote(profile)));
         }
     }
-    parts.push("up".into());
-    parts.push("-d".into());
-    let cmdline = parts.join(" ");
+    cmdline.push_str(" up -d");
 
     let mut cmd = match crate::installer::docker_access() {
         crate::installer::DockerAccess::ViaGroup => tools::sg_command("docker", &cmdline)?,
         _ => tools::sh_command(&cmdline)?,
     };
     cmd.current_dir(repo);
-    // Forward the engine-selection vars compose reads.
-    for key in [
-        "AI_BACKEND",
-        "VLLM_BASE_URL",
-        "VLLM_MODEL",
-        "VLLM_BASE_MODEL",
-    ] {
+    for key in ["AI_BACKEND", "VLLM_BASE_URL", "VLLM_MODEL", "VLLM_BASE_MODEL"] {
         if let Some(v) = env.get(key) {
             cmd.env(key, v);
         }
@@ -271,6 +295,133 @@ fn compose_up(repo: &Path, env: &HashMap<String, String>) -> Result<(), String> 
         ));
     }
     Ok(())
+}
+
+/// Free space in GiB on the filesystem holding `path`, via POSIX `df`.
+/// std has no portable statvfs and we take no extra crates.
+fn free_gib(path: &Path) -> Option<u64> {
+    let out = tools::command("df")
+        .ok()?
+        .args(["-Pk", &path.to_string_lossy()])
+        .output()
+        .ok()?;
+    let text = String::from_utf8_lossy(&out.stdout);
+    let avail_kb: u64 = text.lines().nth(1)?.split_whitespace().nth(3)?.parse().ok()?;
+    Some(avail_kb / 1024 / 1024)
+}
+
+/// Images plus the ~5.5 GB of model weights need real room; running out mid-pull
+/// surfaces as a confusing compose/vLLM error deep into a long first launch.
+const MIN_FREE_GIB: u64 = 12;
+
+/// Register the Ollama models the backend will ask for (Apple Silicon path).
+///
+/// `ollama_ready()` only proves the daemon answers on 11434 — a freshly
+/// installed Ollama has no models at all, so without this the backend requests
+/// model "interviewer" and every turn fails. setup_local.sh does this for
+/// from-source users; installed-app users never run it. Mirrors that logic:
+/// fetch the published adapter, then `ollama create` both tags.
+fn ensure_ollama_models(app: &AppHandle, repo: &Path, env: &HashMap<String, String>) -> Result<(), String> {
+    let interviewer = env.get("VLLM_MODEL").cloned().unwrap_or_else(|| "interviewer".into());
+    let base = env
+        .get("VLLM_BASE_MODEL")
+        .cloned()
+        .unwrap_or_else(|| "qwen2.5-7b-instruct".into());
+
+    let listed = tools::command("ollama")?
+        .arg("list")
+        .output()
+        .map(|o| String::from_utf8_lossy(&o.stdout).to_string())
+        .unwrap_or_default();
+    let registered = |tag: &str| listed.lines().any(|l| l.split_whitespace().next() == Some(tag));
+    if registered(&interviewer) && registered(&base) {
+        return Ok(());
+    }
+
+    // The adapter is ours and must be fetched; the base is a public Ollama tag
+    // that `ollama create` pulls on demand.
+    let adapter = repo.join("ollama").join("models").join("interviewer-lora.gguf");
+    if !adapter.is_file() {
+        emit(app, 34, "Downloading the interviewer model (one-time, ~323 MB)…");
+        std::fs::create_dir_all(adapter.parent().unwrap())
+            .map_err(|e| format!("could not create ollama/models: {e}"))?;
+        tools::download(
+            "https://huggingface.co/FinalRound/prepai-interviewer/resolve/main/interviewer-lora.gguf",
+            &adapter,
+        )?;
+    }
+
+    for (tag, modelfile) in [(&base, "Modelfile.base"), (&interviewer, "Modelfile.interviewer")] {
+        if registered(tag) {
+            continue;
+        }
+        emit(app, 38, &format!("Registering local model '{tag}'…"));
+        let src = repo.join("ollama").join(modelfile);
+        let text = std::fs::read_to_string(&src)
+            .map_err(|e| format!("could not read {}: {e}", src.display()))?;
+        // Absolutise the relative ADAPTER path so `ollama create` resolves it
+        // no matter what directory it runs from.
+        let abs_models = repo.join("ollama").join("models");
+        let patched = text.replace(
+            "ADAPTER ./models/",
+            &format!("ADAPTER {}/", abs_models.to_string_lossy()),
+        );
+        let tmp = std::env::temp_dir().join(format!("finalround-{modelfile}"));
+        std::fs::write(&tmp, patched).map_err(|e| format!("could not stage {modelfile}: {e}"))?;
+
+        let out = tools::command("ollama")?
+            .args(["create", tag, "-f", &tmp.to_string_lossy()])
+            .output()
+            .map_err(|e| format!("failed to run ollama create: {e}"))?;
+        let _ = std::fs::remove_file(&tmp);
+        if !out.status.success() {
+            return Err(format!(
+                "Couldn't register the local model '{tag}':\n{}",
+                String::from_utf8_lossy(&out.stderr)
+                    .lines()
+                    .rev()
+                    .take(3)
+                    .collect::<Vec<_>>()
+                    .join("\n")
+            ));
+        }
+    }
+    Ok(())
+}
+
+/// Seed the coding-problem bank once. setup_local.sh does this for from-source
+/// users; installed-app users never run it, so their coding round would have no
+/// problems at all. Best-effort: a failure here must not block the interview.
+fn seed_problem_bank(app: &AppHandle, repo: &Path) {
+    let Some(compose) = crate::installer::compose_prefix() else { return };
+    let run = |cmdline: &str| -> Option<std::process::Output> {
+        let built = match crate::installer::docker_access() {
+            crate::installer::DockerAccess::ViaGroup => tools::sg_command("docker", cmdline),
+            _ => tools::sh_command(cmdline),
+        };
+        built.ok()?.current_dir(repo).output().ok()
+    };
+
+    let count_py = "import os,pymongo;c=pymongo.MongoClient(os.environ['MONGODB_URI']);\
+print(c[os.environ.get('DB_NAME','FinalRound')][os.environ.get('PROBLEMS_COLLECTION','leetcode')].count_documents({}))";
+    let count_cmd = format!(
+        "{compose} -f {} exec -T backend python -c {}",
+        tools::shell_quote("docker-compose.local.yml"),
+        tools::shell_quote(count_py)
+    );
+    let existing: u64 = run(&count_cmd)
+        .map(|o| String::from_utf8_lossy(&o.stdout).trim().parse().unwrap_or(0))
+        .unwrap_or(0);
+    if existing > 0 {
+        return;
+    }
+
+    emit(app, 90, "Preparing coding problems (one-time, a few minutes)…");
+    let seed_cmd = format!(
+        "{compose} -f {} exec -T backend python -m scripts.scrape_leetcode --per-difficulty 25 --sleep 1.0",
+        tools::shell_quote("docker-compose.local.yml")
+    );
+    let _ = run(&seed_cmd);
 }
 
 /// Minimal HTTP GET; true when the server answers `200`.
@@ -317,11 +468,7 @@ pub async fn start_stack(app: AppHandle) -> Result<String, StartupError> {
     };
     ensure_backend_env(&repo)?;
 
-    emit(&app, 15, "Detecting hardware and inference engine…");
-    let env = detect_engine(&repo)?;
-    let engine = env.get("INFERENCE_ENGINE").cloned().unwrap_or_default();
-
-    emit(&app, 20, "Checking prerequisites…");
+    emit(&app, 18, "Checking prerequisites…");
     use crate::installer::DockerAccess;
     let access = crate::installer::docker_access();
     if !matches!(access, DockerAccess::Ready | DockerAccess::ViaGroup) {
@@ -340,10 +487,44 @@ pub async fn start_stack(app: AppHandle) -> Result<String, StartupError> {
             action: action.to_string(),
         });
     }
-    if engine == "ollama" && !crate::installer::ollama_ready() {
-        return Err(StartupError::MissingOllama {
-            message: "Ollama isn't installed or isn't running.".into(),
+
+    // Compose is a separate package from the engine and is genuinely absent on
+    // some installs; the same elevated setup installs it, so reuse that button.
+    if crate::installer::compose_prefix().is_none() {
+        return Err(StartupError::MissingDocker {
+            message: "Docker is installed, but Docker Compose is missing.".into(),
+            action: "install".into(),
         });
+    }
+
+    // Bail out early rather than failing deep inside a multi-GB pull.
+    if let Some(free) = free_gib(&repo) {
+        if free < MIN_FREE_GIB {
+            return Err(StartupError::Other {
+                message: format!(
+                    "Not enough free disk space: {free} GiB available, about {MIN_FREE_GIB} GiB \
+                     needed for the container images and model weights. Free some space and \
+                     reopen FinalRound."
+                ),
+            });
+        }
+    }
+
+    emit(&app, 22, "Detecting hardware and inference engine…");
+    // A host NVIDIA driver isn't enough for the gpu profile — tell the detector
+    // whether Docker can actually pass a GPU through, so it falls back to the
+    // cloud engine instead of compose dying on a missing device driver.
+    let env = detect_engine(&repo, crate::installer::docker_has_gpu())?;
+    let engine = env.get("INFERENCE_ENGINE").cloned().unwrap_or_default();
+
+    if engine == "ollama" {
+        if !crate::installer::ollama_ready() {
+            return Err(StartupError::MissingOllama {
+                message: "Ollama isn't installed or isn't running.".into(),
+            });
+        }
+        // Daemon up is not the same as models present.
+        ensure_ollama_models(&app, &repo, &env)?;
     }
 
     emit(&app, 30, &format!("Starting services (engine: {engine})…"));
@@ -368,6 +549,7 @@ pub async fn start_stack(app: AppHandle) -> Result<String, StartupError> {
             frontend_ready = true;
         }
         if backend_ready && frontend_ready {
+            seed_problem_bank(&app, &repo);
             emit(&app, 100, "Ready.");
             return Ok(APP_URL.to_string());
         }

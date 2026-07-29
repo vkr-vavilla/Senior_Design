@@ -44,9 +44,9 @@ const ASSETS: Record<
   },
   linux: {
     name: 'Linux',
-    sub: 'AppImage · portable',
-    file: `FinalRound_${VERSION}_amd64.AppImage`,
-    alt: { label: 'Prefer .deb?', file: `FinalRound_${VERSION}_amd64.deb` },
+    sub: 'Debian / Ubuntu · .deb',
+    file: `FinalRound_${VERSION}_amd64.deb`,
+    alt: { label: 'Prefer a portable AppImage?', file: `FinalRound_${VERSION}_amd64.AppImage` },
   },
 };
 
@@ -119,7 +119,7 @@ type ModeKey = keyof typeof MODES;
 const STACK = [
   { icon: Cpu, title: 'Interviewer model', desc: 'Qwen2.5-7B with a fine-tuned interviewer adapter — the persona that runs your mock interview.' },
   { icon: Mic, title: 'Speech-to-text', desc: 'faster-whisper transcribes your spoken answers on-device. No cloud, no key.', local: true },
-  { icon: Volume2, title: 'Text-to-speech', desc: 'Kokoro voices read the questions aloud, entirely offline.', local: true },
+  { icon: Volume2, title: 'Text-to-speech', desc: 'Questions read aloud via Google Cloud TTS. Optional — needs Google credentials; interviews run fine without it.' },
   { icon: Database, title: 'MongoDB', desc: 'Bundled database for accounts, transcripts and generated feedback.' },
   { icon: Terminal, title: 'Coding sandbox', desc: 'Runs your code in the live coding round, with 50 problems pre-seeded.' },
   { icon: RefreshCw, title: 'Crash recovery', desc: 'Redis snapshots every turn, so an interrupted interview resumes where it stopped.' },
@@ -130,15 +130,15 @@ const STACK = [
 const RUN_STEPS: Record<OSKey, { text: React.ReactNode; code?: string }[]> = {
   linux: [
     {
-      text: 'Make the AppImage executable, then run it:',
-      code: `chmod +x ${ASSETS.linux.file}\n./${ASSETS.linux.file}`,
+      text: 'Install the .deb, then launch "FinalRound" from your app menu:',
+      code: `sudo apt install ./${ASSETS.linux.file}`,
     },
     {
-      text: 'Using the .deb instead? Install it, then launch "FinalRound" from your app menu:',
-      code: `sudo dpkg -i ${ASSETS.linux.alt!.file}`,
+      text: 'Using the portable AppImage instead? Make it executable and run it. Ubuntu 22.04+ ships FUSE 3 only, so the AppImage needs libfuse2 — install it if you see "Cannot mount AppImage":',
+      code: `chmod +x ${ASSETS.linux.alt!.file}\n./${ASSETS.linux.alt!.file}\n\n# only if it refuses to mount:\nsudo apt install libfuse2`,
     },
     {
-      text: 'On first launch the app checks for Docker. If it’s missing, click "Install Docker" — it runs Docker’s official installer (get.docker.com) after asking for your admin password, then prompts you to restart FinalRound once so the new permissions apply.',
+      text: 'On first launch the app checks for Docker. If anything is missing, click "Install Docker" — after your admin password it installs Docker, Docker Compose, the docker group and (on NVIDIA machines) the container toolkit, then continues on its own. Everything else it needs ships inside the app.',
     },
   ],
   mac: [

@@ -4,7 +4,9 @@
   "version": "0.1.1",
   "identifier": "com.finalround.desktop",
   "build": {
-    "frontendDist": "../src"
+    "frontendDist": "../src",
+    "beforeBuildCommand": "node bundle-runtime.mjs",
+    "beforeDevCommand": "node bundle-runtime.mjs"
   },
   "app": {
     "withGlobalTauri": true,
@@ -39,6 +41,9 @@
       "icons/icon.ico"
     ],
     "shortDescription": "AI mock-interview practice, running locally.",
-    "longDescription": "FinalRound runs a full AI interview stack on your machine — auto-detecting the best local inference engine (vLLM on NVIDIA, Ollama on Mac) or falling back to the Gemini API."
+    "longDescription": "FinalRound runs a full AI interview stack on your machine — auto-detecting the best local inference engine (vLLM on NVIDIA, Ollama on Mac) or falling back to the Gemini API.",
+    "resources": [
+      "runtime.tar.gz"
+    ]
   }
 }

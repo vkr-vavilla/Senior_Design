@@ -43,6 +43,52 @@ pub enum DockerAccess {
     NotInstalled,
 }
 
+/// Run a shell line through whichever docker route works here.
+fn docker_sh(cmdline: &str) -> Result<std::process::Output, String> {
+    let built = if docker_access() == DockerAccess::ViaGroup {
+        tools::sg_command("docker", cmdline)
+    } else {
+        tools::sh_command(cmdline)
+    };
+    built?.output().map_err(|e| e.to_string())
+}
+
+/// The shell-quoted command prefix that runs Compose here, or None when Compose
+/// isn't usable at all.
+///
+/// `docker compose` (the v2 CLI plugin) is NOT guaranteed to exist: a machine
+/// where Docker came from `apt install docker.io` has the engine and no plugin,
+/// and `docker compose …` then fails with "docker: unknown command" plus a dump
+/// of Docker's usage text. Try the plugin, then a standalone `docker-compose`.
+pub fn compose_prefix() -> Option<String> {
+    let docker = docker_bin()?;
+    let plugin = format!("{docker} compose");
+    if docker_sh(&format!("{plugin} version"))
+        .map(|o| o.status.success())
+        .unwrap_or(false)
+    {
+        return Some(plugin);
+    }
+    let standalone = tools::shell_quote(&tools::find("docker-compose")?.to_string_lossy());
+    if docker_sh(&format!("{standalone} version"))
+        .map(|o| o.status.success())
+        .unwrap_or(false)
+    {
+        return Some(standalone);
+    }
+    None
+}
+
+/// Can Docker actually hand a GPU to a container? A host NVIDIA driver is not
+/// enough — that needs the NVIDIA Container Toolkit, without which the compose
+/// `gpu` profile dies with 'could not select device driver "nvidia"'.
+pub fn docker_has_gpu() -> bool {
+    let Some(docker) = docker_bin() else { return false };
+    docker_sh(&format!("{docker} info --format '{{{{json .Runtimes}}}}'"))
+        .map(|o| String::from_utf8_lossy(&o.stdout).to_lowercase().contains("nvidia"))
+        .unwrap_or(false)
+}
+
 /// The docker CLI resolved absolutely, as a shell-quoted program name.
 fn docker_bin() -> Option<String> {
     tools::find("docker").map(|p| tools::shell_quote(&p.to_string_lossy()))
@@ -166,49 +212,61 @@ fn install_docker_macos() -> Result<InstallOutcome, String> {
     Ok(InstallOutcome { ready: true, message: "Docker is installed and running.".into() })
 }
 
-/// Elevated first-run setup, run once under pkexec. Written defensively because
-/// this executes on machines we've never seen:
-///   * the `docker` group may not exist yet (usermod fails hard on a missing
-///     group — the error a fresh Ubuntu box hit),
-///   * `logname` needs a controlling terminal, which a GUI-launched app has
-///     none of, so it returns nothing; pkexec exports PKEXEC_UID instead,
-///   * not every distro is systemd,
-///   * curl is not guaranteed to be installed.
-/// Steps are independent and each failure names itself on stderr, so the UI can
-/// show which one broke instead of one opaque "installing Docker failed".
+/// Elevated first-run setup, run once under pkexec. Everything here is written
+/// for a machine with nothing on it, because that is what end users have:
+///   * neither curl nor wget may exist (both absent on a stock ubuntu:24.04),
+///   * the package index is usually stale, which aborts Docker's installer,
+///   * the `docker` group may not exist — usermod fails hard if it doesn't,
+///   * `logname` needs a controlling terminal a GUI app doesn't have; pkexec
+///     exports PKEXEC_UID instead,
+///   * `apt install docker.io` gives an engine with NO compose v2 plugin, so
+///     `docker compose` is an unknown command,
+///   * an NVIDIA driver on the host does not mean Docker can pass the GPU
+///     through — that needs the NVIDIA Container Toolkit,
+///   * not every distro is systemd.
+/// Each step names itself on stderr so the UI can say which one broke.
 const LINUX_DOCKER_SETUP: &str = r#"
 set -u
 fail() { echo "STEP_FAILED: $1" >&2; exit "$2"; }
+have() { command -v "$1" >/dev/null 2>&1; }
 
-# 1. Install Docker unless it is already present.
-if ! command -v docker >/dev/null 2>&1; then
-  # Docker's installer aborts if the package index is stale or half-broken,
-  # which is the default state of a freshly imaged machine. Refresh first and
-  # keep going even if some third-party repo is unreachable.
-  if command -v apt-get >/dev/null 2>&1; then
-    apt-get update -qq || apt-get update -qq --allow-releaseinfo-change || true
-  elif command -v dnf >/dev/null 2>&1; then
-    dnf -y makecache || true
-  fi
-  if command -v curl >/dev/null 2>&1; then
-    curl -fsSL https://get.docker.com -o /tmp/get-docker.sh || fail download 11
-  elif command -v wget >/dev/null 2>&1; then
-    wget -qO /tmp/get-docker.sh https://get.docker.com || fail download 11
-  else
-    fail no-downloader 12
-  fi
+PKG=""
+if have apt-get; then PKG=apt; elif have dnf; then PKG=dnf; elif have pacman; then PKG=pacman; fi
+
+# 0. Refresh the package index. A freshly imaged machine's index is stale or
+#    half-broken, which is enough to abort Docker's installer.
+case "$PKG" in
+  apt) apt-get update -qq || apt-get update -qq --allow-releaseinfo-change || true ;;
+  dnf) dnf -y makecache || true ;;
+  pacman) pacman -Sy --noconfirm || true ;;
+esac
+
+# 1. Guarantee a downloader. Nothing else in this script works without one.
+if ! have curl && ! have wget; then
+  case "$PKG" in
+    apt) apt-get install -y curl >/dev/null 2>&1 || true ;;
+    dnf) dnf install -y curl >/dev/null 2>&1 || true ;;
+    pacman) pacman -S --noconfirm curl >/dev/null 2>&1 || true ;;
+  esac
+fi
+have curl || have wget || fail no-downloader 12
+fetch() { # fetch <url> <dest>
+  if have curl; then curl -fsSL "$1" -o "$2"; else wget -qO "$2" "$1"; fi
+}
+
+# 2. Install Docker unless it is already present.
+if ! have docker; then
+  fetch https://get.docker.com /tmp/get-docker.sh || fail download 11
   sh /tmp/get-docker.sh || fail installer 13
   rm -f /tmp/get-docker.sh
 fi
-command -v docker >/dev/null 2>&1 || fail docker-missing 14
+have docker || fail docker-missing 14
 
-# 2. Ensure the docker group exists before touching membership. -f makes this a
-#    no-op when it is already there.
+# 3. Ensure the docker group exists before touching membership.
 groupadd -f docker 2>/dev/null || true
 getent group docker >/dev/null 2>&1 || fail groupadd 15
 
-# 3. Work out which human launched us. PKEXEC_UID is the reliable source under
-#    a GUI launch; the rest are fallbacks for other elevation paths.
+# 4. Add the human who launched us.
 TARGET=""
 if [ -n "${PKEXEC_UID:-}" ]; then TARGET="$(id -nu "$PKEXEC_UID" 2>/dev/null || true)"; fi
 [ -n "$TARGET" ] || TARGET="${SUDO_USER:-}"
@@ -216,12 +274,60 @@ if [ -n "${PKEXEC_UID:-}" ]; then TARGET="$(id -nu "$PKEXEC_UID" 2>/dev/null || 
 [ -n "$TARGET" ] || fail no-user 16
 usermod -aG docker "$TARGET" || fail usermod 17
 
-# 4. Start the daemon. Skipped, not fatal, on non-systemd systems.
-if command -v systemctl >/dev/null 2>&1; then
+# 5. Start the daemon before probing compose/GPU, which both need it.
+if have systemctl; then
   systemctl enable --now docker || true
-elif command -v service >/dev/null 2>&1; then
+elif have service; then
   service docker start || true
 fi
+
+# 6. Guarantee Compose v2. The distro package is tried first; the official
+#    plugin binary is the fallback and works no matter how Docker was installed.
+if ! docker compose version >/dev/null 2>&1; then
+  case "$PKG" in
+    apt) apt-get install -y docker-compose-plugin >/dev/null 2>&1 || true ;;
+    dnf) dnf install -y docker-compose-plugin >/dev/null 2>&1 || true ;;
+    pacman) pacman -S --noconfirm docker-compose >/dev/null 2>&1 || true ;;
+  esac
+fi
+if ! docker compose version >/dev/null 2>&1; then
+  DEST=/usr/local/lib/docker/cli-plugins
+  mkdir -p "$DEST"
+  fetch "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-$(uname -m)" \
+        "$DEST/docker-compose" || true
+  [ -s "$DEST/docker-compose" ] && chmod 0755 "$DEST/docker-compose"
+fi
+docker compose version >/dev/null 2>&1 || fail compose 18
+
+# 7. NVIDIA Container Toolkit — only when there is a GPU driver but Docker
+#    can't reach it. Never fatal: without it we fall back to the cloud engine.
+if have nvidia-smi && ! docker info 2>/dev/null | grep -qi nvidia; then
+  case "$PKG" in
+    apt)
+      KEYRING=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+      fetch https://nvidia.github.io/libnvidia-container/gpgkey /tmp/nv.key && \
+        gpg --dearmor -o "$KEYRING" /tmp/nv.key 2>/dev/null || true
+      rm -f /tmp/nv.key
+      fetch https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list /tmp/nv.list && \
+        sed "s#deb https://#deb [signed-by=$KEYRING] https://#g" /tmp/nv.list \
+          > /etc/apt/sources.list.d/nvidia-container-toolkit.list || true
+      rm -f /tmp/nv.list
+      apt-get update -qq || true
+      apt-get install -y nvidia-container-toolkit >/dev/null 2>&1 || true
+      ;;
+    dnf)
+      fetch https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo \
+            /etc/yum.repos.d/nvidia-container-toolkit.repo || true
+      dnf install -y nvidia-container-toolkit >/dev/null 2>&1 || true
+      ;;
+  esac
+  if have nvidia-ctk; then
+    nvidia-ctk runtime configure --runtime=docker >/dev/null 2>&1 || true
+    if have systemctl; then systemctl restart docker || true
+    elif have service; then service docker restart || true; fi
+  fi
+fi
+
 echo "OK $TARGET"
 "#;
 

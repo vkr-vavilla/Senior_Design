@@ -20,12 +20,36 @@ import asyncio
 from google.cloud import texttospeech
 
 _client = None
+_unavailable_reason: str | None = None
+
+
+class TTSUnavailable(RuntimeError):
+    """No usable Google credentials on this machine.
+
+    Local/desktop installs have no service account and most users will never run
+    `gcloud auth application-default login`, so this is the normal state there,
+    not an error worth a 500. The caller turns it into a 503 the frontend can
+    treat as "voice off" while the rest of the interview runs untouched.
+    """
 
 
 def _get_client() -> texttospeech.TextToSpeechClient:
-    global _client
+    global _client, _unavailable_reason
+    if _unavailable_reason is not None:
+        raise TTSUnavailable(_unavailable_reason)
     if _client is None:
-        _client = texttospeech.TextToSpeechClient()
+        try:
+            _client = texttospeech.TextToSpeechClient()
+        except Exception as e:
+            # Cache it: without credentials this fails identically every turn,
+            # and retrying per request adds latency to every single reply.
+            _unavailable_reason = (
+                "Voice needs Google Cloud Text-to-Speech credentials, which this "
+                "install doesn't have. The interview works normally without it. "
+                "To enable voice, run `gcloud auth application-default login` or "
+                "set GOOGLE_APPLICATION_CREDENTIALS to a service-account key."
+            )
+            raise TTSUnavailable(_unavailable_reason) from e
     return _client
 
 

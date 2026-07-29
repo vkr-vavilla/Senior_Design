@@ -105,9 +105,21 @@ else
   RAM_GB="$(total_ram_gb || echo 0)"
   log "OS=$OS ARCH=$ARCH nvidia_vram_gb=${VRAM_GB:-none} ram_gb=$RAM_GB"
 
-  if [ "$OS" = "Linux" ] && [ -n "${VRAM_GB:-}" ] && [ "${VRAM_GB:-0}" -ge "$MIN_VLLM_VRAM_GB" ]; then
+  # A host GPU is necessary but NOT sufficient: vLLM runs in a container, so
+  # Docker also needs the NVIDIA Container Toolkit. Without it `--profile gpu`
+  # dies with 'could not select device driver "nvidia"'. The caller (the desktop
+  # supervisor) probes Docker and passes the answer in, because it knows how to
+  # reach Docker; when unset we assume yes and preserve the old behaviour.
+  DOCKER_GPU="${PREPAI_DOCKER_GPU:-1}"
+
+  if [ "$OS" = "Linux" ] && [ -n "${VRAM_GB:-}" ] && [ "${VRAM_GB:-0}" -ge "$MIN_VLLM_VRAM_GB" ] \
+     && [ "$DOCKER_GPU" != "0" ]; then
     ENGINE="vllm"
     log "NVIDIA GPU with ${VRAM_GB} GiB VRAM on Linux -> vllm"
+  elif [ "$OS" = "Linux" ] && [ -n "${VRAM_GB:-}" ] && [ "${VRAM_GB:-0}" -ge "$MIN_VLLM_VRAM_GB" ]; then
+    # GPU present, but Docker can't use it. Falling back beats a hard failure.
+    ENGINE="gemini"
+    log "NVIDIA GPU found but Docker lacks the NVIDIA Container Toolkit -> gemini"
   elif is_apple_silicon && [ "${RAM_GB:-0}" -ge "$MIN_APPLE_RAM_GB" ]; then
     ENGINE="ollama"
     log "Apple Silicon with ${RAM_GB} GiB unified memory -> ollama on the host (Metal)"

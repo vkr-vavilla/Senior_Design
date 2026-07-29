@@ -54,6 +54,10 @@ services:
       # Fully local speech-to-text — no API key. WHISPER_MODEL: tiny/base/small/medium.
       - STT_BACKEND=local
       - WHISPER_MODEL=${WHISPER_MODEL:-small}
+      # Optional: voice (Google Cloud TTS). Absent on most local installs, in
+      # which case the backend returns 503 for /tts and the interview runs
+      # without spoken questions. Point this at a service-account key to enable.
+      - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS:-}
       - PYTHONUNBUFFERED=1
     volumes:
       - ./backend:/app

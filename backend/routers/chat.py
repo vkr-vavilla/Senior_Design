@@ -482,12 +482,22 @@ async def synthesize_speech(request: dict, user_id: str = Depends(get_current_us
         natural_text = natural_text.replace("‘", "'").replace("’", "'")
         natural_text = re.sub(r"[\"“”]", "", natural_text)
 
-        from tts_google import synthesize as google_synthesize
-        wav_bytes = await google_synthesize(natural_text, voice, speed)
+        from tts_google import synthesize as google_synthesize, TTSUnavailable
+        try:
+            wav_bytes = await google_synthesize(natural_text, voice, speed)
+        except TTSUnavailable as e:
+            # 503 + a specific code so the client can disable voice once and stop
+            # asking, instead of retrying a call that can never succeed here.
+            raise HTTPException(
+                status_code=503,
+                detail={"code": "tts_unavailable", "message": str(e)},
+            )
 
         from fastapi.responses import Response
         return Response(content=wav_bytes, media_type="audio/wav")
 
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"Synthesis error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
