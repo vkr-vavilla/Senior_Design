@@ -149,3 +149,27 @@ pub fn download(url: &str, dest: &Path) -> Result<(), String> {
 
     Err(missing_message("curl"))
 }
+
+
+/// Quote a single argument for /bin/sh.
+pub fn shell_quote(arg: &str) -> String {
+    format!("'{}'", arg.replace('\'', "'\\''"))
+}
+
+/// Run `cmdline` through /bin/sh.
+pub fn sh_command(cmdline: &str) -> Result<Command, String> {
+    let mut cmd = command("sh")?;
+    cmd.arg("-c").arg(cmdline);
+    Ok(cmd)
+}
+
+/// Run `cmdline` with `group` added to the process's group list.
+///
+/// `sg` reads /etc/group at exec time rather than inheriting the caller's
+/// cached supplementary groups, so this makes a brand-new `docker` group
+/// membership usable immediately — no logout, no reboot.
+pub fn sg_command(group: &str, cmdline: &str) -> Result<Command, String> {
+    let mut cmd = command("sg")?;
+    cmd.arg(group).arg("-c").arg(cmdline);
+    Ok(cmd)
+}

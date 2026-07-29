@@ -38,10 +38,12 @@ struct Progress {
 #[derive(Serialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum StartupError {
-    // `installed` lets the UI offer "Start Docker" instead of "Install Docker"
-    // when the CLI is present but the daemon is down — the case that used to
-    // sit on "Installing…" until it timed out.
-    MissingDocker { message: String, installed: bool },
+    // `action` tells the UI which recovery to offer: "install" (no Docker),
+    // "start" (present but daemon down) or "relogin" (present and running, but
+    // this account has no access and `sg` can't bridge it). Without this the UI
+    // offered a button that re-ran the same setup and bounced the user between
+    // "installed but not running" and "restart the app" forever.
+    MissingDocker { message: String, action: String },
     MissingOllama { message: String },
     Other { message: String },
 }
@@ -221,17 +223,32 @@ fn detect_engine(repo: &Path) -> Result<HashMap<String, String>, String> {
 /// `docker compose -f docker-compose.local.yml [--profile P] up -d`, with the
 /// engine env from detect_engine injected so compose interpolates it.
 fn compose_up(repo: &Path, env: &HashMap<String, String>) -> Result<(), String> {
-    let mut cmd = tools::command("docker")?;
-    cmd.current_dir(repo)
-        .arg("compose")
-        .arg("-f")
-        .arg("docker-compose.local.yml");
+    let docker = tools::find("docker")
+        .ok_or_else(|| "Docker isn't installed.".to_string())?;
+
+    // Assembled as a shell line so the same string can run directly or through
+    // `sg docker` when this session hasn't picked up the docker group yet.
+    let mut parts = vec![
+        tools::shell_quote(&docker.to_string_lossy()),
+        "compose".into(),
+        "-f".into(),
+        tools::shell_quote("docker-compose.local.yml"),
+    ];
     if let Some(profile) = env.get("COMPOSE_PROFILES") {
         if !profile.is_empty() {
-            cmd.arg("--profile").arg(profile);
+            parts.push("--profile".into());
+            parts.push(tools::shell_quote(profile));
         }
     }
-    cmd.arg("up").arg("-d");
+    parts.push("up".into());
+    parts.push("-d".into());
+    let cmdline = parts.join(" ");
+
+    let mut cmd = match crate::installer::docker_access() {
+        crate::installer::DockerAccess::ViaGroup => tools::sg_command("docker", &cmdline)?,
+        _ => tools::sh_command(&cmdline)?,
+    };
+    cmd.current_dir(repo);
     // Forward the engine-selection vars compose reads.
     for key in [
         "AI_BACKEND",
@@ -243,11 +260,15 @@ fn compose_up(repo: &Path, env: &HashMap<String, String>) -> Result<(), String> 
             cmd.env(key, v);
         }
     }
-    let status = cmd
-        .status()
-        .map_err(|e| format!("failed to run docker compose: {e}. Is Docker installed and running?"))?;
-    if !status.success() {
-        return Err("docker compose up failed — check Docker Desktop is running.".into());
+    let out = cmd
+        .output()
+        .map_err(|e| format!("failed to run docker compose: {e}"))?;
+    if !out.status.success() {
+        let stderr = String::from_utf8_lossy(&out.stderr);
+        return Err(format!(
+            "docker compose up failed.\n{}",
+            stderr.lines().rev().take(4).collect::<Vec<_>>().join("\n")
+        ));
     }
     Ok(())
 }
@@ -301,14 +322,23 @@ pub async fn start_stack(app: AppHandle) -> Result<String, StartupError> {
     let engine = env.get("INFERENCE_ENGINE").cloned().unwrap_or_default();
 
     emit(&app, 20, "Checking prerequisites…");
-    if !crate::installer::docker_ready() {
-        let installed = crate::installer::docker_installed();
-        let message = if installed {
-            "Docker is installed but not running.".to_string()
-        } else {
-            "Docker isn't installed.".to_string()
+    use crate::installer::DockerAccess;
+    let access = crate::installer::docker_access();
+    if !matches!(access, DockerAccess::Ready | DockerAccess::ViaGroup) {
+        let (message, action) = match access {
+            DockerAccess::NotInstalled => ("Docker isn't installed.", "install"),
+            DockerAccess::DaemonDown => ("Docker is installed but not running.", "start"),
+            // Running, but this account can't reach the socket and `sg` can't
+            // stand in — a real re-login (or the group fix) is required.
+            _ => (
+                "Docker is running, but your account doesn't have permission to use it.",
+                "relogin",
+            ),
         };
-        return Err(StartupError::MissingDocker { message, installed });
+        return Err(StartupError::MissingDocker {
+            message: message.to_string(),
+            action: action.to_string(),
+        });
     }
     if engine == "ollama" && !crate::installer::ollama_ready() {
         return Err(StartupError::MissingOllama {
@@ -369,11 +399,19 @@ pub async fn stop_stack() -> Result<(), String> {
         // Installed app: the runtime lives in ~/.prepai (see bootstrap_repo).
         Err(_) => bootstrap_dir()?,
     };
-    if let Ok(mut cmd) = tools::command("docker") {
-        let _ = cmd
-            .current_dir(&repo)
-            .args(["compose", "-f", "docker-compose.local.yml", "stop"])
-            .status();
+    if let Some(docker) = tools::find("docker") {
+        let cmdline = format!(
+            "{} compose -f {} stop",
+            tools::shell_quote(&docker.to_string_lossy()),
+            tools::shell_quote("docker-compose.local.yml")
+        );
+        let built = match crate::installer::docker_access() {
+            crate::installer::DockerAccess::ViaGroup => tools::sg_command("docker", &cmdline),
+            _ => tools::sh_command(&cmdline),
+        };
+        if let Ok(mut cmd) = built {
+            let _ = cmd.current_dir(&repo).status();
+        }
     }
     Ok(())
 }

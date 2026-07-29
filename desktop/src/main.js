@@ -76,15 +76,25 @@ async function boot() {
     const kind = err && err.kind;
     if (kind === "missing_docker") {
       status.textContent = "Docker is required.";
-      if (err.installed) {
-        // Present but not running: starting it is all that's needed, and
-        // labelling that "Install" made a 2-minute wait look like a hang.
+      if (err.action === "start") {
         offerInstall(
           "Start Docker",
           "install_docker",
           "FinalRound runs its services in Docker, which is installed but not running. " +
             "FinalRound will start Docker and wait for it to come up — on the first " +
             "launch Docker itself may ask for permission, which can take a minute."
+        );
+      } else if (err.action === "relogin") {
+        // Deliberately no action button: nothing this app can do from inside the
+        // current login session will grant the group, so offering a button here
+        // is what produced the install/restart loop.
+        status.textContent = "One more step.";
+        showError(
+          (err.message || "Docker isn't reachable.") +
+            "\n\nYour account needs to be in the 'docker' group. If you just added it, " +
+            "log out and back in (or reboot) and reopen FinalRound.\n\n" +
+            "To add it manually:\n  sudo groupadd -f docker\n  sudo usermod -aG docker $USER",
+          { notice: true, retry: true }
         );
       } else {
         offerInstall(

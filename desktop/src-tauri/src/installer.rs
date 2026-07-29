@@ -24,25 +24,64 @@ pub struct InstallOutcome {
     pub message: String,
 }
 
-/// Is the docker CLI present anywhere we know to look? Distinct from
-/// docker_ready(): a GUI app's PATH omits /usr/local/bin, so "cannot spawn
-/// docker" must never be reported as "Docker isn't installed".
-pub fn docker_installed() -> bool {
-    tools::exists("docker")
+/// How (or whether) this process can talk to Docker. Distinguishing these is
+/// what stops the app looping: "daemon down" and "your session lacks the docker
+/// group" look identical through a bare `docker info` exit code, but they need
+/// completely different fixes.
+#[derive(Clone, Copy, PartialEq)]
+pub enum DockerAccess {
+    /// Direct invocation works.
+    Ready,
+    /// Denied directly, but works through `sg docker` — i.e. the account is in
+    /// the docker group and only this login session hasn't picked it up yet.
+    ViaGroup,
+    /// Installed, reachable, but the daemon isn't running.
+    DaemonDown,
+    /// Installed and running, but this account has no access and `sg` can't
+    /// bridge it (not in the group yet, or `sg` unavailable).
+    NoPermission,
+    NotInstalled,
 }
 
-/// Docker is usable: CLI resolvable AND the daemon answers. Re-resolves the
-/// binary on every call, so it picks up the CLI symlink Docker Desktop creates
-/// during its own first-launch setup.
-pub fn docker_ready() -> bool {
-    match tools::command("docker") {
-        Ok(mut cmd) => cmd
-            .arg("info")
-            .output()
-            .map(|o| o.status.success())
-            .unwrap_or(false),
-        Err(_) => false,
+/// The docker CLI resolved absolutely, as a shell-quoted program name.
+fn docker_bin() -> Option<String> {
+    tools::find("docker").map(|p| tools::shell_quote(&p.to_string_lossy()))
+}
+
+pub fn docker_access() -> DockerAccess {
+    let Some(docker) = docker_bin() else {
+        return DockerAccess::NotInstalled;
+    };
+    let probe = format!("{docker} info");
+
+    let direct = tools::sh_command(&probe).and_then(|mut c| {
+        c.output().map_err(|e| e.to_string())
+    });
+    let Ok(out) = direct else {
+        return DockerAccess::NotInstalled;
+    };
+    if out.status.success() {
+        return DockerAccess::Ready;
     }
+
+    let stderr = String::from_utf8_lossy(&out.stderr).to_lowercase();
+    let denied = stderr.contains("permission denied");
+    if denied {
+        // Try the group bridge before telling anyone to log out.
+        if let Ok(mut c) = tools::sg_command("docker", &probe) {
+            if c.output().map(|o| o.status.success()).unwrap_or(false) {
+                return DockerAccess::ViaGroup;
+            }
+        }
+        return DockerAccess::NoPermission;
+    }
+    DockerAccess::DaemonDown
+}
+
+
+/// Docker is usable right now, by whatever route.
+pub fn docker_ready() -> bool {
+    matches!(docker_access(), DockerAccess::Ready | DockerAccess::ViaGroup)
 }
 
 /// Ollama serves on 11434 when it's actually up; a TCP probe beats checking
@@ -127,6 +166,65 @@ fn install_docker_macos() -> Result<InstallOutcome, String> {
     Ok(InstallOutcome { ready: true, message: "Docker is installed and running.".into() })
 }
 
+/// Elevated first-run setup, run once under pkexec. Written defensively because
+/// this executes on machines we've never seen:
+///   * the `docker` group may not exist yet (usermod fails hard on a missing
+///     group — the error a fresh Ubuntu box hit),
+///   * `logname` needs a controlling terminal, which a GUI-launched app has
+///     none of, so it returns nothing; pkexec exports PKEXEC_UID instead,
+///   * not every distro is systemd,
+///   * curl is not guaranteed to be installed.
+/// Steps are independent and each failure names itself on stderr, so the UI can
+/// show which one broke instead of one opaque "installing Docker failed".
+const LINUX_DOCKER_SETUP: &str = r#"
+set -u
+fail() { echo "STEP_FAILED: $1" >&2; exit "$2"; }
+
+# 1. Install Docker unless it is already present.
+if ! command -v docker >/dev/null 2>&1; then
+  # Docker's installer aborts if the package index is stale or half-broken,
+  # which is the default state of a freshly imaged machine. Refresh first and
+  # keep going even if some third-party repo is unreachable.
+  if command -v apt-get >/dev/null 2>&1; then
+    apt-get update -qq || apt-get update -qq --allow-releaseinfo-change || true
+  elif command -v dnf >/dev/null 2>&1; then
+    dnf -y makecache || true
+  fi
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL https://get.docker.com -o /tmp/get-docker.sh || fail download 11
+  elif command -v wget >/dev/null 2>&1; then
+    wget -qO /tmp/get-docker.sh https://get.docker.com || fail download 11
+  else
+    fail no-downloader 12
+  fi
+  sh /tmp/get-docker.sh || fail installer 13
+  rm -f /tmp/get-docker.sh
+fi
+command -v docker >/dev/null 2>&1 || fail docker-missing 14
+
+# 2. Ensure the docker group exists before touching membership. -f makes this a
+#    no-op when it is already there.
+groupadd -f docker 2>/dev/null || true
+getent group docker >/dev/null 2>&1 || fail groupadd 15
+
+# 3. Work out which human launched us. PKEXEC_UID is the reliable source under
+#    a GUI launch; the rest are fallbacks for other elevation paths.
+TARGET=""
+if [ -n "${PKEXEC_UID:-}" ]; then TARGET="$(id -nu "$PKEXEC_UID" 2>/dev/null || true)"; fi
+[ -n "$TARGET" ] || TARGET="${SUDO_USER:-}"
+[ -n "$TARGET" ] || TARGET="$(logname 2>/dev/null || true)"
+[ -n "$TARGET" ] || fail no-user 16
+usermod -aG docker "$TARGET" || fail usermod 17
+
+# 4. Start the daemon. Skipped, not fatal, on non-systemd systems.
+if command -v systemctl >/dev/null 2>&1; then
+  systemctl enable --now docker || true
+elif command -v service >/dev/null 2>&1; then
+  service docker start || true
+fi
+echo "OK $TARGET"
+"#;
+
 fn install_docker_linux() -> Result<InstallOutcome, String> {
     if !tools::exists("pkexec") {
         return Err("Couldn't request admin rights (pkexec is missing). \
@@ -134,28 +232,60 @@ fn install_docker_linux() -> Result<InstallOutcome, String> {
                     then add yourself to the docker group:  sudo usermod -aG docker $USER"
             .into());
     }
-    // get.docker.com is Docker's official convenience installer and handles
-    // distro detection (apt/dnf/pacman/…) itself. logname resolves the login
-    // user even though this shell runs as root under pkexec.
-    run_ok(
-        &mut tools::command("pkexec")?.args([
-            "sh",
-            "-c",
-            "curl -fsSL https://get.docker.com | sh && \
-             usermod -aG docker \"$(logname)\" && \
-             systemctl enable --now docker",
-        ]),
-        "installing Docker",
-    )?;
-    // The daemon is up, but THIS process predates the new `docker` group
-    // membership, so its docker calls would still be denied. A restart of the
-    // app (fresh process, fresh groups) is the honest fix — don't fake it.
-    Ok(InstallOutcome {
-        ready: false,
-        message: "Docker was installed and started. Restart FinalRound so your \
-                  account's new Docker permissions take effect."
-            .into(),
-    })
+    let out = tools::command("pkexec")?
+        .args(["sh", "-c", LINUX_DOCKER_SETUP])
+        .output()
+        .map_err(|e| format!("failed to request admin rights: {e}"))?;
+
+    if !out.status.success() {
+        let stderr = String::from_utf8_lossy(&out.stderr);
+        let step = stderr
+            .lines()
+            .rev()
+            .find_map(|l| l.strip_prefix("STEP_FAILED: "))
+            .unwrap_or("");
+        return Err(match step {
+            "download" | "no-downloader" => "Couldn't download Docker's installer. \
+                Check your internet connection, or install Docker yourself from \
+                https://docs.docker.com/engine/install/ and reopen FinalRound."
+                .to_string(),
+            "installer" | "docker-missing" => format!(
+                "Docker's own installer didn't complete on this system. Install Docker \
+                 from https://docs.docker.com/engine/install/ and reopen FinalRound.\n{}",
+                stderr.lines().rev().take(3).collect::<Vec<_>>().join(" ")
+            ),
+            "groupadd" | "usermod" | "no-user" => "Docker installed, but adding your \
+                account to the 'docker' group failed. Run this once, then log out and \
+                back in:  sudo groupadd -f docker && sudo usermod -aG docker $USER"
+                .to_string(),
+            // Empty step means pkexec itself failed — most often the user
+            // dismissed the password prompt.
+            _ => "Admin permission was denied, so Docker wasn't installed.".to_string(),
+        });
+    }
+
+    // This session's processes still carry the group list they were given at
+    // login, so a direct `docker` call is still denied — but `sg docker` reads
+    // /etc/group at exec time, so the membership we just granted is usable
+    // immediately. If that works, carry on without making anyone log out.
+    match docker_access() {
+        DockerAccess::Ready | DockerAccess::ViaGroup => Ok(InstallOutcome {
+            ready: true,
+            message: "Docker is installed and running.".into(),
+        }),
+        DockerAccess::DaemonDown => Ok(InstallOutcome {
+            ready: false,
+            message: "Docker was installed but its service didn't start. Start Docker \
+                      (or reboot), then reopen FinalRound."
+                .into(),
+        }),
+        _ => Ok(InstallOutcome {
+            ready: false,
+            message: "Docker is installed, but your account still can't reach it. \
+                      Log out and back in (or reboot), then reopen FinalRound."
+                .into(),
+        }),
+    }
 }
 
 #[tauri::command]
