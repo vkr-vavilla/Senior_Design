@@ -79,3 +79,9 @@ data/raw/leetcode/
 
 # --- Docker ---
 .docker/
+
+# --- TypeScript build cache ---
+*.tsbuildinfo
+
+# --- Generated video/brag output ---
+brag-output/
