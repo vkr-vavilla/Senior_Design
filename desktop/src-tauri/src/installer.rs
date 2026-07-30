@@ -6,7 +6,9 @@
 //! privilege escalation is always the OS's own dialog (pkexec / osascript
 //! "with administrator privileges") — we never see or store a password.
 
-use std::process::Command;
+use std::ffi::OsStr;
+use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
 
 use serde::Serialize;
@@ -185,8 +187,11 @@ pub async fn install_docker() -> Result<InstallOutcome, String> {
 }
 
 fn install_docker_macos() -> Result<InstallOutcome, String> {
-    let app_present = std::path::Path::new("/Applications/Docker.app").is_dir();
-    if !app_present {
+    let (docker_name, docker_id) = tools::DOCKER_APP;
+    // Wherever it is — a Mac with Docker in ~/Applications used to be treated
+    // as a Mac with no Docker at all, and re-installing over it failed.
+    let mut app = tools::find_app(docker_name, docker_id);
+    if app.is_none() {
         let url = if cfg!(target_arch = "aarch64") {
             "https://desktop.docker.com/mac/main/arm64/Docker.dmg"
         } else {
@@ -214,11 +219,22 @@ fn install_docker_macos() -> Result<InstallOutcome, String> {
         }
         let _ = std::fs::remove_file(&dmg);
         install?;
+        app = tools::find_app(docker_name, docker_id);
     }
+    let app = app.ok_or(
+        "Docker Desktop was installed but its application bundle can't be found. \
+         Install Docker from https://docs.docker.com/get-docker/ and reopen FinalRound.",
+    )?;
 
     // First launch of Docker Desktop is slow (it installs its privileged
-    // helper — that authorization dialog is Docker's own, not ours).
-    run_ok(&mut tools::command("open")?.args(["-a", "Docker"]), "launching Docker Desktop")?;
+    // helper — that authorization dialog is Docker's own, not ours). Open the
+    // bundle by path: `open -a Docker` resolves the name through
+    // LaunchServices, which hasn't indexed an app we copied seconds ago.
+    register_app(&app);
+    run_ok(
+        &mut tools::command("open")?.args([OsStr::new("-a"), app.as_os_str()]),
+        "launching Docker Desktop",
+    )?;
     wait_until("Docker to start", Duration::from_secs(120), docker_ready)?;
     Ok(InstallOutcome { ready: true, message: "Docker is installed and running.".into() })
 }
@@ -446,6 +462,102 @@ fn install_docker_linux() -> Result<InstallOutcome, String> {
     }
 }
 
+/// Ollama's bundle, wherever it is, but only if it actually carries the server
+/// binary. `Ollama.app` existing as a directory is not proof of a usable
+/// install: an interrupted download leaves a partial bundle behind, and the old
+/// `is_dir()` check then skipped the re-download forever.
+fn ollama_app() -> Option<PathBuf> {
+    let (name, id) = tools::OLLAMA_APP;
+    tools::find_app(name, id).filter(|app| ollama_server_bin(app).is_some())
+}
+
+/// The `ollama` executable inside a bundle. Which subdirectory holds it has
+/// moved between Ollama releases, so look in all of them.
+fn ollama_server_bin(app: &Path) -> Option<PathBuf> {
+    tools::app_bin_dirs(app)
+        .into_iter()
+        .map(|d| d.join("ollama"))
+        .find(|p| tools::is_executable(p))
+}
+
+/// A folder we can actually write an .app into.
+///
+/// /Applications is group-writable for admin accounts, but a standard or
+/// managed account can't touch it — and `ditto` into it fails with a bare
+/// "Permission denied". macOS's own answer for that case is ~/Applications,
+/// which LaunchServices, Spotlight and `open` treat identically.
+fn writable_app_dir() -> Result<PathBuf, String> {
+    let system = PathBuf::from("/Applications");
+    let probe = system.join(".finalround-write-probe");
+    if std::fs::write(&probe, b"").is_ok() {
+        let _ = std::fs::remove_file(&probe);
+        return Ok(system);
+    }
+    let home = std::env::var_os("HOME")
+        .ok_or("Can't tell where your home folder is, so there's nowhere to install Ollama.")?;
+    let user = PathBuf::from(home).join("Applications");
+    std::fs::create_dir_all(&user)
+        .map_err(|e| format!("couldn't create {}: {e}", user.display()))?;
+    Ok(user)
+}
+
+/// Register a bundle with LaunchServices. A bundle unpacked by `ditto` is not
+/// in that database until something scans it, and every `open -a <name>` lookup
+/// goes through it — that gap is what produced "Unable to find application
+/// named 'Ollama'" immediately after a successful install. Best-effort: the
+/// launch below works by path regardless.
+fn register_app(app: &Path) {
+    const LSREGISTER: &str =
+        "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister";
+    if Path::new(LSREGISTER).is_file() {
+        let _ = Command::new(LSREGISTER)
+            .args([OsStr::new("-f"), app.as_os_str()])
+            .output();
+    }
+}
+
+/// Start the Ollama server from a bundle we've already located.
+///
+/// Two attempts on purpose. `open` by absolute path launches the menu-bar app
+/// the way a user would, which is what we want on a normal desktop. But its
+/// first run shows a welcome window and doesn't serve until that's dismissed,
+/// and it can't launch at all without a window server — so if 11434 stays shut,
+/// run the server binary from inside the bundle directly. That's all the
+/// backend needs, and a second `serve` simply fails to bind if the GUI did
+/// start one in the meantime.
+fn start_ollama(app: &Path) -> Result<(), String> {
+    register_app(app);
+    let opened = run_ok(
+        &mut tools::command("open")?.args([OsStr::new("-a"), app.as_os_str()]),
+        "launching Ollama",
+    );
+    if opened.is_ok() && wait_until("Ollama to start", Duration::from_secs(30), ollama_ready).is_ok()
+    {
+        return Ok(());
+    }
+
+    let bin = ollama_server_bin(app)
+        .ok_or_else(|| format!("no ollama server binary inside {}", app.display()))?;
+    Command::new(&bin)
+        .arg("serve")
+        .env("PATH", tools::augmented_path())
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+        .map_err(|e| format!("couldn't start {}: {e}", bin.display()))?;
+    match (
+        wait_until("Ollama to start", Duration::from_secs(30), ollama_ready),
+        opened,
+    ) {
+        (Ok(()), _) => Ok(()),
+        // Both routes failed — the `open` error is the more useful one, but
+        // keep the timeout too so the splash screen shows what was tried.
+        (Err(timeout), Err(open_err)) => Err(format!("{open_err}\n{timeout}")),
+        (Err(timeout), Ok(())) => Err(timeout),
+    }
+}
+
 #[tauri::command]
 pub async fn install_ollama() -> Result<InstallOutcome, String> {
     if !cfg!(target_os = "macos") {
@@ -458,21 +570,31 @@ pub async fn install_ollama() -> Result<InstallOutcome, String> {
         return Ok(InstallOutcome { ready: true, message: "Ollama is already running.".into() });
     }
 
-    if !std::path::Path::new("/Applications/Ollama.app").is_dir() {
-        let zip = std::env::temp_dir().join("FinalRound-Ollama.zip");
-        let zip_str = zip.to_string_lossy().to_string();
-        tools::download("https://ollama.com/download/Ollama-darwin.zip", &zip)?;
-        // Plain unzip into /Applications — same as a manual drag-install, no
-        // elevation needed on a personal Mac.
-        let extract = run_ok(
-            &mut tools::command("ditto")?.args(["-x", "-k", &zip_str, "/Applications"]),
-            "extracting Ollama into /Applications",
-        );
-        let _ = std::fs::remove_file(&zip);
-        extract?;
-    }
+    let app = match ollama_app() {
+        Some(app) => app,
+        None => {
+            let dest = writable_app_dir()?;
+            let dest_str = dest.to_string_lossy().to_string();
+            let zip = std::env::temp_dir().join("FinalRound-Ollama.zip");
+            let zip_str = zip.to_string_lossy().to_string();
+            tools::download("https://ollama.com/download/Ollama-darwin.zip", &zip)?;
+            // Plain unzip — same as a manual drag-install, no elevation needed.
+            let extract = run_ok(
+                &mut tools::command("ditto")?.args(["-x", "-k", &zip_str, &dest_str]),
+                &format!("extracting Ollama into {dest_str}"),
+            );
+            let _ = std::fs::remove_file(&zip);
+            extract?;
+            ollama_app().ok_or_else(|| {
+                format!(
+                    "Ollama's download unpacked into {dest_str} but no working Ollama.app came \
+                     out of it. Install it yourself from https://ollama.com/download and reopen \
+                     FinalRound."
+                )
+            })?
+        }
+    };
 
-    run_ok(&mut tools::command("open")?.args(["-a", "Ollama"]), "launching Ollama")?;
-    wait_until("Ollama to start", Duration::from_secs(30), ollama_ready)?;
+    start_ollama(&app)?;
     Ok(InstallOutcome { ready: true, message: "Ollama is installed and running.".into() })
 }

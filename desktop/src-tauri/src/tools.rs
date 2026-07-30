@@ -16,36 +16,151 @@ use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
+/// The .app bundles whose internal CLIs we care about, with the bundle
+/// identifier used to locate them through Spotlight when they aren't in any of
+/// the usual folders.
+/// Not cfg-gated: the macOS installer paths in installer.rs are compiled on
+/// every target (they're guarded at runtime by `cfg!`), so the names they
+/// reference have to exist everywhere.
+pub const DOCKER_APP: (&str, &str) = ("Docker", "com.docker.docker");
+pub const OLLAMA_APP: (&str, &str) = ("Ollama", "com.electron.ollama");
+
 /// Directories to search beyond whatever PATH we inherited. Order matters:
 /// package-manager locations first, then app-bundle internals.
+///
+/// The bundle locations are resolved at call time rather than hardcoded to
+/// /Applications: a Mac where the user (or a managed-device policy) put Docker
+/// or Ollama in ~/Applications otherwise looks like a machine with neither
+/// installed.
 #[cfg(target_os = "macos")]
-const EXTRA_DIRS: &[&str] = &[
-    "/usr/local/bin",                                  // Docker Desktop CLI symlink, Intel homebrew
-    "/opt/homebrew/bin",                               // Apple Silicon homebrew
-    "/usr/bin",
-    "/bin",
-    "/usr/sbin",
-    "/sbin",
+fn extra_dirs() -> Vec<PathBuf> {
+    let mut dirs: Vec<PathBuf> = [
+        "/usr/local/bin",  // Docker Desktop CLI symlink, Intel homebrew
+        "/opt/homebrew/bin", // Apple Silicon homebrew
+        "/usr/bin",
+        "/bin",
+        "/usr/sbin",
+        "/sbin",
+    ]
+    .iter()
+    .map(PathBuf::from)
+    .collect();
+
     // Docker Desktop's real binaries — present whenever Docker.app is
     // installed, even if the user declined the /usr/local/bin symlinks.
-    "/Applications/Docker.app/Contents/Resources/bin",
-    // Ollama ships its CLI inside the bundle. /usr/local/bin/ollama only
+    // Ollama ships its CLI inside its bundle too: /usr/local/bin/ollama only
     // appears after the user clicks "Install command line" in Ollama's UI, so
-    // on a fresh install this is the only copy that exists.
-    "/Applications/Ollama.app/Contents/Resources",
-    "/Applications/Ollama.app/Contents/MacOS",
-];
+    // on a fresh install the in-bundle copy is the only one that exists.
+    for (name, _) in [DOCKER_APP, OLLAMA_APP] {
+        if let Some(app) = find_app_in_dirs(name) {
+            dirs.extend(app_bin_dirs(&app));
+        }
+    }
+    dirs
+}
 
 #[cfg(not(target_os = "macos"))]
-const EXTRA_DIRS: &[&str] = &[
-    "/usr/local/bin",
-    "/usr/bin",
-    "/bin",
-    "/usr/sbin",
-    "/sbin",
-    "/snap/bin", // Ubuntu snap-installed docker
-    "/opt/homebrew/bin",
-];
+fn extra_dirs() -> Vec<PathBuf> {
+    [
+        "/usr/local/bin",
+        "/usr/bin",
+        "/bin",
+        "/usr/sbin",
+        "/sbin",
+        "/snap/bin", // Ubuntu snap-installed docker
+        "/opt/homebrew/bin",
+    ]
+    .iter()
+    .map(PathBuf::from)
+    .collect()
+}
+
+/// Folders macOS itself treats as application directories, most specific first.
+#[cfg(target_os = "macos")]
+fn app_search_dirs() -> Vec<PathBuf> {
+    let mut dirs = Vec::new();
+    if let Some(home) = std::env::var_os("HOME") {
+        dirs.push(PathBuf::from(home).join("Applications"));
+    }
+    dirs.extend(
+        ["/Applications", "/Applications/Utilities", "/System/Applications"]
+            .iter()
+            .map(PathBuf::from),
+    );
+    dirs
+}
+
+/// The directories inside an .app that hold command-line executables.
+/// Meaningless off macOS, but see DOCKER_APP above for why it's still compiled.
+pub fn app_bin_dirs(app: &Path) -> Vec<PathBuf> {
+    let contents = app.join("Contents");
+    vec![
+        contents.join("Resources").join("bin"),
+        contents.join("Resources"),
+        contents.join("MacOS"),
+    ]
+}
+
+#[cfg(target_os = "macos")]
+fn is_app_bundle(p: &Path) -> bool {
+    p.join("Contents").join("Info.plist").is_file()
+}
+
+/// Cheap lookup: just stat the well-known application folders. Used on the hot
+/// path (every `find` call) so it must never spawn a process.
+#[cfg(target_os = "macos")]
+fn find_app_in_dirs(app_name: &str) -> Option<PathBuf> {
+    let bundle = format!("{app_name}.app");
+    app_search_dirs()
+        .into_iter()
+        .map(|d| d.join(&bundle))
+        .find(|p| is_app_bundle(p))
+}
+
+/// Absolute path to an installed .app, wherever it lives.
+///
+/// Folder scan first, then Spotlight by bundle identifier, which finds it even
+/// on a machine where someone keeps applications somewhere unusual. Spotlight
+/// is deliberately the fallback: it costs a subprocess, and it returns nothing
+/// on volumes with indexing disabled, so it can only ever add results.
+#[cfg(target_os = "macos")]
+pub fn find_app(app_name: &str, bundle_id: &str) -> Option<PathBuf> {
+    if let Some(found) = find_app_in_dirs(app_name) {
+        return Some(found);
+    }
+    let out = Command::new("/usr/bin/mdfind")
+        .arg(format!("kMDItemCFBundleIdentifier == '{bundle_id}'"))
+        .output()
+        .ok()?;
+    let hits: Vec<PathBuf> = String::from_utf8_lossy(&out.stdout)
+        .lines()
+        .map(|l| PathBuf::from(l.trim()))
+        .filter(|p| is_app_bundle(p) && !is_stashed_copy(p))
+        .collect();
+    // An installed app sits in some "Applications" folder. Prefer one that
+    // does; only fall back to an unusual location if that's all there is.
+    hits.iter()
+        .find(|p| p.parent().and_then(|d| d.file_name()) == Some("Applications".as_ref()))
+        .or_else(|| hits.first())
+        .cloned()
+}
+
+/// Spotlight also indexes copies that aren't installs: Docker Desktop leaves a
+/// half-unpacked Docker.app under ~/Library/Application Support/…/in_progress,
+/// and a mounted .dmg or the Trash look just as much like a real bundle.
+/// Launching one of those would be worse than reporting nothing found.
+#[cfg(target_os = "macos")]
+fn is_stashed_copy(p: &Path) -> bool {
+    let s = p.to_string_lossy();
+    ["/Library/", "/.Trash", "/Volumes/", "/private/var/folders/"]
+        .iter()
+        .any(|frag| s.contains(frag))
+}
+
+#[cfg(not(target_os = "macos"))]
+pub fn find_app(_app_name: &str, _bundle_id: &str) -> Option<PathBuf> {
+    None
+}
 
 /// Per-user install locations, which need $HOME expanded so they can't live in
 /// the const above. Docker Desktop 4.18+ puts its CLI in ~/.docker/bin and adds
@@ -73,8 +188,8 @@ pub fn find(name: &str) -> Option<PathBuf> {
             }
         }
     }
-    for dir in EXTRA_DIRS {
-        let candidate = Path::new(dir).join(name);
+    for dir in extra_dirs() {
+        let candidate = dir.join(name);
         if is_executable(&candidate) {
             return Some(candidate);
         }
@@ -88,7 +203,7 @@ pub fn find(name: &str) -> Option<PathBuf> {
     None
 }
 
-fn is_executable(p: &Path) -> bool {
+pub fn is_executable(p: &Path) -> bool {
     // is_file() follows symlinks, which is what we want for /usr/local/bin
     // entries that point into an app bundle.
     if !p.is_file() {
@@ -115,12 +230,21 @@ pub fn augmented_path() -> OsString {
     if let Some(path) = std::env::var_os("PATH") {
         dirs.extend(std::env::split_paths(&path));
     }
-    for p in EXTRA_DIRS.iter().map(PathBuf::from).chain(home_dirs()) {
+    let fallback = extra_dirs();
+    for p in fallback.iter().cloned().chain(home_dirs()) {
         if !dirs.contains(&p) {
             dirs.push(p);
         }
     }
-    std::env::join_paths(dirs).unwrap_or_else(|_| OsString::from(EXTRA_DIRS.join(":")))
+    std::env::join_paths(dirs).unwrap_or_else(|_| {
+        OsString::from(
+            fallback
+                .iter()
+                .map(|p| p.to_string_lossy().into_owned())
+                .collect::<Vec<_>>()
+                .join(":"),
+        )
+    })
 }
 
 /// A Command for `name`, resolved absolutely and given a full PATH.
