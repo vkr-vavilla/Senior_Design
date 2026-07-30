@@ -11,7 +11,7 @@ all run on your computer. Nothing is metered and no cloud account is required
 |---|---|---|
 | LLM (interviewer) | Qwen2.5-7B + fine-tuned LoRA via vLLM | needs an NVIDIA GPU (~10 GB VRAM); no GPU → Gemini API with your own free key |
 | Speech-to-text | faster-whisper (`STT_BACKEND=local`) | CPU, offline, no API key |
-| Text-to-speech | Kokoro ONNX | CPU, offline, bundled in the backend image |
+| Text-to-speech | Kokoro-82M ONNX (`TTS_BACKEND=kokoro`) | CPU, offline, no API key; ~353 MB of weights download on first boot into `backend/kokoro_models/` |
 | Database | MongoDB 7 container | data persists in the `mongo-data` Docker volume |
 | Coding sandbox | Piston | Python runtime auto-installed on first boot |
 | Crash-safety cache | Redis | per-turn interview snapshots |
@@ -135,6 +135,7 @@ docker compose -f docker-compose.local.yml logs -f vllm
 | `AI_BACKEND` | `qwen` | `qwen` (local model) or `gemini` (cloud API) |
 | `WHISPER_MODEL` | `small` | local STT size: `tiny` / `base` / `small` / `medium` — bigger is more accurate but slower on CPU |
 | `STT_BACKEND` | `local` (in this compose) | set `groq` + `GROQ_API_KEY` in `backend/.env` to use cloud STT instead |
+| `TTS_BACKEND` | `kokoro` (in this compose) | on-device voice, no key. Set `google` + `GOOGLE_APPLICATION_CREDENTIALS` for Cloud TTS instead. If neither can serve audio the app falls back to your browser's built-in voice |
 
 Example: `WHISPER_MODEL=base ./setup_local.sh` on a weaker CPU.
 

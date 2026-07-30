@@ -22,9 +22,13 @@ services:
       - PISTON_URL=http://piston:2000
       # Redis: per-turn crash-safety snapshot of the live interview (best-effort)
       - REDIS_URL=redis://redis:6379/0
+      # Voice engine. Defaults to google to mirror the hosted deploy; set
+      # TTS_BACKEND=kokoro to exercise the on-device engine the downloadable
+      # package ships (docker-compose.local.yml), which needs no credentials.
+      - TTS_BACKEND=${TTS_BACKEND:-google}
       # Optional: voice (Google Cloud TTS). Absent on most local installs, in
-      # which case the backend returns 503 for /tts and the interview runs
-      # without spoken questions. Point this at a service-account key to enable.
+      # which case the backend returns 503 for /tts and the interview falls back
+      # to the browser's voice. Point this at a service-account key to enable.
       - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS:-}
       - PYTHONUNBUFFERED=1
     volumes:

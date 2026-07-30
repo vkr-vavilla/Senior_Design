@@ -1,10 +1,16 @@
 """
-Google Cloud Text-to-Speech client.
+Google Cloud Text-to-Speech client — the engine for the hosted deploy
+(TTS_BACKEND=google, the default).
 
-Replaces the self-hosted Kokoro model, which held ~2GB of the container's
-memory resident for its entire lifetime (loaded at startup, never freed) — the
-direct cause of repeated Cloud Run OOM kills during live interviews. This is a
-stateless API call instead: no model in memory, nothing to pre-warm or crash.
+Used here instead of the self-hosted Kokoro model, which held ~2GB of the
+container's memory resident for its entire lifetime (loaded at startup, never
+freed) — the direct cause of repeated Cloud Run OOM kills during live
+interviews. This is a stateless API call instead: no model in memory, nothing
+to pre-warm or crash.
+
+That memory ceiling is a hosted-runtime constraint, so the downloadable package
+still runs Kokoro locally (TTS_BACKEND=kokoro, see tts_kokoro.py) where there
+are no Google credentials to authenticate with.
 
 Auth: Application Default Credentials. On Cloud Run this is automatic via the
 attached service account — no key file needed — as long as the "Cloud
@@ -19,18 +25,16 @@ import asyncio
 
 from google.cloud import texttospeech
 
+# Shared with tts_kokoro so routers/chat.py catches one type whichever engine
+# TTS_BACKEND selects. Re-exported here because callers used to import it from
+# this module. Local/desktop installs have no service account and most users
+# will never run `gcloud auth application-default login`, so raising it is the
+# normal state there — see tts.py. Those installs should set TTS_BACKEND=kokoro,
+# which needs no credentials at all.
+from tts import TTSUnavailable  # noqa: F401
+
 _client = None
 _unavailable_reason: str | None = None
-
-
-class TTSUnavailable(RuntimeError):
-    """No usable Google credentials on this machine.
-
-    Local/desktop installs have no service account and most users will never run
-    `gcloud auth application-default login`, so this is the normal state there,
-    not an error worth a 500. The caller turns it into a 503 the frontend can
-    treat as "voice off" while the rest of the interview runs untouched.
-    """
 
 
 def _get_client() -> texttospeech.TextToSpeechClient:

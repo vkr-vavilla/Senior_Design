@@ -13,3 +13,7 @@ env
 .git
 .gitignore
 README.md
+# Kokoro weights (~353 MB): downloaded at runtime into the bind-mounted
+# backend/ dir, never baked into the image. Without this, `COPY . .` slurps
+# them into every build on a machine that already has them.
+kokoro_models/

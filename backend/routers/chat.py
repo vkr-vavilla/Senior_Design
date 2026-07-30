@@ -475,16 +475,18 @@ async def synthesize_speech(request: dict, user_id: str = Depends(get_current_us
         import re
         natural_text = re.sub(r"\s+", " ", text.strip())
         natural_text = natural_text.replace("—", ", ").replace(" - ", ", ")
-        # Double-quote glyphs have no pronunciation in Google TTS's phonemizer and
-        # make it stumble/pause wherever one sits — strip straight and curly variants.
+        # Double-quote glyphs have no pronunciation in either engine's phonemizer
+        # and make it stumble/pause wherever one sits — strip straight and curly.
         # Apostrophes are kept (normalized to straight '): stripping them breaks
         # contractions/possessives ("don't" -> "dont") and mispronounces the word.
         natural_text = natural_text.replace("‘", "'").replace("’", "'")
         natural_text = re.sub(r"[\"“”]", "", natural_text)
 
-        from tts_google import synthesize as google_synthesize, TTSUnavailable
+        # Engine picked by TTS_BACKEND (Cloud TTS hosted, Kokoro on local
+        # installs); either raises TTSUnavailable when this box can't do voice.
+        from tts import synthesize as tts_synthesize, TTSUnavailable
         try:
-            wav_bytes = await google_synthesize(natural_text, voice, speed)
+            wav_bytes = await tts_synthesize(natural_text, voice, speed)
         except TTSUnavailable as e:
             # 503 + a specific code so the client can disable voice once and stop
             # asking, instead of retrying a call that can never succeed here.

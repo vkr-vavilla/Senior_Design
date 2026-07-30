@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from database import connect_db, close_db
 from routers import auth, chat, interview, coding
-from config import AI_BACKEND
+from config import AI_BACKEND, TTS_BACKEND
 import asyncio
 import os
 import subprocess
@@ -136,6 +136,23 @@ async def lifespan(app: FastAPI):
     # "local" request. Pre-warming unconditionally would keep the model
     # resident in memory for every instance regardless of use — stt_local.py
     # already lazy-loads it on first actual "local" request instead.
+
+    # Kokoro TTS (local installs only): fetch the ~353 MB of weights and build
+    # the ONNX session now, so the first spoken question isn't stuck behind a
+    # download mid-interview. Deliberately not awaited — a slow or offline first
+    # run must not hold up startup, and nothing breaks if it never finishes:
+    # /chat/synthesize lazy-loads on demand and the client falls back to the
+    # browser's voice until the weights are there.
+    if TTS_BACKEND == "kokoro":
+        async def _prewarm_kokoro():
+            try:
+                from tts_kokoro import prewarm
+                await prewarm()
+                print("[Kokoro] ready.")
+            except Exception as e:
+                print(f"[Kokoro] pre-warm skipped: {e}")
+
+        asyncio.create_task(_prewarm_kokoro())
 
     yield
     await close_db()

@@ -1,6 +1,7 @@
 # ── FinalRound local package: fully self-contained stack ─────────────────────────
 # Everything runs on this machine: MongoDB is bundled (no Atlas account),
-# speech-to-text is local faster-whisper (no Groq key), TTS is local Kokoro.
+# speech-to-text is local faster-whisper (no Groq key), text-to-speech is local
+# Kokoro (no Google credentials).
 # The only optional cloud dependency is Gemini, for machines without a GPU.
 #
 # First run (recommended):   ./setup_local.sh
@@ -54,9 +55,12 @@ services:
       # Fully local speech-to-text — no API key. WHISPER_MODEL: tiny/base/small/medium.
       - STT_BACKEND=local
       - WHISPER_MODEL=${WHISPER_MODEL:-small}
-      # Optional: voice (Google Cloud TTS). Absent on most local installs, in
-      # which case the backend returns 503 for /tts and the interview runs
-      # without spoken questions. Point this at a service-account key to enable.
+      # Fully local voice — Kokoro-82M on CPU, no Google credentials. The ~353 MB
+      # of weights download on first boot into the bind-mounted backend/kokoro_models
+      # (see the volumes below), so a rebuild doesn't re-fetch them. Until they
+      # land, the frontend falls back to the browser's own speech synthesis.
+      # Set TTS_BACKEND=google + GOOGLE_APPLICATION_CREDENTIALS to use Cloud TTS.
+      - TTS_BACKEND=${TTS_BACKEND:-kokoro}
       - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS:-}
       - PYTHONUNBUFFERED=1
     volumes:

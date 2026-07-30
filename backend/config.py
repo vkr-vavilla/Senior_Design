@@ -33,6 +33,19 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 # and frontend InterviewConfig.sttEngine), not a fixed server-wide backend.
 # Whisper size for the "local" engine: tiny/base/small/medium (bigger = better, slower).
 WHISPER_MODEL = os.getenv("WHISPER_MODEL", "small").lower()
+# Text-to-speech engine: "google" (Cloud TTS — needs credentials, which the
+# hosted deploy gets from its service account) or "kokoro" (Kokoro-82M on CPU
+# via ONNX — no key, works offline, set by the downloadable package). Defaults
+# to google so the hosted deploy is unaffected by the presence of this setting.
+# Either way the frontend falls back to the browser's own speech synthesis if
+# /chat/synthesize can't serve audio, so voice is never a hard dependency.
+TTS_BACKEND = os.getenv("TTS_BACKEND", "google").lower()
+# Where Kokoro's weights live (~353 MB, downloaded on first use). The local
+# compose bind-mounts backend/ from the host, so the download survives rebuilds.
+KOKORO_MODEL_DIR = os.getenv(
+    "KOKORO_MODEL_DIR",
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "kokoro_models"),
+)
 VLLM_BASE_URL = os.getenv("VLLM_BASE_URL", "http://localhost:8080/v1")
 VLLM_MODEL = os.getenv("VLLM_MODEL", "Qwen/Qwen2.5-7B-Instruct")
 # Base (non-LoRA) model id, used ONLY for grading feedback. VLLM_MODEL points at

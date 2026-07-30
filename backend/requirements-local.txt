@@ -1,0 +1,13 @@
+# Extra dependencies for the downloadable/local package (backend/Dockerfile).
+#
+# Deliberately NOT in requirements-docker.txt: the hosted image
+# (backend/Dockerfile.gemini) uses Google Cloud TTS and has no use for
+# onnxruntime and its phonemizer stack, which add ~250 MB to the image.
+#
+# Versions match the pinned set in the repo-root requirements.txt, which is the
+# combination Kokoro was originally verified against.
+kokoro-onnx==0.5.0
+onnxruntime==1.23.2
+espeakng-loader==0.2.4
+phonemizer-fork==3.3.2
+soundfile==0.13.1
