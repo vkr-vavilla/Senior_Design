@@ -26,26 +26,33 @@ const REPO = 'https://github.com/vkr-vavilla/Senior_Design';
 const VERSION = '0.1.2';
 const DL = `${REPO}/releases/latest/download`;
 
-type OSKey = 'mac' | 'windows' | 'linux';
+// Windows has no native build — the .exe was pulled because it never worked.
+// Windows users run the Linux bundles inside WSL2, so 'windows' is not an OSKey.
+type OSKey = 'mac' | 'linux';
 
 const ASSETS: Record<
   OSKey,
-  { name: string; sub: string; file: string; alt?: { label: string; file: string } }
+  {
+    name: string;
+    /** Label for the "After downloading" tab — defaults to `name`. */
+    tab?: string;
+    sub: string;
+    file: string;
+    pill?: string;
+    alt?: { label: string; file: string };
+  }
 > = {
   mac: {
     name: 'macOS',
     sub: 'Apple Silicon · universal',
     file: `FinalRound_${VERSION}_universal.dmg`,
   },
-  windows: {
-    name: 'Windows',
-    sub: 'Windows 10/11 · 64-bit',
-    file: `FinalRound_${VERSION}_x64-setup.exe`,
-  },
   linux: {
     name: 'Linux',
-    sub: 'Debian / Ubuntu · .deb',
+    tab: 'Linux / Windows (WSL2)',
+    sub: 'Debian / Ubuntu · .deb or AppImage',
     file: `FinalRound_${VERSION}_amd64.deb`,
+    pill: 'Also Windows, via WSL2',
     alt: { label: 'Prefer a portable AppImage?', file: `FinalRound_${VERSION}_amd64.AppImage` },
   },
 };
@@ -56,36 +63,38 @@ const OS_ICONS: Record<OSKey, React.ReactNode> = {
       <path d="M17.05 12.54c-.03-2.7 2.2-4 2.3-4.06-1.25-1.83-3.2-2.08-3.9-2.11-1.66-.17-3.24.98-4.08.98-.84 0-2.14-.96-3.52-.93-1.81.03-3.48 1.05-4.4 2.67-1.88 3.26-.48 8.08 1.35 10.72.9 1.29 1.96 2.74 3.36 2.69 1.35-.06 1.86-.87 3.49-.87 1.63 0 2.09.87 3.52.84 1.45-.02 2.37-1.31 3.25-2.61 1.03-1.5 1.45-2.95 1.47-3.02-.03-.01-2.82-1.08-2.85-4.3M14.4 4.6c.74-.9 1.24-2.15 1.1-3.4-1.07.05-2.36.71-3.13 1.61-.68.79-1.28 2.06-1.12 3.28 1.19.09 2.41-.6 3.15-1.49" />
     </svg>
   ),
-  windows: (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6" aria-hidden="true">
-      <path d="M3 5.5 10.2 4.5v7.05H3V5.5m8.1-1.13L21 3v8.55h-9.9V4.37M3 12.45h7.2v7.06L3 18.5v-6.05m8.1 0H21V21l-9.9-1.36v-7.19Z" />
-    </svg>
-  ),
   linux: <Terminal className="w-6 h-6" aria-hidden="true" />,
 };
+
+const WindowsGlyph = ({ className = 'w-4 h-4' }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+    <path d="M3 5.5 10.2 4.5v7.05H3V5.5m8.1-1.13L21 3v8.55h-9.9V4.37M3 12.45h7.2v7.06L3 18.5v-6.05m8.1 0H21V21l-9.9-1.36v-7.19Z" />
+  </svg>
+);
 
 const MODES = {
   gpu: {
     label: 'NVIDIA GPU',
     tag: 'Fastest',
-    blurb: 'Runs the fine-tuned model locally on your own card. Fully offline.',
+    blurb:
+      'Runs the fine-tuned model locally on your own card. Fully offline. Required for local inference on every non-Mac machine.',
     accent: 'text-indigo-400',
     force: './setup_local.sh --gpu',
     rows: [
-      ['Operating system', 'Linux', 'Linux, kernel headers installed'],
+      ['Operating system', 'Linux · Windows via WSL2', 'Linux, kernel headers installed'],
       ['GPU', 'NVIDIA · 10 GB VRAM', 'NVIDIA · 12 GB+ VRAM'],
       ['NVIDIA driver', '535+ (you install this)', '570'],
       ['System RAM', '16 GB', '32 GB'],
       ['Free disk', '20 GB', '25 GB SSD'],
       ['Also needed', 'Docker, Compose, Container Toolkit — installed for you', '—'],
     ],
-    note: 'The app installs Docker, Compose and the NVIDIA Container Toolkit itself. The GPU driver is the one thing it will not touch — see the setup steps below. Without a working driver it falls back to Cloud mode automatically. First launch downloads ~5.5 GB of weights once.',
+    note: 'The app installs Docker, Compose and the NVIDIA Container Toolkit itself. The GPU driver is the one thing it will not touch — see the setup steps below. Without a working driver it falls back to Cloud mode automatically. First launch downloads ~5.5 GB of weights once. On Windows the driver goes on Windows itself, not inside WSL2.',
   },
   mac: {
     label: 'Apple Silicon',
     tag: 'Mac',
     blurb:
-      'Metal + unified memory — the GPU reads the same memory pool, so there is no transfer penalty.',
+      'M1 or newer only. Metal + unified memory — the GPU reads the same memory pool, so there is no transfer penalty.',
     accent: 'text-violet-400',
     force: './setup_local.sh --ollama',
     rows: [
@@ -95,17 +104,17 @@ const MODES = {
       ['Free disk', '12 GB', '16 GB SSD'],
       ['Also needed', 'Docker Desktop, Ollama (installed natively)', '—'],
     ],
-    note: 'Ollama must run natively on macOS, not in Docker — containers cannot reach Metal. The installer checks for it and tells you how to fix it.',
+    note: 'Intel Macs cannot run the model locally — there is no Metal GPU path for them, so they use Cloud mode. Ollama must also run natively on macOS, not in Docker: containers cannot reach Metal. The installer checks for it and tells you how to fix it.',
   },
   api: {
     label: 'Cloud API',
     tag: 'No GPU',
     blurb:
-      'No local model at all. Use this on any machine without a supported GPU — speech and the coding round still run on your device.',
+      'No local model at all. Use this on any machine without an NVIDIA GPU or Apple Silicon — speech and the coding round still run on your device.',
     accent: 'text-cyan-400',
     force: './setup_local.sh --api',
     rows: [
-      ['Operating system', 'macOS / Linux / Windows', 'any'],
+      ['Operating system', 'macOS / Linux / Windows (WSL2)', 'any'],
       ['GPU', 'None', 'None'],
       ['System RAM', '8 GB', '16 GB'],
       ['Free disk', '6 GB', '8 GB'],
@@ -131,6 +140,10 @@ const STACK = [
 const RUN_STEPS: Record<OSKey, { text: React.ReactNode; code?: string }[]> = {
   linux: [
     {
+      text: 'On Windows? Install WSL2 with Ubuntu first, reopen it, and run the steps below inside that shell — the .deb and AppImage are the Windows path too. Skip this step on a native Linux machine.',
+      code: 'wsl --install -d Ubuntu     # PowerShell as Administrator, then reboot',
+    },
+    {
       text: 'Install the .deb, then launch "FinalRound" from your app menu:',
       code: `sudo apt install ./${ASSETS.linux.file}`,
     },
@@ -152,22 +165,19 @@ const RUN_STEPS: Record<OSKey, { text: React.ReactNode; code?: string }[]> = {
       text: 'The app then checks for Docker (and Ollama on Apple Silicon) and offers to install whichever is missing — no manual setup.',
     },
   ],
-  windows: [
-    {
-      text: `Run ${ASSETS.windows.file}. If SmartScreen shows "Windows protected your PC", click "More info" → "Run anyway" — the build isn’t code-signed yet.`,
-    },
-    {
-      text: 'Install Docker Desktop from docker.com if you don’t have it — on Windows the app checks for it but can’t install it for you yet.',
-    },
-  ],
 };
 
 function detectOS(): OSKey {
   if (typeof navigator === 'undefined') return 'mac';
   const p = `${navigator.platform} ${navigator.userAgent}`.toLowerCase();
-  if (p.includes('win')) return 'windows';
-  if (p.includes('linux') || p.includes('android')) return 'linux';
+  // Windows visitors get the Linux bundles — they run them under WSL2.
+  if (p.includes('win') || p.includes('linux') || p.includes('android')) return 'linux';
   return 'mac';
+}
+
+function isWindowsVisitor(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  return `${navigator.platform} ${navigator.userAgent}`.toLowerCase().includes('win');
 }
 
 export default function DownloadPage() {
@@ -175,10 +185,14 @@ export default function DownloadPage() {
   // know the visitor's platform, and guessing wrong for one frame is cheaper
   // than blocking the whole hero on a client-only render.
   const [os, setOs] = useState<OSKey>('mac');
+  const [onWindows, setOnWindows] = useState(false);
   const [mode, setMode] = useState<ModeKey>('gpu');
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => setOs(detectOS()), []);
+  useEffect(() => {
+    setOs(detectOS());
+    setOnWindows(isWindowsVisitor());
+  }, []);
 
   const primary = ASSETS[os];
   const spec = MODES[mode];
@@ -233,6 +247,15 @@ export default function DownloadPage() {
 
           {/* Primary, OS-detected download */}
           <div className="flex flex-col items-center gap-3">
+            {onWindows && (
+              <div className="inline-flex items-center gap-2 mb-1 px-3.5 py-2 rounded-xl border border-slate-700/80 bg-slate-900/70 text-sm text-slate-400">
+                <WindowsGlyph className="w-4 h-4 text-slate-400 shrink-0" />
+                <span>
+                  <span className="text-slate-200 font-medium">Windows detected.</span> The Linux
+                  package is your download — FinalRound runs on Windows through WSL2.
+                </span>
+              </div>
+            )}
             <a
               href={`${DL}/${primary.file}`}
               className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-0.5 cursor-pointer text-base"
@@ -254,7 +277,7 @@ export default function DownloadPage() {
       {/* ── Platforms ─────────────────────────────────────────── */}
       <section id="platforms" className="relative py-16 border-y border-slate-800/40 bg-slate-950/70">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-3xl mx-auto">
             {(Object.keys(ASSETS) as OSKey[]).map((key) => {
               const a = ASSETS[key];
               const isCurrent = key === os;
@@ -276,10 +299,18 @@ export default function DownloadPage() {
                     {OS_ICONS[key]}
                   </div>
                   <h3 className="text-lg font-bold text-white mt-4 mb-1">{a.name}</h3>
-                  <p className="text-sm text-slate-500 mb-5">{a.sub}</p>
+                  <p className="text-sm text-slate-500">{a.sub}</p>
+                  {a.pill ? (
+                    <div className="mt-2.5">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700/80 text-[11px] font-medium text-slate-300">
+                        <WindowsGlyph className="w-3 h-3" />
+                        {a.pill}
+                      </span>
+                    </div>
+                  ) : null}
                   <a
                     href={`${DL}/${a.file}`}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white text-sm font-medium transition-colors duration-200 w-full justify-center cursor-pointer"
+                    className="inline-flex items-center gap-2 mt-5 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white text-sm font-medium transition-colors duration-200 w-full justify-center cursor-pointer"
                   >
                     <Download className="w-4 h-4" />
                     Download
@@ -295,6 +326,19 @@ export default function DownloadPage() {
                 </div>
               );
             })}
+          </div>
+
+          {/* No native Windows installer — the .exe was removed, WSL2 is the path */}
+          <div className="max-w-3xl mx-auto mt-6 flex gap-3 rounded-2xl border border-slate-800 bg-slate-900/40 px-5 py-4">
+            <WindowsGlyph className="w-5 h-5 text-slate-400 shrink-0 mt-0.5" />
+            <p className="text-sm text-slate-400 leading-relaxed">
+              <span className="text-slate-200 font-medium">On Windows?</span> Grab the Linux
+              download above. There is no native Windows installer — FinalRound runs on Windows
+              through <span className="text-slate-300">WSL2</span>, using the same{' '}
+              <code className="font-mono text-slate-300">.deb</code> or{' '}
+              <code className="font-mono text-slate-300">.AppImage</code> package. Install WSL2 with
+              Ubuntu, then follow the Linux steps below inside it.
+            </p>
           </div>
 
           <p className="text-center text-slate-500 text-sm mt-8">
@@ -325,7 +369,7 @@ export default function DownloadPage() {
                         : 'text-slate-400 border border-slate-700 hover:text-white hover:border-slate-600'
                     }`}
                   >
-                    {ASSETS[key].name}
+                    {ASSETS[key].tab ?? ASSETS[key].name}
                   </button>
                 ))}
               </div>
@@ -366,6 +410,38 @@ export default function DownloadPage() {
               inference is GPU-only by design — a 7B model on CPU is too slow for a live
               conversation, so machines without a supported GPU use the cloud instead.
             </p>
+          </div>
+
+          {/* The one hardware rule that decides whether local inference is possible */}
+          <div className="max-w-4xl mx-auto mb-10 rounded-2xl border border-indigo-500/25 bg-indigo-500/[0.06] px-6 py-5">
+            <div className="flex gap-3">
+              <Zap className="w-5 h-5 text-indigo-400 shrink-0 mt-0.5" />
+              <div className="text-sm text-slate-400 leading-relaxed">
+                <p className="text-white font-semibold mb-1.5">
+                  To run the model locally you need one of these two
+                </p>
+                <ul className="space-y-1.5">
+                  <li>
+                    <span className="text-slate-200 font-medium">
+                      An NVIDIA GPU on Windows or Linux
+                    </span>{' '}
+                    — 10 GB+ VRAM. AMD and Intel graphics are not supported, and neither is CPU-only
+                    inference.
+                  </li>
+                  <li>
+                    <span className="text-slate-200 font-medium">A Mac with Apple Silicon</span> —
+                    M1 or newer (M1/M2/M3/M4), 16 GB+ unified memory. Intel Macs cannot run it
+                    locally.
+                  </li>
+                </ul>
+                <p className="mt-2.5">
+                  Anything else — a laptop with integrated graphics, an AMD card, an Intel Mac —
+                  still runs the full app, just in{' '}
+                  <span className="text-slate-300">Cloud API mode</span> with a free Gemini key.
+                  Speech, the coding sandbox and the database stay on your machine either way.
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Mode selector */}
@@ -448,7 +524,8 @@ export default function DownloadPage() {
             <div className="px-6 py-4 border-b border-slate-800 bg-slate-900">
               <h3 className="font-bold text-white">Running the model on your own NVIDIA GPU</h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Only needed for local GPU inference — skip it entirely if you're using Cloud mode.
+                Only needed for local GPU inference on Windows or Linux — skip it on a Mac, or if
+                you're using Cloud mode.
               </p>
             </div>
             <div className="px-6 py-5 space-y-4 text-sm text-slate-400 leading-relaxed">
@@ -458,6 +535,17 @@ export default function DownloadPage() {
                 GPU driver: that builds a kernel module, needs a reboot, and a failed attempt
                 leaves your package manager wedged. Install it yourself first.
               </p>
+              <div className="flex gap-2.5 rounded-xl border border-slate-700/70 bg-slate-950/60 px-3.5 py-3">
+                <WindowsGlyph className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+                <p className="text-xs text-slate-400">
+                  <span className="text-slate-300 font-medium">On Windows with WSL2:</span> install
+                  the normal NVIDIA driver on Windows itself and stop there. Do{' '}
+                  <span className="text-slate-300">not</span> install a driver inside the Ubuntu
+                  distro — WSL2 passes the GPU through, and a driver in the distro breaks it. Check
+                  it worked by running <code className="font-mono text-slate-300">nvidia-smi</code>{' '}
+                  inside WSL.
+                </p>
+              </div>
               <div>
                 <p className="text-slate-300 font-medium mb-2">Ubuntu / Debian</p>
                 <pre className="px-4 py-3 rounded-lg bg-slate-950 border border-slate-800 overflow-x-auto text-xs font-mono text-slate-300 leading-relaxed">
