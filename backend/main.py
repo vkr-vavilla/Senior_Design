@@ -196,7 +196,9 @@ async def public_config():
     isn't there. Reporting capability from the server can't drift like that:
     whatever engine this backend is configured for is the truth.
     """
-    from config import AI_BACKEND, GEMINI_API_KEY
+    from importlib.util import find_spec
+
+    from config import AI_BACKEND, GEMINI_API_KEY, GROQ_API_KEY
     local_engine = AI_BACKEND != "gemini"
     return {
         # "local" only when a local engine really is wired up.
@@ -204,6 +206,15 @@ async def public_config():
         "local_engine": local_engine,
         # Lets the UI say the key is optional instead of required.
         "gemini_key_configured": bool(GEMINI_API_KEY),
+        # Which speech-to-text engines this server can actually run. The
+        # frontend used to default to Groq unconditionally, so a deployment
+        # without GROQ_API_KEY rejected every spoken answer with a 400 that
+        # only ever reached the browser console. find_spec, not import, so
+        # this stays cheap — faster-whisper is loaded lazily on first use.
+        "stt_engines": {
+            "groq": bool(GROQ_API_KEY),
+            "local": find_spec("faster_whisper") is not None,
+        },
     }
 
 

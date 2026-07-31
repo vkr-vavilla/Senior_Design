@@ -11,6 +11,7 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { useInterviewChat } from '@/hooks/useInterviewChat';
 import { useTextToSpeech } from '@/hooks/useTextToSpeech';
+import { useVoiceActivity } from '@/hooks/useVoiceActivity';
 import { chatApi } from '@/lib/api';
 import { BUILD_TIME_DEPLOYMENT, DEFAULT_MODEL_SOURCE, GEMINI_KEY_URL, fetchDeploymentConfig } from '@/lib/deployment';
 import { cn, formatTime } from '@/lib/utils';
@@ -31,7 +32,11 @@ import {
     Volume2,
     VolumeX,
     Sparkles,
-    Mic2
+    Mic2,
+    Mic,
+    MicOff,
+    Hand,
+    AlertTriangle
 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -102,17 +107,32 @@ function InterviewPageContent() {
   const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [isVoiceMode, setIsVoiceMode] = useState(true);
   const [isTranscribing, setIsTranscribing] = useState(false);
+  const [transcribeError, setTranscribeError] = useState<string | null>(null);
   const [geminiKey, setGeminiKey] = useState('');
+  // Hands-free is the default: a real interview has no push-to-talk button.
+  // The preference sticks, and the button is still there for noisy rooms.
+  const [handsFree, setHandsFree] = useState(true);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setGeminiKey(localStorage.getItem('gemini_api_key') || '');
+      setHandsFree(localStorage.getItem('handsfree_mode') !== 'off');
     }
   }, []);
 
   const { isRecording, recordingTime, startRecording, stopRecording } = useAudioRecorder();
 
-  const { speakStream, stop: stopSpeaking, engine, setEngine, flush, getAudioLevel } = useTextToSpeech(token ?? undefined);
+  const {
+    speakStream,
+    stop: stopSpeaking,
+    engine,
+    setEngine,
+    flush,
+    getAudioLevel,
+    isBusy: isAlexSpeaking,
+    playbackBlocked,
+    unlockPlayback,
+  } = useTextToSpeech(token ?? undefined);
 
   // Pre-fill from query params
   const [config, setConfig] = useState<InterviewConfig>({
@@ -126,13 +146,72 @@ function InterviewPageContent() {
   });
 
   const [isCloud, setIsCloud] = useState(BUILD_TIME_DEPLOYMENT === 'cloud');
+  const [sttEngines, setSttEngines] = useState<Record<'groq' | 'local', boolean>>({
+    groq: true,
+    local: true,
+  });
   useEffect(() => {
     fetchDeploymentConfig().then((cfg) => {
       const cloud = cfg.deployment === 'cloud';
       setIsCloud(cloud);
-      if (cloud) setConfig((c) => ({ ...c, modelSource: 'api' }));
+      setSttEngines(cfg.sttEngines);
+      setConfig((c) => ({
+        ...c,
+        ...(cloud ? { modelSource: 'api' as const } : {}),
+        // Don't leave the user pointed at a transcriber this server can't run.
+        // Groq is the historical default and needs an API key the desktop
+        // build has no reason to have; faster-whisper needs none.
+        ...(cfg.sttEngines[c.sttEngine ?? 'groq']
+          ? {}
+          : { sttEngine: (cfg.sttEngines.local ? 'local' : 'groq') as 'local' | 'groq' }),
+      }));
     });
   }, []);
+
+  const transcribeAndSend = async (audio: Blob) => {
+    try {
+      setIsTranscribing(true);
+      setTranscribeError(null);
+      const { text } = await chatApi.transcribe(audio, token ?? undefined, config.sttEngine);
+      if (text.trim()) {
+        sendMessage(text);
+      } else {
+        // Transcriber ran but heard no words. Say so — otherwise this looks
+        // exactly like the failure above, and exactly like a broken mic.
+        setTranscribeError("Didn't catch that — try speaking a little louder.");
+      }
+    } catch (err) {
+      // Must be visible. This used to be console-only, so a server without a
+      // GROQ_API_KEY rejected every spoken answer with a 400 and the interview
+      // just sat there — the mic looked like it was working, because it was.
+      console.error('Transcription failed:', err);
+      setTranscribeError(err instanceof Error ? err.message : 'Could not transcribe your answer.');
+    } finally {
+      setIsTranscribing(false);
+    }
+  };
+
+  /**
+   * Hands-free turn taking. Silero VAD watches the mic and decides when the
+   * candidate has finished, so there is no button to hold — the thing that
+   * most breaks the illusion of a real interview.
+   *
+   * `hold` mutes the mic for the whole of Alex's turn: while his reply is
+   * still streaming in, while any of it is queued or playing (isBusy, not
+   * isSpeaking — see useTextToSpeech), and while we are transcribing the turn
+   * we just captured. Without it the VAD hears Alex through the speakers and
+   * feeds his own words back as the candidate's answer.
+   */
+  const voice = useVoiceActivity({
+    enabled: handsFree && hasStarted && !sessionEnded,
+    hold: !isConnected || sessionEnded || isStreaming || isTranscribing || isAlexSpeaking,
+    onUtterance: transcribeAndSend,
+  });
+
+  // Hands-free can fail for reasons the candidate can't fix mid-interview (mic
+  // permission denied, no AudioWorklet in this webview). Push-to-talk stays
+  // available in that case rather than leaving them with no way to answer.
+  const handsFreeActive = handsFree && voice.status !== 'error';
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -155,6 +234,10 @@ function InterviewPageContent() {
 
   const handleStart = () => {
     if (!config.role.trim() || !token) return;
+    // Must run inside the click handler: browsers only grant audio playback
+    // permission from a real user gesture, and Alex starts talking on his own
+    // a second later with no gesture anywhere near it.
+    unlockPlayback();
     startInterview(config, token);
     setHasStarted(true);
   };
@@ -169,16 +252,17 @@ function InterviewPageContent() {
 
   const handleTranscribeAndSend = async () => {
     try {
-      setIsTranscribing(true);
-      const audioBlob = await stopRecording();
-      const { text } = await chatApi.transcribe(audioBlob, token ?? undefined, config.sttEngine);
-      if (text.trim()) {
-        sendMessage(text);
-      }
+      await transcribeAndSend(await stopRecording());
     } catch (err) {
-      console.error('Transcription failed:', err);
-    } finally {
-      setIsTranscribing(false);
+      console.error('Could not stop recording:', err);
+    }
+  };
+
+  const toggleHandsFree = () => {
+    const next = !handsFree;
+    setHandsFree(next);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('handsfree_mode', next ? 'on' : 'off');
     }
   };
 
@@ -262,7 +346,9 @@ function InterviewPageContent() {
 
             <Select
               label="Voice Input (Speech-to-Text)"
-              options={STT_ENGINES}
+              // Only what this server can actually run. Offering Groq without
+              // a key on the server meant every spoken answer 400'd silently.
+              options={STT_ENGINES.filter((e) => sttEngines[e.value as 'groq' | 'local'])}
               value={config.sttEngine}
               onChange={(e) =>
                 setConfig((c) => ({
@@ -270,7 +356,68 @@ function InterviewPageContent() {
                   sttEngine: e.target.value as InterviewConfig['sttEngine'],
                 }))
               }
+              hint={
+                !sttEngines.groq
+                  ? 'Runs on your machine, no API key needed. The model downloads once on first use.'
+                  : undefined
+              }
             />
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-slate-300">Response Mode</label>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  {
+                    on: true,
+                    icon: Mic,
+                    title: 'Hands-free',
+                    blurb: 'Just talk. We detect when you finish.',
+                  },
+                  {
+                    on: false,
+                    icon: Hand,
+                    title: 'Push to talk',
+                    blurb: 'Press the mic, answer, press again.',
+                  },
+                ].map((mode) => (
+                  <button
+                    key={mode.title}
+                    type="button"
+                    onClick={() => {
+                      if (handsFree !== mode.on) toggleHandsFree();
+                    }}
+                    className={cn(
+                      'text-left rounded-xl border p-3 transition-all',
+                      handsFree === mode.on
+                        ? 'border-indigo-500/50 bg-indigo-500/10 ring-1 ring-indigo-500/20'
+                        : 'border-slate-700 bg-slate-800/40 hover:border-slate-600'
+                    )}
+                  >
+                    <div className="flex items-center gap-2">
+                      <mode.icon
+                        className={cn(
+                          'w-4 h-4',
+                          handsFree === mode.on ? 'text-indigo-400' : 'text-slate-500'
+                        )}
+                      />
+                      <span
+                        className={cn(
+                          'text-sm font-medium',
+                          handsFree === mode.on ? 'text-white' : 'text-slate-400'
+                        )}
+                      >
+                        {mode.title}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-1 leading-snug">{mode.blurb}</p>
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-slate-500">
+                Hands-free runs voice detection on your machine — no audio leaves it, and your mic
+                is muted while the interviewer is speaking.
+              </p>
+            </div>
 
             {config.modelSource === 'api' && (
               <div className="space-y-2">
@@ -456,6 +603,33 @@ function InterviewPageContent() {
               )}
 
               <button
+                onClick={toggleHandsFree}
+                className={cn(
+                  'p-2 rounded-lg border transition-all',
+                  voice.status === 'error'
+                    ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+                    : handsFree
+                      ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                      : 'bg-slate-800 border-slate-700 text-slate-500 hover:text-slate-400'
+                )}
+                title={
+                  voice.status === 'error'
+                    ? `Hands-free unavailable — ${voice.error ?? 'using push-to-talk'}`
+                    : handsFree
+                      ? 'Hands-free on — click for push-to-talk'
+                      : 'Push-to-talk — click for hands-free'
+                }
+              >
+                {voice.status === 'error' ? (
+                  <AlertTriangle className="w-4 h-4" />
+                ) : handsFree ? (
+                  <Mic className="w-4 h-4" />
+                ) : (
+                  <MicOff className="w-4 h-4" />
+                )}
+              </button>
+
+              <button
                 onClick={() => {
                   const next = !isVoiceMode;
                   setIsVoiceMode(next);
@@ -510,7 +684,10 @@ function InterviewPageContent() {
         <SiriWave
           size={380}
           renderScale={0.9}
-          getAmplitude={getAudioLevel}
+          // Whoever currently has the floor drives the wave: Alex's playback
+          // level, or the candidate's mic level in hands-free mode. Only one
+          // is ever non-zero — the mic is muted while Alex talks.
+          getAmplitude={() => Math.max(getAudioLevel(), voice.getInputLevel())}
           className={cn(
             'transition-opacity duration-300 max-w-full max-h-full',
             isVoiceMode ? 'opacity-100' : 'opacity-40'
@@ -534,7 +711,23 @@ function InterviewPageContent() {
           recordingTime={recordingTime}
           onStartRecording={handleStartRecording}
           onStopRecording={handleTranscribeAndSend}
-          placeholder={isTranscribing ? 'Transcribing your voice...' : 'Type or record your response...'}
+          handsFree={handsFreeActive}
+          voiceStatus={voice.status}
+          // Ranked by urgency. A blocked transcriber or blocked playback both
+          // look like a dead app from the outside, so neither may stay silent.
+          voiceError={
+            transcribeError ??
+            (playbackBlocked
+              ? "Your browser blocked audio playback, so you won't hear Alex. Answers still work — click anywhere and restart the interview to enable voice."
+              : voice.error)
+          }
+          placeholder={
+            isTranscribing
+              ? 'Transcribing your voice...'
+              : handsFreeActive
+                ? 'Just answer out loud — or type here'
+                : 'Type or record your response...'
+          }
         />
       </div>
 

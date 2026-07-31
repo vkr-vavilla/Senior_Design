@@ -15,6 +15,7 @@ import asyncio
 import re
 import tempfile
 import os
+from importlib.util import find_spec
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -428,27 +429,36 @@ async def transcribe_audio(
 
         try:
             # User picks the STT engine at interview setup ("Groq" premium vs
-            # "Faster-Whisper" standard); Groq is the default. "local" runs
-            # faster-whisper on CPU, no API key needed, unlimited but slower.
-            if engine == "local":
-                from stt_local import transcribe_file
-                return {"text": await transcribe_file(tmp_path)}
+            # "Faster-Whisper" standard). faster-whisper is also the fallback
+            # for everything Groq can't serve — no GROQ_API_KEY on this server,
+            # a rate limit, an expired key. Falling back beats returning an
+            # error: the candidate is mid-interview and can fix none of those,
+            # and a rejected answer is indistinguishable from a dead mic.
+            if engine != "local" and groq_client:
+                try:
+                    with open(tmp_path, "rb") as audio_file:
+                        transcription = groq_client.audio.transcriptions.create(
+                            file=(file.filename, audio_file.read()),
+                            model="whisper-large-v3",
+                            response_format="json",
+                            language="en",
+                            temperature=0.0
+                        )
+                    return {"text": transcription.text}
+                except Exception as e:
+                    print(f"Groq transcription failed, falling back to faster-whisper: {e}")
 
-            if not groq_client:
+            if find_spec("faster_whisper") is None:
                 raise HTTPException(
                     status_code=400,
-                    detail="Groq speech-to-text isn't configured on the server (missing GROQ_API_KEY). Choose the standard voice engine instead.",
+                    detail=(
+                        "No speech-to-text engine is available on this server. "
+                        "Set GROQ_API_KEY, or install faster-whisper for on-device transcription."
+                    ),
                 )
 
-            with open(tmp_path, "rb") as audio_file:
-                transcription = groq_client.audio.transcriptions.create(
-                    file=(file.filename, audio_file.read()),
-                    model="whisper-large-v3",
-                    response_format="json",
-                    language="en",
-                    temperature=0.0
-                )
-            return {"text": transcription.text}
+            from stt_local import transcribe_file
+            return {"text": await transcribe_file(tmp_path)}
         finally:
             if os.path.exists(tmp_path):
                 os.remove(tmp_path)

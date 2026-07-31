@@ -151,7 +151,11 @@ export const chatApi = {
   },
   async transcribe(audioBlob: Blob, token?: string, engine: 'groq' | 'local' = 'groq'): Promise<{ text: string }> {
     const formData = new FormData();
-    formData.append('file', audioBlob, 'recording.webm');
+    // The extension has to match the bytes: the backend derives its temp-file
+    // suffix from this name, and Groq picks its decoder from it. Push-to-talk
+    // sends MediaRecorder webm; hands-free sends WAV cut by the VAD.
+    const filename = audioBlob.type.includes('wav') ? 'utterance.wav' : 'recording.webm';
+    formData.append('file', audioBlob, filename);
     formData.append('engine', engine);
 
     const response = await fetch(`${API_URL}/chat/transcribe`, {
@@ -161,17 +165,37 @@ export const chatApi = {
     });
 
     if (!response.ok) {
-      throw new Error('Transcription failed');
+      // Pass the server's own words through — it explains actionable things
+      // like a missing GROQ_API_KEY, which "Transcription failed" hides.
+      const detail = await response
+        .json()
+        .then((b) => b?.detail)
+        .catch(() => null);
+      throw new Error(detail || `Transcription failed (${response.status})`);
     }
 
     return response.json();
   },
   async synthesize(text: string, token?: string): Promise<Blob> {
-    const response = await fetch(`${API_URL}/chat/synthesize`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
-      body: JSON.stringify({ text }),
-    });
+    // Bounded on purpose. Kokoro runs on CPU in the local package, and a
+    // request that never returns holds the "Alex is speaking" flag up forever
+    // — which keeps the microphone gated shut, so a slow synth would silently
+    // cost the candidate their turn. Failing fast lets the caller move on.
+    // Scaled with length: clips are now whole groups of sentences, and a
+    // fixed cap sized for a short clause would abort every long one.
+    const abort = new AbortController();
+    const timer = setTimeout(() => abort.abort(), Math.min(60000, 15000 + 100 * text.length));
+    let response: Response;
+    try {
+      response = await fetch(`${API_URL}/chat/synthesize`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
+        body: JSON.stringify({ text }),
+        signal: abort.signal,
+      });
+    } finally {
+      clearTimeout(timer);
+    }
 
     if (!response.ok) {
       let detail = '';

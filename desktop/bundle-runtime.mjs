@@ -37,8 +37,16 @@ const EXCLUDE_DIRS = ['node_modules', '.next', '__pycache__', '.venv', 'venv', '
 // Python source the backend imports at startup.
 const EXCLUDE_PATHS = [
   'ollama/models',          // *.gguf weights, 4.7 GB — fetched at first run
-  'backend/kokoro_models',  // 338 MB ONNX, unused since the Google TTS switch
+  // ~353 MB of Kokoro weights. Excluded but NOT unused: the local package's
+  // TTS runs on them (TTS_BACKEND=kokoro). They download on first boot into
+  // this bind-mounted directory, so shipping them would quadruple the
+  // installer to save one first-run download.
+  'backend/kokoro_models',
   'training/artifacts',     // local LoRA adapter
+  // Silero VAD runtime, ~15 MB, copied out of node_modules by the frontend's
+  // prebuild step. Derived, not source — and shipping it half-included would
+  // be worse than not at all, since the .onnx is dropped by EXCLUDE_SUFFIX.
+  'frontend/public/vad',
 ];
 
 // Suffix matches — weights and local state, never source.

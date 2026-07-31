@@ -105,6 +105,10 @@ services:
       - "3000:3000"
     stdin_open: true
     tty: true
+    # Same dev server as the image's CMD, but with the dependency check in
+    # front — node_modules is an anonymous volume that survives container
+    # recreation and can fall behind package.json after a pull.
+    command: sh -c "node scripts/ensure-deps.mjs && npm run dev"
     environment:
       # NEXT_PUBLIC vars are browser-side, so they use the host machine's address
       - NEXT_PUBLIC_API_URL=http://localhost:8080

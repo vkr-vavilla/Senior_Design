@@ -190,7 +190,10 @@ services:
     # an end-user install, not a dev checkout, so serve a production build
     # instead. The build re-runs on container start, which both picks up a
     # `git pull` and is why the desktop splash shows a "building" phase.
-    command: sh -c "npm run build && npm run start"
+    # ensure-deps first: node_modules lives in an anonymous volume that
+    # outlives container recreation, so after an update it can be older than
+    # the code bind-mounted over it. See frontend/scripts/ensure-deps.mjs.
+    command: sh -c "node scripts/ensure-deps.mjs && npm run build && npm run start"
     environment:
       # NEXT_PUBLIC vars are browser-side, so they use the host machine's address
       - NEXT_PUBLIC_API_URL=http://localhost:8080

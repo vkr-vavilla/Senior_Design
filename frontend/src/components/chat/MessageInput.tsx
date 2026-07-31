@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
-import { Send, Mic, Square, Loader2 } from 'lucide-react';
+import { Send, Mic, MicOff, Square, Loader2, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import type { VoiceActivityStatus } from '@/hooks/useVoiceActivity';
 
 interface MessageInputProps {
   onSend: (message: string) => void;
@@ -14,7 +15,27 @@ interface MessageInputProps {
   recordingTime?: number;
   onStartRecording?: () => void;
   onStopRecording?: () => void;
+  /** Hands-free mode: no button to hold, so show mic state instead. */
+  handsFree?: boolean;
+  voiceStatus?: VoiceActivityStatus;
+  voiceError?: string | null;
 }
+
+/** What the mic is doing right now, in the candidate's terms. */
+const VOICE_HINTS: Record<VoiceActivityStatus, { label: string; className: string } | null> = {
+  off: null,
+  loading: { label: 'Starting mic', className: 'text-slate-400 border-slate-700 bg-slate-800' },
+  listening: {
+    label: 'Listening',
+    className: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10',
+  },
+  speech: {
+    label: 'Hearing you',
+    className: 'text-indigo-300 border-indigo-500/40 bg-indigo-500/15',
+  },
+  held: { label: 'Mic muted', className: 'text-slate-500 border-slate-700 bg-slate-800' },
+  error: { label: 'Mic unavailable', className: 'text-amber-400 border-amber-500/30 bg-amber-500/10' },
+};
 
 export function MessageInput({
   onSend,
@@ -26,6 +47,9 @@ export function MessageInput({
   recordingTime = 0,
   onStartRecording,
   onStopRecording,
+  handsFree = false,
+  voiceStatus = 'off',
+  voiceError = null,
 }: MessageInputProps) {
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -61,6 +85,7 @@ export function MessageInput({
   };
 
   const canSend = value.trim().length > 0 && !disabled && !isStreaming;
+  const voiceHint = VOICE_HINTS[voiceStatus];
 
   return (
     <div className="border-t border-slate-800 bg-slate-950 px-4 py-4">
@@ -102,8 +127,28 @@ export function MessageInput({
           )}
 
           <div className="flex items-center gap-2">
+            {/* Hands-free: nothing to press, so the mic reports its own state.
+                Push-to-talk keeps the button below. */}
+            {handsFree && voiceHint && (
+              <div
+                className={cn(
+                  'flex items-center gap-1.5 h-9 px-3 rounded-xl border text-xs font-medium shrink-0 transition-colors',
+                  voiceHint.className
+                )}
+              >
+                {voiceStatus === 'loading' ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : voiceStatus === 'held' ? (
+                  <MicOff className="w-3.5 h-3.5" />
+                ) : (
+                  <Mic className={cn('w-3.5 h-3.5', voiceStatus === 'speech' && 'animate-pulse')} />
+                )}
+                {voiceHint.label}
+              </div>
+            )}
+
             {/* Mic Button */}
-            {!disabled && !isStreaming && onStartRecording && (
+            {!handsFree && !disabled && !isStreaming && onStartRecording && (
               <button
                 onClick={isRecording ? onStopRecording : onStartRecording}
                 className={cn(
@@ -138,10 +183,25 @@ export function MessageInput({
             </button>
           </div>
         </div>
-        <p className="text-xs text-slate-600 mt-2 text-center">
-          Press <kbd className="px-1 py-0.5 bg-slate-800 rounded text-slate-500 font-mono">Enter</kbd> to send &middot;{' '}
-          <kbd className="px-1 py-0.5 bg-slate-800 rounded text-slate-500 font-mono">Shift+Enter</kbd> for new line
-        </p>
+        {voiceError ? (
+          <p className="flex items-center justify-center gap-1.5 text-xs text-amber-500/90 mt-2 text-center">
+            <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+            {voiceError}
+          </p>
+        ) : (
+          <p className="text-xs text-slate-600 mt-2 text-center">
+            {handsFree ? (
+              <>Answer out loud &mdash; we&apos;ll send it when you pause &middot; or type and press{' '}
+                <kbd className="px-1 py-0.5 bg-slate-800 rounded text-slate-500 font-mono">Enter</kbd>
+              </>
+            ) : (
+              <>
+                Press <kbd className="px-1 py-0.5 bg-slate-800 rounded text-slate-500 font-mono">Enter</kbd> to send &middot;{' '}
+                <kbd className="px-1 py-0.5 bg-slate-800 rounded text-slate-500 font-mono">Shift+Enter</kbd> for new line
+              </>
+            )}
+          </p>
+        )}
       </div>
     </div>
   );

@@ -30,10 +30,14 @@ export const DEFAULT_MODEL_SOURCE: 'local' | 'api' = IS_CLOUD ? 'api' : 'local';
 /** Where users get a free Gemini key. */
 export const GEMINI_KEY_URL = 'https://aistudio.google.com/apikey';
 
+export type SttEngine = 'groq' | 'local';
+
 export interface DeploymentConfig {
   deployment: Deployment;
   localEngine: boolean;
   geminiKeyConfigured: boolean;
+  /** Speech-to-text engines this server can actually run. */
+  sttEngines: Record<SttEngine, boolean>;
 }
 
 /** Ask the backend what it can do. Falls back to the build-time guess. */
@@ -42,6 +46,9 @@ export async function fetchDeploymentConfig(): Promise<DeploymentConfig> {
     deployment: BUILD_TIME_DEPLOYMENT,
     localEngine: BUILD_TIME_DEPLOYMENT === 'local',
     geminiKeyConfigured: false,
+    // Assume both until told otherwise — an older backend has no stt_engines
+    // field, and hiding a working engine is worse than offering a broken one.
+    sttEngines: { groq: true, local: true },
   };
   try {
     const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
@@ -52,6 +59,12 @@ export async function fetchDeploymentConfig(): Promise<DeploymentConfig> {
       deployment: data.deployment === 'cloud' ? 'cloud' : 'local',
       localEngine: Boolean(data.local_engine),
       geminiKeyConfigured: Boolean(data.gemini_key_configured),
+      sttEngines: data.stt_engines
+        ? {
+            groq: Boolean(data.stt_engines.groq),
+            local: Boolean(data.stt_engines.local),
+          }
+        : fallback.sttEngines,
     };
   } catch {
     // Backend not up yet (the desktop app polls while it boots) — the guess is

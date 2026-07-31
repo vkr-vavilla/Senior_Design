@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Merged into the generated bundle Info.plist by the Tauri CLI.
+
+  NSMicrophoneUsageDescription is not optional on macOS: TCC kills any process
+  that reaches for the microphone without one, so leaving it out turns the
+  first spoken answer into a crash rather than a permission prompt. wry already
+  grants WebKit's own capture permission, which makes this the only thing
+  standing between the packaged Mac app and a working voice interview.
+
+  Keep the wording specific — this exact string is what the user reads in the
+  system dialog, and a vague one gets denied.
+-->
+<plist version="1.0">
+<dict>
+  <key>NSMicrophoneUsageDescription</key>
+  <string>FinalRound uses your microphone so you can answer interview questions out loud. Audio is transcribed on your own machine and never leaves it.</string>
+</dict>
+</plist>

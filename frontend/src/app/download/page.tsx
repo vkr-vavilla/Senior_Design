@@ -23,7 +23,7 @@ import { useEffect, useState } from 'react';
 // these links don't need touching when the version bumps — only ASSETS does,
 // since Tauri stamps the version into each filename.
 const REPO = 'https://github.com/vkr-vavilla/Senior_Design';
-const VERSION = '0.1.1';
+const VERSION = '0.1.2';
 const DL = `${REPO}/releases/latest/download`;
 
 type OSKey = 'mac' | 'windows' | 'linux';
